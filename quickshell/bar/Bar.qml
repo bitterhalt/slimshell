@@ -23,6 +23,7 @@ PanelWindow {
     required property var notificationService
     required property var weatherService
     required property var batteryService
+    required property var idleService
 
     screen: targetScreen
     implicitHeight: config.barHeight
@@ -127,6 +128,7 @@ PanelWindow {
         Idle {
             config: barWindow.config
             barWindow: barWindow
+            idleService: barWindow.idleService
         }
 
         Battery {

@@ -83,6 +83,7 @@ The goal is to keep the shell small, understandable, and easy to extend: shared 
 │   └── RegionSelector.qml
 ├── services
 │   ├── BatteryService.qml
+│   ├── IdleService.qml
 │   ├── NiriService.qml
 │   ├── NotificationService.qml
 │   ├── ThemeService.qml

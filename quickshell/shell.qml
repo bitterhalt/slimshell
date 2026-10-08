@@ -54,6 +54,10 @@ ShellRoot {
     id: appBatteryService
   }
 
+  IdleService {
+    id: appIdleService
+  }
+
   PwObjectTracker {
     objects: [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource]
   }
@@ -101,6 +105,7 @@ ShellRoot {
       notificationService: appNotificationService
       weatherService: appWeatherService
       batteryService: appBatteryService
+      idleService: appIdleService
 
       visible: root.barVisible
     }
