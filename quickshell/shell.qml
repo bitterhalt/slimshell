@@ -11,6 +11,8 @@ import "recorder"
 import "osd"
 import "bar"
 import "menu"
+import "modules/bluetooth"
+import "modules/notifications"
 
 ShellRoot {
   id: root
@@ -44,6 +46,45 @@ ShellRoot {
 
   NotificationService {
     id: appNotificationService
+  }
+
+  NotificationPopup {
+    id: appNotificationPopup
+    config: appConfig
+    targetScreen: Quickshell.screens.length > 0
+      ? Quickshell.screens[0]
+      : null
+    notificationService: appNotificationService
+  }
+
+  Connections {
+    target: appNotificationService
+
+    function onToastSerialChanged(): void {
+      if (!appNotificationService.dnd
+          && appNotificationService.toastNotification) {
+        appNotificationPopup.show(
+          appNotificationService.toastNotification
+        )
+      }
+    }
+
+    function onDndChanged(): void {
+      if (appNotificationService.dnd)
+        appNotificationPopup.hide()
+    }
+  }
+
+  BluetoothService {
+    id: appBluetoothService
+  }
+
+  BluetoothNotifier {
+    config: appConfig
+    targetScreen: Quickshell.screens.length > 0
+      ? Quickshell.screens[0]
+      : null
+    devices: appBluetoothService.devices
   }
 
   WeatherService {
@@ -107,6 +148,8 @@ ShellRoot {
       niri: niriService
       volumeOsd: appVolumeOsd
       notificationService: appNotificationService
+      notificationPopup: appNotificationPopup
+      bluetoothService: appBluetoothService
       weatherService: appWeatherService
       batteryService: appBatteryService
       idleService: appIdleService

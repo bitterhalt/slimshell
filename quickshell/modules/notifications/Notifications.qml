@@ -9,6 +9,7 @@ Item {
     required property var barWindow
     required property var popupManager
     required property var notificationService
+    required property var notificationPopup
 
     readonly property bool active:
         notificationService.dnd
@@ -63,30 +64,11 @@ Item {
         }
     }
 
-    NotificationPopup {
-        id: notificationPopup
-
-        config: root.config
-        barWindow: root.barWindow
-        notificationService: root.notificationService
-    }
-
     Connections {
         target: notificationService
 
         function onToastSerialChanged(): void {
-            if (!notificationService.dnd
-                    && notificationService.toastNotification) {
-                popupManager.closeHost("notificationCenter")
-                notificationPopup.show(
-                    notificationService.toastNotification
-                )
-            }
-        }
-
-        function onDndChanged(): void {
-            if (notificationService.dnd)
-                notificationPopup.hide()
+            popupManager.closeHost("notificationCenter")
         }
     }
 

@@ -21,6 +21,8 @@ PanelWindow {
     required property var niri
     required property var volumeOsd
     required property var notificationService
+    required property var notificationPopup
+    required property var bluetoothService
     required property var weatherService
     required property var batteryService
     required property var idleService
@@ -88,6 +90,7 @@ PanelWindow {
             barWindow: barWindow
             popupManager: popupManager
             notificationService: barWindow.notificationService
+            notificationPopup: barWindow.notificationPopup
         }
 
         Recorder {
@@ -118,6 +121,7 @@ PanelWindow {
             config: barWindow.config
             barWindow: barWindow
             popupManager: popupManager
+            bluetoothService: barWindow.bluetoothService
         }
 
         Audio {
