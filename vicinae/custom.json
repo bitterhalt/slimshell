@@ -1,0 +1,12 @@
+{
+  "launcher_window": {
+    "size": {
+      "width": 570,
+      "height": 480
+    },
+
+    "layer_shell": {
+      "layer": "overlay"
+    }
+  }
+}

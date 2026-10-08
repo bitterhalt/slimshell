@@ -1,0 +1,167 @@
+return {
+
+  -- Tfm (file manager)
+  {
+    "rolv-apneseth/tfm.nvim",
+    cmd = "Tfm",
+    opts = {
+      file_manager = "lf",
+      replace_netrw = true,
+      enable_cmds = true,
+      ui = {
+        border = "single",
+        height = 1,
+        width = 1,
+        x = 0.5,
+        y = 0.5,
+      },
+    },
+    keys = {
+      {
+        "<leader>e",
+        "<Cmd>Tfm<CR>",
+        desc = "Open file manager",
+      },
+    },
+  },
+
+  -- Which-key
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    init = function()
+      vim.o.timeout = true
+      vim.o.timeoutlen = 300
+    end,
+    opts = {
+      icons = {
+        breadcrumb = ">",
+        separator = ">",
+        group = "+",
+      },
+    },
+  },
+
+  -- Noice
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "rcarriga/nvim-notify",
+    },
+    config = function()
+      require("noice").setup({
+        routes = {
+          {
+            filter = {
+              event = "msg_show",
+              find = "written",
+            },
+            opts = { skip = true },
+          },
+        },
+      })
+    end,
+  },
+
+  -- FzfLua
+  {
+    "ibhagwan/fzf-lua",
+    cmd = "FzfLua",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function()
+      require("fzf-lua").setup({
+        winopts = {
+          fullscreen = false,
+        },
+      })
+    end,
+    keys = {
+      { "<leader>ff", "<Cmd>FzfLua files<CR>", desc = "Search files" },
+      { "<leader><tab>", "<Cmd>FzfLua buffers<CR>", desc = "Search buffers" },
+      { "<leader>fw", "<Cmd>FzfLua live_grep<CR>", desc = "Search for a pattern" },
+      { "<leader>fr", "<Cmd>FzfLua oldfiles<CR>", desc = "Search recent files" },
+      { "<leader>fz", "<Cmd>FzfLua zoxide<CR>", desc = "List recent directories" },
+    },
+  },
+
+  -- Persistence
+  {
+    "folke/persistence.nvim",
+    event = "BufReadPre",
+    config = true,
+    keys = {
+      {
+        "<leader>ss",
+        function()
+          require("persistence").load()
+        end,
+        desc = "Restore last session",
+      },
+      {
+        "<leader>sl",
+        function()
+          local persistence = require("persistence")
+          local fzf = require("fzf-lua")
+          local sessions = persistence.list()
+
+          if #sessions == 0 then
+            vim.notify("No sessions found", vim.log.levels.WARN)
+            return
+          end
+
+          fzf.fzf_exec(sessions, {
+            actions = {
+              ["default"] = function(selected)
+                if selected and selected[1] then
+                  persistence.load({ last = false, file = selected[1] })
+                end
+              end,
+            },
+          })
+        end,
+        desc = "Select session (fzf-lua)",
+      },
+    },
+  },
+
+  -- Trouble
+  {
+    "folke/trouble.nvim",
+    opts = {},
+    cmd = "Trouble",
+    keys = {
+      {
+        "<leader>fd",
+        "<cmd>Trouble diagnostics toggle<cr>",
+        desc = "Diagnostics (Trouble)",
+      },
+      {
+        "<leader>fX",
+        "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
+        desc = "Buffer Diagnostics (Trouble)",
+      },
+      {
+        "<leader>cs",
+        "<cmd>Trouble symbols toggle focus=false<cr>",
+        desc = "Symbols (Trouble)",
+      },
+      {
+        "<leader>cl",
+        "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
+        desc = "LSP Definitions / references / ... (Trouble)",
+      },
+      {
+        "<leader>xL",
+        "<cmd>Trouble loclist toggle<cr>",
+        desc = "Location List (Trouble)",
+      },
+      {
+        "<leader>xQ",
+        "<cmd>Trouble qflist toggle<cr>",
+        desc = "Quickfix List (Trouble)",
+      },
+    },
+  },
+}
