@@ -86,6 +86,7 @@ The goal is to keep the shell small, understandable, and easy to extend: shared 
 │   ├── IdleService.qml
 │   ├── NiriService.qml
 │   ├── NotificationService.qml
+│   ├── RecorderService.qml
 │   ├── ThemeService.qml
 │   └── WeatherService.qml
 └── shell.qml
@@ -272,9 +273,7 @@ Variants {
 
 This means connecting another display should create another bar automatically.
 
-Most modules are naturally screen-local. Some features currently combine global state and per-screen UI, particularly the recorder and power-menu IPC handlers. If full multi-monitor support is needed later, these should be split so shared state and IPC live at `ShellRoot` level while each bar retains only its per-screen UI.
-
-This is intentionally left simple for the current single-monitor setup rather than adding unused complexity ahead of time.
+Machine-wide weather, battery, idle, notification, and recorder state is owned by services under `ShellRoot` and passed into each bar. Recorder IPC opens its per-screen UI on the first screen, while clicking a bar uses that bar's screen. Power-menu IPC and per-screen notification/Bluetooth toasts still need explicit screen routing for complete multi-monitor behavior.
 
 ## Installation
 

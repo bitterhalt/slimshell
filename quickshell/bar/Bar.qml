@@ -24,6 +24,7 @@ PanelWindow {
     required property var weatherService
     required property var batteryService
     required property var idleService
+    required property var recorderService
 
     screen: targetScreen
     implicitHeight: config.barHeight
@@ -92,6 +93,7 @@ PanelWindow {
         Recorder {
             config: barWindow.config
             barWindow: barWindow
+            recorderService: barWindow.recorderService
         }
 
     }
