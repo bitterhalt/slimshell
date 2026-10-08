@@ -8,23 +8,24 @@ Item {
     visible: false
 
     property bool disabled: false
+    property var targetScreen: null
 
-    signal notificationRequested(string message)
+    signal notificationRequested(string message, var screen)
 
     function refresh(): void {
         if (!statusCheck.running)
             statusCheck.running = true
     }
 
-    function toggle(): void {
+    function toggle(screen): void {
         if (disabled) {
             Quickshell.execDetached(["swayidle"])
             disabled = false
-            notificationRequested("Enabled")
+            notificationRequested("Enabled", screen || targetScreen)
         } else {
             Quickshell.execDetached(["pkill", "-x", "swayidle"])
             disabled = true
-            notificationRequested("Disabled")
+            notificationRequested("Disabled", screen || targetScreen)
         }
     }
 
@@ -43,7 +44,7 @@ Item {
         target: "idle"
 
         function toggle(): void {
-            root.toggle()
+            root.toggle(root.targetScreen)
         }
 
         function refresh(): void {

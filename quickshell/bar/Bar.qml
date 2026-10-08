@@ -27,6 +27,7 @@ PanelWindow {
     required property var batteryService
     required property var idleService
     required property var recorderService
+    required property var uiService
 
     screen: targetScreen
     implicitHeight: config.barHeight
@@ -83,6 +84,7 @@ PanelWindow {
             barWindow: barWindow
             popupManager: popupManager
             weatherData: barWindow.weatherService
+            uiService: barWindow.uiService
         }
 
         Notifications {
@@ -91,6 +93,7 @@ PanelWindow {
             popupManager: popupManager
             notificationService: barWindow.notificationService
             notificationPopup: barWindow.notificationPopup
+            uiService: barWindow.uiService
         }
 
         Recorder {
@@ -147,6 +150,7 @@ PanelWindow {
             config: barWindow.config
             barWindow: barWindow
             popupManager: popupManager
+            uiService: barWindow.uiService
         }
 
     }

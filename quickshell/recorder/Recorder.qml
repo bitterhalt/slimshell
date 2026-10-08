@@ -13,8 +13,7 @@ Item {
 
     readonly property bool runningNow: recorderService.runningNow
     readonly property bool ipcOwner:
-        Quickshell.screens.length > 0
-        && barWindow.screen === Quickshell.screens[0]
+        barWindow.screen === recorderService.targetScreen
 
     property int selectedIndex: 0
     readonly property int actionCount: runningNow ? 3 : 2
@@ -325,15 +324,20 @@ Item {
         target: recorderService
 
         function onMenuActionRequested(action): void {
-            if (!root.ipcOwner)
+            if (action === "close") {
+                root.closeMenu()
                 return
+            }
+
+            if (!root.ipcOwner) {
+                root.closeMenu()
+                return
+            }
 
             if (action === "toggle")
                 root.toggleMenu()
             else if (action === "open")
                 root.openMenu()
-            else if (action === "close")
-                root.closeMenu()
         }
 
         function onRegionSelectionRequested(): void {

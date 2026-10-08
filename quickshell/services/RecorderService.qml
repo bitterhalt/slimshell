@@ -10,6 +10,7 @@ Item {
     property string outputFile: ""
     property string pendingTarget: ""
     property bool pendingAudio: false
+    property var targetScreen: null
 
     readonly property bool runningNow: recorderProcess.running
     readonly property bool busy: runningNow || prepareDirectory.running

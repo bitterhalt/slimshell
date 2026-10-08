@@ -18,6 +18,19 @@ ShellRoot {
   id: root
 
   property bool barVisible: true
+  readonly property var activeScreen: {
+    const screens = Quickshell.screens
+
+    if (!screens || screens.length === 0)
+      return null
+
+    for (let i = 0; i < screens.length; ++i) {
+      if (screens[i].name === niriService.focusedOutput)
+        return screens[i]
+    }
+
+    return screens[0]
+  }
 
   ThemeService {
     id: themeService
@@ -36,12 +49,14 @@ ShellRoot {
   ThemeMenu {
     id: themeMenu
     config: appConfig
+    targetScreen: root.activeScreen
   }
 
   Menu {
     id: mainMenu
     config: appConfig
     themeMenu: themeMenu
+    targetScreen: root.activeScreen
   }
 
   NotificationService {
@@ -51,9 +66,7 @@ ShellRoot {
   NotificationPopup {
     id: appNotificationPopup
     config: appConfig
-    targetScreen: Quickshell.screens.length > 0
-      ? Quickshell.screens[0]
-      : null
+    targetScreen: root.activeScreen
     notificationService: appNotificationService
   }
 
@@ -81,9 +94,7 @@ ShellRoot {
 
   BluetoothNotifier {
     config: appConfig
-    targetScreen: Quickshell.screens.length > 0
-      ? Quickshell.screens[0]
-      : null
+    targetScreen: root.activeScreen
     devices: appBluetoothService.devices
   }
 
@@ -97,10 +108,17 @@ ShellRoot {
 
   IdleService {
     id: appIdleService
+    targetScreen: root.activeScreen
   }
 
   RecorderService {
     id: appRecorderService
+    targetScreen: root.activeScreen
+  }
+
+  ShellUiService {
+    id: shellUiService
+    targetScreen: root.activeScreen
   }
 
   PwObjectTracker {
@@ -110,6 +128,7 @@ ShellRoot {
   VolumeOsd {
     id: appVolumeOsd
     config: appConfig
+    targetScreen: root.activeScreen
   }
 
   // Niri/keybind control:
@@ -154,6 +173,7 @@ ShellRoot {
       batteryService: appBatteryService
       idleService: appIdleService
       recorderService: appRecorderService
+      uiService: shellUiService
 
       visible: root.barVisible
     }

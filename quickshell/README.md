@@ -88,6 +88,7 @@ The goal is to keep the shell small, understandable, and easy to extend: shared 
 │   ├── NiriService.qml
 │   ├── NotificationService.qml
 │   ├── RecorderService.qml
+│   ├── ShellUiService.qml
 │   ├── ThemeService.qml
 │   └── WeatherService.qml
 └── shell.qml
@@ -274,7 +275,7 @@ Variants {
 
 This means connecting another display should create another bar automatically.
 
-Machine-wide weather, battery, idle, Bluetooth, notification, and recorder state is owned by services under `ShellRoot` and passed into each bar. Global notification and Bluetooth toasts appear on the first screen; recorder IPC also opens its per-screen UI there, while clicking a bar uses that bar's screen. Power-menu and notification-center IPC still need active-screen routing for complete multi-monitor behavior.
+Machine-wide weather, battery, idle, Bluetooth, notification, and recorder state is owned by services under `ShellRoot` and passed into each bar. Niri's focused output selects the screen for global toasts and keyboard-driven IPC menus; direct clicks continue to use the clicked bar's screen.
 
 ## Installation
 

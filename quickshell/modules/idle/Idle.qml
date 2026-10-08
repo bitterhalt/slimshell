@@ -22,7 +22,7 @@ Item {
     MouseArea {
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
-        onClicked: idleService.toggle()
+        onClicked: idleService.toggle(barWindow.screen)
     }
 
     IdleNotifier {
@@ -34,8 +34,9 @@ Item {
     Connections {
         target: idleService
 
-        function onNotificationRequested(message): void {
-            idleNotifier.show(message)
+        function onNotificationRequested(message, screen): void {
+            if (barWindow.screen === screen)
+                idleNotifier.show(message)
         }
     }
 }

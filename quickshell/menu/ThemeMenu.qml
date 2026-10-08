@@ -9,6 +9,7 @@ Item {
     id: root
 
     required property var config
+    required property var targetScreen
 
     property var themes: []
     property var recentThemes: []
@@ -240,9 +241,7 @@ Item {
     PanelWindow {
         id: themeMenu
 
-        screen: Quickshell.screens.length > 0
-            ? Quickshell.screens[0]
-            : null
+        screen: root.targetScreen
 
         anchors {
             top: true
