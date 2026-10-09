@@ -28,6 +28,8 @@ mako
 matugen
 me.proton.authenticator
 menus
+!quickshell/menus/
+!quickshell/menus/**
 mirador
 mozilla
 nautilus
