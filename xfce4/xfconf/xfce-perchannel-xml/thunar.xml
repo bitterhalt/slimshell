@@ -11,7 +11,7 @@
   <property name="misc-single-click" type="bool" value="false"/>
   <property name="last-menubar-visible" type="bool" value="false"/>
   <property name="last-details-view-zoom-level" type="string" value="THUNAR_ZOOM_LEVEL_25_PERCENT"/>
-  <property name="last-details-view-column-widths" type="string" value="107,119,112,106,91,80,67,50,570,69,50,78,50,184"/>
+  <property name="last-details-view-column-widths" type="string" value="107,119,112,106,91,80,67,50,581,69,50,67,50,184"/>
   <property name="last-renamer-dialog-maximized" type="bool" value="false"/>
   <property name="misc-volume-management" type="bool" value="false"/>
   <property name="last-side-pane" type="string" value="THUNAR_SIDEPANE_TYPE_SHORTCUTS"/>
