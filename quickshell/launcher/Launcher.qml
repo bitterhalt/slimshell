@@ -238,18 +238,6 @@ Item {
             ? visibleRows * rowHeight + 9 + footerHeight
             : 0)
 
-    readonly property string actionLabel: {
-        const item = results[selectedIndex]
-
-        switch (item ? item.type : "") {
-        case "application": return "Open application"
-        case "calculator": return "Copy result"
-        case "file": return "Open file"
-        case "binary": return "Run binary"
-        case "emoji": return "Copy emoji"
-        default: return ""
-        }
-    }
 
     function close(): void {
         finalizeClose()
@@ -828,13 +816,6 @@ Item {
                         text: root.actionLabel
                     }
 
-                    KeyCap {
-                        visible: root.actionLabel !== ""
-                        label: "↵"
-                        edgeColor: root.config.borderColor
-                        textColor: root.config.muted
-                        fontPointSize: root.config.fontSize(0.74)
-                    }
 
                     Rectangle {
                         visible: root.actionLabel !== ""
