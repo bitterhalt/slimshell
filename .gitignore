@@ -15,7 +15,7 @@ elio
 fastfetch
 foot
 fuzzel
-xfce4/*
+xfce4/xfconf/xfce-perchannel-xml/thunar.xml
 fzf
 galculator
 gamma-launcher
