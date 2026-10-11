@@ -13,6 +13,7 @@ import "bar"
 import "menus"
 import "bar/modules/bluetooth"
 import "notifications"
+import "launcher"
 
 ShellRoot {
   id: root
@@ -56,6 +57,11 @@ ShellRoot {
     id: mainMenu
     config: appConfig
     themeMenu: themeMenu
+    targetScreen: root.activeScreen
+  }
+
+  AppLauncher {
+    config: appConfig
     targetScreen: root.activeScreen
   }
 

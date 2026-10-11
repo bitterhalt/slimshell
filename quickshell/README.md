@@ -20,6 +20,7 @@ The goal is to keep the shell small, understandable, and easy to extend: shared 
 - System tray
 - Native power menu
 - Native screen recorder menu
+- Compact application launcher with calculator, file search, and dmenu mode
 - Pywal-aware theming with fallback colors
 - QuickShell IPC controls for selected shell features
 
@@ -28,6 +29,7 @@ The goal is to keep the shell small, understandable, and easy to extend: shared 
 ```text
 .
 ├── Config.qml
+├── Launcher.qml
 ├── bar
 │   ├── Bar.qml
 │   └── modules
@@ -46,6 +48,12 @@ The goal is to keep the shell small, understandable, and easy to extend: shared 
 │   ├── PopupManager.qml
 │   ├── SectionHeader.qml
 │   └── ToggleSwitch.qml
+├── launcher
+│   ├── AppLauncher.qml
+│   ├── Scorer.js
+│   ├── dmenu.sh
+│   ├── launcher.sh
+│   └── open-file.sh
 ├── menus
 │   ├── MainMenu.qml
 │   └── ThemeMenu.qml
@@ -82,6 +90,8 @@ The goal is to keep the shell small, understandable, and easy to extend: shared 
 `Bar.qml` is primarily responsible for arranging modules under `bar/modules/`. Cross-shell notification and weather UI use top-level feature directories instead of being owned by one bar.
 
 `Config.qml` contains global shell configuration such as bar geometry, typography, popup styling, clock formats, and shared colors.
+
+The launcher runs inside the main shell and is controlled through `launcher` and `dmenu` IPC targets. `Launcher.qml` remains available as a standalone development entrypoint.
 
 ## Configuration
 
