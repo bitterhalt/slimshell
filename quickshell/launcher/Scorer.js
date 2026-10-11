@@ -128,3 +128,19 @@ function scoreText(text, query) {
 
     return fuzzyScore(value, query) * 100
 }
+
+// Emoji names are short and numerous; fuzzy matching creates unrelated hits.
+function scoreEmoji(name, query) {
+    const value = String(name || "").toLowerCase()
+
+    if (value === query)
+        return 10000
+    if (value.startsWith(query))
+        return 5000
+    if (wordBoundaryMatch(value, query))
+        return 3000
+    if (value.includes(query))
+        return 500
+
+    return 0
+}

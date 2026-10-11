@@ -37,7 +37,7 @@ Item {
         { label: "Wi-Fi", icon: "󰖩", command: "foot -a impala -e impala" },
         { label: "Network Manager", icon: "󰲝", command: "foot -e nmtui" },
         { label: "Update System", icon: "󰑐", command: "foot -a pop-upgrade -e sysup" },
-        { label: "Monitor", icon: "󰨇", page: "monitor" }
+        { label: "Monitor", icon: "󰨇", page: "monitor" },
     ]
 
     readonly property var monitorItems: [
@@ -46,6 +46,13 @@ Item {
         { label: "Nethogs [Network Monitor]", icon: "󰛳", command: "foot -a nethogs -e nethogs" },
         { label: "Logs", icon: "󰌱", command: "foot -a foot -T journalctl -e journalctl -f" },
         { label: "Combined", icon: "󰕮", command: "foot -a Sysmon -T Sysmon -e ~/.local/bin/tmux-sysmon.sh" }
+    ]
+
+    readonly property var notesItems: [
+        { label: "Search", icon: "󰍉", command: "foot -e ~/.local/bin/menu_notes" },
+        { label: "New Note", icon: "󰎚", command: "foot -e ~/.local/bin/menu_notes -c" },
+        { label: "TODO", icon: "", command: "foot -a noteterm -T Notes sh -c 'cd ~/Documents/personal/notes/ && nvim todo.md'" },
+        { label: "Delete", icon: "󰩹", command: "foot -e ~/.local/bin/menu_notes -d" }
     ]
 
     readonly property var themingItems: [
@@ -64,6 +71,8 @@ Item {
             return systemItems
         case "monitor":
             return monitorItems
+        case "notes":
+            return notesItems
         case "theming":
             return themingItems
         default:
@@ -81,6 +90,8 @@ Item {
             return "Settings"
         case "monitor":
             return "Monitor"
+        case "notes":
+            return "Notes"
         case "theming":
             return "Theming"
         default:
@@ -395,7 +406,9 @@ Item {
         function theming(): void {
             root.openPage("theming")
         }
-
+        function notes(): void {
+            root.openPage("notes")
+        }
         function close(): void {
             root.closeMenu()
         }

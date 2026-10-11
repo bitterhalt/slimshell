@@ -20,7 +20,7 @@ The goal is to keep the shell small, understandable, and easy to extend: shared 
 - System tray
 - Native power menu
 - Native screen recorder menu
-- Compact application launcher with calculator, file search, and dmenu mode
+- Compact application launcher with calculator, file search, run, and emoji modes
 - Pywal-aware theming with fallback colors
 - QuickShell IPC controls for selected shell features
 
@@ -29,7 +29,6 @@ The goal is to keep the shell small, understandable, and easy to extend: shared 
 ```text
 .
 ├── Config.qml
-├── Launcher.qml
 ├── bar
 │   ├── Bar.qml
 │   └── modules
@@ -42,6 +41,8 @@ The goal is to keep the shell small, understandable, and easy to extend: shared 
 │       ├── tray
 │       ├── window
 │       └── workspaces
+├── clipboard
+│   └── Clipboard.qml
 ├── components
 │   ├── PanelSeparator.qml
 │   ├── PopoutPanel.qml
@@ -49,11 +50,8 @@ The goal is to keep the shell small, understandable, and easy to extend: shared 
 │   ├── SectionHeader.qml
 │   └── ToggleSwitch.qml
 ├── launcher
-│   ├── AppLauncher.qml
-│   ├── Scorer.js
-│   ├── dmenu.sh
-│   ├── launcher.sh
-│   └── open-file.sh
+│   ├── Launcher.qml
+│   └── Scorer.js
 ├── menus
 │   ├── MainMenu.qml
 │   └── ThemeMenu.qml
@@ -89,9 +87,11 @@ The goal is to keep the shell small, understandable, and easy to extend: shared 
 
 `Bar.qml` is primarily responsible for arranging modules under `bar/modules/`. Cross-shell notification and weather UI use top-level feature directories instead of being owned by one bar.
 
+`Clipboard.qml` is a standalone shell panel controlled by the `clipboard` IPC target. It reads and decodes local `cliphist` entries and never sends clipboard contents to external services.
+
 `Config.qml` contains global shell configuration such as bar geometry, typography, popup styling, clock formats, and shared colors.
 
-The launcher runs inside the main shell and is controlled through `launcher` and `dmenu` IPC targets. `Launcher.qml` remains available as a standalone development entrypoint.
+`launcher/Launcher.qml` contains the launcher UI and state; `Scorer.js` holds the matching logic. The centered panel is hosted by the main shell and controlled through `qs ipc call launcher toggle`.
 
 ## Configuration
 

@@ -16,14 +16,18 @@ Item {
 
     property bool opened: false
     property bool quitOnClose: false
+    property bool forceExpanded: false
 
     // Modes, switched with Ctrl+<key>.
     readonly property var modes: [
         { id: "apps", label: "Apps", name: "Applications", key: "A" },
-        { id: "run", label: "Run", name: "Run binary", key: "B" }
+        { id: "run", label: "Run", name: "Run binary", key: "B" },
+        { id: "emoji", label: "Emoji", name: "Emoji", key: "E" }
     ]
     property string mode: "apps"
     readonly property bool runMode: mode === "run"
+    readonly property bool emojiMode: mode === "emoji"
+    property var emojiEntries: []
 
     // Run-mode data
     property var binaries: []
@@ -40,6 +44,7 @@ Item {
 
     readonly property string placeholder: runMode
         ? "Search binaries"
+        : emojiMode ? "Search emoji"
         : fileMode ? "Search files" : "Search applications"
 
     property string query: ""
@@ -53,15 +58,23 @@ Item {
     readonly property int footerHeight: 38
     readonly property int capHeight: 20
     readonly property int contentWidth: 560
-    readonly property int topOffset: 120
+    readonly property int maximumCardHeight: inputHeight
+        + maxVisibleRows * rowHeight + 9 + footerHeight
+    readonly property int expandedTopMargin: Math.max(
+        config.popupGap,
+        Math.round(((targetScreen ? targetScreen.height : 0)
+            - maximumCardHeight) / 2)
+            + config.popupGap
+    )
     readonly property bool fileMode:
-        !runMode && query.trim().startsWith("/")
+        !runMode && !emojiMode && query.trim().startsWith("/")
     readonly property string fileNeedle:
         fileMode ? query.trim().slice(1).trim() : ""
 
     readonly property bool calculatorQuery: {
         const value = query.trim()
         return !runMode
+            && !emojiMode
             && !fileMode
             && /[0-9]/.test(value)
             && /[+\-*/%^]/.test(value)
@@ -138,15 +151,37 @@ Item {
                 || (a.text < b.text ? -1 : 1))
     }
 
+    readonly property var emojiResults: {
+        const value = query.trim().toLowerCase()
+
+        return emojiEntries
+            .map(entry => ({
+                type: "emoji",
+                text: entry.name,
+                emoji: entry.emoji,
+                subtitle: "",
+                icon: "",
+                score: value === ""
+                    ? 0
+                    : entry.emoji.includes(value)
+                        ? 10000
+                        : Scorer.scoreEmoji(entry.name, value)
+            }))
+            .filter(item => value === "" || item.score > 0)
+            .slice(0, 100)
+    }
+
     readonly property var results: {
         const value = query.trim().toLowerCase()
         let entries = []
 
         if (runMode) {
             entries = binaryResults
+        } else if (emojiMode) {
+            entries = emojiResults
         } else if (fileMode) {
             entries = fileResults
-        } else if (value !== "") {
+        } else if (value !== "" || forceExpanded) {
             entries = applications
                 .map(entry => ({
                     type: "application",
@@ -159,6 +194,19 @@ Item {
                 .filter(item => item.score > 0)
                 .sort((a, b) => b.score - a.score
                     || a.text.localeCompare(b.text))
+
+            if (value === "" && forceExpanded) {
+                entries = applications
+                    .map(entry => ({
+                        type: "application",
+                        entry: entry,
+                        text: entry.name || entry.id,
+                        subtitle: entry.genericName || entry.comment || "",
+                        icon: entry.icon || "",
+                        score: 0
+                    }))
+                    .sort((a, b) => a.text.localeCompare(b.text))
+            }
         }
 
         if (!runMode && calculatorResult !== "") {
@@ -175,7 +223,9 @@ Item {
 
     // Run mode lists recent binaries even before anything is typed.
     readonly property bool expanded:
-        query.trim() !== "" || (runMode && results.length > 0)
+        forceExpanded
+        || query.trim() !== ""
+        || (runMode && results.length > 0)
     readonly property bool fileSearching:
         fileProcess.running || fileSearchDebounce.running
     readonly property int visibleRows:
@@ -196,6 +246,7 @@ Item {
         case "calculator": return "Copy result"
         case "file": return "Open file"
         case "binary": return "Run binary"
+        case "emoji": return "Copy emoji"
         default: return ""
         }
     }
@@ -214,6 +265,7 @@ Item {
 
     function reset(): void {
         mode = "apps"
+        forceExpanded = false
         query = ""
         calculatorResult = ""
         fileResults = []
@@ -237,6 +289,7 @@ Item {
             return
 
         mode = id
+        forceExpanded = id === "emoji"
         selectedIndex = 0
         calculatorResult = ""
         updateCalculator()
@@ -247,7 +300,23 @@ Item {
             historyFile.reload()
         }
 
+        if (emojiMode && emojiEntries.length === 0)
+            emojiFile.reload()
+
         searchInput.forceActiveFocus()
+    }
+
+    function navigateResults(direction): void {
+        if (!expanded) {
+            forceExpanded = true
+            selectedIndex = results.length > 0 ? 0 : -1
+            return
+        }
+
+        if (direction > 0)
+            selectNext()
+        else
+            selectPrevious()
     }
 
     function selectNext(): void {
@@ -293,6 +362,9 @@ Item {
         } else if (item.type === "binary") {
             recordRun(item.text)
             Quickshell.execDetached([item.text])
+            finalizeClose()
+        } else if (item.type === "emoji") {
+            Quickshell.execDetached(["wl-copy", item.emoji])
             finalizeClose()
         }
     }
@@ -416,28 +488,28 @@ Item {
     PanelWindow {
         id: launcherWindow
 
+
         screen: root.targetScreen
         visible: root.opened
         color: "transparent"
         exclusiveZone: 0
         focusable: true
+        WlrLayershell.namespace: "launcher"
+        WlrLayershell.layer: WlrLayer.Overlay
+        WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+        onVisibleChanged: {
+            if (visible)
+                Qt.callLater(() => {
+                return searchInput.forceActiveFocus();
+            });
+
+        }
 
         anchors {
             top: true
             bottom: true
             left: true
             right: true
-        }
-
-        WlrLayershell.namespace: "launcher"
-        WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.keyboardFocus: visible
-            ? WlrKeyboardFocus.Exclusive
-            : WlrKeyboardFocus.None
-
-        onVisibleChanged: {
-            if (visible)
-                Qt.callLater(() => searchInput.forceActiveFocus())
         }
 
         // Click outside the card to dismiss.
@@ -451,16 +523,23 @@ Item {
 
             width: root.contentWidth
             height: root.cardHeight
-
             anchors.top: parent.top
-            anchors.topMargin: root.topOffset
+            anchors.topMargin: root.expandedTopMargin
             anchors.horizontalCenter: parent.horizontalCenter
-
             color: root.config.surface
             border.color: root.config.borderColor
             border.width: 1
             radius: root.config.popupRadius
             clip: true
+
+            Behavior on height {
+                enabled: root.opened
+
+                NumberAnimation {
+                    duration: 180
+                    easing.type: Easing.OutCubic
+                }
+            }
 
             TextInput {
                 id: searchInput
@@ -471,7 +550,6 @@ Item {
                 height: root.inputHeight
                 leftPadding: 18
                 rightPadding: 18
-
                 focus: true
                 verticalAlignment: TextInput.AlignVCenter
                 color: root.config.fg
@@ -479,70 +557,80 @@ Item {
                 selectedTextColor: root.config.bg
                 font.pointSize: root.config.fontSize(1.08)
                 clip: true
-
                 onTextChanged: {
-                    root.query = text
-                    root.selectedIndex = 0
-                    root.updateCalculator()
-                    root.updateFileSearch()
+                    root.query = text;
+                    root.selectedIndex = 0;
+                    root.updateCalculator();
+                    root.updateFileSearch();
                 }
-
-                Keys.onPressed: event => {
-                    const control = event.modifiers & Qt.ControlModifier
-
+                Keys.onPressed: (event) => {
+                    const control = event.modifiers & Qt.ControlModifier;
                     switch (event.key) {
                     case Qt.Key_Down:
-                        root.selectNext()
-                        event.accepted = true
-                        break
+                        root.navigateResults(1);
+                        event.accepted = true;
+                        break;
                     case Qt.Key_Up:
-                        root.selectPrevious()
-                        event.accepted = true
-                        break
+                        root.navigateResults(-1);
+                        event.accepted = true;
+                        break;
+                    case Qt.Key_Tab:
+                        root.navigateResults(1);
+                        event.accepted = true;
+                        break;
+                    case Qt.Key_Backtab:
+                        root.navigateResults(-1);
+                        event.accepted = true;
+                        break;
                     case Qt.Key_J:
                         if (control) {
-                            root.selectNext()
-                            event.accepted = true
+                            root.selectNext();
+                            event.accepted = true;
                         }
-                        break
+                        break;
                     case Qt.Key_K:
                         if (control) {
-                            root.selectPrevious()
-                            event.accepted = true
+                            root.selectPrevious();
+                            event.accepted = true;
                         }
-                        break
+                        break;
                     case Qt.Key_A:
                         if (control) {
-                            root.setMode("apps")
-                            event.accepted = true
+                            root.setMode("apps");
+                            event.accepted = true;
                         }
-                        break
+                        break;
                     case Qt.Key_B:
                         if (control) {
-                            root.setMode("run")
-                            event.accepted = true
+                            root.setMode("run");
+                            event.accepted = true;
                         }
-                        break
+                        break;
+                    case Qt.Key_E:
+                        if (control) {
+                            root.setMode("emoji");
+                            event.accepted = true;
+                        }
+                        break;
                     case Qt.Key_PageDown:
-                        root.selectPage(1)
-                        event.accepted = true
-                        break
+                        root.selectPage(1);
+                        event.accepted = true;
+                        break;
                     case Qt.Key_PageUp:
-                        root.selectPage(-1)
-                        event.accepted = true
-                        break
+                        root.selectPage(-1);
+                        event.accepted = true;
+                        break;
                     case Qt.Key_Return:
                     case Qt.Key_Enter:
-                        root.activateSelected()
-                        event.accepted = true
-                        break
+                        root.activateSelected();
+                        event.accepted = true;
+                        break;
                     case Qt.Key_Escape:
-                        root.close()
-                        event.accepted = true
-                        break
+                        root.close();
+                        event.accepted = true;
+                        break;
                     }
                 }
-
                 Component.onCompleted: forceActiveFocus()
             }
 
@@ -551,7 +639,6 @@ Item {
                 anchors.leftMargin: 18
                 anchors.verticalCenter: searchInput.verticalCenter
                 visible: searchInput.text.length === 0
-
                 color: root.config.muted
                 font.pointSize: root.config.fontSize(1.08)
                 text: root.placeholder
@@ -576,7 +663,6 @@ Item {
                 anchors.right: parent.right
                 anchors.leftMargin: 4
                 anchors.rightMargin: 4
-
                 visible: root.expanded
                 clip: true
                 interactive: contentHeight > height
@@ -595,10 +681,7 @@ Item {
                     Rectangle {
                         anchors.fill: parent
                         radius: 4
-                        color: resultRow.index === root.selectedIndex
-                            || rowMouse.containsMouse
-                            ? root.config.borderColor
-                            : "transparent"
+                        color: resultRow.index === root.selectedIndex || rowMouse.containsMouse ? root.config.borderColor : "transparent"
                     }
 
                     IconImage {
@@ -609,26 +692,18 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         implicitSize: 26
                         visible: source.toString() !== ""
-                        source: modelData.icon
-                            ? Quickshell.iconPath(modelData.icon, true)
-                            : ""
+                        source: modelData.icon ? Quickshell.iconPath(modelData.icon, true) : ""
                     }
 
                     Text {
                         anchors.left: parent.left
                         anchors.leftMargin: 12
                         anchors.verticalCenter: parent.verticalCenter
-                        visible: modelData.type === "calculator"
-                            || modelData.type === "file"
-                            || modelData.type === "binary"
-
+                        visible: modelData.type === "calculator" || modelData.type === "file" || modelData.type === "binary" || modelData.type === "emoji"
                         color: root.config.accent
-                        font.family: root.config.iconFontFamily
+                        font.family: modelData.type === "emoji" ? root.config.textFontFamily : root.config.iconFontFamily
                         font.pointSize: root.config.iconSize
-                        text: modelData.type === "file" ? "󰈔"
-                            : modelData.type === "binary"
-                                ? (modelData.recent ? root.iconStar : root.iconRun)
-                                : "󰃬"
+                        text: modelData.type === "emoji" ? modelData.emoji : modelData.type === "file" ? "󰈔" : modelData.type === "binary" ? (modelData.recent ? root.iconStar : root.iconRun) : "󰃬"
                     }
 
                     Column {
@@ -641,7 +716,6 @@ Item {
 
                         Text {
                             width: parent.width
-
                             color: root.config.fg
                             font.pointSize: root.config.fontSize(0.96)
                             font.weight: Font.Medium
@@ -652,12 +726,12 @@ Item {
                         Text {
                             width: parent.width
                             visible: (modelData.subtitle || "") !== ""
-
                             color: root.config.muted
                             font.pointSize: root.config.fontSize(0.74)
                             elide: Text.ElideRight
                             text: modelData.subtitle || ""
                         }
+
                     }
 
                     MouseArea {
@@ -669,7 +743,9 @@ Item {
                         onEntered: root.selectedIndex = resultRow.index
                         onClicked: root.activateSelected()
                     }
+
                 }
+
             }
 
             Text {
@@ -677,17 +753,16 @@ Item {
                 anchors.topMargin: 18
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: root.expanded && root.results.length === 0
-
                 color: root.config.muted
                 font.pointSize: root.config.fontSize(0.88)
-                text: root.runMode
-                    ? (binaryProcess.running
-                        ? "Loading binaries…" : "No binaries found")
-                    : root.fileMode && root.fileNeedle.length < 2
-                        ? "Type at least two characters after /"
-                        : root.fileMode && root.fileSearching ? "Searching…"
-                        : root.fileMode ? "No files found"
-                        : "No applications found"
+                    text: root.runMode
+                        ? (binaryProcess.running ? "Loading binaries…" : "No binaries found")
+                        : root.emojiMode ? "No emoji found"
+                        : root.fileMode && root.fileNeedle.length < 2
+                            ? "Type at least two characters after /"
+                            : root.fileMode && root.fileSearching ? "Searching…"
+                            : root.fileMode ? "No files found"
+                            : "No applications found"
             }
 
             // Footer: current mode on the left, action + mode hints on the right.
@@ -725,7 +800,7 @@ Item {
                         color: root.config.accent
                         font.family: root.config.iconFontFamily
                         font.pointSize: root.config.fontSize(0.9)
-                        text: root.runMode ? root.iconRun : root.iconApps
+                        text: root.emojiMode ? "😀" : root.runMode ? root.iconRun : root.iconApps
                     }
 
                     Text {
@@ -733,8 +808,9 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                         color: root.config.muted
                         font.pointSize: root.config.fontSize(0.8)
-                        text: root.runMode ? "Run binary" : "Applications"
+                        text: root.emojiMode ? "Emoji" : root.runMode ? "Run binary" : "Applications"
                     }
+
                 }
 
                 Row {
@@ -775,8 +851,7 @@ Item {
                             id: hint
 
                             required property var modelData
-                            readonly property bool active:
-                                root.mode === modelData.id
+                            readonly property bool active: root.mode === modelData.id
 
                             anchors.verticalCenter: parent.verticalCenter
                             width: hintRow.width
@@ -790,30 +865,25 @@ Item {
                                 Text {
                                     height: root.capHeight
                                     verticalAlignment: Text.AlignVCenter
-                                    color: hint.active
-                                        ? root.config.accent
-                                        : root.config.muted
+                                    color: hint.active ? root.config.accent : root.config.muted
                                     font.pointSize: root.config.fontSize(0.8)
                                     text: hint.modelData.label
                                 }
 
                                 KeyCap {
                                     label: "Ctrl"
-                                    edgeColor: hint.active
-                                        ? root.config.accent
-                                        : root.config.borderColor
+                                    edgeColor: hint.active ? root.config.accent : root.config.borderColor
                                     textColor: root.config.muted
                                     fontPointSize: root.config.fontSize(0.74)
                                 }
 
                                 KeyCap {
                                     label: hint.modelData.key
-                                    edgeColor: hint.active
-                                        ? root.config.accent
-                                        : root.config.borderColor
+                                    edgeColor: hint.active ? root.config.accent : root.config.borderColor
                                     textColor: root.config.muted
                                     fontPointSize: root.config.fontSize(0.74)
                                 }
+
                             }
 
                             MouseArea {
@@ -821,11 +891,17 @@ Item {
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: root.setMode(hint.modelData.id)
                             }
+
                         }
+
                     }
+
                 }
+
             }
+
         }
+
     }
 
     Timer {
@@ -993,6 +1069,36 @@ Item {
                 .split("\n")
                 .filter(line => line.length > 0)
         }
+    }
+
+    FileView {
+        id: emojiFile
+
+        path: (Quickshell.env("HOME") || "")
+            + "/.local/share/emoji/emoji.txt"
+        watchChanges: true
+        printErrors: false
+
+        onLoaded: {
+            root.emojiEntries = text()
+                .split("\n")
+                .map(line => {
+                    const value = line.trim()
+                    const separator = value.search(/\s/)
+
+                    if (separator < 1)
+                        return null
+
+                    return {
+                        emoji: value.slice(0, separator),
+                        name: value.slice(separator).trim()
+                    }
+                })
+                .filter(entry => entry !== null)
+            root.selectedIndex = 0
+        }
+
+        onLoadFailed: root.emojiEntries = []
     }
 
     IpcHandler {
