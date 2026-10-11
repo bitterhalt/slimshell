@@ -17,12 +17,30 @@ Item {
     property bool opened: false
     property bool quitOnClose: false
 
-    // Height animation is only enabled while the launcher is on screen, so
-    // resetting state on close/open never animates a stale, expanded card.
-    property bool animateHeight: false
+    // Modes, switched with Ctrl+<key>.
+    readonly property var modes: [
+        { id: "apps", label: "Apps", name: "Applications", key: "A" },
+        { id: "run", label: "Run", name: "Run binary", key: "B" }
+    ]
+    property string mode: "apps"
+    readonly property bool runMode: mode === "run"
 
-    readonly property string placeholder:
-        fileMode ? "Search files" : "Search applications"
+    // Run-mode data
+    property var binaries: []
+    property var history: []
+    readonly property string historyPath:
+        (Quickshell.env("HOME") || "") + "/.cache/fuzzel-runhistory"
+    readonly property int historyShown: 5
+    readonly property int historyKept: 50
+
+    // Nerd font glyphs
+    readonly property string iconApps: String.fromCodePoint(0xF003B)
+    readonly property string iconRun: String.fromCodePoint(0xF018D)
+    readonly property string iconStar: String.fromCodePoint(0xF04CE)
+
+    readonly property string placeholder: runMode
+        ? "Search binaries"
+        : fileMode ? "Search files" : "Search applications"
 
     property string query: ""
     property string calculatorResult: ""
@@ -32,14 +50,19 @@ Item {
     readonly property int maxVisibleRows: 7
     readonly property int rowHeight: 46
     readonly property int inputHeight: 50
+    readonly property int footerHeight: 38
+    readonly property int capHeight: 20
     readonly property int contentWidth: 560
-    readonly property bool fileMode: query.trim().startsWith("/")
+    readonly property int topOffset: 120
+    readonly property bool fileMode:
+        !runMode && query.trim().startsWith("/")
     readonly property string fileNeedle:
         fileMode ? query.trim().slice(1).trim() : ""
 
     readonly property bool calculatorQuery: {
         const value = query.trim()
-        return !fileMode
+        return !runMode
+            && !fileMode
             && /[0-9]/.test(value)
             && /[+\-*/%^]/.test(value)
             && /^[0-9\s+\-*/%^().,]+$/.test(value)
@@ -58,11 +81,70 @@ Item {
             })
     }
 
+    readonly property var binarySet: new Set(binaries)
+
+    // Most recent unique, still-existing binaries (newest first).
+    readonly property var recentBinaries: {
+        const seen = new Set()
+        const out = []
+
+        for (let i = history.length - 1;
+                i >= 0 && out.length < historyShown; --i) {
+            const name = history[i]
+
+            if (!name || seen.has(name))
+                continue
+
+            seen.add(name)
+
+            if (binarySet.size > 0 && !binarySet.has(name))
+                continue
+
+            out.push(name)
+        }
+
+        return out
+    }
+
+    readonly property var binaryResults: {
+        const value = query.trim().toLowerCase()
+        const recent = new Set(recentBinaries)
+
+        const toItem = (name, score) => ({
+            type: "binary",
+            text: name,
+            subtitle: recent.has(name) ? "Recently used" : "",
+            icon: "",
+            recent: recent.has(name),
+            score: score
+        })
+
+        if (value === "") {
+            const rest = binaries
+                .filter(name => !recent.has(name))
+                .slice(0, 100)
+                .map(name => toItem(name, 0))
+
+            return recentBinaries.map(name => toItem(name, 0)).concat(rest)
+        }
+
+        return binaries
+            .map(name => toItem(
+                name,
+                Scorer.scoreText(name, value) + (recent.has(name) ? 200 : 0)
+            ))
+            .filter(item => item.score > 0)
+            .sort((a, b) => b.score - a.score
+                || (a.text < b.text ? -1 : 1))
+    }
+
     readonly property var results: {
         const value = query.trim().toLowerCase()
         let entries = []
 
-        if (fileMode) {
+        if (runMode) {
+            entries = binaryResults
+        } else if (fileMode) {
             entries = fileResults
         } else if (value !== "") {
             entries = applications
@@ -79,7 +161,7 @@ Item {
                     || a.text.localeCompare(b.text))
         }
 
-        if (calculatorResult !== "") {
+        if (!runMode && calculatorResult !== "") {
             entries.unshift({
                 type: "calculator",
                 text: calculatorResult,
@@ -91,7 +173,9 @@ Item {
         return entries.slice(0, 100)
     }
 
-    readonly property bool expanded: query.trim() !== ""
+    // Run mode lists recent binaries even before anything is typed.
+    readonly property bool expanded:
+        query.trim() !== "" || (runMode && results.length > 0)
     readonly property bool fileSearching:
         fileProcess.running || fileSearchDebounce.running
     readonly property int visibleRows:
@@ -99,14 +183,28 @@ Item {
             ? Math.max(1, Math.min(maxVisibleRows, results.length))
             : 0
 
+    readonly property int cardHeight: inputHeight
+        + (expanded
+            ? visibleRows * rowHeight + 9 + footerHeight
+            : 0)
+
+    readonly property string actionLabel: {
+        const item = results[selectedIndex]
+
+        switch (item ? item.type : "") {
+        case "application": return "Open application"
+        case "calculator": return "Copy result"
+        case "file": return "Open file"
+        case "binary": return "Run binary"
+        default: return ""
+        }
+    }
+
     function close(): void {
         finalizeClose()
     }
 
     function finalizeClose(): void {
-        // Collapse the card with animation off *before* hiding, so the next
-        // toggle starts from an empty, collapsed launcher.
-        animateHeight = false
         opened = false
         reset()
 
@@ -115,6 +213,7 @@ Item {
     }
 
     function reset(): void {
+        mode = "apps"
         query = ""
         calculatorResult = ""
         fileResults = []
@@ -123,18 +222,32 @@ Item {
     }
 
     function openApplications(): void {
-        animateHeight = false
         reset()
         opened = true
 
-        Qt.callLater(() => {
-            searchInput.forceActiveFocus()
-            animateHeight = true
-        })
+        Qt.callLater(() => searchInput.forceActiveFocus())
     }
 
     function toggleApplications(): void {
         opened ? close() : openApplications()
+    }
+
+    function setMode(id): void {
+        if (mode === id)
+            return
+
+        mode = id
+        selectedIndex = 0
+        calculatorResult = ""
+        updateCalculator()
+        updateFileSearch()
+
+        if (runMode) {
+            loadBinaries()
+            historyFile.reload()
+        }
+
+        searchInput.forceActiveFocus()
     }
 
     function selectNext(): void {
@@ -177,7 +290,43 @@ Item {
             finalizeClose()
         } else if (item.type === "file") {
             openFile(item.path)
+        } else if (item.type === "binary") {
+            recordRun(item.text)
+            Quickshell.execDetached([item.text])
+            finalizeClose()
         }
+    }
+
+    // Collect every executable on $PATH (replaces `find` in menu_run).
+    function loadBinaries(): void {
+        if (binaries.length > 0 || binaryProcess.running)
+            return
+
+        const dirs = [...new Set(
+            (Quickshell.env("PATH") || "")
+                .split(":")
+                .filter(dir => dir.length > 0)
+        )]
+
+        binaryProcess.command = [
+            "fd", "-L", "-H", "--no-ignore",
+            "--max-depth", "1",
+            "-t", "x",
+            "-a",
+            ".",
+            ...dirs
+        ]
+        binaryProcess.running = true
+    }
+
+    // Same history file/format as menu_run: one name per line, newest last.
+    function recordRun(name): void {
+        const next = history.filter(entry =>
+            entry !== name && (binarySet.size === 0 || binarySet.has(entry)))
+
+        next.push(name)
+        history = next.slice(-historyKept)
+        historyFile.setText(history.join("\n") + "\n")
     }
 
     // Replaces open-file.sh: detect the mime type, then either edit the file
@@ -241,6 +390,29 @@ Item {
         }
     }
 
+    component KeyCap: Rectangle {
+        property string label: ""
+        property color edgeColor: "gray"
+        property color textColor: "gray"
+        property real fontPointSize: 9
+
+        implicitHeight: 20
+        implicitWidth: Math.max(implicitHeight, capText.implicitWidth + 12)
+        radius: 4
+        color: "transparent"
+        border.width: 1
+        border.color: edgeColor
+
+        Text {
+            id: capText
+
+            anchors.centerIn: parent
+            color: parent.textColor
+            font.pointSize: parent.fontPointSize
+            text: parent.label
+        }
+    }
+
     PanelWindow {
         id: launcherWindow
 
@@ -257,6 +429,7 @@ Item {
             right: true
         }
 
+        WlrLayershell.namespace: "launcher"
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.keyboardFocus: visible
             ? WlrKeyboardFocus.Exclusive
@@ -267,6 +440,7 @@ Item {
                 Qt.callLater(() => searchInput.forceActiveFocus())
         }
 
+        // Click outside the card to dismiss.
         MouseArea {
             anchors.fill: parent
             onClicked: root.close()
@@ -276,11 +450,10 @@ Item {
             id: card
 
             width: root.contentWidth
-            height: root.inputHeight
-                + (root.expanded ? root.visibleRows * root.rowHeight + 8 : 0)
+            height: root.cardHeight
 
             anchors.top: parent.top
-            anchors.topMargin: 120
+            anchors.topMargin: root.topOffset
             anchors.horizontalCenter: parent.horizontalCenter
 
             color: root.config.surface
@@ -288,15 +461,6 @@ Item {
             border.width: 1
             radius: root.config.popupRadius
             clip: true
-
-            Behavior on height {
-                enabled: root.animateHeight
-
-                NumberAnimation {
-                    duration: 140
-                    easing.type: Easing.OutCubic
-                }
-            }
 
             TextInput {
                 id: searchInput
@@ -347,6 +511,18 @@ Item {
                             event.accepted = true
                         }
                         break
+                    case Qt.Key_A:
+                        if (control) {
+                            root.setMode("apps")
+                            event.accepted = true
+                        }
+                        break
+                    case Qt.Key_B:
+                        if (control) {
+                            root.setMode("run")
+                            event.accepted = true
+                        }
+                        break
                     case Qt.Key_PageDown:
                         root.selectPage(1)
                         event.accepted = true
@@ -394,10 +570,12 @@ Item {
 
                 anchors.top: searchInput.bottom
                 anchors.topMargin: 5
-                anchors.bottom: parent.bottom
+                anchors.bottom: footer.top
+                anchors.bottomMargin: 4
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.margins: 4
+                anchors.leftMargin: 4
+                anchors.rightMargin: 4
 
                 visible: root.expanded
                 clip: true
@@ -442,11 +620,15 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         visible: modelData.type === "calculator"
                             || modelData.type === "file"
+                            || modelData.type === "binary"
 
                         color: root.config.accent
                         font.family: root.config.iconFontFamily
                         font.pointSize: root.config.iconSize
-                        text: modelData.type === "file" ? "󰈔" : "󰃬"
+                        text: modelData.type === "file" ? "󰈔"
+                            : modelData.type === "binary"
+                                ? (modelData.recent ? root.iconStar : root.iconRun)
+                                : "󰃬"
                     }
 
                     Column {
@@ -498,11 +680,150 @@ Item {
 
                 color: root.config.muted
                 font.pointSize: root.config.fontSize(0.88)
-                text: root.fileMode && root.fileNeedle.length < 2
-                    ? "Type at least two characters after /"
-                    : root.fileMode && root.fileSearching ? "Searching…"
-                    : root.fileMode ? "No files found"
-                    : "No applications found"
+                text: root.runMode
+                    ? (binaryProcess.running
+                        ? "Loading binaries…" : "No binaries found")
+                    : root.fileMode && root.fileNeedle.length < 2
+                        ? "Type at least two characters after /"
+                        : root.fileMode && root.fileSearching ? "Searching…"
+                        : root.fileMode ? "No files found"
+                        : "No applications found"
+            }
+
+            // Footer: current mode on the left, action + mode hints on the right.
+            Item {
+                id: footer
+
+                visible: root.expanded
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                height: root.footerHeight
+
+                // Keep clicks on the footer from reaching the dismiss area.
+                MouseArea {
+                    anchors.fill: parent
+                }
+
+                Rectangle {
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    height: 1
+                    color: root.config.borderColor
+                }
+
+                Row {
+                    anchors.left: parent.left
+                    anchors.leftMargin: 14
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 8
+
+                    Text {
+                        height: root.capHeight
+                        verticalAlignment: Text.AlignVCenter
+                        color: root.config.accent
+                        font.family: root.config.iconFontFamily
+                        font.pointSize: root.config.fontSize(0.9)
+                        text: root.runMode ? root.iconRun : root.iconApps
+                    }
+
+                    Text {
+                        height: root.capHeight
+                        verticalAlignment: Text.AlignVCenter
+                        color: root.config.muted
+                        font.pointSize: root.config.fontSize(0.8)
+                        text: root.runMode ? "Run binary" : "Applications"
+                    }
+                }
+
+                Row {
+                    anchors.right: parent.right
+                    anchors.rightMargin: 14
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 8
+
+                    Text {
+                        visible: root.actionLabel !== ""
+                        height: root.capHeight
+                        verticalAlignment: Text.AlignVCenter
+                        color: root.config.fg
+                        font.pointSize: root.config.fontSize(0.8)
+                        text: root.actionLabel
+                    }
+
+                    KeyCap {
+                        visible: root.actionLabel !== ""
+                        label: "↵"
+                        edgeColor: root.config.borderColor
+                        textColor: root.config.muted
+                        fontPointSize: root.config.fontSize(0.74)
+                    }
+
+                    Rectangle {
+                        visible: root.actionLabel !== ""
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 1
+                        height: 14
+                        color: root.config.borderColor
+                    }
+
+                    Repeater {
+                        model: root.modes
+
+                        delegate: Item {
+                            id: hint
+
+                            required property var modelData
+                            readonly property bool active:
+                                root.mode === modelData.id
+
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: hintRow.width
+                            height: root.capHeight
+
+                            Row {
+                                id: hintRow
+
+                                spacing: 5
+
+                                Text {
+                                    height: root.capHeight
+                                    verticalAlignment: Text.AlignVCenter
+                                    color: hint.active
+                                        ? root.config.accent
+                                        : root.config.muted
+                                    font.pointSize: root.config.fontSize(0.8)
+                                    text: hint.modelData.label
+                                }
+
+                                KeyCap {
+                                    label: "Ctrl"
+                                    edgeColor: hint.active
+                                        ? root.config.accent
+                                        : root.config.borderColor
+                                    textColor: root.config.muted
+                                    fontPointSize: root.config.fontSize(0.74)
+                                }
+
+                                KeyCap {
+                                    label: hint.modelData.key
+                                    edgeColor: hint.active
+                                        ? root.config.accent
+                                        : root.config.borderColor
+                                    textColor: root.config.muted
+                                    fontPointSize: root.config.fontSize(0.74)
+                                }
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.setMode(hint.modelData.id)
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -624,6 +945,25 @@ Item {
     }
 
     Process {
+        id: binaryProcess
+
+        // fd prints an error for PATH entries that don't exist; ignore it.
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const names = text.split("\n")
+                    .filter(path => path.length > 0)
+                    .map(path => path.slice(path.lastIndexOf("/") + 1))
+                    .filter(name => name.length > 0)
+
+                root.binaries = [...new Set(names)].sort()
+                root.selectedIndex = 0
+            }
+        }
+
+        stderr: StdioCollector {}
+    }
+
+    Process {
         id: mimeProcess
 
         property string path: ""
@@ -638,6 +978,20 @@ Item {
 
                 root.finalizeClose()
             }
+        }
+    }
+
+    FileView {
+        id: historyFile
+
+        path: root.historyPath
+        atomicWrites: true
+        printErrors: false
+
+        onLoaded: {
+            root.history = text()
+                .split("\n")
+                .filter(line => line.length > 0)
         }
     }
 
