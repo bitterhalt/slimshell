@@ -15,7 +15,7 @@ elio
 fastfetch
 foot
 fuzzel
-xfce4/xfconf/xfce-perchannel-xml/thunar.xml
+xfce4/*/*/*/
 fzf
 galculator
 gamma-launcher
@@ -51,6 +51,7 @@ unity3d
 wget
 wiremix
 wtf
+/xfce4/
 
 /environment.d/30-secrets.conf
 /opencode/service.json

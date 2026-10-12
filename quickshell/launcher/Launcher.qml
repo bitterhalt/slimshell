@@ -71,14 +71,26 @@ Item {
     readonly property string fileNeedle:
         fileMode ? query.trim().slice(1).trim() : ""
 
+    // "=" prefix hands everything after it to qalc, so units, functions and
+    // words work too ("=5 km to miles", "=sqrt(2)", "=1x3").
+    readonly property bool calcPrefix:
+        !runMode && !emojiMode && query.trim().startsWith("=")
+    readonly property string calcExpression:
+        calcPrefix ? query.trim().slice(1).trim() : query.trim()
+
+    // Plain math without the prefix is still detected automatically.
     readonly property bool calculatorQuery: {
+        if (calcPrefix)
+            return calcExpression.length > 0
+
         const value = query.trim()
         return !runMode
             && !emojiMode
             && !fileMode
             && /[0-9]/.test(value)
-            && /[+\-*/%^]/.test(value)
-            && /^[0-9\s+\-*/%^().,]+$/.test(value)
+            && (/[+\-*/%^×÷]/.test(value)
+                || /\d\s*[xX]\s*[\d(.]/.test(value))
+            && /^[0-9\s+\-*/%^().,xX×÷]+$/.test(value)
     }
 
     readonly property var applications: {
@@ -119,14 +131,20 @@ Item {
         return out
     }
 
+    // Run mode: the first word picks the binary, the rest are its arguments
+    // ("firefox --private-window"; quotes and backslashes are honored).
+    readonly property var runTokens: splitCommand(query)
+    readonly property string runName: runTokens.length > 0 ? runTokens[0] : ""
+    readonly property var runArgs: runTokens.slice(1)
+
     readonly property var binaryResults: {
-        const value = query.trim().toLowerCase()
+        const value = runName.toLowerCase()
         const recent = new Set(recentBinaries)
 
         const toItem = (name, score) => ({
             type: "binary",
             text: name,
-            subtitle: recent.has(name) ? "Recently used" : "",
+            subtitle: "",
             icon: "",
             recent: recent.has(name),
             score: score
@@ -141,12 +159,14 @@ Item {
             return recentBinaries.map(name => toItem(name, 0)).concat(rest)
         }
 
+        // Filter on the match score first; the recent bonus only reorders.
         return binaries
-            .map(name => toItem(
-                name,
-                Scorer.scoreText(name, value) + (recent.has(name) ? 200 : 0)
+            .map(name => ({ name: name, base: Scorer.scoreText(name, value) }))
+            .filter(entry => entry.base > 0)
+            .map(entry => toItem(
+                entry.name,
+                entry.base + (recent.has(entry.name) ? 200 : 0)
             ))
-            .filter(item => item.score > 0)
             .sort((a, b) => b.score - a.score
                 || (a.text < b.text ? -1 : 1))
     }
@@ -179,6 +199,8 @@ Item {
             entries = binaryResults
         } else if (emojiMode) {
             entries = emojiResults
+        } else if (calcPrefix) {
+            entries = []
         } else if (fileMode) {
             entries = fileResults
         } else if (value !== "" || forceExpanded) {
@@ -213,7 +235,7 @@ Item {
             entries.unshift({
                 type: "calculator",
                 text: calculatorResult,
-                subtitle: query.trim(),
+                subtitle: calcExpression,
                 icon: "󰃬"
             })
         }
@@ -349,12 +371,54 @@ Item {
             openFile(item.path)
         } else if (item.type === "binary") {
             recordRun(item.text)
-            Quickshell.execDetached([item.text])
+            Quickshell.execDetached([item.text, ...runArgs])
             finalizeClose()
         } else if (item.type === "emoji") {
             Quickshell.execDetached(["wl-copy", item.emoji])
             finalizeClose()
         }
+    }
+
+    // Shell-like word splitting: whitespace separates words, '...' and "..."
+    // group them, and a backslash escapes the next character.
+    function splitCommand(text): var {
+        const tokens = []
+        let current = ""
+        let quote = ""
+        let started = false
+        let escaped = false
+
+        for (const ch of String(text || "")) {
+            if (escaped) {
+                current += ch
+                escaped = false
+            } else if (ch === "\\" && quote !== "'") {
+                escaped = true
+                started = true
+            } else if (quote !== "") {
+                if (ch === quote)
+                    quote = ""
+                else
+                    current += ch
+            } else if (ch === "\"" || ch === "'") {
+                quote = ch
+                started = true
+            } else if (/\s/.test(ch)) {
+                if (started) {
+                    tokens.push(current)
+                    current = ""
+                    started = false
+                }
+            } else {
+                current += ch
+                started = true
+            }
+        }
+
+        if (started)
+            tokens.push(current)
+
+        return tokens
     }
 
     // Collect every executable on $PATH (replaces `find` in menu_run).
@@ -415,6 +479,17 @@ Item {
         } else {
             Quickshell.execDetached([terminal, "-e", "sudoedit", path])
         }
+    }
+
+    // qalc doesn't treat "x" as multiplication; map it (and ×/÷) to operators.
+    function normalizeExpression(expression): string {
+        let out = expression.replace(/×/g, "*").replace(/÷/g, "/")
+
+        // Leave hex literals such as 0x1F alone.
+        if (!/0[xX][0-9a-fA-F]/.test(out))
+            out = out.replace(/(\d|\))\s*[xX]\s*(?=[\d(.])/g, "$1*")
+
+        return out
     }
 
     function updateCalculator(): void {
@@ -480,6 +555,8 @@ Item {
         screen: root.targetScreen
         visible: root.opened
         color: "transparent"
+        implicitWidth: root.contentWidth
+        implicitHeight: root.cardHeight
         exclusiveZone: 0
         focusable: true
         WlrLayershell.namespace: "launcher"
@@ -495,25 +572,18 @@ Item {
 
         anchors {
             top: true
-            bottom: true
             left: true
-            right: true
         }
 
-        // Click outside the card to dismiss.
-        MouseArea {
-            anchors.fill: parent
-            onClicked: root.close()
-        }
+        margins.top: root.expandedTopMargin
+        margins.left: root.targetScreen
+            ? Math.max(0, Math.round((root.targetScreen.width - width) / 2))
+            : 0
 
         Rectangle {
             id: card
 
-            width: root.contentWidth
-            height: root.cardHeight
-            anchors.top: parent.top
-            anchors.topMargin: root.expandedTopMargin
-            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.fill: parent
             color: root.config.surface
             border.color: root.config.borderColor
             border.width: 1
@@ -524,7 +594,7 @@ Item {
                 enabled: root.opened
 
                 NumberAnimation {
-                    duration: 180
+                    duration: 100
                     easing.type: Easing.OutCubic
                 }
             }
@@ -743,7 +813,11 @@ Item {
                 visible: root.expanded && root.results.length === 0
                 color: root.config.muted
                 font.pointSize: root.config.fontSize(0.88)
-                    text: root.runMode
+                    text: root.calcPrefix
+                        ? (root.calcExpression === "" ? "Type an expression"
+                            : calculatorProcess.running || calculatorDebounce.running
+                                ? "Calculating…" : "Can't evaluate expression")
+                        : root.runMode
                         ? (binaryProcess.running ? "Loading binaries…" : "No binaries found")
                         : root.emojiMode ? "No emoji found"
                         : root.fileMode && root.fileNeedle.length < 2
@@ -894,7 +968,7 @@ Item {
 
             calculatorProcess.expression = root.query.trim()
             calculatorProcess.command = [
-                "qalc", "-t", calculatorProcess.expression
+                "qalc", "-t", root.normalizeExpression(root.calcExpression)
             ]
             calculatorProcess.running = true
         }
