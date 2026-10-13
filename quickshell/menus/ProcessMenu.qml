@@ -22,12 +22,12 @@ Item {
 
         if (killTarget)
             return [{
-                "name": "Cancel",
-                "action": "cancel"
-            }, {
-                "name": "Force kill",
-                "action": "kill"
-            }];
+            "name": "Cancel",
+            "action": "cancel"
+        }, {
+            "name": "Force kill",
+            "action": "kill"
+        }];
 
         const needle = query.trim().toLowerCase();
         return processes.filter((process) => {
@@ -96,7 +96,7 @@ Item {
         } else if (item.action === "cancel") {
             back();
         } else if (item.action === "kill") {
-            killProcess.command = ["python3", helperPath, "kill", String(killTarget.pid), killTarget.started, String(Quickshell.processId)];
+            killProcess.command = ["python3", helperPath, "kill", String(killTarget.pid), killTarget.started];
             killProcess.running = true;
         }
     }
@@ -106,7 +106,7 @@ Item {
     Process {
         id: listProcess
 
-        command: ["python3", root.helperPath, "list", String(Quickshell.processId)]
+        command: ["python3", root.helperPath, "list"]
         onExited: (exitCode) => {
             if (root.opened && exitCode !== 0)
                 root.errorText = "Could not read processes";
@@ -324,7 +324,7 @@ Item {
                     color: root.errorText ? root.config.urgent : root.config.muted
                     font.pointSize: root.config.fontSize(0.78)
                     elide: Text.ElideRight
-                    text: root.errorText || (killProcess.running ? "Killing…" : root.killTarget ? "Enter Confirm · Esc Back" : "Processes · Enter Select · Ctrl+R Refresh")
+                    text: root.errorText || (killProcess.running ? "Killing…" : root.killTarget ? "Enter Confirm · Esc Back" : "Enter Select · Ctrl+R Refresh")
                 }
 
             }

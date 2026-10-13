@@ -18,13 +18,13 @@ def identity(pid):
     return fields[19]
 
 
-def list_processes(excluded_pid):
+def list_processes():
     processes = []
     for directory in Path("/proc").iterdir():
         if not directory.name.isdigit():
             continue
         pid = int(directory.name)
-        if pid in (excluded_pid, os.getpid()):
+        if pid == os.getpid():
             continue
         try:
             started = identity(pid)
@@ -35,8 +35,8 @@ def list_processes(excluded_pid):
     return sorted(processes, key=lambda item: (item["name"].lower(), item["pid"]))
 
 
-def kill_process(pid, started, excluded_pid):
-    if pid <= 1 or pid in (excluded_pid, os.getpid()):
+def kill_process(pid, started):
+    if pid <= 1 or pid == os.getpid():
         raise PermissionError("This process is protected")
     # A pidfd pins the target even if it exits and its PID is reused.
     descriptor = os.pidfd_open(pid)
@@ -51,9 +51,9 @@ def kill_process(pid, started, excluded_pid):
 def main():
     try:
         if sys.argv[1] == "list":
-            print(json.dumps(list_processes(int(sys.argv[2]))))
+            print(json.dumps(list_processes()))
         elif sys.argv[1] == "kill":
-            kill_process(int(sys.argv[2]), sys.argv[3], int(sys.argv[4]))
+            kill_process(int(sys.argv[2]), sys.argv[3])
         else:
             raise ValueError("Unknown action")
     except (OSError, ValueError, IndexError) as error:

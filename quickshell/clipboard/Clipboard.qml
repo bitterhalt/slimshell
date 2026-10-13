@@ -23,10 +23,10 @@ PanelWindow {
     property string pendingTextId: ""
     property string previewEntryId: ""
 
-    readonly property int panelWidth: 820
-    readonly property int panelHeight: 510
-    readonly property int historyWidth: 300
-    readonly property int rowHeight: 48
+    readonly property int panelWidth: 720
+    readonly property int panelHeight: 420
+    readonly property int historyWidth: 280
+    readonly property int rowHeight: 36
     readonly property string previewPath:
         (Quickshell.env("XDG_RUNTIME_DIR") || "/tmp")
         + "/quickshell/clipboard-preview-"
@@ -271,7 +271,7 @@ PanelWindow {
             anchors.topMargin: 1
             anchors.leftMargin: 1
             width: root.historyWidth
-            height: 48
+            height: 42
             z: 1
             TextInput {
                 id: searchInput
@@ -281,7 +281,7 @@ PanelWindow {
                 anchors.right: parent.right
                 anchors.rightMargin: 18
                 anchors.verticalCenter: parent.verticalCenter
-                height: 46
+                height: 40
                 verticalAlignment: TextInput.AlignVCenter
                 color: root.config.fg
                 selectionColor: root.config.accent
@@ -378,7 +378,7 @@ PanelWindow {
                         required property int index
 
                         width: ListView.view.width
-                        height: 48
+                        height: root.rowHeight
 
                         Rectangle {
                             anchors.fill: parent
@@ -493,7 +493,7 @@ PanelWindow {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            height: 42
+            height: 32
 
             Rectangle {
                 anchors.top: parent.top
