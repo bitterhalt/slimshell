@@ -24,3 +24,7 @@
 - Lua syntax: `luac -p <changed-lua-files>`
 - Python syntax without creating `__pycache__`: `python -c 'import ast, pathlib; p=pathlib.Path("FILE"); ast.parse(p.read_text(), filename=str(p))'`
 - Do not use repository-wide Ruff, ShellCheck, shfmt, or `qmllint` as clean gates: the current tree has known pre-existing findings, and `qmllint` does not resolve the QuickShell imports reliably. A QuickShell runtime smoke test launches the live shell, so run one only when requested.
+
+## Keep readmes clean
+
+A readme doesn't need long-winded explanations of the essentials like power menu etc.
