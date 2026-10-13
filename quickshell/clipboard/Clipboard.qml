@@ -25,6 +25,7 @@ PanelWindow {
 
     readonly property int panelWidth: 820
     readonly property int panelHeight: 510
+    readonly property int historyWidth: 300
     readonly property int rowHeight: 48
     readonly property string previewPath:
         (Quickshell.env("XDG_RUNTIME_DIR") || "/tmp")
@@ -267,8 +268,11 @@ PanelWindow {
 
             anchors.top: parent.top
             anchors.left: parent.left
-            anchors.right: parent.right
+            anchors.topMargin: 1
+            anchors.leftMargin: 1
+            width: root.historyWidth
             height: 48
+            z: 1
             TextInput {
                 id: searchInput
 
@@ -328,7 +332,7 @@ PanelWindow {
                 visible: searchInput.text.length === 0
                 color: root.config.muted
                 font.pointSize: root.config.fontSize(1.04)
-                text: "Browse clipboard history…"
+                text: "Search clipboard…"
             }
 
         }
@@ -336,14 +340,16 @@ PanelWindow {
         Rectangle {
             anchors.top: header.bottom
             anchors.left: parent.left
-            anchors.right: parent.right
+            anchors.leftMargin: 1
+            width: root.historyWidth
             height: 1
+            z: 1
             color: root.config.borderColor
         }
 
         Row {
-            anchors.top: header.bottom
-            anchors.topMargin: 0
+            anchors.top: parent.top
+            anchors.topMargin: 1
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.leftMargin: 1
@@ -351,7 +357,7 @@ PanelWindow {
             anchors.bottom: footer.top
 
             Rectangle {
-                width: 250
+                width: root.historyWidth
                 height: parent.height
                 color: root.config.bg
 
@@ -360,6 +366,7 @@ PanelWindow {
 
                     anchors.fill: parent
                     anchors.margins: 8
+                    anchors.topMargin: header.height + 9
                     clip: true
                     spacing: 2
                     model: root.filteredEntries
@@ -437,7 +444,7 @@ PanelWindow {
             }
 
             Item {
-                width: parent.width - 251
+                width: parent.width - root.historyWidth - 1
                 height: parent.height
 
                 Image {
