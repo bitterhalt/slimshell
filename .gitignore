@@ -53,6 +53,6 @@ wiremix
 wtf
 /xfce4/
 
-/environment.d/30-secrets.conf
+/environment.d/40-secrets.conf
 /opencode/service.json
 /opencode/cli.json
