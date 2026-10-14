@@ -27,4 +27,4 @@
 
 ## Keep readmes clean
 
-- README doesn't have to be an encyclopedia. Just list the basic features without unnecessary technical jargon
+- README doesn't have to be an encyclopedia. Just list the basic features and structure without unnecessary technical jargon
