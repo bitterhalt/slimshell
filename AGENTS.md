@@ -27,4 +27,4 @@
 
 ## Keep readmes clean
 
-A readme doesn't need long-winded explanations of the essentials like power menu etc.
+- README doesn't have to be an encyclopedia. Just list the basic features without unnecessary technical jargon
