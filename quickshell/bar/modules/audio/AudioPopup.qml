@@ -488,7 +488,7 @@ PopoutPanel {
             color: deviceRow.row.active ? deviceRow.config.accent : deviceRow.config.fg
             font.family: deviceRow.config.iconFontFamily
             font.pointSize: deviceRow.config.iconSize
-            text: deviceRow.row.active ? "󰄬" : deviceRow.icon
+            text: deviceRow.icon
         }
 
         Text {
