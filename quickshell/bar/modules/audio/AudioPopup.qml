@@ -10,15 +10,17 @@ PopoutPanel {
     config: audioItem.config
     contentWidth: Math.min(440, audioItem.barWindow.screen
         ? audioItem.barWindow.screen.width - config.popupGap * 2 : 440)
-    padding: 12
-    readonly property int chromeHeight: 98
+    padding: 10
+    readonly property int rowHeight: 60
+    readonly property int rowSpacing: 4
+    readonly property int chromeHeight: 90
     readonly property real desiredBodyHeight: popupState.helpOpen ? helpRows.implicitHeight
         : popupState.contextOpen ? optionRows.implicitHeight
-        : Math.max(76, popupState.rows.length * 80 - 4)
-    readonly property real maximumBodyHeight: Math.max(76, Math.min(396,
+        : Math.max(rowHeight, popupState.rows.length * (rowHeight + rowSpacing) - rowSpacing)
+    readonly property real maximumBodyHeight: Math.max(rowHeight, Math.min(rowHeight * 5 + rowSpacing * 4,
         root.audioItem.barWindow.screen
             ? root.audioItem.barWindow.screen.height - root.config.popupGap - root.padding * 2 - chromeHeight - 24
-            : 396))
+            : rowHeight * 5 + rowSpacing * 4))
 
     AudioPopupState {
         id: popupState
@@ -47,7 +49,7 @@ PopoutPanel {
             id: header
             anchors.left: parent.left
             anchors.right: parent.right
-            height: 28
+            height: 24
 
             Text {
                 renderType: Text.NativeRendering
@@ -103,7 +105,7 @@ PopoutPanel {
                 anchors.fill: parent
                 visible: !popupState.contextOpen && !popupState.helpOpen
                 clip: true
-                spacing: 4
+                spacing: root.rowSpacing
                 model: popupState.rows
                 keyNavigationEnabled: false
                 cacheBuffer: 80
@@ -112,7 +114,7 @@ PopoutPanel {
                     required property var modelData
                     required property int index
                     width: rowsView.width
-                    height: 76
+                    height: root.rowHeight
                     config: root.config
                     row: entry.modelData
                     node: root.audioItem.nodeForId(entry.modelData.id)
@@ -217,7 +219,7 @@ PopoutPanel {
             anchors.right: parent.right
             anchors.bottom: footer.top
             anchors.bottomMargin: 6
-            height: 20
+            height: 18
             text: popupState.helpOpen ? "Volume range: 0–150% · keyboard step: 5%"
                 : popupState.selectedRow && popupState.selectedRow.kind !== "playback" && !popupState.selectedRow.active
                     ? "← → Volume · m Mute · d Default · Enter Options"
@@ -233,7 +235,7 @@ PopoutPanel {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            height: 32
+            height: 30
 
             Rectangle {
                 anchors.top: parent.top
@@ -257,8 +259,11 @@ PopoutPanel {
                             anchors.fill: parent
                             anchors.margins: 2
                             radius: 4
-                            color: tabMouse.containsMouse || popupState.tabIndex === tab.index
-                                ? root.config.borderColor : "transparent"
+                            color: popupState.tabIndex === tab.index ? root.config.bg
+                                : tabMouse.containsMouse ? root.config.borderColor : "transparent"
+                            border.width: 1
+                            border.color: popupState.tabIndex === tab.index
+                                ? root.config.accent : root.config.borderColor
                         }
                         Text {
                             renderType: Text.NativeRendering
@@ -296,8 +301,6 @@ PopoutPanel {
             anchors.fill: parent
             radius: 4
             color: choiceMouse.containsMouse || choice.selected ? choice.config.borderColor : "transparent"
-            border.width: 1
-            border.color: choice.selected ? choice.config.accent : "transparent"
         }
         Column {
             anchors.left: parent.left

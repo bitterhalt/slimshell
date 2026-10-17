@@ -163,6 +163,7 @@ Item {
             const slider = findChild(popup, "audioVolumeSlider");
             verify(slider !== null);
             compare(slider.value, 0.55);
+            compare(slider.background.color, fixture.config.muted);
             const percent = findChild(popup, "audioVolumePercent");
             compare(percent.text, "55%");
             fixture.speakerAudio.volume = 1.5;
@@ -172,6 +173,8 @@ Item {
             compare(popupControls.tabIndex, 1);
             keyClick(Qt.Key_Tab, Qt.ShiftModifier);
             compare(popupControls.tabIndex, 0);
+            const currentSlider = findChild(popup, "audioVolumeSlider");
+            compare(currentSlider.background.color, fixture.config.muted);
             keyClick(Qt.Key_Escape);
             verify(fixture.closed);
         }
@@ -232,7 +235,7 @@ Item {
             const popupControls = findChild(popup, "audioPopupState");
             waitForPolish(host.Window.window);
             const twoDeviceHeight = popup.implicitHeight;
-            verify(twoDeviceHeight < 300);
+            verify(twoDeviceHeight < 250);
             popupControls.setTab(1);
             waitForPolish(host.Window.window);
             verify(popup.implicitHeight < twoDeviceHeight);
