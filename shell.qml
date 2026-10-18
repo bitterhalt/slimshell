@@ -60,17 +60,10 @@ ShellRoot {
     id: mainMenu
     config: appConfig
     themeMenu: themeMenu
-    tmuxMenu: tmuxMenu
     targetScreen: root.activeScreen
     lockService: appLockService
     idleService: appIdleService
     wallpaperPicker: appWallpaperPicker
-  }
-
-  TmuxMenu {
-    id: tmuxMenu
-    config: appConfig
-    targetScreen: root.activeScreen
   }
 
   ProcessMenu {

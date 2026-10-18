@@ -10,7 +10,6 @@ Item {
 
     required property var config
     required property var themeMenu
-    required property var tmuxMenu
     required property var targetScreen
     required property var lockService
     required property var idleService
@@ -200,12 +199,6 @@ Item {
         if (item.action === "saveTheme") {
             closeMenu()
             Qt.callLater(() => root.themeMenu.openSavePrompt())
-            return
-        }
-
-        if (item.action === "tmuxMenu") {
-            closeMenu()
-            root.tmuxMenu.openMenu()
             return
         }
 

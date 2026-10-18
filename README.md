@@ -24,14 +24,14 @@
 - Fullscreen and region recording
 - Wallpaper picker and Pywal themes
 - DeepL translator
-- Tmux session manager and process killer
+- Process killer
 - Keyboard shortcuts and IPC controls
 
 Network and Bluetooth popups can also be opened with `qs ipc call network toggle` and `qs ipc call bluetooth toggle`.
 
 In the launcher, `/needle` searches files and `=expression` calculates with `qalc` (plain math works too). The modes are Apps (desktop entries), Run (binaries, recently used first), Emoji (search by name; Enter copies it), and Timer (`25m Focus`, `45s`, `1:30`, `2h`; selecting a running timer cancels it). Enter activates the selected row and Esc closes.
 
-For a stdin-driven picker, use `printf '%s\n' one two three | ./launcher/dmenu-runner -p "Pick"`. Enter prints the selected line, Shift+Enter prints the typed text, and Esc cancels with exit status 1. This requires Slimshell to be running.
+For a stdin-driven picker (Dmenu Mode), use `printf '%s\n' one two three | ./launcher/dmenu-runner -p "Pick"`. Enter prints the selected line, Shift+Enter prints the typed text, and Esc cancels with exit status 1. This requires quickshell to be running.
 
 Use `-l N` / `--lines N` to set the visible rows (default 7). Add `--minimal-lines` to shrink to the number of input choices; filtering keeps that height. Oversized menus fit the screen, and `-l 0` shows only the prompt and mode footer, with Enter returning typed text.
 
@@ -119,7 +119,6 @@ quickshell/
 │   ├── ProcessMenu.qml
 │   ├── processes.py
 │   ├── ThemeMenu.qml
-│   ├── TmuxMenu.qml
 │   └── WallpaperMenu.qml
 ├── notifications/
 │   ├── NotificationCard.qml
