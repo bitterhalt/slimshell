@@ -299,6 +299,13 @@ PanelWindow {
                 }
 
                 Keys.onPressed: event => {
+                    if (event.key === Qt.Key_0 && event.modifiers === Qt.ControlModifier) {
+                        if (!wipeProcess.running)
+                            wipeProcess.running = true
+                        event.accepted = true
+                        return
+                    }
+
                     switch (event.key) {
                     case Qt.Key_Down:
                     case Qt.Key_Tab:
@@ -647,6 +654,18 @@ PanelWindow {
 
     Process {
         id: copyProcess
+    }
+
+    Process {
+        id: wipeProcess
+        command: ["cliphist", "wipe"]
+
+        onExited: exitCode => {
+            if (exitCode === 0)
+                root.close()
+            else
+                console.warn("Clipboard history wipe failed (exit code " + exitCode + ")")
+        }
     }
 
     Process {
