@@ -1,6 +1,10 @@
-# QuickShell Config
+# Slimshell
 
-A personal [QuickShell](https://quickshell.org/) desktop shell for **Niri + Wayland**.
+### What Slim is and what it isn’t
+
+- It **IS** A personalised Quickshell environment for **NIRI**
+- Why slim? I needed a lightweight desktop environment with compact design
+- What Slim **ISN’T**: A higly environment featuring all the bells and whistles; this is mainly designed for my own use
 
 ## Features
 
