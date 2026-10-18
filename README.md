@@ -2,9 +2,9 @@
 
 ### What Slim is and what it isn’t
 
-- It **Is** A personalised Quickshell environment for **NIRI**
+- It **is** A personalised Quickshell environment for **NIRI**
 - Why slim? I needed a lightweight desktop environment with compact design
-- What Slim **Isn’t**: A highly customizable environment featuring all the bells and whistles; this is mainly designed for my own use
+- What Slim **isn’t**: A highly customizable environment featuring all the bells and whistles; this is mainly designed for my own use
 
 ## Features
 
