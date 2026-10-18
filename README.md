@@ -4,7 +4,7 @@
 
 - It **IS** A personalised Quickshell environment for **NIRI**
 - Why slim? I needed a lightweight desktop environment with compact design
-- What Slim **ISN’T**: A higly environment featuring all the bells and whistles; this is mainly designed for my own use
+- What Slim **ISN’T**: A highly customizable environment featuring all the bells and whistles; this is mainly designed for my own use
 
 ## Features
 
