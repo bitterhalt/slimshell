@@ -31,6 +31,10 @@ Network and Bluetooth popups can also be opened with `qs ipc call network toggle
 
 In the launcher, `/needle` searches files and `=expression` calculates with `qalc` (plain math works too). The modes are Apps (desktop entries), Run (binaries, recently used first), Emoji (search by name; Enter copies it), and Timer (`25m Focus`, `45s`, `1:30`, `2h`; selecting a running timer cancels it). Enter activates the selected row and Esc closes.
 
+For a stdin-driven picker, use `printf '%s\n' one two three | ./launcher/dmenu-runner -p "Pick"`. Enter prints the selected line, Shift+Enter prints the typed text, and Esc cancels with exit status 1. This requires Slimshell to be running.
+
+Use `-l N` / `--lines N` to set the visible rows (default 7). Add `--minimal-lines` to shrink to the number of input choices; filtering keeps that height. Oversized menus fit the screen, and `-l 0` shows only the prompt and mode footer, with Enter returning typed text.
+
 ## Structure
 
 ```text
@@ -92,10 +96,14 @@ quickshell/
 │   └── tests/
 │       └── tst_popoutpanel.qml
 ├── launcher/
+│   ├── Dmenu.js
 │   ├── Emoji.js
 │   ├── Launcher.qml
 │   ├── Scorer.js
+│   ├── dmenu-runner
 │   └── tests/
+│       ├── test_dmenu_runner.py
+│       ├── tst_dmenu.qml
 │       └── tst_emoji.qml
 ├── lock/
 │   ├── LockContext.qml

@@ -154,3 +154,24 @@ function scoreEmoji(name, query) {
 
     return 0
 }
+
+// dmenu lines can be anything (paths, commands, sentences): no fuzzy matching,
+// but multi-word queries match when every word appears somewhere in the line.
+function scoreLine(text, query) {
+    const value = String(text || "").toLowerCase()
+
+    if (value === query)
+        return 10000
+    if (value.startsWith(query))
+        return 5000
+    if (wordBoundaryMatch(value, query))
+        return 3000
+    if (value.includes(query))
+        return 500
+
+    const tokens = query.split(/\s+/).filter(token => token.length > 0)
+    if (tokens.length > 1 && tokens.every(token => value.includes(token)))
+        return 300
+
+    return 0
+}

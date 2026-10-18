@@ -5,6 +5,7 @@ import Quickshell.Wayland
 import Quickshell.Widgets
 
 import "Scorer.js" as Scorer
+import "Dmenu.js" as Dmenu
 import "Emoji.js" as Emoji
 
 Item {
@@ -24,6 +25,16 @@ Item {
     readonly property bool runMode: mode === "run"
     readonly property bool emojiMode: mode === "emoji"
     readonly property bool timerMode: mode === "timer"
+    // dmenu mode is entered only through `qs ipc call launcher dmenu`, so it
+    // is not part of `modes` and can't be reached by cycling.
+    readonly property bool dmenuMode: mode === "dmenu"
+    property var dmenuItems: []
+    property string dmenuPrompt: ""
+    property int dmenuLines: 7
+    property bool dmenuMinimalLines: false
+    // Result file awaited by the caller; empty when no request is pending.
+    property string dmenuOutPath: ""
+    readonly property string dmenuSessionId: Date.now().toString() + "-" + Math.random().toString()
     property var emojiEntries: []
     property var emojiHistory: []
     property bool emojiHistoryReady: false
@@ -58,8 +69,11 @@ Item {
     readonly property string iconApps: String.fromCodePoint(0xF003B)
     readonly property string iconRun: String.fromCodePoint(0xF018D)
     readonly property string iconStar: String.fromCodePoint(0xF04CE)
+    readonly property string iconList: String.fromCodePoint(0xF0279)
 
-    readonly property string placeholder: runMode
+    readonly property string placeholder: dmenuMode
+        ? (dmenuPrompt !== "" ? dmenuPrompt : "Select")
+        : runMode
         ? "Search binaries"
         : timerMode ? "Set a timer (e.g. 25m Focus)"
         : emojiMode ? "Search emoji"
@@ -78,7 +92,7 @@ Item {
     readonly property int contentWidth: 400
     readonly property int contentSpacing: config.barModuleSpacing
     readonly property bool fileMode:
-        !runMode && !emojiMode && !timerMode
+        !runMode && !emojiMode && !timerMode && !dmenuMode
         && query.trim().startsWith("/")
     readonly property string fileNeedle:
         fileMode ? query.trim().slice(1).trim() : ""
@@ -86,7 +100,7 @@ Item {
     // "=" prefix hands everything after it to qalc, so units, functions and
     // words work too ("=5 km to miles", "=sqrt(2)", "=1x3").
     readonly property bool calcPrefix:
-        !runMode && !emojiMode && !timerMode
+        !runMode && !emojiMode && !timerMode && !dmenuMode
         && query.trim().startsWith("=")
     readonly property string calcExpression:
         calcPrefix ? query.trim().slice(1).trim() : query.trim()
@@ -100,6 +114,7 @@ Item {
         return !runMode
             && !emojiMode
             && !timerMode
+            && !dmenuMode
             && !fileMode
             && /[0-9]/.test(value)
             && (/[+\-*/%^×÷]/.test(value)
@@ -206,6 +221,31 @@ Item {
             }))
     }
 
+    readonly property var dmenuResults: {
+        if (!opened || !dmenuMode)
+            return []
+
+        const toItem = (line, index, score) => ({
+            type: "dmenu",
+            text: line,
+            subtitle: "",
+            icon: "",
+            index: index,
+            score: score
+        })
+
+        const value = query.trim().toLowerCase()
+
+        // Keep the caller's order until something is typed.
+        if (value === "")
+            return dmenuItems.map((line, i) => toItem(line, i, 0))
+
+        return dmenuItems
+            .map((line, i) => toItem(line, i, Scorer.scoreLine(line, value)))
+            .filter(item => item.score > 0)
+            .sort((a, b) => b.score - a.score || a.index - b.index)
+    }
+
     readonly property var timerInput: opened && timerMode ? parseTimer(query) : null
 
     readonly property var timerResults: {
@@ -245,7 +285,9 @@ Item {
         const value = query.trim().toLowerCase()
         let entries = []
 
-        if (runMode) {
+        if (dmenuMode) {
+            entries = dmenuResults
+        } else if (runMode) {
             entries = binaryResults
         } else if (emojiMode) {
             entries = emojiResults
@@ -283,7 +325,7 @@ Item {
                     || a.text.localeCompare(b.text))
         }
 
-        if (!runMode && !timerMode && calculatorResult !== "") {
+        if (!runMode && !timerMode && !dmenuMode && calculatorResult !== "") {
             entries.unshift({
                 type: "calculator",
                 text: calculatorResult,
@@ -292,17 +334,26 @@ Item {
             })
         }
 
+        if (dmenuMode)
+            return entries
+
         return !runMode && value === "" ? entries : entries.slice(0, 100)
     }
 
     onResultsChanged: selectedIndex = Math.max(0,
         Math.min(selectedIndex, results.length - 1))
 
-    // The launcher stays at a fixed size; its result list scrolls when needed.
+    // Normal modes stay fixed; dmenu can choose a row count per request.
     readonly property bool expanded: true
     readonly property bool fileSearching:
         fileProcess.running || fileSearchDebounce.running
-    readonly property int visibleRows: maxVisibleRows
+    readonly property int availableDmenuRows: targetScreen
+        ? Math.max(0, Math.floor((targetScreen.height - config.popupGap * 2
+            - inputHeight - contentSpacing * 2 - footerHeight - 2) / rowHeight))
+        : maxVisibleRows
+    readonly property int visibleRows: dmenuMode
+        ? Dmenu.visibleRows(dmenuLines, dmenuMinimalLines, dmenuItems.length, availableDmenuRows)
+        : maxVisibleRows
 
     readonly property int cardHeight: inputHeight
         + visibleRows * rowHeight
@@ -316,6 +367,9 @@ Item {
     }
 
     function finalizeClose(): void {
+        // Closing without a pick (Esc, toggle, ...) must still release the
+        // process waiting on the FIFO.
+        cancelDmenu()
         opened = false
         reset()
 
@@ -333,6 +387,7 @@ Item {
     }
 
     function openApplications(): void {
+        cancelDmenu()
         reset()
         opened = true
 
@@ -343,8 +398,59 @@ Item {
         opened ? close() : openApplications()
     }
 
+    // Called from IPC: the items are read from itemsPath, and the result is
+    // written atomically to outPath, awaited by launcher/dmenu-runner.
+    function requestDmenu(itemsPath, outPath, prompt, lines, minimalLines): void {
+        // Hide and clear the previous request before loading new choices.
+        finalizeClose()
+        dmenuOutPath = outPath
+        dmenuPrompt = prompt
+        dmenuLines = Math.max(0, lines)
+        dmenuMinimalLines = minimalLines
+        dmenuFile.path = ""
+        dmenuFile.path = itemsPath
+    }
+
+    function beginDmenu(items): void {
+        dmenuItems = items
+        reset()
+        mode = "dmenu"
+        opened = true
+
+        Qt.callLater(() => searchInput.forceActiveFocus())
+    }
+
+    function writeDmenuOutput(path, value): void {
+        Quickshell.execDetached([
+            "sh", "-c",
+            'umask 077; printf "%s" "$2" > "$1.tmp" && mv -- "$1.tmp" "$1"',
+            "dmenu-output", path, value === null ? "cancel\n" : "ok\n" + value + "\n"
+        ])
+    }
+
+    function submitDmenu(value): void {
+        if (dmenuOutPath === "")
+            return
+
+        writeDmenuOutput(dmenuOutPath, value)
+        dmenuOutPath = ""
+        dmenuItems = []
+        dmenuPrompt = ""
+        finalizeClose()
+    }
+
+    function cancelDmenu(): void {
+        if (dmenuOutPath === "")
+            return
+
+        writeDmenuOutput(dmenuOutPath, null)
+        dmenuOutPath = ""
+        dmenuItems = []
+        dmenuPrompt = ""
+    }
+
     function setMode(id): void {
-        if (mode === id)
+        if (mode === id || dmenuMode)
             return
 
         mode = id
@@ -370,6 +476,9 @@ Item {
     }
 
     function cycleMode(direction): void {
+        if (dmenuMode)
+            return
+
         const currentIndex = modes.indexOf(mode)
         const nextIndex = (currentIndex + direction + modes.length)
             % modes.length
@@ -377,6 +486,9 @@ Item {
     }
 
     function openFileSearch(): void {
+        if (dmenuMode)
+            return
+
         setMode("apps")
         searchInput.text = "/"
         searchInput.cursorPosition = 1
@@ -423,7 +535,9 @@ Item {
 
         const item = results[selectedIndex]
 
-        if (item.type === "timer-start") {
+        if (item.type === "dmenu") {
+            submitDmenu(item.text)
+        } else if (item.type === "timer-start") {
             timerService.startTimer(item.seconds, item.note)
             searchInput.text = ""
             timerClock = Date.now()
@@ -894,7 +1008,11 @@ Item {
                         break;
                     case Qt.Key_Return:
                     case Qt.Key_Enter:
-                        root.activateSelected();
+                        // Shift+Enter (or Enter with no result rows) returns typed text.
+                        if (root.dmenuMode && ((event.modifiers & Qt.ShiftModifier) || root.visibleRows === 0))
+                            root.submitDmenu(searchInput.text);
+                        else
+                            root.activateSelected();
                         event.accepted = true;
                         break;
                     case Qt.Key_Escape:
@@ -975,7 +1093,7 @@ Item {
 
                     Column {
                         anchors.left: parent.left
-                        anchors.leftMargin: 50
+                        anchors.leftMargin: modelData.type === "dmenu" ? 12 : 50
                         anchors.right: parent.right
                         anchors.rightMargin: 12
                         anchors.verticalCenter: parent.verticalCenter
@@ -988,6 +1106,7 @@ Item {
                             font.pointSize: root.config.fontSize(0.96)
                             font.weight: Font.Medium
                             elide: Text.ElideRight
+                            textFormat: modelData.type === "dmenu" ? Text.PlainText : Text.AutoText
                             text: modelData.text
                         }
 
@@ -1027,10 +1146,11 @@ Item {
                 anchors.top: searchInput.bottom
                 anchors.topMargin: 18
                 anchors.horizontalCenter: parent.horizontalCenter
-                visible: root.expanded && root.results.length === 0
+                visible: root.expanded && root.visibleRows > 0 && root.results.length === 0
                 color: root.config.muted
                 font.pointSize: root.config.fontSize(0.88)
-                    text: root.calcPrefix
+                    text: root.dmenuMode ? "No matches"
+                        : root.calcPrefix
                         ? (root.calcExpression === "" ? "Type an expression"
                             : calculatorProcess.running || calculatorDebounce.running
                                 ? "Calculating…" : "Can't evaluate expression")
@@ -1083,7 +1203,7 @@ Item {
                         color: root.config.accent
                         font.family: root.config.iconFontFamily
                         font.pointSize: root.config.fontSize(0.9)
-                        text: root.emojiMode ? "😀" : root.timerMode ? "󰔛" : root.runMode ? root.iconRun : root.iconApps
+                        text: root.dmenuMode ? root.iconList : root.emojiMode ? "😀" : root.timerMode ? "󰔛" : root.runMode ? root.iconRun : root.iconApps
                     }
 
                     Text {
@@ -1092,7 +1212,7 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                         color: root.config.muted
                         font.pointSize: root.config.fontSize(0.8)
-                        text: root.emojiMode ? "Emoji" : root.timerMode ? "Timer" : root.runMode ? "Bin" : "Apps"
+                        text: root.dmenuMode ? "Dmenu" : root.emojiMode ? "Emoji" : root.timerMode ? "Timer" : root.runMode ? "Bin" : "Apps"
                     }
 
                 }
@@ -1296,6 +1416,25 @@ Item {
     }
 
     FileView {
+        id: dmenuFile
+
+        printErrors: false
+        onLoaded: {
+            // Ignore a late load for a request that was already cancelled.
+            if (root.dmenuOutPath === "")
+                return
+
+            const content = text()
+            const lines = content === "" ? [] : content.split("\n")
+            // A final newline terminates the last choice, not an extra choice.
+            if (content.endsWith("\n"))
+                lines.pop()
+            root.beginDmenu(lines)
+        }
+        onLoadFailed: root.close()
+    }
+
+    FileView {
         id: emojiFile
 
         path: (Quickshell.env("HOME") || "")
@@ -1351,6 +1490,15 @@ Item {
 
         function close(): void {
             root.close()
+        }
+
+        function dmenuSession(): string {
+            return root.dmenuSessionId
+        }
+
+        // Used by launcher/dmenu-runner.
+        function dmenu(itemsPath: string, outPath: string, prompt: string, lines: int, minimalLines: bool): void {
+            root.requestDmenu(itemsPath, outPath, prompt, lines, minimalLines)
         }
     }
 }
