@@ -345,15 +345,6 @@ PanelWindow {
                 }
             }
 
-            Text {
-                renderType: Text.NativeRendering
-                Layout.fillWidth: true
-                text: root.selected ? root.selected.name : root.controller.directory
-                elide: Text.ElideMiddle
-                color: root.config.fg
-                font.pointSize: root.config.fontSize(0.82)
-            }
-
             RowLayout {
                 Layout.fillWidth: true
                 visible: root.fixedPrompt
