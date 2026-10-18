@@ -57,22 +57,16 @@ Rectangle {
         width: root.appIconSize
         height: root.appIconSize
 
-        Rectangle {
+        Image {
             anchors.fill: parent
             visible: !root.critical && !root.timerNotification && root.hasImage
-            radius: width / 2
-            clip: true
-            color: config.surface
-
-            Image {
-                anchors.fill: parent
-                source: !root.critical && !root.timerNotification && root.hasImage ? root.notification.image : ""
-                sourceSize.width: Math.ceil(width * Screen.devicePixelRatio)
-                sourceSize.height: Math.ceil(height * Screen.devicePixelRatio)
-                fillMode: Image.PreserveAspectCrop
-                asynchronous: true
-            }
-
+            source: !root.critical && !root.timerNotification && root.hasImage ? root.notification.image : ""
+            // Decode above display resolution without loading the full screenshot.
+            sourceSize.width: Math.ceil(width * Screen.devicePixelRatio * 2)
+            sourceSize.height: Math.ceil(height * Screen.devicePixelRatio * 2)
+            fillMode: Image.PreserveAspectFit
+            smooth: true
+            asynchronous: true
         }
 
         IconImage {
