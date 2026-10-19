@@ -21,9 +21,8 @@ It is built for my own desktop: compact, opinionated, and comfortable to use fro
 |                     | What's included                                                                                              |
 | ------------------- | ------------------------------------------------------------------------------------------------------------ |
 | **Desktop**         | Per-screen bar, workspaces, window title, clock, weather, battery, and system tray                           |
-| **Controls**        | Keyboard-driven Wi-Fi, Bluetooth, and audio popups; output, input, playback, and card profile tabs           |
+| **Controls**        | Keyboard-driven menus for Bluetooth, Wifi, Audio and Notifications                                           |
 | **Launch & pick**   | Application launcher, file search, calculator, binary runner, emoji, timers, and a stdin-driven dmenu picker |
-| **Stay informed**   | Notifications, history, do-not-disturb, and Bluetooth connection and low-battery alerts                      |
 | **Everyday tools**  | Clipboard history, DeepL translation, and fullscreen or region recording                                     |
 | **Session & style** | Lock screen, power menu, idle timeouts, wallpaper picker, and Pywal themes                                   |
 
