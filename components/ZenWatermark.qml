@@ -45,11 +45,11 @@ PanelWindow {
             width: labels.width
             renderType: Text.NativeRendering
             textFormat: Text.PlainText
-            text: "Zen mode"
+            text: "Zen Mode"
             color: root.config.fg
             font.family: root.config.textFontFamily
             font.pointSize: root.config.fontSize(1)
-            horizontalAlignment: Text.AlignRight
+            horizontalAlignment: Text.AlignHCenter
         }
 
         Text {
