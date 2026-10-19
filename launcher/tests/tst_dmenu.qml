@@ -6,6 +6,23 @@ import "../Dmenu.js" as Dmenu
 TestCase {
     name: "DmenuScoring"
 
+    function test_output_modes() {
+        compare(Dmenu.outputValue("two", false, 1), "two");
+        compare(Dmenu.outputValue("first", true, 0), "0");
+        compare(Dmenu.outputValue("", true, 2), "2");
+        compare(Dmenu.outputValue("custom", true), "-1");
+        compare(Dmenu.outputValue("custom", false), "custom");
+
+        // A sorted/filtered row retains its original input index, including
+        // duplicates: don't infer the index by looking up the returned text.
+        const matches = [
+            {text: "duplicate", index: 4},
+            {text: "duplicate", index: 1}
+        ];
+        compare(Dmenu.outputValue(matches[0].text, true, matches[0].index), "4");
+        compare(Dmenu.outputValue(matches[1].text, true, matches[1].index), "1");
+    }
+
     function test_row_counts() {
         compare(Dmenu.visibleRows(7, false, 2, 20), 7);
         compare(Dmenu.visibleRows(7, true, 2, 20), 2);

@@ -9,6 +9,7 @@
 prompt=""
 lines=7
 minimal_lines=false
+index_mode=false
 while [ $# -gt 0 ]; do
     case "$1" in
         -p|--prompt)
@@ -21,6 +22,7 @@ while [ $# -gt 0 ]; do
         --lines=*) lines="${1#--lines=}"; shift ;;
         -l?*) lines="${1#-l}"; shift ;;
         --minimal-lines) minimal_lines=true; shift ;;
+        --index) index_mode=true; shift ;;
         # dmenu/rofi flags that take a value: accepted and ignored
         -fn|-nb|-nf|-sb|-sf|-m|-w)
             [ $# -ge 2 ] || { printf '%s requires a value\n' "$1" >&2; exit 2; }
@@ -51,7 +53,7 @@ cat > "$dir/items" || exit 1
 # Session identity changes on reload/restart. Bound IPC calls, not the time a
 # user may spend selecting; a vanished shell must not leave the caller waiting.
 session=$(timeout 3 qs ipc call launcher dmenuSession) || exit 1
-timeout 3 qs ipc call launcher dmenu "$dir/items" "$dir/out" "$prompt" "$lines" "$minimal_lines" >/dev/null || exit 1
+timeout 3 qs ipc call launcher dmenu "$dir/items" "$dir/out" "$prompt" "$lines" "$minimal_lines" "$index_mode" >/dev/null || exit 1
 
 ticks=0
 while [ ! -f "$dir/out" ]; do

@@ -32,6 +32,7 @@ Item {
     property string dmenuPrompt: ""
     property int dmenuLines: 7
     property bool dmenuMinimalLines: false
+    property bool dmenuIndexMode: false
     // Result file awaited by the caller; empty when no request is pending.
     property string dmenuOutPath: ""
     readonly property string dmenuSessionId: Date.now().toString() + "-" + Math.random().toString()
@@ -400,13 +401,14 @@ Item {
 
     // Called from IPC: the items are read from itemsPath, and the result is
     // written atomically to outPath, awaited by launcher/dmenu-runner.
-    function requestDmenu(itemsPath, outPath, prompt, lines, minimalLines): void {
+    function requestDmenu(itemsPath, outPath, prompt, lines, minimalLines, indexMode): void {
         // Hide and clear the previous request before loading new choices.
         finalizeClose()
         dmenuOutPath = outPath
         dmenuPrompt = prompt
         dmenuLines = Math.max(0, lines)
         dmenuMinimalLines = minimalLines
+        dmenuIndexMode = indexMode
         dmenuFile.path = ""
         dmenuFile.path = itemsPath
     }
@@ -428,11 +430,11 @@ Item {
         ])
     }
 
-    function submitDmenu(value): void {
+    function submitDmenu(value, inputIndex): void {
         if (dmenuOutPath === "")
             return
 
-        writeDmenuOutput(dmenuOutPath, value)
+        writeDmenuOutput(dmenuOutPath, Dmenu.outputValue(value, dmenuIndexMode, inputIndex))
         dmenuOutPath = ""
         dmenuItems = []
         dmenuPrompt = ""
@@ -536,7 +538,7 @@ Item {
         const item = results[selectedIndex]
 
         if (item.type === "dmenu") {
-            submitDmenu(item.text)
+            submitDmenu(item.text, item.index)
         } else if (item.type === "timer-start") {
             timerService.startTimer(item.seconds, item.note)
             searchInput.text = ""
@@ -1497,8 +1499,8 @@ Item {
         }
 
         // Used by launcher/dmenu-runner.
-        function dmenu(itemsPath: string, outPath: string, prompt: string, lines: int, minimalLines: bool): void {
-            root.requestDmenu(itemsPath, outPath, prompt, lines, minimalLines)
+        function dmenu(itemsPath: string, outPath: string, prompt: string, lines: int, minimalLines: bool, indexMode: bool): void {
+            root.requestDmenu(itemsPath, outPath, prompt, lines, minimalLines, indexMode)
         }
     }
 }

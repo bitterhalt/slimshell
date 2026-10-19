@@ -24,7 +24,7 @@ It is built for my own desktop: compact, opinionated, and comfortable to use fro
 | **Controls**        | Keyboard-driven Wi-Fi, Bluetooth, and audio popups; output, input, playback, and card profile tabs           |
 | **Launch & pick**   | Application launcher, file search, calculator, binary runner, emoji, timers, and a stdin-driven dmenu picker |
 | **Stay informed**   | Notifications, history, do-not-disturb, and Bluetooth connection and low-battery alerts                      |
-| **Everyday tools**  | Clipboard history, DeepL translation, process killer, and fullscreen or region recording                     |
+| **Everyday tools**  | Clipboard history, DeepL translation, and fullscreen or region recording                                     |
 | **Session & style** | Lock screen, power menu, idle timeouts, wallpaper picker, and Pywal themes                                   |
 
 Menus support keyboard shortcuts and external control through IPC. For example:
@@ -60,6 +60,7 @@ printf '%s\n' Search 'New Note' TODO Delete |
 
 - **Enter** returns the selected line; **Shift+Enter** returns your typed text.
 - **Esc** cancels with exit status `1`.
+- `--index` returns the selected entry's original zero-based input index instead of its text, even after filtering or sorting. Custom typed text returns `-1`.
 - `-l N` / `--lines N` sets the row count (default **7**).
 - `--minimal-lines` shrinks the menu to the number of input choices. Filtering doesn't resize it.
 - `-l 0` shows the prompt and mode footer only; **Enter** returns typed text.
@@ -89,7 +90,7 @@ bar/            Bar and its modules
 components/     Reusable UI and popup components
 services/       Shared desktop state and integrations
 launcher/       Launcher, dmenu runner, and search helpers
-menus/          System, theme, wallpaper, and process menus
+menus/          System, theme, and wallpaper menus
 notifications/  Notification popups and history
 clipboard/      Clipboard picker and previews
 lock/           Lock screen components and PAM setup

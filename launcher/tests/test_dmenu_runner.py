@@ -28,10 +28,11 @@ if method == "dmenuSession":
         time.sleep(30)
     print("new-session" if started and kind == "reloaded" else "session")
 elif method == "dmenu":
-    items, output, prompt, lines, minimal = sys.argv[5:]
+    items, output, prompt, lines, minimal, index_mode = sys.argv[5:]
     (base / "request.json").write_text(json.dumps({
         "items": Path(items).read_text(), "prompt": prompt, "output": output,
         "lines": int(lines), "minimal": minimal,
+        "index_mode": index_mode,
     }))
     if kind == "ipc-error":
         sys.exit(1)
@@ -87,6 +88,19 @@ class DmenuRunnerTests(unittest.TestCase):
         request = json.loads((self.base / "request.json").read_text())
         self.assertEqual(request["lines"], 7)
         self.assertEqual(request["minimal"], "false")
+        self.assertEqual(request["index_mode"], "false")
+
+    def test_index_mode(self):
+        result = self.run_runner("--index", choice="1")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "1\n")
+        request = json.loads((self.base / "request.json").read_text())
+        self.assertEqual(request["index_mode"], "true")
+
+    def test_cancel_in_index_mode(self):
+        result = self.run_runner("--index", kind="cancel")
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.stdout, "")
 
     def test_line_options(self):
         for args, expected in ((["-l", "3"], 3), (["-l4"], 4),

@@ -66,11 +66,6 @@ ShellRoot {
     wallpaperPicker: appWallpaperPicker
   }
 
-  ProcessMenu {
-    config: appConfig
-    targetScreen: root.activeScreen
-  }
-
   LockService {
     id: appLockService
   }
