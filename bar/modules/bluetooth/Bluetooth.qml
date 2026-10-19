@@ -29,7 +29,9 @@ Item {
     property string selectedAddress: ""
     property bool confirmForget: false
     property string forgetAddress: ""
-    readonly property var forgetTarget: popupRows.find(row => row.address === forgetAddress) || null
+    readonly property var forgetTarget: popupRows.find((row) => {
+        return row.address === forgetAddress;
+    }) || null
     property bool helpOpen: false
 
     function selectDevice(index) {
@@ -58,6 +60,7 @@ Item {
                 cancelForget();
                 if (adapter && adapter.enabled && row && row.paired)
                     bluetoothService.forgetDevice(row);
+
             }
             event.accepted = true;
             return true;
@@ -83,9 +86,9 @@ Item {
             selectDevice(index < 0 ? 0 : Math.min(popupRows.length - 1, index + 1));
         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
             const row = selectedDevice();
-            if (row) {
+            if (row)
                 toggleDevice(row);
-            }
+
         } else if (event.key === Qt.Key_T) {
             const row = selectedDevice();
             if (row && row.paired)
@@ -97,7 +100,6 @@ Item {
                 forgetAddress = row.address;
                 confirmForget = true;
             }
-
         } else {
             return false;
         }
@@ -107,7 +109,8 @@ Item {
 
     function toggleDevice(row) {
         if (confirmForget || helpOpen || !adapter || !adapter.enabled)
-            return;
+            return ;
+
         bluetoothService.toggleDevice(row);
     }
 
@@ -119,6 +122,7 @@ Item {
     onPopupRowsChanged: Qt.callLater(() => {
         if (confirmForget && !forgetTarget)
             cancelForget();
+
         if (popupRows.length > 0 && !popupRows.some((row) => {
             return row.address === selectedAddress;
         }))
@@ -178,7 +182,6 @@ Item {
             Component.onCompleted: {
                 root.cancelForget();
                 root.helpOpen = false;
-                root.bluetoothService.beginDiscovery();
                 Qt.callLater(() => {
                     return forceActiveFocus();
                 });
@@ -191,10 +194,20 @@ Item {
             Component.onDestruction: {
                 root.cancelForget();
                 root.helpOpen = false;
-                root.bluetoothService.endDiscovery();
             }
             Keys.onPressed: (event) => {
+                if (!root.confirmForget && discoveryState.handleKey(event.key, event.modifiers)) {
+                    root.helpOpen = false;
+                    event.accepted = true;
+                    return ;
+                }
                 return root.handlePopupKey(event);
+            }
+
+            DiscoveryState {
+                id: discoveryState
+
+                bluetoothService: root.bluetoothService
             }
 
             Item {
@@ -211,30 +224,16 @@ Item {
                     text: "Bluetooth"
                 }
 
-                Row {
+                ToggleSwitch {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: 8
-
-                    Text {
-                        renderType: Text.NativeRendering
-                        anchors.verticalCenter: parent.verticalCenter
-                        color: config.muted
-                        font.pointSize: config.fontSize(0.85)
-                        text: root.adapter && root.adapter.enabled ? "On" : "Off"
+                    config: root.config
+                    checked: root.adapter && root.adapter.enabled
+                    enabled: root.adapter !== null
+                    onToggled: {
+                        if (root.adapter)
+                            root.adapter.enabled = !root.adapter.enabled;
                     }
-
-                    ToggleSwitch {
-                        config: root.config
-                        checked: root.adapter && root.adapter.enabled
-                        enabled: root.adapter !== null
-                        onToggled: {
-                            if (root.adapter)
-                                root.adapter.enabled = !root.adapter.enabled;
-
-                        }
-                    }
-
                 }
 
             }
@@ -310,32 +309,6 @@ Item {
 
                 }
 
-                Item {
-                    width: parent.width
-                    height: 18
-
-                    Text {
-                        renderType: Text.NativeRendering
-                        anchors.left: parent.left
-                        anchors.verticalCenter: parent.verticalCenter
-                        color: config.muted
-                        font.pointSize: config.fontSize(0.77)
-                        font.weight: Font.DemiBold
-                        font.letterSpacing: 0.4
-                        text: "AVAILABLE"
-                    }
-
-                    Text {
-                        renderType: Text.NativeRendering
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        color: config.muted
-                        font.pointSize: config.fontSize(0.77)
-                        text: root.adapter && root.adapter.discovering ? "Scanning…" : ""
-                    }
-
-                }
-
                 Repeater {
                     model: root.availableRows
 
@@ -384,8 +357,41 @@ Item {
                 visible: root.helpOpen
                 color: root.config.muted
                 font.pointSize: root.config.fontSize(0.78)
-                text: "↑/↓ or j/k Select · Enter Connect/Pair · t Trust/Untrust · f Forget · ?/Esc Back"
+                text: "↑/↓ or j/k Select · Enter Connect/Pair · t Trust/Untrust · f Forget · Ctrl+S Scan/Stop · ?/Esc Back"
                 wrapMode: Text.WordWrap
+            }
+
+            Item {
+                width: parent.width
+                height: 28
+                visible: !!root.adapter && root.adapter.enabled && !root.confirmForget
+
+                Rectangle {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    height: 1
+                    color: root.config.borderColor
+                }
+
+                Text {
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    renderType: Text.NativeRendering
+                    color: root.config.muted
+                    font.pointSize: root.config.fontSize(0.78)
+                    text: root.adapter && root.adapter.discovering ? "Scanning…" : "? Help"
+                }
+
+                Text {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    renderType: Text.NativeRendering
+                    color: root.config.muted
+                    font.pointSize: root.config.fontSize(0.78)
+                    text: discoveryState.requested ? "Ctrl+S: Stop scan" : "Ctrl+S: Scan"
+                }
+
             }
 
         }
@@ -466,6 +472,7 @@ Item {
 
                 Text {
                     id: trustedStar
+
                     width: deviceRow.trusted ? 12 : 0
                     color: deviceRow.config.accent
                     font.pointSize: deviceRow.config.fontSize(0.78)

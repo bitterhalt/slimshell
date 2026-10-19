@@ -36,6 +36,8 @@ qs ipc call bluetooth toggle
 
 Slimshell pauses Wi-Fi scanning while Ethernet is connected; NetworkManager may still perform its own scans. Network on/off controls are left to your own tools or window-manager bindings.
 
+Bluetooth scanning is controlled with **Ctrl+S**. The footer shows the shortcut and scanning status, and closing the popup stops its scan.
+
 ## Launcher
 
 One launcher, four modes. Switch directly with the shortcuts below, or cycle with **Ctrl+← / Ctrl+→**.
