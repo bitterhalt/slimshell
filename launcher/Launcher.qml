@@ -37,6 +37,7 @@ Item {
     property string dmenuOutPath: ""
     readonly property string dmenuSessionId: Date.now().toString() + "-" + Math.random().toString()
     property var emojiEntries: []
+    property bool emojiDataRequested: false
     property var emojiHistory: []
     property bool emojiHistoryReady: false
     readonly property string emojiHistoryPath:
@@ -466,8 +467,12 @@ Item {
             historyFile.reload()
         }
 
-        if (emojiMode && emojiEntries.length === 0)
-            emojiFile.reload()
+        if (emojiMode) {
+            if (!emojiDataRequested)
+                emojiDataRequested = true
+            else if (emojiEntries.length === 0)
+                emojiFile.reload()
+        }
 
         if (timerMode) {
             timerClock = Date.now()
@@ -1439,9 +1444,9 @@ Item {
     FileView {
         id: emojiFile
 
-        path: (Quickshell.env("HOME") || "")
-            + "/.local/share/emoji/emoji.txt"
-        watchChanges: true
+        path: root.emojiDataRequested
+            ? (Quickshell.env("HOME") || "") + "/.local/share/emoji/emoji.txt" : ""
+        watchChanges: root.emojiDataRequested
         printErrors: false
 
         onLoaded: {
@@ -1460,7 +1465,8 @@ Item {
                     }
                 })
                 .filter(entry => entry !== null)
-            root.selectedIndex = 0
+            if (root.emojiMode)
+                root.selectedIndex = 0
         }
 
         onLoadFailed: root.emojiEntries = []
