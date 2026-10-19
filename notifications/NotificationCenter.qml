@@ -1,7 +1,12 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
+import Quickshell.Services.Notifications
+import "../components"
+import "HistoryModel.js" as HistoryModel
 
-Item {
+FocusScope {
     id: root
 
     required property var config
@@ -9,152 +14,232 @@ Item {
     readonly property int popupWidth: 360
     readonly property int popupMinHeight: 320
     readonly property int popupMaxHeight: 650
-    readonly property int popupPadding: 12
-    readonly property int itemSpacing: 8
+    readonly property int popupPadding: 10
+
+    signal closeRequested()
 
     implicitWidth: popupWidth
-    implicitHeight: Math.min(Math.max(notificationService.notificationCount > 0 ? 72 + notificationService.notificationCount * 100 : 118, popupMinHeight), popupMaxHeight)
+    implicitHeight: Math.min(Math.max(notificationService.notificationCount > 0
+        ? 80 + notificationService.notificationCount * 100 : 118, popupMinHeight), popupMaxHeight)
     width: implicitWidth
     height: implicitHeight
+    focus: true
+    Component.onCompleted: Qt.callLater(() => forceActiveFocus())
+    Keys.onPressed: event => {
+        if (history.handleKey(event.key, event.modifiers, event.text))
+            event.accepted = true;
+    }
+
+    function keepSelectionVisible() {
+        if (history.selectedIndex >= 0 && history.selectedIndex < list.count)
+            list.positionViewAtIndex(history.selectedIndex, ListView.Contain);
+    }
+
+    function iconSource(icon) {
+        if (!icon)
+            return "";
+        return icon.startsWith("/") || icon.startsWith("file:")
+            ? icon : Quickshell.iconPath(icon, true);
+    }
+
+    HistoryState {
+        id: history
+        objectName: "historyState"
+        notificationService: root.notificationService
+        onSelectionMoved: Qt.callLater(root.keepSelectionVisible)
+        onCloseRequested: root.closeRequested()
+    }
 
     Rectangle {
         anchors.fill: parent
-        color: config.surface
-        border.color: config.borderColor
+        color: root.config.surface
+        border.color: root.config.borderColor
         border.width: 1
-        radius: config.popupRadius
+        radius: root.config.popupRadius
+    }
 
-        Column {
-            anchors.fill: parent
-            anchors.margins: root.popupPadding
-            spacing: 10
+    Item {
+        id: historyHeader
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: root.popupPadding
+        height: 28
 
-            Item {
-                width: parent.width
-                height: 32
+        Text {
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            renderType: Text.NativeRendering
+            color: root.config.fg
+            font.pointSize: root.config.fontSize(1)
+            font.weight: Font.DemiBold
+            text: "Notifications"
+        }
 
-                Text {
-                    renderType: Text.NativeRendering
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    color: config.fg
-                    font.pointSize: config.fontSize(1.05)
-                    font.weight: Font.DemiBold
-                    text: "Notifications"
-                }
+        Row {
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 8
 
-                Row {
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 12
-
-                    Text {
-                        renderType: Text.NativeRendering
-                        anchors.verticalCenter: parent.verticalCenter
-                        color: notificationService.dnd ? config.accent : config.muted
-                        font.pointSize: config.fontSize(0.82)
-                        text: "DND"
-                    }
-
-                    Rectangle {
-                        width: 34
-                        height: 18
-                        radius: 9
-                        color: notificationService.dnd ? config.accent : config.borderColor
-
-                        Rectangle {
-                            width: 14
-                            height: 14
-                            radius: 7
-                            y: 2
-                            x: notificationService.dnd ? 18 : 2
-                            color: config.fg
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: notificationService.toggleDnd()
-                        }
-
-                    }
-
-                }
-
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                renderType: Text.NativeRendering
+                color: root.notificationService.dnd ? root.config.accent : root.config.muted
+                font.pointSize: root.config.fontSize(0.8)
+                text: "DND"
             }
 
-            Rectangle {
-                width: parent.width
-                height: 1
-                color: config.borderColor
+            ToggleSwitch {
+                config: root.config
+                checked: root.notificationService.dnd
+                onToggled: {
+                    root.notificationService.toggleDnd();
+                    root.forceActiveFocus();
+                }
             }
+        }
+    }
 
-            Item {
-                width: parent.width
-                height: parent.height - 76
+    ListView {
+        id: list
+        objectName: "historyList"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: historyHeader.bottom
+        anchors.bottom: history.helpOpen ? helpText.top : historyFooter.top
+        anchors.leftMargin: root.popupPadding
+        anchors.rightMargin: root.popupPadding
+        anchors.topMargin: 8
+        anchors.bottomMargin: 8
+        visible: count > 0
+        clip: true
+        spacing: 4
+        keyNavigationEnabled: false
+        onCountChanged: Qt.callLater(root.keepSelectionVisible)
 
-                Text {
-                    renderType: Text.NativeRendering
-                    anchors.centerIn: parent
-                    visible: notificationService.notificationCount === 0
-                    color: config.muted
-                    font.pointSize: config.fontSize(0.9)
-                    text: "No notifications"
-                }
+        // Preserve delegates when notifications arrive or disappear.
+        model: ScriptModel { values: history.rows }
 
-                ListView {
-                    id: list
+        delegate: HistoryCard {
+            id: card
+            required property var modelData
+            required property int index
 
-                    anchors.fill: parent
-                    visible: notificationService.notificationCount > 0
-                    clip: true
-                    spacing: root.itemSpacing
-
-                    // ScriptModel diffs by object, so delegates (and scroll
-                    // position) survive when notifications come and go.
-                    model: ScriptModel {
-                        values: notificationService.notifications.slice().reverse()
-                    }
-
-                    delegate: NotificationCard {
-                        required property var modelData
-
-                        width: ListView.view.width
-                        config: root.config
-                        notification: modelData
-                        notificationService: root.notificationService
-                    }
-
-                }
-
+            width: list.width
+            config: root.config
+            notification: modelData
+            selected: index === history.selectedIndex
+            critical: modelData.urgency === NotificationUrgency.Critical
+            timeLabel: root.notificationService.timeLabel(modelData)
+            appIconSource: root.iconSource(modelData.appIcon || "")
+            actionEntries: HistoryModel.actionsFor(modelData.actions)
+            onHeightChanged: if (selected) Qt.callLater(root.keepSelectionVisible)
+            onPicked: {
+                history.select(index);
+                root.forceActiveFocus();
             }
+            onCloseRequested: {
+                history.select(index);
+                history.dismissSelected();
+                root.forceActiveFocus();
+            }
+            onActionRequested: entry => {
+                history.select(index);
+                history.invoke(entry);
+                root.forceActiveFocus();
+            }
+        }
+    }
 
-            Item {
-                width: parent.width
-                height: 24
-                visible: notificationService.notificationCount > 0
+    Text {
+        anchors.centerIn: list
+        visible: history.rows.length === 0
+        renderType: Text.NativeRendering
+        text: "No notifications"
+        color: root.config.muted
+        font.pointSize: root.config.fontSize(0.9)
+    }
 
-                Text {
-                    renderType: Text.NativeRendering
-                    anchors.centerIn: parent
-                    color: clearMouse.containsMouse ? config.fg : config.muted
-                    font.pointSize: config.fontSize(0.82)
-                    text: "Clear all"
+    Text {
+        id: helpText
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: historyFooter.top
+        anchors.margins: root.popupPadding
+        visible: history.helpOpen
+        renderType: Text.NativeRendering
+        wrapMode: Text.WordWrap
+        color: root.config.muted
+        font.pointSize: root.config.fontSize(0.78)
+        text: "↑/↓ or j/k Select · Tab Next · Enter Default action · x / c Close · Ctrl+C Clear all · Lettered buttons invoke actions · Esc Back/Close"
+    }
+
+    Item {
+        id: historyFooter
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.margins: root.popupPadding
+        height: Math.max(helpHint.implicitHeight, footerActions.implicitHeight) + 8
+
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            height: 1
+            color: root.config.borderColor
+        }
+
+        Text {
+            id: helpHint
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.topMargin: 8
+            renderType: Text.NativeRendering
+            color: helpMouse.containsMouse ? root.config.fg : root.config.muted
+            font.pointSize: root.config.fontSize(0.76)
+            text: history.helpOpen ? "Esc Back" : "? Help"
+            MouseArea {
+                id: helpMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    history.helpOpen = !history.helpOpen;
+                    root.forceActiveFocus();
                 }
+            }
+        }
 
+        Row {
+            id: footerActions
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.topMargin: 8
+            spacing: 12
+
+            Text {
+                renderType: Text.NativeRendering
+                text: "x / c Close"
+                color: root.config.muted
+                font.pointSize: root.config.fontSize(0.76)
+            }
+            Text {
+                renderType: Text.NativeRendering
+                text: "Ctrl+C Clear all"
+                color: clearMouse.containsMouse ? root.config.fg : root.config.muted
+                font.pointSize: root.config.fontSize(0.76)
                 MouseArea {
                     id: clearMouse
-
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: notificationService.clearAll()
+                    onClicked: {
+                        root.notificationService.clearAll();
+                        root.forceActiveFocus();
+                    }
                 }
-
             }
-
         }
-
     }
-
 }

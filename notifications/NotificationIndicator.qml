@@ -49,7 +49,7 @@ Item {
                 "notificationCenter",
                 notificationCenterComponent,
                 root,
-                false,
+                true,
                 true
             )
         }
@@ -61,6 +61,7 @@ Item {
         NotificationCenter {
             config: root.config
             notificationService: root.notificationService
+            onCloseRequested: root.popupManager.closeHost("notificationCenter")
         }
     }
 
@@ -93,7 +94,7 @@ Item {
                     "notificationCenter",
                     notificationCenterComponent,
                     root,
-                    false,
+                    true,
                     true
                 )
             } else if (action === "open") {
@@ -101,7 +102,7 @@ Item {
                     "notificationCenter",
                     notificationCenterComponent,
                     root,
-                    false,
+                    true,
                     true
                 )
             }
