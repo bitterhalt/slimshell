@@ -1,17 +1,34 @@
 import QtQuick
-import Quickshell.Io
+import Quickshell.Services.UPower
 
 Item {
     id: root
 
     visible: false
 
-    property bool present: false
-    property int capacity: 0
-    property string status: ""
+    // UPower's display device aggregates system batteries, not peripherals.
+    readonly property var device: UPower.displayDevice
+    readonly property bool present: !!device && device.ready
+        && device.isLaptopBattery && device.isPresent
+    readonly property int capacity: present && Number.isFinite(device.percentage)
+        ? Math.max(0, Math.min(100, Math.round(device.percentage))) : 0
+    readonly property string status: {
+        if (!present)
+            return ""
+
+        switch (device.state) {
+        case UPowerDeviceState.Charging: return "Charging"
+        case UPowerDeviceState.Discharging: return "Discharging"
+        case UPowerDeviceState.Empty: return "Empty"
+        case UPowerDeviceState.FullyCharged: return "Full"
+        case UPowerDeviceState.PendingCharge: return "Not charging"
+        case UPowerDeviceState.PendingDischarge: return "Pending discharge"
+        default: return "Unknown"
+        }
+    }
 
     readonly property string icon: {
-        if (status.toLowerCase().includes("charging"))
+        if (status === "Charging")
             return "󰂄"
 
         const icons = [
@@ -20,51 +37,5 @@ Item {
         ]
         const index = Math.max(0, Math.min(10, Math.round(capacity / 10)))
         return icons[index]
-    }
-
-    function refresh(): void {
-        if (!batteryProcess.running)
-            batteryProcess.running = true
-    }
-
-    Process {
-        id: batteryProcess
-
-        command: [
-            "sh",
-            "-lc",
-            "for BAT in /sys/class/power_supply/BAT*; do "
-                + "[ -d \"$BAT\" ] || continue; "
-                + "printf '%s\\n%s\\n' \"$(cat \"$BAT/capacity\")\" "
-                + "\"$(cat \"$BAT/status\" 2>/dev/null || true)\"; "
-                + "exit 0; done; exit 1"
-        ]
-
-        onExited: exitCode => {
-            if (exitCode !== 0)
-                root.present = false
-        }
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const lines = text.trim().split(/\n+/)
-
-                if (lines.length > 0 && lines[0] !== "") {
-                    root.capacity = parseInt(lines[0]) || 0
-                    root.status = lines.length > 1 ? lines[1] : ""
-                    root.present = true
-                } else {
-                    root.present = false
-                }
-            }
-        }
-    }
-
-    Timer {
-        running: true
-        repeat: true
-        interval: 60000
-        triggeredOnStart: true
-        onTriggered: root.refresh()
     }
 }
