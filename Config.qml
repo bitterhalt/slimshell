@@ -17,6 +17,9 @@ Item {
     // Clock
     property string clockFormat: "HH:mm"
     property string clockAlternativeFormat: "dddd, d MMMM"
+    // Desktop watermark while the bar is hidden.
+    property real zenWatermarkOpacity: 0.45
+    property int zenWatermarkMargin: 32
     // Popup geometry
     property int popupGap: 16
     property int popupRadius: 4

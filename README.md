@@ -103,6 +103,8 @@ osd/            Volume overlay
 
 Tests live beside the features they cover.
 
+Hiding the bar reveals a subtle clock and “Zen mode” watermark on the wallpaper, behind application windows. Its opacity and edge margin are adjustable in `Config.qml`.
+
 ## Transparency
 
 This shell was developed with LLM assistance under my supervision. I direct the design, review the changes, and test them on my own desktop. These are personal dotfiles, so review and adapt them before using them on yours.
@@ -111,4 +113,4 @@ This shell was developed with LLM assistance under my supervision. I direct the 
 
 - [ ] A dedicated clock popup for barless mode, instead of opening notifications.
 - [ ] A visual refresh for the weather widget.
-- [ ] A subtle “Zen Mode is enabled” watermark in the bottom-right corner in barless mode.
+- [x] A subtle clock and Zen mode watermark in the top-right corner in barless mode.

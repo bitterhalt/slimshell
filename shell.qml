@@ -220,6 +220,18 @@ ShellRoot {
   Variants {
     model: Quickshell.screens
 
+    ZenWatermark {
+      required property var modelData
+
+      targetScreen: modelData
+      config: appConfig
+      visible: !root.barVisible
+    }
+  }
+
+  Variants {
+    model: Quickshell.screens
+
     Bar {
       required property var modelData
 
