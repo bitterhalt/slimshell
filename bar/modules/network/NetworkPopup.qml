@@ -17,13 +17,13 @@ PopoutPanel {
     property int selectedNetworkIndex: 0
     property int selectedActionIndex: 0
     property bool helpOpen: false
-    readonly property var selectableRows: network.selectableRows
+    readonly property bool showNearby: scanState.resultsVisible && network.wifiBrowsingAvailable
+    readonly property var selectableRows: Model.selectableRows(network.networkRows, showNearby)
 
-    Binding {
-        target: root.network.wifiDevice
-        property: "scannerEnabled"
-        value: root.network.wifiBrowsingAvailable
-        when: root.network.wifiDevice !== null
+    ScanState {
+        id: scanState
+        wifiDevice: root.network.wifiDevice
+        allowed: root.network.wifiBrowsingAvailable
     }
 
     function resetState() {
@@ -81,6 +81,11 @@ PopoutPanel {
     }
 
     function handlePopupKey(event) {
+        if (!passwordMode && !actionMode && scanState.handleKey(event.key, event.modifiers)) {
+            helpOpen = false;
+            event.accepted = true;
+            return true;
+        }
         if (event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier))
             return false;
         if (passwordMode) {
@@ -90,6 +95,15 @@ PopoutPanel {
                 return true;
             }
             return false;
+        }
+        if (actionMode && !helpOpen) {
+            const index = Model.actionShortcut(event.text,
+                !!actionPage.selectedNetwork && actionPage.selectedNetwork.connected);
+            if (index >= 0) {
+                activateAction(index);
+                event.accepted = true;
+                return true;
+            }
         }
         if (event.key === Qt.Key_Escape) {
             if (helpOpen)
@@ -172,11 +186,6 @@ PopoutPanel {
             selectNetwork(index < 0 ? 0 : index);
         }
     }
-    Component.onDestruction: {
-        if (network.wifiDevice)
-            network.wifiDevice.scannerEnabled = false;
-
-    }
 
     Item {
         width: parent.width
@@ -194,21 +203,10 @@ PopoutPanel {
 
     }
 
-    PanelSeparator {
-        config: root.config
-    }
-
     Column {
         width: parent.width
         spacing: 2
         visible: !root.passwordMode && !root.actionMode
-
-        SectionHeader {
-            renderType: Text.NativeRendering
-            config: root.config
-            visible: root.network.connectionKind !== "disconnected"
-            text: "CONNECTED"
-        }
 
         Item {
             width: parent.width
@@ -318,7 +316,7 @@ PopoutPanel {
                 onEntered: {
                     if (root.network.connectedWifi) {
                         root.selectedSsid = root.network.connectedWifi.name;
-                        root.selectedNetworkIndex = root.network.selectableRows.findIndex(
+                        root.selectedNetworkIndex = root.selectableRows.findIndex(
                             row => row.ssid === root.selectedSsid);
                     }
                 }
@@ -326,15 +324,8 @@ PopoutPanel {
 
         }
 
-        SectionHeader {
-            renderType: Text.NativeRendering
-            config: root.config
-            visible: root.network.wifiBrowsingAvailable && root.network.wifiDevice !== null
-            text: "AVAILABLE NETWORKS"
-        }
-
         Repeater {
-            model: root.network.wifiBrowsingAvailable ? root.network.networkRows.filter((row) => {
+            model: root.showNearby ? root.network.networkRows.filter((row) => {
                 return !row.connected;
             }) : []
 
@@ -348,7 +339,7 @@ PopoutPanel {
                 row: modelData
                 enabled: !modelData.stateChanging
                 selected: modelData.ssid === root.selectedSsid
-                onFocused: root.selectNetwork(root.network.selectableRows.findIndex(
+                onFocused: root.selectNetwork(root.selectableRows.findIndex(
                     row => row.ssid === modelData.ssid))
                 onActivated: root.openRow(modelData)
             }
@@ -382,12 +373,24 @@ PopoutPanel {
         Text {
             renderType: Text.NativeRendering
             width: parent.width
-            visible: root.network.wifiBrowsingAvailable && root.network.wifiDevice
+            visible: root.showNearby && root.network.wifiDevice
                 && root.network.networkRows.length === 0
             horizontalAlignment: Text.AlignHCenter
             color: root.config.muted
             font.pointSize: root.config.fontSize(0.85)
             text: root.network.wifiDevice && root.network.wifiDevice.scannerEnabled ? "Scanning…" : "No networks found"
+            topPadding: 10
+            bottomPadding: 10
+        }
+
+        Text {
+            renderType: Text.NativeRendering
+            width: parent.width
+            visible: !root.showNearby && root.network.connectionKind === "disconnected" && scanState.canScan
+            horizontalAlignment: Text.AlignHCenter
+            color: root.config.muted
+            font.pointSize: root.config.fontSize(0.85)
+            text: "Not connected"
             topPadding: 10
             bottomPadding: 10
         }
@@ -432,7 +435,7 @@ PopoutPanel {
                 onActiveFocusChanged: if (activeFocus) root.selectedActionIndex = 0
                 width: (parent.width - 6) / 2
                 height: parent.height
-                text: actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "Disconnect" : "Connect"
+                text: actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "[d]isconnect" : "[c]onnect"
                 onClicked: root.activateAction(0)
 
                 background: Rectangle {
@@ -461,7 +464,7 @@ PopoutPanel {
                 onActiveFocusChanged: if (activeFocus) root.selectedActionIndex = 1
                 width: (parent.width - 6) / 2
                 height: parent.height
-                text: "Forget"
+                text: "[f]orget"
                 onClicked: root.activateAction(1)
 
                 background: Rectangle {
@@ -492,7 +495,7 @@ PopoutPanel {
             onActiveFocusChanged: if (activeFocus) root.selectedActionIndex = 2
             width: parent.width
             height: 30
-            text: "Cancel"
+            text: "Cancel [Esc]"
             onClicked: root.activateAction(2)
 
             background: Rectangle {
@@ -664,7 +667,49 @@ PopoutPanel {
         color: root.config.muted
         font.pointSize: root.config.fontSize(0.74)
         wrapMode: Text.WordWrap
-        text: "↑/↓ or j/k Select · Enter Connect · ?/Esc Help/Close"
+        text: root.actionMode
+            ? (actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "d Disconnect" : "c Connect")
+                + " · f Forget · Esc Back"
+            : "↑/↓ or j/k Select · Enter Connect · Ctrl+S Scan/Stop · ?/Esc Help/Close"
+    }
+
+    Item {
+        width: parent.width
+        height: Math.max(footerStatus.implicitHeight, footerHint.implicitHeight) + root.spacing
+        visible: !root.passwordMode && !root.actionMode
+
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            height: 1
+            color: root.config.borderColor
+        }
+
+        Text {
+            id: footerStatus
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.topMargin: root.spacing
+            renderType: Text.NativeRendering
+            color: root.config.muted
+            font.pointSize: root.config.fontSize(0.78)
+            text: scanState.requested ? "Scanning…" : "? Help"
+        }
+
+        Text {
+            id: footerHint
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.topMargin: root.spacing
+            renderType: Text.NativeRendering
+            color: root.config.muted
+            font.pointSize: root.config.fontSize(0.78)
+            text: root.network.wiredConnected ? "Ethernet connected"
+                : !root.network.wifiDevice ? "No Wi-Fi adapter"
+                : !Networking.wifiEnabled ? "Wi-Fi off"
+                : scanState.requested ? "Ctrl+S: Stop scan" : "Ctrl+S: Scan"
+        }
     }
 
 }

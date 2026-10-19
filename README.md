@@ -34,7 +34,7 @@ qs ipc call network toggle
 qs ipc call bluetooth toggle
 ```
 
-Slimshell pauses Wi-Fi scanning while Ethernet is connected; NetworkManager may still perform its own scans. Network on/off controls are left to your own tools or window-manager bindings.
+The Network popup shows current connections first. **Ctrl+S** starts/stops Wi-Fi scanning and reveals nearby networks; results stay visible until the popup closes. Ethernet blocks Slimshell's Wi-Fi scanning, though NetworkManager may still perform its own scans. Network on/off controls are left to your own tools or window-manager bindings.
 
 Bluetooth scanning is controlled with **Ctrl+S**. The footer shows the shortcut and scanning status, and closing the popup stops its scan.
 

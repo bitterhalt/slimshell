@@ -17,7 +17,6 @@ Item {
     readonly property var networkRows: Model.rows(wifiNetworkObjects)
     readonly property bool wiredConnected: wiredDevice !== null && wiredDevice.connected
     readonly property bool wifiBrowsingAvailable: Model.shouldScanWifi(Networking.wifiEnabled, wiredConnected)
-    readonly property var selectableRows: networkRows.filter(row => row.connected || wifiBrowsingAvailable)
     readonly property var connectedWifi: {
         for (var i = 0; i < wifiNetworkObjects.length; ++i) {
             if (wifiNetworkObjects[i] && wifiNetworkObjects[i].connected)

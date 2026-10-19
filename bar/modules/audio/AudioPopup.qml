@@ -15,7 +15,7 @@ PopoutPanel {
     padding: 10
     readonly property int rowHeight: popupState.tabIndex === 3 ? 48 : 60
     readonly property int rowSpacing: 4
-    readonly property int chromeHeight: 90
+    readonly property int chromeHeight: header.height + 12 + status.height + root.spacing + footer.height
     readonly property real desiredBodyHeight: popupState.helpOpen ? helpRows.implicitHeight
         : popupState.contextOpen ? optionRows.implicitHeight
         : Math.max(rowHeight, popupState.rows.length * (rowHeight + rowSpacing) - rowSpacing)
@@ -263,7 +263,7 @@ PopoutPanel {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: footer.top
-            anchors.bottomMargin: 6
+            anchors.bottomMargin: root.spacing
             height: 18
             text: popupState.helpOpen ? "Volume range: 0–150% · keyboard step: 5%"
                 : popupState.tabIndex === 3
@@ -286,7 +286,7 @@ PopoutPanel {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            height: 30
+            height: 26 + root.spacing
 
             Rectangle {
                 anchors.top: parent.top
@@ -297,7 +297,8 @@ PopoutPanel {
             Row {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.top: parent.top
+                anchors.topMargin: root.spacing
                 Repeater {
                     model: popupState.tabs
                     delegate: Item {

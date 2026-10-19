@@ -233,13 +233,10 @@ Item {
                     onToggled: {
                         if (root.adapter)
                             root.adapter.enabled = !root.adapter.enabled;
+
                     }
                 }
 
-            }
-
-            PanelSeparator {
-                config: root.config
             }
 
             Text {
@@ -363,7 +360,7 @@ Item {
 
             Item {
                 width: parent.width
-                height: 28
+                height: Math.max(footerStatus.implicitHeight, footerHint.implicitHeight) + bluetoothPopup.spacing
                 visible: !!root.adapter && root.adapter.enabled && !root.confirmForget
 
                 Rectangle {
@@ -375,8 +372,10 @@ Item {
                 }
 
                 Text {
+                    id: footerStatus
                     anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.top: parent.top
+                    anchors.topMargin: bluetoothPopup.spacing
                     renderType: Text.NativeRendering
                     color: root.config.muted
                     font.pointSize: root.config.fontSize(0.78)
@@ -384,8 +383,10 @@ Item {
                 }
 
                 Text {
+                    id: footerHint
                     anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.top: parent.top
+                    anchors.topMargin: bluetoothPopup.spacing
                     renderType: Text.NativeRendering
                     color: root.config.muted
                     font.pointSize: root.config.fontSize(0.78)

@@ -4,6 +4,19 @@ function shouldScanWifi(wifiEnabled, wiredConnected) {
     return wifiEnabled && !wiredConnected
 }
 
+function selectableRows(rows, showNearby) {
+    return rows.filter(row => row.connected || showNearby)
+}
+
+function actionShortcut(text, connected) {
+    const key = String(text || "").toLowerCase()
+    if (key === (connected ? "d" : "c"))
+        return 0
+    if (key === "f")
+        return 1
+    return -1
+}
+
 function strengthIcon(strength) {
     if (strength >= 0.75)
         return "󰤨"

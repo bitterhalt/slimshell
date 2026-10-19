@@ -5,12 +5,12 @@ Item {
 
     required property var config
     property int contentWidth: 330
-    property int padding: 14
+    property int padding: 10
     property int spacing: 8
     default property alias contentData: panelContent.data
 
     function prepareLayout() {
-        panelContent.forceLayout()
+        panelContent.forceLayout();
     }
 
     implicitWidth: contentWidth

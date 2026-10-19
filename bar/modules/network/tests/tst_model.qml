@@ -5,6 +5,26 @@ import "../Model.js" as Model
 TestCase {
     name: "NetworkModel"
 
+    function test_action_shortcuts_follow_connection_state() {
+        compare(Model.actionShortcut("c", false), 0);
+        compare(Model.actionShortcut("C", false), 0);
+        compare(Model.actionShortcut("d", true), 0);
+        compare(Model.actionShortcut("D", true), 0);
+        compare(Model.actionShortcut("c", true), -1);
+        compare(Model.actionShortcut("d", false), -1);
+        compare(Model.actionShortcut("f", true), 1);
+        compare(Model.actionShortcut("F", false), 1);
+        compare(Model.actionShortcut("", true), -1);
+        compare(Model.actionShortcut("x", false), -1);
+    }
+
+    function test_only_visible_networks_are_selectable() {
+        const rows = [{ssid: "Home", connected: true}, {ssid: "Nearby", connected: false}];
+        compare(Model.selectableRows(rows, false), [rows[0]]);
+        compare(Model.selectableRows(rows, true), rows);
+        compare(Model.selectableRows([rows[1]], false), []);
+    }
+
     function test_wifi_scan_policy() {
         compare(Model.shouldScanWifi(true, false), true);
         compare(Model.shouldScanWifi(true, true), false);
