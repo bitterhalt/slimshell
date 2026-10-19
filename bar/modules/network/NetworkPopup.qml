@@ -19,6 +19,13 @@ PopoutPanel {
     property bool helpOpen: false
     readonly property var selectableRows: network.selectableRows
 
+    Binding {
+        target: root.network.wifiDevice
+        property: "scannerEnabled"
+        value: root.network.wifiBrowsingAvailable
+        when: root.network.wifiDevice !== null
+    }
+
     function resetState() {
         const previousSsid = selectedSsid;
         passwordMode = false;
@@ -154,8 +161,6 @@ PopoutPanel {
     contentWidth: 240
     focus: true
     Component.onCompleted: {
-        if (network.wifiDevice)
-            network.wifiDevice.scannerEnabled = Networking.wifiEnabled;
         if (selectableRows.length > 0)
             selectNetwork(0);
         Qt.callLater(() => forceActiveFocus());
@@ -185,28 +190,6 @@ PopoutPanel {
             font.pointSize: root.config.fontSize(1)
             font.weight: Font.DemiBold
             text: root.passwordMode ? "Connect to Wi-Fi" : (root.actionMode ? "Wi-Fi network" : "Network")
-        }
-
-        Row {
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: 8
-            visible: !root.passwordMode && !root.actionMode && root.network.wifiDevice !== null
-
-            Text {
-                renderType: Text.NativeRendering
-                anchors.verticalCenter: parent.verticalCenter
-                color: root.config.muted
-                font.pointSize: root.config.fontSize(0.85)
-                text: Networking.wifiEnabled ? "Wi-Fi On" : "Wi-Fi Off"
-            }
-
-            ToggleSwitch {
-                config: root.config
-                checked: Networking.wifiEnabled
-                onToggled: Networking.wifiEnabled = !Networking.wifiEnabled
-            }
-
         }
 
     }
@@ -346,14 +329,14 @@ PopoutPanel {
         SectionHeader {
             renderType: Text.NativeRendering
             config: root.config
-            visible: Networking.wifiEnabled && root.network.wifiDevice !== null
+            visible: root.network.wifiBrowsingAvailable && root.network.wifiDevice !== null
             text: "AVAILABLE NETWORKS"
         }
 
         Repeater {
-            model: root.network.networkRows.filter((row) => {
+            model: root.network.wifiBrowsingAvailable ? root.network.networkRows.filter((row) => {
                 return !row.connected;
-            })
+            }) : []
 
             delegate: NetworkRow {
                 required property var modelData
@@ -387,7 +370,7 @@ PopoutPanel {
         Text {
             renderType: Text.NativeRendering
             width: parent.width
-            visible: root.network.wifiDevice && !Networking.wifiEnabled
+            visible: !root.network.wiredConnected && root.network.wifiDevice && !Networking.wifiEnabled
             horizontalAlignment: Text.AlignHCenter
             color: root.config.muted
             font.pointSize: root.config.fontSize(0.85)
@@ -399,7 +382,8 @@ PopoutPanel {
         Text {
             renderType: Text.NativeRendering
             width: parent.width
-            visible: root.network.wifiDevice && Networking.wifiEnabled && root.network.networkRows.length === 0
+            visible: root.network.wifiBrowsingAvailable && root.network.wifiDevice
+                && root.network.networkRows.length === 0
             horizontalAlignment: Text.AlignHCenter
             color: root.config.muted
             font.pointSize: root.config.fontSize(0.85)

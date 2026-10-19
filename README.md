@@ -34,6 +34,8 @@ qs ipc call network toggle
 qs ipc call bluetooth toggle
 ```
 
+Slimshell pauses Wi-Fi scanning while Ethernet is connected; NetworkManager may still perform its own scans. Network on/off controls are left to your own tools or window-manager bindings.
+
 ## Launcher
 
 One launcher, four modes. Switch directly with the shortcuts below, or cycle with **Ctrl+← / Ctrl+→**.

@@ -5,6 +5,13 @@ import "../Model.js" as Model
 TestCase {
     name: "NetworkModel"
 
+    function test_wifi_scan_policy() {
+        compare(Model.shouldScanWifi(true, false), true);
+        compare(Model.shouldScanWifi(true, true), false);
+        compare(Model.shouldScanWifi(false, false), false);
+        compare(Model.shouldScanWifi(false, true), false);
+    }
+
     function test_connected_access_point_wins_over_stronger_duplicate() {
         const connected = {name: "Home", connected: true, known: true, signalStrength: 0.2};
         const stronger = {name: "Home", connected: false, known: true, signalStrength: 0.9};

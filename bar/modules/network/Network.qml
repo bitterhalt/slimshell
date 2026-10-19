@@ -15,7 +15,9 @@ Item {
     readonly property var wiredDevice: findDevice(DeviceType.Wired)
     readonly property var wifiNetworkObjects: wifiDevice && wifiDevice.networks ? wifiDevice.networks.values : []
     readonly property var networkRows: Model.rows(wifiNetworkObjects)
-    readonly property var selectableRows: networkRows
+    readonly property bool wiredConnected: wiredDevice !== null && wiredDevice.connected
+    readonly property bool wifiBrowsingAvailable: Model.shouldScanWifi(Networking.wifiEnabled, wiredConnected)
+    readonly property var selectableRows: networkRows.filter(row => row.connected || wifiBrowsingAvailable)
     readonly property var connectedWifi: {
         for (var i = 0; i < wifiNetworkObjects.length; ++i) {
             if (wifiNetworkObjects[i] && wifiNetworkObjects[i].connected)
@@ -97,14 +99,9 @@ Item {
 
     MouseArea {
         anchors.fill: parent
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        acceptedButtons: Qt.LeftButton
         cursorShape: Qt.PointingHandCursor
-        onClicked: (mouse) => {
-            if (mouse.button === Qt.LeftButton)
-                popupManager.toggleHost("network", networkPopupComponent, root, true);
-            else if (wifiDevice)
-                Networking.wifiEnabled = !Networking.wifiEnabled;
-        }
+        onClicked: popupManager.toggleHost("network", networkPopupComponent, root, true)
     }
 
     Component {

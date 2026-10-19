@@ -1,5 +1,9 @@
 .pragma library
 
+function shouldScanWifi(wifiEnabled, wiredConnected) {
+    return wifiEnabled && !wiredConnected
+}
+
 function strengthIcon(strength) {
     if (strength >= 0.75)
         return "󰤨"
