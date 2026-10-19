@@ -89,7 +89,7 @@ Item {
 
             // OSDs should remain visible above fullscreen surfaces.
             WlrLayershell.layer: WlrLayer.Overlay
-            WlrLayershell.namespace: "quickshell-osd"
+            WlrLayershell.namespace: "slim-osd"
 
             exclusiveZone: 0
             implicitWidth: 220

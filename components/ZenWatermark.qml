@@ -17,7 +17,7 @@ PanelWindow {
     margins.top: config.zenWatermarkMargin
     margins.right: config.zenWatermarkMargin
     WlrLayershell.layer: WlrLayer.Bottom
-    WlrLayershell.namespace: "slimshell-zen-watermark"
+    WlrLayershell.namespace: "slim-zen-watermark"
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
     anchors {

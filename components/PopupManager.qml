@@ -140,25 +140,25 @@ Item {
     PopupSurface {
         managerRef: manager
         hostKey: "weather"
-        surfaceNamespace: "quickshell-weather"
+        surfaceNamespace: "slim-weather"
     }
 
     PopupSurface {
         managerRef: manager
         hostKey: "notificationCenter"
-        surfaceNamespace: "quickshell-notification-center"
+        surfaceNamespace: "slim-notification-center"
     }
 
     PopupSurface {
         managerRef: manager
         hostKey: "barPopup"
-        surfaceNamespace: "quickshell-barpopup"
+        surfaceNamespace: "slim-barpopup"
     }
 
     PopupSurface {
         managerRef: manager
         hostKey: ""
-        surfaceNamespace: "quickshell-submenu"
+        surfaceNamespace: "slim-submenu"
     }
 
     // The full-screen surface only catches outside clicks. It lives below the
@@ -177,7 +177,7 @@ Item {
             right: true
         }
 
-        WlrLayershell.namespace: "quickshell-popup-catcher"
+        WlrLayershell.namespace: "slim-popup-catcher"
         WlrLayershell.layer: WlrLayer.Top
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 

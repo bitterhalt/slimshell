@@ -34,7 +34,7 @@ PanelWindow {
     screen: targetScreen
     implicitHeight: config.barHeight
     color: config.bg
-    WlrLayershell.namespace: "quickshell-bar"
+    WlrLayershell.namespace: "slim-bar"
 
     anchors {
         top: true

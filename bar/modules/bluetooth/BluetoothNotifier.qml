@@ -105,7 +105,7 @@ Item {
 
         screen: root.targetScreen
         margins.top: root.config.popupGap
-        WlrLayershell.namespace: "quickshell-notifications"
+        WlrLayershell.namespace: "slim-notifications"
         WlrLayershell.layer: WlrLayer.Overlay
         exclusiveZone: 0
         implicitWidth: root.batteryAlert ? 200 : 200

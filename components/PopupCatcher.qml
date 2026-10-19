@@ -18,7 +18,7 @@ PanelWindow {
     anchors.bottom: true
     anchors.left: true
     anchors.right: true
-    WlrLayershell.namespace: "quickshell-popup-catcher"
+    WlrLayershell.namespace: "slim-popup-catcher"
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 

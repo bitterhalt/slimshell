@@ -155,7 +155,7 @@ Scope {
                 )
                 : 0
 
-            WlrLayershell.namespace: "quickshell-notifications"
+            WlrLayershell.namespace: "slim-notifications"
             WlrLayershell.layer: WlrLayer.Overlay
 
             exclusiveZone: 0
@@ -225,7 +225,7 @@ Scope {
             )
             : 0
 
-        WlrLayershell.namespace: "quickshell-notifications"
+        WlrLayershell.namespace: "slim-notifications"
         WlrLayershell.layer: WlrLayer.Overlay
 
         exclusiveZone: 0

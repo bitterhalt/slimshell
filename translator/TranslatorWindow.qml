@@ -128,7 +128,7 @@ PanelWindow {
     anchors.left: true
     margins.top: config.popupGap
     margins.left: targetScreen ? Math.max(0, Math.round((targetScreen.width - width) / 2)) : 0
-    WlrLayershell.namespace: "quickshell-translator"
+    WlrLayershell.namespace: "slim-translator"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 

@@ -277,7 +277,7 @@ Item {
         focusable: true
 
         WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.namespace: "quickshell-submenu"
+        WlrLayershell.namespace: "slim-submenu"
         WlrLayershell.keyboardFocus: visible
             ? WlrKeyboardFocus.Exclusive
             : WlrKeyboardFocus.None
