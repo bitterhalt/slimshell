@@ -12,7 +12,7 @@ FocusScope {
     required property var config
     required property var notificationService
     readonly property int popupWidth: 360
-    readonly property int popupMinHeight: 320
+    readonly property int popupMinHeight: 328
     readonly property int popupMaxHeight: 650
     readonly property int popupPadding: 10
 

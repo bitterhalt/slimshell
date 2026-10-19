@@ -48,7 +48,7 @@ Rectangle {
         y: 12
         width: 30
         height: 30
-        source: root.hasImage ? root.notification.image : root.appIconSource
+        source: root.appIconSource
         sourceSize.width: Math.ceil(width * Screen.devicePixelRatio * 2)
         sourceSize.height: Math.ceil(height * Screen.devicePixelRatio * 2)
         fillMode: Image.PreserveAspectFit
@@ -149,6 +149,23 @@ Rectangle {
             wrapMode: Text.Wrap
             maximumLineCount: 3
             elide: Text.ElideRight
+        }
+
+        Image {
+            id: preview
+            objectName: "historyImagePreview"
+            readonly property real aspectRatio: implicitWidth > 0 && implicitHeight > 0
+                ? implicitWidth / implicitHeight : 1
+            width: Math.min(content.width, 240, 120 * aspectRatio)
+            height: width / aspectRatio
+            visible: root.hasImage && status === Image.Ready
+            source: root.hasImage ? root.notification.image : ""
+            sourceSize.width: Math.ceil(Math.min(content.width, 240) * Screen.devicePixelRatio * 2)
+            sourceSize.height: Math.ceil(120 * Screen.devicePixelRatio * 2)
+            fillMode: Image.PreserveAspectFit
+            horizontalAlignment: Image.AlignLeft
+            smooth: true
+            asynchronous: true
         }
 
         Flow {

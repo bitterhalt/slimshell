@@ -265,6 +265,41 @@ Item {
             verify(findChild(card, "historyCloseButton") !== null);
         }
 
+        function test_history_image_preview_is_bounded_and_aspect_correct() {
+            const note = notification(1);
+            note.image = "data:image/svg+xml," + encodeURIComponent(
+                '<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900"><rect width="1600" height="900" fill="orange"/></svg>');
+            card = createTemporaryObject(cardComponent, host, {width: 340, config: config,
+                selected: true, notification: note});
+            const preview = findChild(card, "historyImagePreview");
+            verify(preview !== null);
+            tryCompare(preview, "status", Image.Ready);
+            waitForPolish(host.Window.window);
+            verify(preview.visible);
+            verify(preview.width > 200 && preview.width <= 240);
+            verify(preview.height <= 120);
+            verify(Math.abs(preview.width / preview.height - 16 / 9) < 0.01);
+            verify(card.implicitHeight > preview.height);
+        }
+
+        function test_portrait_preview_and_missing_image() {
+            const note = notification(1);
+            note.image = "data:image/svg+xml," + encodeURIComponent(
+                '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="800"><rect width="400" height="800" fill="orange"/></svg>');
+            card = createTemporaryObject(cardComponent, host, {width: 340, config: config,
+                notification: note});
+            const preview = findChild(card, "historyImagePreview");
+            tryCompare(preview, "status", Image.Ready);
+            waitForPolish(host.Window.window);
+            verify(preview.height <= 120);
+            verify(Math.abs(preview.width / preview.height - 0.5) < 0.01);
+            const withImage = card.implicitHeight;
+            card.notification = notification(2);
+            waitForPolish(host.Window.window);
+            verify(!preview.visible);
+            verify(card.implicitHeight < withImage);
+        }
+
         function test_card_mouse_actions_and_close() {
             const note = notification(1, [action("default", "Open")]);
             card = createTemporaryObject(cardComponent, host, {width: 340, config: config,
