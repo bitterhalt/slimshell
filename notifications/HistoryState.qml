@@ -81,7 +81,12 @@ Item {
         } else if (key === Qt.Key_X || key === Qt.Key_C) {
             dismissSelected();
         } else if (key === Qt.Key_Return || key === Qt.Key_Enter) {
-            invoke(actions.find(entry => entry.action && entry.action.identifier === "default"));
+            // The default may share a label with a visible action and have
+            // been deduplicated. Enter still invokes the original default.
+            const action = selectedNotification
+                ? selectedNotification.actions.find(action => action.identifier === "default") : null;
+            if (action)
+                invoke({action: action, dismiss: Model.isCloseAction(action)});
         } else {
             const letter = (text || (key >= Qt.Key_A && key <= Qt.Key_Z ? String.fromCharCode(key) : "")).toLowerCase();
             const entry = actions.find(entry => entry.key !== "" && entry.key === letter);

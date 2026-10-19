@@ -1,29 +1,31 @@
 .pragma library
 
+function actionLabel(action) {
+    return action.text || (action.identifier === "default" ? "Open" : "Action")
+}
+
+function isCloseAction(action) {
+    return actionLabel(action).replace(/&/g, "").trim().toLowerCase() === "close"
+}
+
 function actionsFor(actions) {
     const used = new Set(["c", "x", "j", "k"])
+    const seen = new Set()
     const entries = []
-    let hasClose = false
     for (let i = 0; i < (actions || []).length; ++i) {
         const action = actions[i]
-        const label = action.text || (action.identifier === "default" ? "Open" : "Action")
-        const close = label.replace(/&/g, "").trim().toLowerCase() === "close"
-        if (close && hasClose)
+        const label = actionLabel(action)
+        const normalized = label.replace(/&/g, "").trim().toLowerCase()
+        if (isCloseAction(action) || seen.has(normalized))
             continue
-        let key = "c"
-        if (close) {
-            hasClose = true
-        } else {
-            const candidates = label.toLowerCase().replace(/[^a-z0-9]/g, "")
-                + "abcdefghijklmnopqrstuvwxyz0123456789"
-            key = candidates.split("").find(letter => !used.has(letter)) || ""
-            if (key !== "")
-                used.add(key)
-        }
-        entries.push({label: label, key: key, action: action, dismiss: close})
+        seen.add(normalized)
+        const candidates = label.toLowerCase().replace(/[^a-z0-9]/g, "")
+            + "abcdefghijklmnopqrstuvwxyz0123456789"
+        const key = candidates.split("").find(letter => !used.has(letter)) || ""
+        if (key !== "")
+            used.add(key)
+        entries.push({label: label, key: key, action: action})
     }
-    if (!hasClose)
-        entries.push({label: "Close", key: "c", action: null, dismiss: true})
     return entries
 }
 

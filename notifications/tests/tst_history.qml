@@ -130,10 +130,20 @@ Item {
 
         function test_close_action_is_local_dismissal() {
             service.notifications = [notification(5, [action("close", "Close")])];
-            const entry = state.actions.find(item => item.key === "c");
-            verify(entry.dismiss);
-            state.invoke(entry);
+            compare(state.actions, []);
+            press(Qt.Key_C);
             compare(service.calls, ["dismiss:5"]);
+        }
+
+        function test_duplicate_labels_keep_one_button_but_preserve_default() {
+            service.notifications = [notification(5, [
+                action("edit", "Edit"), action("default", "Edit"),
+                action("open", "Open"), action("close", "Close")
+            ])];
+            compare(state.actions.map(entry => entry.label), ["Edit", "Open"]);
+            press(Qt.Key_Return);
+            press(Qt.Key_E, Qt.NoModifier, "e");
+            compare(service.calls, ["action:default", "action:edit"]);
         }
 
         function test_action_shortcuts_and_default() {
@@ -158,12 +168,12 @@ Item {
             ]);
             const keys = entries.map(item => item.key);
             compare(new Set(keys).size, keys.length);
-            compare(entries.filter(item => item.dismiss).length, 1);
+            verify(!entries.some(item => item.label === "Close"));
             compare(entries[0].key, "o");
             verify(!keys.includes("x"));
             verify(!keys.includes("j"));
             verify(!keys.includes("k"));
-            compare(Model.actionsFor([])[0].key, "c");
+            compare(Model.actionsFor([]), []);
         }
 
         function test_help_escape_and_modifiers() {
@@ -212,8 +222,17 @@ Item {
             compare(findText(card, "12:34").color, config.fg);
             compare(findText(card, "×").color, config.fg);
             verify(findText(card, "[o] Open") !== null);
-            verify(findText(card, "[c] Close") !== null);
+            compare(findText(card, "[c] Close"), null);
             verify(card.implicitHeight > unselectedHeight);
+        }
+
+        function test_actionless_notification_has_no_button_row() {
+            const note = notification(1);
+            card = createTemporaryObject(cardComponent, host, {width: 340, config: config,
+                selected: true, notification: note, actionEntries: Model.actionsFor(note.actions)});
+            waitForPolish(host.Window.window);
+            compare(findText(card, "[c] Close"), null);
+            verify(findChild(card, "historyCloseButton") !== null);
         }
 
         function test_card_mouse_actions_and_close() {
