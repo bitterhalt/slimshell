@@ -2,185 +2,112 @@
   <img src="assets/slimshell.svg" alt="Slimshell: a slim rat walking along a thin bar" width="100%">
 </p>
 
-### What Slim is and what it isn’t
+<p align="center">
+  A compact, keyboard-first desktop shell for <a href="https://github.com/YaLTeR/niri">Niri</a>, built with <a href="https://quickshell.org/">Quickshell</a>.
+</p>
 
-- It **is** a personalised Quickshell environment for **NIRI**
-- Why slim? I needed a lightweight desktop environment with compact design
-- What Slim **isn’t**: A highly customizable environment featuring all the bells and whistles
+<p align="center">
+  <a href="#features">Features</a> · <a href="#launcher">Launcher</a> · <a href="#dmenu-mode">Dmenu mode</a> · <a href="#getting-started">Getting started</a>
+</p>
 
-> This is mainly designed for my own use to replace bar, notifications and some complicated bash scripts
+## Small shell, personal choices
+
+Slimshell brings my bar, notifications, and everyday menus together—replacing a collection of separate tools and increasingly complicated Bash scripts.
+
+It is built for my own desktop: compact, opinionated, and comfortable to use from the keyboard. It isn't a desktop environment with endless customization or every bell and whistle. Borrow what you like, and adapt the rest.
 
 ## Features
 
-- Per-screen bar with workspaces, window title, clock, weather, battery, and system tray
-- Keyboard-driven Network and Bluetooth popups, plus PipeWire audio controls
-- Keyboard-driven audio tabs: Outputs, Inputs, Playback, and card profiles
-- Notifications, history, and do-not-disturb mode
-- Bluetooth connection and low-battery alerts
-- Application launcher with Apps, Run, Emoji, and Timer modes (`Ctrl+A` / `Ctrl+B` / `Ctrl+E` / `Ctrl+T`, or cycle with `Ctrl+←` / `Ctrl+→`)
-- Clipboard history
-- Lock screen and power menu
-- Idle monitoring with editable timeouts
-- Fullscreen and region recording
-- Wallpaper picker and Pywal themes
-- DeepL translator
-- Process killer
-- Keyboard shortcuts and IPC controls
+|                     | What's included                                                                                              |
+| ------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **Desktop**         | Per-screen bar, workspaces, window title, clock, weather, battery, and system tray                           |
+| **Controls**        | Keyboard-driven Wi-Fi, Bluetooth, and audio popups; output, input, playback, and card profile tabs           |
+| **Launch & pick**   | Application launcher, file search, calculator, binary runner, emoji, timers, and a stdin-driven dmenu picker |
+| **Stay informed**   | Notifications, history, do-not-disturb, and Bluetooth connection and low-battery alerts                      |
+| **Everyday tools**  | Clipboard history, DeepL translation, process killer, and fullscreen or region recording                     |
+| **Session & style** | Lock screen, power menu, idle timeouts, wallpaper picker, and Pywal themes                                   |
 
-Network and Bluetooth popups can also be opened with `qs ipc call network toggle` and `qs ipc call bluetooth toggle`.
+Menus support keyboard shortcuts and external control through IPC. For example:
 
-In the launcher, `/needle` searches files and `=expression` calculates with `qalc` (plain math works too). The modes are Apps (desktop entries), Run (binaries, recently used first), Emoji (search by name; Enter copies it), and Timer (`25m Focus`, `45s`, `1:30`, `2h`; selecting a running timer cancels it). Enter activates the selected row and Esc closes.
+```bash
+qs ipc call network toggle
+qs ipc call bluetooth toggle
+```
 
-For a stdin-driven picker (**Dmenu Mode**), use `printf '%s\n' one two three | ./launcher/dmenu-runner -p "Pick"`. Enter prints the selected line, Shift+Enter prints the typed text, and Esc cancels with exit status 1. This requires quickshell to be running.
+## Launcher
 
-Use `-l N` / `--lines N` to set the visible rows (default 7). Add `--minimal-lines` to shrink to the number of input choices; filtering keeps that height. Oversized menus fit the screen, and `-l 0` shows only the prompt and mode footer, with Enter returning typed text.
+One launcher, four modes. Switch directly with the shortcuts below, or cycle with **Ctrl+← / Ctrl+→**.
+
+| Mode  | Shortcut | What it does                                             |
+| ----- | -------- | -------------------------------------------------------- |
+| Apps  | `Ctrl+A` | Search and launch desktop applications                   |
+| Run   | `Ctrl+B` | Run binaries, with recently used commands first          |
+| Emoji | `Ctrl+E` | Search by name and copy the selected emoji               |
+| Timer | `Ctrl+T` | Start timers such as `25m Focus`, `45s`, `1:30`, or `2h` |
+
+In Apps mode, `/needle` searches files and `=expression` calculates with `qalc`. Plain math works too.
+
+**Enter** activates the selected result; **Esc** closes the launcher. Selecting a running timer cancels it.
+
+## Dmenu mode
+
+Give your existing menu scripts the same look as the launcher. Pipe in newline-separated choices; the selected line comes back on stdout.
+
+```bash
+printf '%s\n' Search 'New Note' TODO Delete |
+  ./launcher/dmenu-runner -p "Notes" -l 4 --minimal-lines
+```
+
+- **Enter** returns the selected line; **Shift+Enter** returns your typed text.
+- **Esc** cancels with exit status `1`.
+- `-l N` / `--lines N` sets the row count (default **7**).
+- `--minimal-lines` shrinks the menu to the number of input choices. Filtering doesn't resize it.
+- `-l 0` shows the prompt and mode footer only; **Enter** returns typed text.
+
+Oversized menus are limited to the screen height. Slimshell must already be running. The runner supports these options, not every dmenu or rofi flag.
+
+## Getting started
+
+The shell is designed for **Niri + Wayland**, with **Quickshell**, **PipeWire**, **NetworkManager**, **BlueZ**, and **UPower**. Icons use **Symbols Nerd Font Mono**.
+
+Feature helpers use Python, `wl-clipboard`, `cliphist`, `gpu-screen-recorder`, ImageMagick, `awww`, and Pywal. The calculator uses `qalc`; audio card profiles need `pactl` and PipeWire's PulseAudio compatibility service. DeepL translation needs `DEEPL_API` in the shell's environment—keep credentials out of the repository.
+
+Review the configuration before using it: menus include personal commands and paths. To launch this checkout from its root directory:
+
+```bash
+qs -p .
+```
+
+`Config.qml` holds settings such as font scale, bar geometry, popup spacing, and idle defaults. This is a personal configuration rather than a drop-in setup for every machine.
 
 ## Structure
 
 ```text
-quickshell/
-├── shell.qml
-├── Config.qml
-├── bar/
-│   ├── Bar.qml
-│   └── modules/
-│       ├── audio/
-│       │   ├── Audio.qml
-│       │   ├── AudioPopup.qml
-│       │   ├── AudioPopupState.qml
-│       │   ├── AudioProfiles.qml
-│       │   ├── AudioVolumeRow.qml
-│       │   ├── Model.js
-│       │   ├── Profiles.js
-│       │   └── tests/
-│       │       ├── AudioFixture.qml
-│       │       ├── ProfileFixture.qml
-│       │       └── tst_audio.qml
-│       ├── battery/
-│       │   └── Battery.qml
-│       ├── bluetooth/
-│       │   ├── Bluetooth.qml
-│       │   ├── BluetoothNotifier.qml
-│       │   ├── Model.js
-│       │   └── tests/
-│       │       └── tst_model.qml
-│       ├── clock/
-│       │   └── Clock.qml
-│       ├── idle/
-│       │   ├── Idle.qml
-│       │   └── IdleNotifier.qml
-│       ├── network/
-│       │   ├── Model.js
-│       │   ├── Network.qml
-│       │   ├── NetworkPopup.qml
-│       │   ├── NetworkRow.qml
-│       │   └── tests/
-│       │       └── tst_model.qml
-│       ├── tray/
-│       │   ├── Power.qml
-│       │   ├── Tray.qml
-│       │   └── TrayMenu.qml
-│       ├── window/
-│       │   └── WindowTitle.qml
-│       └── workspaces/
-│           └── Workspaces.qml
-├── clipboard/
-│   └── Clipboard.qml
-├── components/
-│   ├── PanelSeparator.qml
-│   ├── PopoutPanel.qml
-│   ├── PopupCatcher.qml
-│   ├── PopupManager.qml
-│   ├── SectionHeader.qml
-│   ├── ToggleSwitch.qml
-│   └── tests/
-│       └── tst_popoutpanel.qml
-├── launcher/
-│   ├── Dmenu.js
-│   ├── Emoji.js
-│   ├── Launcher.qml
-│   ├── Scorer.js
-│   ├── dmenu-runner
-│   └── tests/
-│       ├── test_dmenu_runner.py
-│       ├── tst_dmenu.qml
-│       └── tst_emoji.qml
-├── lock/
-│   ├── LockContext.qml
-│   ├── LockSurface.qml
-│   ├── lock.sh
-│   └── pam/
-│       └── quickshell-lock
-├── lock.qml
-├── lock-test.qml
-├── menus/
-│   ├── IdleSettings.qml
-│   ├── MainMenu.qml
-│   ├── ProcessMenu.qml
-│   ├── processes.py
-│   ├── ThemeMenu.qml
-│   └── WallpaperMenu.qml
-├── notifications/
-│   ├── NotificationCard.qml
-│   ├── NotificationCenter.qml
-│   ├── NotificationIndicator.qml
-│   └── NotificationPopup.qml
-├── osd/
-│   └── VolumeOsd.qml
-├── recorder/
-│   ├── Recorder.qml
-│   └── RegionSelector.qml
-├── services/
-│   ├── BatteryService.qml
-│   ├── BluetoothService.qml
-│   ├── IdleService.qml
-│   ├── LockService.qml
-│   ├── NiriService.qml
-│   ├── NotificationService.qml
-│   ├── RecorderService.qml
-│   ├── ShellUiService.qml
-│   ├── ThemeService.qml
-│   ├── TimerService.qml
-│   ├── WeatherService.qml
-│   ├── bluetooth/
-│   │   ├── BatteryWarning.js
-│   │   └── tests/
-│   │       └── tst_batterywarning.qml
-│   └── idle/
-│       ├── Duration.js
-│       ├── suspend.sh
-│       └── tests/
-│           └── tst_duration.qml
-├── translator/
-│   ├── Languages.js
-│   ├── Translator.qml
-│   ├── TranslatorButton.qml
-│   ├── TranslatorWindow.qml
-│   ├── deepl.py
-│   ├── test_deepl.py
-│   └── tests/
-│       └── tst_languages.qml
-├── wallpaper/
-│   ├── Wallpaper.qml
-│   ├── setbg.py
-│   └── test_setbg.py
-└── weather/
-    ├── WeatherPopup.qml
-    └── weather.py
+shell.qml       Shell entrypoint and service wiring
+Config.qml      Shared appearance and behavior settings
+bar/            Bar and its modules
+components/     Reusable UI and popup components
+services/       Shared desktop state and integrations
+launcher/       Launcher, dmenu runner, and search helpers
+menus/          System, theme, wallpaper, and process menus
+notifications/  Notification popups and history
+clipboard/      Clipboard picker and previews
+lock/           Lock screen components and PAM setup
+recorder/       Screen recording and region selection
+translator/     DeepL translator
+wallpaper/      Wallpaper helpers
+weather/        Weather popup and helper
+osd/            Volume overlay
 ```
 
-## Requirements
-
-QuickShell, Niri, PipeWire, NetworkManager, BlueZ, and UPower.
-
-Feature helpers use Python, `wl-clipboard`, `cliphist`, `gpu-screen-recorder`, ImageMagick, `awww`, and Pywal. Audio card profiles require `pactl` and PipeWire's PulseAudio compatibility service. The translator requires `DEEPL_API` in the shell's environment.
+Tests live beside the features they cover.
 
 ## Transparency
 
 This shell was developed with LLM assistance under my supervision. I direct the design, review the changes, and test them on my own desktop. These are personal dotfiles, so review and adapt them before using them on yours.
 
-## TODO
+## On the list
 
-- [ ] 1. Some sort of clock popup to replace notications when checking clock in barless mode
-- [ ] 2. Weather widget looks overhaul = At the moment it's just copy of Waybar tooltip so it need some makeup
-- [ ] 3. Barless mode: Draw a watermark-like text in bottom righ with text "Zen Mode is enabled"
+- [ ] A dedicated clock popup for barless mode, instead of opening notifications.
+- [ ] A visual refresh for the weather widget.
+- [ ] A subtle “Zen Mode is enabled” watermark in the bottom-right corner in barless mode.
