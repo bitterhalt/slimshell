@@ -9,7 +9,7 @@ function isCloseAction(action) {
 }
 
 function actionsFor(actions) {
-    const used = new Set(["c", "x", "j", "k"])
+    const used = new Set(["x", "j", "k"])
     const seen = new Set()
     const entries = []
     for (let i = 0; i < (actions || []).length; ++i) {

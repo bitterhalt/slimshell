@@ -171,7 +171,7 @@ FocusScope {
         wrapMode: Text.WordWrap
         color: root.config.muted
         font.pointSize: root.config.fontSize(0.78)
-        text: "↑/↓ or j/k Select · Tab Next · Enter Default action · x / c Close · Ctrl+C Clear all · Lettered buttons invoke actions · Esc Back/Close"
+        text: "↑/↓ or j/k Select · Tab Next · Enter Default action · x Close · Ctrl+C Clear all · Lettered buttons invoke actions · Esc Back/Close"
     }
 
     Item {
@@ -220,7 +220,7 @@ FocusScope {
 
             Text {
                 renderType: Text.NativeRendering
-                text: "x / c Close"
+                text: "x Close"
                 color: root.config.muted
                 font.pointSize: root.config.fontSize(0.76)
             }

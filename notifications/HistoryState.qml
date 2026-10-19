@@ -78,7 +78,7 @@ Item {
             move(-1);
         } else if (key === Qt.Key_Down || key === Qt.Key_J || key === Qt.Key_Tab) {
             move(1);
-        } else if (key === Qt.Key_X || key === Qt.Key_C) {
+        } else if (key === Qt.Key_X) {
             dismissSelected();
         } else if (key === Qt.Key_Return || key === Qt.Key_Enter) {
             // The default may share a label with a visible action and have

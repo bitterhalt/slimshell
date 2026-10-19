@@ -102,8 +102,10 @@ Item {
             compare(state.selectedNotification.id, 3);
         }
 
-        function test_c_dismisses_and_ctrl_c_clears() {
-            press(Qt.Key_C);
+        function test_x_dismisses_and_ctrl_c_clears() {
+            verify(!press(Qt.Key_C));
+            compare(service.calls, []);
+            press(Qt.Key_X);
             compare(service.calls, ["dismiss:3"]);
             compare(service.notifications.length, 2);
             press(Qt.Key_C, Qt.ControlModifier);
@@ -131,7 +133,7 @@ Item {
         function test_close_action_is_local_dismissal() {
             service.notifications = [notification(5, [action("close", "Close")])];
             compare(state.actions, []);
-            press(Qt.Key_C);
+            press(Qt.Key_X);
             compare(service.calls, ["dismiss:5"]);
         }
 
@@ -144,6 +146,16 @@ Item {
             press(Qt.Key_Return);
             press(Qt.Key_E, Qt.NoModifier, "e");
             compare(service.calls, ["action:default", "action:edit"]);
+        }
+
+        function test_c_can_be_an_action_shortcut() {
+            service.notifications = [notification(5, [action("copy", "Copy")])];
+            compare(state.actions[0].key, "c");
+            press(Qt.Key_C, Qt.NoModifier, "c");
+            compare(service.calls, ["action:copy"]);
+            compare(service.notifications.length, 1);
+            press(Qt.Key_C, Qt.ControlModifier);
+            compare(service.calls, ["action:copy", "clear"]);
         }
 
         function test_action_shortcuts_and_default() {

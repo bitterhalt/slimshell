@@ -37,7 +37,7 @@ The Network popup shows current connections first. **Ctrl+S** starts/stops Wi-Fi
 
 Bluetooth scanning is controlled with **Ctrl+S**. The footer shows the shortcut and scanning status, and closing the popup stops its scan.
 
-Notification history supports **↑/↓** or **j/k** to select, **x / c** to dismiss, and **Ctrl+C** to clear all. The selected notification shows lettered action buttons; **Enter** invokes its default action and **Esc** closes history. Notification popups keep their existing behavior.
+Notification history supports **↑/↓** or **j/k** to select, **x** to dismiss, and **Ctrl+C** to clear all. The selected notification shows lettered action buttons; **Enter** invokes its default action and **Esc** closes history. Notification popups keep their existing behavior.
 
 ## Launcher
 
