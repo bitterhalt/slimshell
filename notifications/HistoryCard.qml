@@ -10,6 +10,8 @@ Rectangle {
     required property var notification
     property bool selected: false
     property bool critical: false
+    readonly property color criticalTextColor: "#ad8301"
+    readonly property color criticalMarkerColor: "#af3029"
     property string timeLabel: ""
     property string appIconSource: ""
     property var actionEntries: []
@@ -35,7 +37,9 @@ Rectangle {
         anchors.bottomMargin: 8
         width: 2
         radius: 1
-        color: root.selected ? root.config.accent : root.config.borderColor
+        color: root.critical ? root.criticalMarkerColor
+            : root.selected ? root.config.accent : root.config.borderColor
+        opacity: root.critical && !root.selected ? 0.5 : 1
     }
 
     Image {
@@ -60,7 +64,7 @@ Rectangle {
         horizontalAlignment: Text.AlignHCenter
         visible: !thumbnail.visible
         text: root.critical ? "󰀧" : "󰂚"
-        color: root.critical ? root.config.urgent : root.config.muted
+        color: root.critical ? root.criticalMarkerColor : root.config.muted
         font.family: root.config.iconFontFamily
         font.pointSize: root.config.iconSize
     }
@@ -85,7 +89,7 @@ Rectangle {
                 renderType: Text.NativeRendering
                 textFormat: Text.PlainText
                 text: root.notification ? root.notification.appName || "Notification" : ""
-                color: root.selected ? root.config.fg : root.config.muted
+                color: root.critical ? root.criticalTextColor : root.selected ? root.config.fg : root.config.muted
                 font.pointSize: root.config.fontSize(0.78)
                 elide: Text.ElideRight
             }
@@ -96,7 +100,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 renderType: Text.NativeRendering
                 text: root.timeLabel
-                color: root.selected ? root.config.fg : root.config.muted
+                color: root.critical ? root.criticalTextColor : root.selected ? root.config.fg : root.config.muted
                 font.pointSize: root.config.fontSize(0.72)
             }
             Item {
@@ -109,7 +113,8 @@ Rectangle {
                 Text {
                     anchors.centerIn: parent
                     text: "×"
-                    color: root.selected || closeMouse.containsMouse ? root.config.fg : root.config.muted
+                    color: root.critical ? root.criticalTextColor
+                        : root.selected || closeMouse.containsMouse ? root.config.fg : root.config.muted
                     font.pointSize: root.config.fontSize(1)
                 }
                 MouseArea {
@@ -127,7 +132,7 @@ Rectangle {
             renderType: Text.NativeRendering
             textFormat: Text.PlainText
             text: root.notification ? root.notification.summary || "" : ""
-            color: root.critical ? root.config.urgent : root.config.fg
+            color: root.critical ? root.criticalTextColor : root.config.fg
             font.pointSize: root.config.fontSize(0.96)
             font.weight: Font.Medium
             elide: Text.ElideRight
@@ -139,7 +144,7 @@ Rectangle {
             renderType: Text.NativeRendering
             textFormat: Text.PlainText
             text: root.notification ? root.notification.body || "" : ""
-            color: root.config.muted
+            color: root.critical ? root.criticalTextColor : root.config.muted
             font.pointSize: root.config.fontSize(0.85)
             wrapMode: Text.Wrap
             maximumLineCount: 3
@@ -170,7 +175,7 @@ Rectangle {
                         renderType: Text.NativeRendering
                         textFormat: Text.PlainText
                         text: (actionButton.modelData.key ? "[" + actionButton.modelData.key + "] " : "") + actionButton.modelData.label
-                        color: root.config.fg
+                        color: root.critical ? root.criticalTextColor : root.config.fg
                         font.pointSize: root.config.fontSize(0.78)
                         elide: Text.ElideRight
                     }

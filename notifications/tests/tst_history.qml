@@ -238,6 +238,24 @@ Item {
             verify(card.implicitHeight > unselectedHeight);
         }
 
+        function test_critical_history_colors() {
+            const note = notification(1, [action("default", "Open")]);
+            card = createTemporaryObject(cardComponent, host, {width: 340, config: config,
+                critical: true, timeLabel: "12:34", notification: note,
+                actionEntries: Model.actionsFor(note.actions)});
+            waitForPolish(host.Window.window);
+            const marker = findChild(card, "historySelectionMarker");
+            compare(marker.color, card.criticalMarkerColor);
+            compare(marker.opacity, 0.5);
+            for (const label of ["Test", "12:34", "×", note.summary, note.body])
+                compare(findText(card, label).color, card.criticalTextColor);
+            card.selected = true;
+            waitForPolish(host.Window.window);
+            compare(marker.color, card.criticalMarkerColor);
+            compare(marker.opacity, 1);
+            compare(findText(card, "[o] Open").color, card.criticalTextColor);
+        }
+
         function test_actionless_notification_has_no_button_row() {
             const note = notification(1);
             card = createTemporaryObject(cardComponent, host, {width: 340, config: config,

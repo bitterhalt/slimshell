@@ -114,7 +114,11 @@ Hiding the bar reveals a subtle clock and “Zen mode” watermark on the wallpa
 
 This shell was developed with LLM assistance under my supervision. I direct the design, review the changes, and test them on my own desktop. These are personal dotfiles, so review and adapt them before using them on yours.
 
-## On the list
+## Screenshots and more
+
+Check out [my config](https://github.com/bitterhalt/dotfiles)
+
+## TODO
 
 - [ ] A dedicated clock popup for barless mode, instead of opening notifications.
 - [ ] A visual refresh for the weather widget.
