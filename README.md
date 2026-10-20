@@ -21,7 +21,7 @@ It is built for my own desktop: compact, opinionated, and comfortable to use fro
 |                     | What's included                                                                                              |
 | ------------------- | ------------------------------------------------------------------------------------------------------------ |
 | **Desktop**         | Per-screen bar, workspaces, window title, clock, weather, battery, and system tray                           |
-| **Controls**        | Keyboard-driven menus for Bluetooth, Wifi, Audio and Notifications                                           |
+| **Controls**        | Keyboard-driven menus for Bluetooth, Wi-Fi, audio, and notifications                                         |
 | **Launch & pick**   | Application launcher, file search, calculator, binary runner, emoji, timers, and a stdin-driven dmenu picker |
 | **Everyday tools**  | Clipboard history, DeepL translation, and fullscreen or region recording                                     |
 | **Session & style** | Lock screen, power menu, idle timeouts, wallpaper picker, and Pywal themes                                   |
@@ -72,11 +72,13 @@ printf '%s\n' Search 'New Note' TODO Delete |
 
 Oversized menus are limited to the screen height. Slimshell must already be running. The runner supports these options, not every dmenu or rofi flag.
 
+**Note:** Dmenu mode currently can't display special symbols such as Nerd Font icons, but that may change in the future.
+
 ## Getting started
 
-The shell is designed for **Niri + Wayland**, with **Quickshell**, **PipeWire**, **NetworkManager**, **BlueZ**, and **UPower**. Icons use **Symbols Nerd Font Mono**.
+The shell is designed for **Niri** and requires **Quickshell**, **PipeWire**, **NetworkManager**, **BlueZ**, and **UPower**. Icons use **Symbols Nerd Font Mono**.
 
-Feature helpers use Python, `wl-clipboard`, `cliphist`, `gpu-screen-recorder`, ImageMagick, `awww`, and Pywal. The calculator uses `qalc`; audio card profiles need `pactl` and PipeWire's PulseAudio compatibility service. DeepL translation needs `DEEPL_API` in the shell's environment—keep credentials out of the repository.
+Feature helpers use Python, `wl-clipboard`, `cliphist`, `gpu-screen-recorder`, ImageMagick, `awww`, and Pywal. The calculator uses `qalc`; audio card profiles need `pactl` and PipeWire's PulseAudio compatibility service. DeepL translation needs `DEEPL_API` in your environment.
 
 Review the configuration before using it: menus include personal commands and paths. To launch this checkout from its root directory:
 
@@ -84,9 +86,9 @@ Review the configuration before using it: menus include personal commands and pa
 qs -p .
 ```
 
-`Config.qml` holds settings such as font scale, bar geometry, popup spacing, and idle defaults. This is a personal configuration rather than a drop-in setup for every machine.
+## Settings
 
-`maxVolume` sets the ceiling for Slimshell's audio controls (default `1.1`, or 110%). Other apps can still set higher volumes.
+`Config.qml` holds settings such as font scale, bar geometry, popup spacing, and idle defaults.
 
 ## Structure
 
@@ -108,19 +110,15 @@ weather/        Weather popup and helper
 osd/            Volume overlay
 ```
 
-Tests live beside the features they cover.
-
-Hiding the bar reveals a small clock and “Zen mode” card on the wallpaper, behind application windows. Its background opacity and edge margin are adjustable in `Config.qml`.
-
 ## Transparency
 
 This shell was developed with LLM assistance under my supervision. I direct the design, review the changes, and test them on my own desktop. These are personal dotfiles, so review and adapt them before using them on yours.
 
-This repo is mostly for hobby and learning purposes so don't except that everything works out-of-box.
+This repository is mainly for hobby and learning, so don't expect everything to work out of the box.
 
 ## Screenshots and more
 
-Check out [my config](https://github.com/bitterhalt/dotfiles)
+Check out [my config](https://github.com/bitterhalt/dotfiles).
 
 ## TODO
 
