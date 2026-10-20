@@ -26,18 +26,37 @@ It is built for my own desktop: compact, opinionated, and comfortable to use fro
 | **Everyday tools**  | Clipboard history, DeepL translation, and fullscreen or region recording                                     |
 | **Session & style** | Lock screen, power menu, idle timeouts, wallpaper picker, and Pywal themes                                   |
 
-Menus support keyboard shortcuts and external control through IPC. For example:
+Menus and shell controls can also be driven with `qs ipc call <target> <method>`. Expand for the full IPC reference.
 
-```bash
-qs ipc call network toggle
-qs ipc call bluetooth toggle
-```
+<details>
+<summary>IPC reference</summary>
 
-The Network popup shows current connections first. **Ctrl+S** starts/stops Wi-Fi scanning and reveals nearby networks; results stay visible until the popup closes. Ethernet blocks Slimshell's Wi-Fi scanning, though NetworkManager may still perform its own scans. Network on/off controls are left to your own tools or window-manager bindings.
+| Target | Calls | Effect |
+| --- | --- | --- |
+| `audio` | `toggle`, `open`, `close` | Show or hide the audio popup |
+| `bar` | `toggle`, `hide`, `show`, `isVisible` | Control or query bar visibility |
+| `bluetooth` | `toggle`, `open`, `close` | Show or hide the Bluetooth popup |
+| `clipboard` | `toggle`, `open`, `close`, `refresh`, `copySelected`, `deleteSelected` | Control the clipboard picker |
+| `idle` | `toggle`, `isDisabled`, `settings` | Control idle handling or open its settings |
+| `launcher` | `toggle`, `open`, `close` | Control the application launcher |
+| `lock` | `lock` | Lock the session |
+| `locker` | `isSecure` | Query whether the separate lock-screen process is secure |
+| `menu` | `packages`, `settings`, `system`, `theming`, `close` | Open a main-menu page or close it |
+| `network` | `toggle`, `open`, `close` | Show or hide the network popup |
+| `notificationCenter` | `toggle`, `open`, `close` | Show or hide notification history |
+| `notifications` | `toggleDnd`, `enableDnd`, `disableDnd`, `isDnd`, `clear`, `count` | Control DND or notification history |
+| `power` | `toggle`, `open`, `close` | Control the power menu |
+| `recorder` | `toggle`, `open`, `close`, `fullscreen`, `region`, `stop` | Control screen recording |
+| `theme` | `refresh`, `usingPywal` | Reload or query the active theme |
+| `themeMenu` | `toggle`, `open`, `close`, `save`, `refresh` | Control theme selection and saving |
+| `translator` | `toggle`, `open`, `close` | Control the translator |
+| `volume` | `up`, `down`, `mute` | Adjust or mute the default audio output; shows the OSD |
+| `wallpaper` | `toggle`, `open`, `close`, `refresh` | Control the wallpaper picker or refresh wallpapers |
+| `weather` | `toggle`, `open`, `close` | Show or hide the weather popup |
 
-Bluetooth scanning is controlled with **Ctrl+S**. The footer shows the shortcut and scanning status, and closing the popup stops its scan.
+For example, `qs ipc call volume up` raises the volume by one step. `launcher/dmenu-runner` uses the launcher's IPC internally; call the script to open a picker.
 
-Notification history supports **↑/↓** or **j/k** to select, **x** to dismiss, and **Ctrl+C** to clear all. The selected notification shows lettered action buttons; **Enter** invokes its default action and **Esc** closes history. Notification popups keep their existing behavior.
+</details>
 
 ## Launcher
 
@@ -56,29 +75,39 @@ In Apps mode, `/needle` searches files and `=expression` calculates with `qalc`.
 
 ## Dmenu mode
 
-Give your existing menu scripts the same look as the launcher. Pipe in newline-separated choices; the selected line comes back on stdout.
+For scripts that use dmenu-style pickers:
 
 ```bash
-printf '%s\n' Search 'New Note' TODO Delete |
-  ./launcher/dmenu-runner -p "Notes" -l 4 --minimal-lines
+printf '%s\n' Search 'New Note' TODO Delete | ./launcher/dmenu-runner -p "Notes" -l 4 --minimal-lines
 ```
 
-- **Enter** returns the selected line; **Shift+Enter** returns your typed text.
-- **Esc** cancels with exit status `1`.
-- `--index` returns the selected entry's original zero-based input index instead of its text, even after filtering or sorting. Custom typed text returns `-1`.
-- `-l N` / `--lines N` sets the row count (default **7**).
-- `--minimal-lines` shrinks the menu to the number of input choices. Filtering doesn't resize it.
-- `-l 0` shows the prompt and mode footer only; **Enter** returns typed text.
+- Supported options: `-p` / `--prompt`, `-l N` / `--lines N` (default 7), `--minimal-lines`, and `--index` (return the original zero-based input index; typed text returns `-1`).
+- Enter selects, Shift+Enter returns typed text, and Esc cancels with status 1. `-l 0` opens an input-only picker.
+- Nerd Font and other special symbols in dmenu entries may not render correctly.
 
-Oversized menus are limited to the screen height. Slimshell must already be running. The runner supports these options, not every dmenu or rofi flag.
-
-**Note:** Dmenu mode currently can't display special symbols such as Nerd Font icons, but that may change in the future.
+Slimshell must be running. This is a small dmenu-compatible runner, not a full dmenu/rofi replacement.
 
 ## Getting started
 
-The shell is designed for **Niri** and requires **Quickshell**, **PipeWire**, **NetworkManager**, **BlueZ**, and **UPower**. Icons use **Symbols Nerd Font Mono**.
+### Required
 
-Feature helpers use Python, `wl-clipboard`, `cliphist`, `gpu-screen-recorder`, ImageMagick, `awww`, and Pywal. The calculator uses `qalc`; audio card profiles need `pactl` and PipeWire's PulseAudio compatibility service. DeepL translation needs `DEEPL_API` in your environment.
+- 🧠 with some common sense
+- [Niri](https://github.com/YaLTeR/niri)
+- [Quickshell](https://quickshell.org/)
+- PipeWire
+- NetworkManager
+- BlueZ
+- UPower
+- Symbols Nerd Font Mono (icons)
+
+### Optional features
+
+- Python, `wl-clipboard`, and `cliphist` for helper scripts and clipboard history
+- `gpu-screen-recorder` for screen recording
+- ImageMagick, `awww`, and Pywal for wallpaper tools and themes
+- `qalc` for launcher calculations
+- `pactl` and PipeWire's PulseAudio compatibility service for audio card profiles
+- `DEEPL_API` in your environment for DeepL translation
 
 Review the configuration before using it: menus include personal commands and paths. To launch this checkout from its root directory:
 
