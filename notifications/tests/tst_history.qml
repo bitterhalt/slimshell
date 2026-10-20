@@ -289,6 +289,7 @@ Item {
             verify(card.implicitHeight > 0);
             verify(findChild(card, "historySelectionMarker").visible);
             compare(findChild(card, "historySelectionMarker").color, config.accent);
+            compare(findChild(card, "historySelectionMarker").opacity, 0.5);
             compare(findText(card, "Test").color, config.muted);
             compare(findText(card, "12:34").color, config.muted);
             compare(findText(card, "×").color, config.muted);
@@ -299,6 +300,7 @@ Item {
             waitForPolish(host.Window.window);
             verify(findChild(card, "historySelectionMarker").visible);
             compare(findChild(card, "historySelectionMarker").color, config.accent);
+            compare(findChild(card, "historySelectionMarker").opacity, 1);
             compare(findText(card, "Test").color, config.fg);
             compare(findText(card, "12:34").color, config.fg);
             compare(findText(card, "×").color, config.fg);

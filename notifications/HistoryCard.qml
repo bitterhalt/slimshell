@@ -38,7 +38,7 @@ Rectangle {
         width: 2
         radius: 1
         color: root.critical ? root.criticalMarkerColor : root.config.accent
-        opacity: root.critical && !root.selected ? 0.5 : 1
+        opacity: root.selected ? 1 : 0.5
     }
 
     Image {
