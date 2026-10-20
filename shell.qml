@@ -238,7 +238,6 @@ ShellRoot {
       targetScreen: modelData
       config: appConfig
       niri: niriService
-      volumeOsd: appVolumeOsd
       notificationService: appNotificationService
       notificationPopup: appNotificationPopup
       bluetoothService: appBluetoothService

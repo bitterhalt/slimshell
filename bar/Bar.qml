@@ -20,7 +20,6 @@ PanelWindow {
     required property var targetScreen
     required property var config
     required property var niri
-    required property var volumeOsd
     required property var notificationService
     required property var notificationPopup
     required property var bluetoothService
@@ -136,7 +135,6 @@ PanelWindow {
             config: barWindow.config
             barWindow: barWindow
             popupManager: popupManager
-            volumeOsd: barWindow.volumeOsd
             uiService: barWindow.uiService
         }
 

@@ -114,6 +114,8 @@ Hiding the bar reveals a small clock and “Zen mode” card on the wallpaper, b
 
 This shell was developed with LLM assistance under my supervision. I direct the design, review the changes, and test them on my own desktop. These are personal dotfiles, so review and adapt them before using them on yours.
 
+This repo is mostly for hobby and learning purposes so don't except that everything works out-of-box.
+
 ## Screenshots and more
 
 Check out [my config](https://github.com/bitterhalt/dotfiles)
@@ -122,4 +124,3 @@ Check out [my config](https://github.com/bitterhalt/dotfiles)
 
 - [ ] A dedicated clock popup for barless mode, instead of opening notifications.
 - [ ] A visual refresh for the weather widget.
-- [x] A subtle clock and Zen mode card in the top-right corner in barless mode.

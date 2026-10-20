@@ -11,7 +11,6 @@ Item {
     required property var config
     required property var barWindow
     required property var popupManager
-    required property var volumeOsd
     required property var uiService
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var sinkAudio: sink ? sink.audio : null
@@ -56,11 +55,6 @@ Item {
         if (!node || !node.audio || node.isStream || !node.isSink)
             return ;
 
-        // A default-device change can emit a burst of synthetic volume
-        // updates. It is not a volume adjustment, so keep the OSD quiet.
-        if (volumeOsd)
-            volumeOsd.suppress(1500);
-
         Pipewire.preferredDefaultAudioSink = node;
     }
 
@@ -76,8 +70,6 @@ Item {
         const node = nodeForId(id);
         if (!node || !node.audio || !Number.isFinite(value))
             return;
-        if (volumeOsd)
-            volumeOsd.suppress(600);
         node.audio.volume = Model.clampVolume(value);
     }
 
@@ -91,8 +83,6 @@ Item {
         const node = nodeForId(id);
         if (!node || !node.audio)
             return;
-        if (volumeOsd)
-            volumeOsd.suppress(600);
         node.audio.muted = !node.audio.muted;
     }
 
@@ -138,9 +128,6 @@ Item {
             if (mouse.button === Qt.LeftButton) {
                 popupManager.toggleHost("audio", audioPopupComponent, root, true);
             } else if (root.sinkAudio) {
-                if (volumeOsd)
-                    volumeOsd.suppress(600);
-
                 root.sinkAudio.muted = !root.sinkAudio.muted;
             }
         }
@@ -149,9 +136,6 @@ Item {
                 return ;
 
             var next = root.sinkAudio.volume + (wheel.angleDelta.y > 0 ? 0.05 : -0.05);
-            if (volumeOsd)
-                volumeOsd.suppress(600);
-
             root.sinkAudio.volume = Math.max(0, Math.min(1.5, next));
         }
     }

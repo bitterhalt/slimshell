@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 
@@ -20,48 +21,61 @@ Item {
         currentSink && currentSink.audio ? currentSink.audio : null
 
     property bool volumeOsdVisible: false
-    property bool startupReady: false
-    property double suppressedUntil: 0
 
-    function suppress(ms) {
+    onCurrentSinkChanged: {
         volumeOsdVisible = false
         volumeOsdHideTimer.stop()
-        suppressedUntil = Math.max(suppressedUntil, Date.now() + (ms ?? 400))
     }
 
+    // The OSD is only shown when asked to (keybinds via IPC), never in
+    // reaction to volume events, so Bluetooth connects, startup and other
+    // apps changing the volume don't pop it up.
     function showVolumeOsd() {
-        if (!startupReady || Date.now() < suppressedUntil)
-            return
-
         volumeOsdVisible = true
         volumeOsdHideTimer.restart()
     }
 
-    // Changing the default sink (for example when a Bluetooth headset connects)
-    // is not a user volume adjustment, so don't show the OSD for the settling
-    // volume events that follow.
-    onCurrentSinkChanged: suppress(1500)
+    function adjustVolume(delta) {
+        if (!currentSink || !currentSink.ready || !sinkAudio)
+            return
 
-    Connections {
-        target: osd.sinkAudio
-        ignoreUnknownSignals: true
+        if (sinkAudio.muted && delta > 0)
+            sinkAudio.muted = false
 
-        function onVolumeChanged() {
-            osd.showVolumeOsd()
-        }
+        // Max 150%; rounded so repeated steps don't drift (0.4999...).
+        sinkAudio.volume = Math.max(0, Math.min(1.5,
+            Math.round((sinkAudio.volume + delta) * 100) / 100))
 
-        function onMutedChanged() {
-            osd.showVolumeOsd()
-        }
+        showVolumeOsd()
     }
 
-    Timer {
-        id: volumeOsdStartupTimer
-        interval: 1000
-        running: true
-        repeat: false
+    function toggleMute() {
+        if (!currentSink || !currentSink.ready || !sinkAudio)
+            return
 
-        onTriggered: osd.startupReady = true
+        sinkAudio.muted = !sinkAudio.muted
+        showVolumeOsd()
+    }
+
+    // Niri/keybind control:
+    //
+    //   qs ipc call volume up
+    //   qs ipc call volume down
+    //   qs ipc call volume mute
+    IpcHandler {
+        target: "volume"
+
+        function up(): void {
+            osd.adjustVolume(0.05)
+        }
+
+        function down(): void {
+            osd.adjustVolume(-0.05)
+        }
+
+        function mute(): void {
+            osd.toggleMute()
+        }
     }
 
     Timer {
