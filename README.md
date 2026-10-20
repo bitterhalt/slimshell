@@ -108,7 +108,7 @@ osd/            Volume overlay
 
 Tests live beside the features they cover.
 
-Hiding the bar reveals a subtle clock and “Zen mode” watermark on the wallpaper, behind application windows. Its opacity and edge margin are adjustable in `Config.qml`.
+Hiding the bar reveals a small clock and “Zen mode” card on the wallpaper, behind application windows. Its background opacity and edge margin are adjustable in `Config.qml`.
 
 ## Transparency
 
@@ -122,4 +122,4 @@ Check out [my config](https://github.com/bitterhalt/dotfiles)
 
 - [ ] A dedicated clock popup for barless mode, instead of opening notifications.
 - [ ] A visual refresh for the weather widget.
-- [x] A subtle clock and Zen mode watermark in the top-right corner in barless mode.
+- [x] A subtle clock and Zen mode card in the top-right corner in barless mode.

@@ -220,7 +220,7 @@ ShellRoot {
   Variants {
     model: Quickshell.screens
 
-    ZenWatermark {
+    ZenCard {
       required property var modelData
 
       targetScreen: modelData
