@@ -1,7 +1,7 @@
 import QtQuick
-import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Notifications
+import "../notifications/ToastPolicy.js" as ToastPolicy
 
 Item {
     id: root
@@ -64,12 +64,8 @@ Item {
         nextTimes[notification.id] = Date.now()
         receivedTimes = nextTimes
 
-        // Transient notifications may still be shown as banners, but they
-        // should not remain in history after the banner expires. Low urgency
-        // ones skip the banner and go straight to the notification center.
-        const quiet = notification.urgency === NotificationUrgency.Low
-
-        if (!dnd && !quiet && !notification.lastGeneration) {
+        // Low-urgency notifications also get a toast. DND suppresses all toasts.
+        if (ToastPolicy.shouldShow(notification, dnd)) {
             toastNotification = notification
             toastSerial += 1
         }

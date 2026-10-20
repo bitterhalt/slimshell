@@ -1,5 +1,21 @@
 .pragma library
 
+function iconFromImage(image) {
+    image = String(image || "")
+    return image.startsWith("image://icon/") ? image.substring(13) : ""
+}
+
+function previewImageSource(image) {
+    image = String(image || "")
+    if (!image)
+        return ""
+    if (image.startsWith("image://icon/")) {
+        const icon = image.substring(13)
+        return icon.startsWith("/") ? "file://" + icon : ""
+    }
+    return image
+}
+
 function actionLabel(action) {
     return action.text || (action.identifier === "default" ? "Open" : "Action")
 }

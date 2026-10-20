@@ -42,6 +42,17 @@ FocusScope {
             ? icon : Quickshell.iconPath(icon, true);
     }
 
+    function historyIconSource(notification) {
+        const appIcon = notification ? notification.appIcon || "" : "";
+        if (appIcon)
+            return iconSource(appIcon);
+
+        const icon = HistoryModel.iconFromImage(notification ? notification.image : "");
+        if (!icon)
+            return "";
+        return icon.startsWith("/") ? icon : iconSource(icon);
+    }
+
     HistoryState {
         id: history
         objectName: "historyState"
@@ -131,7 +142,7 @@ FocusScope {
             selected: index === history.selectedIndex
             critical: modelData.urgency === NotificationUrgency.Critical
             timeLabel: root.notificationService.timeLabel(modelData)
-            appIconSource: root.iconSource(modelData.appIcon || "")
+            appIconSource: root.historyIconSource(modelData)
             actionEntries: HistoryModel.actionsFor(modelData.actions)
             onHeightChanged: if (selected) Qt.callLater(root.keepSelectionVisible)
             onPicked: {

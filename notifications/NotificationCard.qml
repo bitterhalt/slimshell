@@ -3,6 +3,7 @@ import QtQuick.Window
 import Quickshell
 import Quickshell.Services.Notifications
 import Quickshell.Widgets
+import "HistoryModel.js" as HistoryModel
 
 Rectangle {
     id: root
@@ -15,7 +16,12 @@ Rectangle {
     property bool dismissOnClick: false
     property int bodyLineLimit: 3
     readonly property int appIconSize: 36
-    readonly property bool hasImage: notification && notification.image && notification.image !== ""
+    readonly property int previewSize: 72
+    readonly property string imageIcon: HistoryModel.iconFromImage(notification ? notification.image : "")
+    readonly property string previewSource: HistoryModel.previewImageSource(notification ? notification.image : "")
+    readonly property bool hasImage: previewSource !== ""
+    // Real pictures get the big box; image://icon/... is just an icon, keep it small.
+    readonly property bool hasPhoto: hasImage && !String(notification.image).startsWith("image://icon/")
     readonly property bool critical: notification && notification.urgency === NotificationUrgency.Critical
     readonly property bool timerNotification: notification && notification.appName === "QuickShell Timer"
     readonly property color criticalBorderColor: "#af3029"
@@ -33,7 +39,9 @@ Rectangle {
     }
 
     implicitHeight: {
-        let h = Math.max(compact ? 84 : 92, contentColumn.implicitHeight + 20);
+        // Do not use imageBox.y here: in compact mode it depends on our height (binding loop).
+        const photoH = hasPhoto ? previewSize + (compact ? 20 : 42) : 0;
+        let h = Math.max(compact ? 84 : 92, contentColumn.implicitHeight + 20, photoH);
         if (actionCount > 0)
             h += 34;
 
@@ -54,19 +62,24 @@ Rectangle {
         anchors.right: parent.right
         anchors.rightMargin: 22
         y: root.compact ? Math.round((parent.height - height) / 2) : 30
-        width: root.appIconSize
-        height: root.appIconSize
+        width: root.hasPhoto ? root.previewSize : root.appIconSize
+        height: width
 
-        Image {
+        ClippingRectangle {
             anchors.fill: parent
             visible: !root.critical && !root.timerNotification && root.hasImage
-            source: !root.critical && !root.timerNotification && root.hasImage ? root.notification.image : ""
-            // Decode above display resolution without loading the full screenshot.
-            sourceSize.width: Math.ceil(width * Screen.devicePixelRatio * 2)
-            sourceSize.height: Math.ceil(height * Screen.devicePixelRatio * 2)
-            fillMode: Image.PreserveAspectFit
-            smooth: true
-            asynchronous: true
+            radius: root.hasPhoto ? 6 : 0
+            color: "transparent"
+
+            Image {
+                anchors.fill: parent
+                source: !root.critical && !root.timerNotification && root.hasImage ? root.previewSource : ""
+                // Width only: Qt keeps the aspect ratio, so the crop has enough pixels.
+                sourceSize.width: Math.ceil(width * Screen.devicePixelRatio * 2)
+                fillMode: root.hasPhoto ? Image.PreserveAspectCrop : Image.PreserveAspectFit
+                smooth: true
+                asynchronous: true
+            }
         }
 
         IconImage {
@@ -74,7 +87,7 @@ Rectangle {
 
             anchors.fill: parent
             visible: !root.critical && !root.timerNotification && !root.hasImage && source.toString() !== ""
-            source: root.iconSource(root.notification ? root.notification.appIcon : "")
+            source: root.iconSource(root.notification ? (root.notification.appIcon || root.imageIcon) : "")
         }
 
         Text {

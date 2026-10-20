@@ -1,5 +1,6 @@
 import ".."
 import "../HistoryModel.js" as Model
+import "../ToastPolicy.js" as ToastPolicy
 import QtQuick
 import QtQuick.Window
 import QtTest
@@ -287,9 +288,6 @@ Item {
             verify(card !== null);
             waitForPolish(host.Window.window);
             verify(card.implicitHeight > 0);
-            verify(findChild(card, "historySelectionMarker").visible);
-            compare(findChild(card, "historySelectionMarker").color, config.accent);
-            compare(findChild(card, "historySelectionMarker").opacity, 0.5);
             compare(findText(card, "Test").color, config.muted);
             compare(findText(card, "12:34").color, config.muted);
             compare(findText(card, "×").color, config.muted);
@@ -298,9 +296,6 @@ Item {
             const unselectedHeight = card.implicitHeight;
             card.selected = true;
             waitForPolish(host.Window.window);
-            verify(findChild(card, "historySelectionMarker").visible);
-            compare(findChild(card, "historySelectionMarker").color, config.accent);
-            compare(findChild(card, "historySelectionMarker").opacity, 1);
             compare(findText(card, "Test").color, config.fg);
             compare(findText(card, "12:34").color, config.fg);
             compare(findText(card, "×").color, config.fg);
@@ -309,26 +304,86 @@ Item {
             verify(card.implicitHeight > unselectedHeight);
         }
 
+        function test_icon_hints_stay_small_while_photos_preview() {
+            compare(Model.iconFromImage("image://icon/dialog-warning"), "dialog-warning");
+            compare(Model.previewImageSource("image://icon/dialog-warning"), "");
+            compare(Model.previewImageSource("image://icon//usr/share/icons/warning.png"),
+                "file:///usr/share/icons/warning.png");
+            verify(Model.previewImageSource("image://qsimage/notification-data") !== "");
+            verify(Model.previewImageSource("file:///tmp/screenshot.png") !== "");
+
+            const note = notification(1);
+            note.image = "image://icon/dialog-warning";
+            const fallbackIcon = "data:image/svg+xml," + encodeURIComponent(
+                '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="blue"/></svg>');
+            card = createTemporaryObject(cardComponent, host, {
+                width: 340, config: config, selected: true,
+                notification: note, appIconSource: fallbackIcon
+            });
+            compare(card.previewSource, "");
+            compare(card.hasImage, false);
+            verify(findChild(card, "historyAppIcon").source.toString().startsWith("data:image/svg+xml,"));
+            verify(!findChild(card, "historyImagePreview").visible);
+        }
+
+        function test_low_urgency_toast_policy() {
+            verify(ToastPolicy.shouldShow({urgency: 0, lastGeneration: false}, false));
+            verify(ToastPolicy.shouldShow({urgency: 1, lastGeneration: false}, false));
+            verify(ToastPolicy.shouldShow({urgency: 2, lastGeneration: false}, false));
+            verify(!ToastPolicy.shouldShow({urgency: 0, lastGeneration: false}, true));
+            verify(!ToastPolicy.shouldShow({urgency: 1, lastGeneration: true}, false));
+            verify(!ToastPolicy.shouldShow(null, false));
+        }
+
         function test_critical_history_colors() {
             const note = notification(1, [action("default", "Open")]);
             card = createTemporaryObject(cardComponent, host, {
                 "width": 340,
                 "config": config,
                 "critical": true,
+                "appIconSource": "data:image/svg+xml," + encodeURIComponent(
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="black"/></svg>'),
                 "timeLabel": "12:34",
                 "notification": note,
                 "actionEntries": Model.actionsFor(note.actions)
             });
             waitForPolish(host.Window.window);
-            const marker = findChild(card, "historySelectionMarker");
-            compare(marker.color, card.criticalMarkerColor);
-            compare(marker.opacity, 0.5);
+            const icon = findText(card, "󰀧");
+            verify(icon !== null);
+            compare(icon.color, card.criticalBorderColor);
+            verify(!findChild(card, "historyAppIcon").visible);
+            compare(card.border.color, card.criticalBorderColor);
             for (const label of ["Test", "12:34", "×", note.summary, note.body]) compare(findText(card, label).color, card.criticalTextColor)
             card.selected = true;
             waitForPolish(host.Window.window);
-            compare(marker.color, card.criticalMarkerColor);
-            compare(marker.opacity, 1);
+            compare(card.border.color, card.criticalBorderColor);
             compare(findText(card, "[o] Open").color, card.criticalTextColor);
+        }
+
+        function test_history_rows_have_subtle_card_surfaces() {
+            const note = notification(1);
+            card = createTemporaryObject(cardComponent, host, {width: 340, config: config,
+                notification: note});
+            compare(card.color, Qt.alpha(config.bg, 0.3));
+            compare(card.border.width, 1);
+            compare(card.border.color, config.muted);
+            compare(card.opacity, 0.72);
+            const hover = findChild(card, "historyHoverHandler");
+            verify(hover !== null);
+            mouseMove(card, card.width / 2, card.height / 2);
+            tryVerify(() => hover.hovered);
+            compare(card.color, Qt.alpha(config.accent, 0.16));
+            compare(card.opacity, 1);
+            compare(card.border.color, config.accent);
+            mouseMove(host, host.width - 1, host.height - 1);
+            tryVerify(() => !hover.hovered);
+            compare(card.opacity, 0.72);
+            compare(card.border.color, config.muted);
+            // Assert selected treatment directly; hover itself is driven by
+            // HoverHandler in the actual UI.
+            card.selected = true;
+            compare(card.color, Qt.alpha(config.accent, 0.12));
+            compare(card.border.color, config.accent);
         }
 
         function test_actionless_notification_has_no_button_row() {
@@ -371,6 +426,7 @@ Item {
             card = createTemporaryObject(cardComponent, host, {
                 "width": 340,
                 "config": config,
+                "selected": true,
                 "notification": note
             });
             const preview = findChild(card, "historyImagePreview");
@@ -383,6 +439,27 @@ Item {
             waitForPolish(host.Window.window);
             verify(!preview.visible);
             verify(card.implicitHeight < withImage);
+        }
+
+        function test_unselected_image_is_not_expanded() {
+            const note = notification(1);
+            note.image = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900"><rect width="1600" height="900" fill="orange"/></svg>');
+            card = createTemporaryObject(cardComponent, host, {
+                "width": 340,
+                "config": config,
+                "notification": note
+            });
+            const preview = findChild(card, "historyImagePreview");
+            verify(preview !== null);
+            compare(preview.source.toString(), "");
+            verify(!preview.visible);
+            const compactHeight = card.implicitHeight;
+            verify(compactHeight < 100);
+            card.selected = true;
+            tryCompare(preview, "status", Image.Ready);
+            waitForPolish(host.Window.window);
+            verify(preview.visible);
+            verify(card.implicitHeight > compactHeight);
         }
 
         function test_card_mouse_actions_and_close() {

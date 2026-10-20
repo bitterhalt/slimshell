@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Window
+import "HistoryModel.js" as HistoryModel
 
 Rectangle {
     id: root
@@ -11,11 +12,13 @@ Rectangle {
     property bool selected: false
     property bool critical: false
     readonly property color criticalTextColor: "#ad8301"
-    readonly property color criticalMarkerColor: "#af3029"
+    readonly property color criticalBorderColor: "#af3029"
     property string timeLabel: ""
     property string appIconSource: ""
     property var actionEntries: []
-    readonly property bool hasImage: !!notification && !!notification.image
+    readonly property string previewSource: HistoryModel.previewImageSource(
+        notification ? notification.image : "")
+    readonly property bool hasImage: previewSource !== ""
 
     signal picked()
     signal closeRequested()
@@ -23,31 +26,28 @@ Rectangle {
 
     implicitHeight: Math.max(46, content.implicitHeight) + 20
     radius: config.popupRadius
-    color: hover.hovered ? config.bg : "transparent"
+    border.width: 1
+    border.color: root.critical ? root.criticalBorderColor
+        : root.selected || hover.hovered ? root.config.accent : root.config.muted
+    opacity: root.selected || hover.hovered ? 1 : 0.72
+    color: root.selected ? Qt.alpha(root.config.accent, 0.12)
+        : hover.hovered ? Qt.alpha(root.config.accent, 0.16)
+        : Qt.alpha(root.config.bg, 0.3)
 
-    HoverHandler { id: hover }
-    TapHandler { onTapped: root.picked() }
-
-    Rectangle {
-        objectName: "historySelectionMarker"
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.topMargin: 8
-        anchors.bottomMargin: 8
-        width: 2
-        radius: 1
-        color: root.critical ? root.criticalMarkerColor : root.config.accent
-        opacity: root.selected ? 1 : 0.5
+    HoverHandler {
+        id: hover
+        objectName: "historyHoverHandler"
     }
+    TapHandler { onTapped: root.picked() }
 
     Image {
         id: thumbnail
+        objectName: "historyAppIcon"
         x: 12
         y: 12
         width: 30
         height: 30
-        source: root.appIconSource
+        source: root.critical ? "" : root.appIconSource
         sourceSize.width: Math.ceil(width * Screen.devicePixelRatio * 2)
         sourceSize.height: Math.ceil(height * Screen.devicePixelRatio * 2)
         fillMode: Image.PreserveAspectFit
@@ -63,7 +63,7 @@ Rectangle {
         horizontalAlignment: Text.AlignHCenter
         visible: !thumbnail.visible
         text: root.critical ? "󰀧" : "󰂚"
-        color: root.critical ? root.criticalMarkerColor : root.config.muted
+        color: root.critical ? root.criticalBorderColor : root.config.muted
         font.family: root.config.iconFontFamily
         font.pointSize: root.config.iconSize
     }
@@ -155,10 +155,10 @@ Rectangle {
             objectName: "historyImagePreview"
             readonly property real aspectRatio: implicitWidth > 0 && implicitHeight > 0
                 ? implicitWidth / implicitHeight : 1
-            width: Math.min(content.width, 240, 120 * aspectRatio)
-            height: width / aspectRatio
-            visible: root.hasImage && status === Image.Ready
-            source: root.hasImage ? root.notification.image : ""
+            width: root.selected && root.hasImage ? Math.min(content.width, 240, 120 * aspectRatio) : 0
+            height: width > 0 ? width / aspectRatio : 0
+            visible: root.selected && root.hasImage && status === Image.Ready
+            source: root.selected && root.hasImage ? root.previewSource : ""
             sourceSize.width: Math.ceil(Math.min(content.width, 240) * Screen.devicePixelRatio * 2)
             sourceSize.height: Math.ceil(120 * Screen.devicePixelRatio * 2)
             fillMode: Image.PreserveAspectFit

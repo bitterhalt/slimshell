@@ -356,7 +356,8 @@ Item {
 
                         height: 1
                         visible: menuItem.isSeparator
-                        color: root.config.accent
+                        color: menuItem.selected || itemMouse.containsMouse
+                            ? root.config.fg : root.config.accent
                     }
 
                     Rectangle {

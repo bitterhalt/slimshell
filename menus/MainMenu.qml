@@ -340,7 +340,8 @@ Item {
                         width: 22
                         horizontalAlignment: Text.AlignHCenter
 
-                        color: root.config.accent
+                        color: menuItem.selected || itemMouse.containsMouse
+                            ? root.config.fg : root.config.accent
                         font.family: root.config.iconFontFamily
                         font.pointSize: root.config.iconSize * 1.077
                         text: modelData.icon ?? ""
@@ -367,7 +368,8 @@ Item {
                         anchors.rightMargin: 8
                         anchors.verticalCenter: parent.verticalCenter
 
-                        color: root.config.muted
+                        color: menuItem.selected || itemMouse.containsMouse
+                            ? root.config.fg : root.config.muted
                         font.family: root.config.iconFontFamily
                         font.pointSize: root.config.iconSize
                         text: "󰅂"
