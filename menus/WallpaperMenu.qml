@@ -286,7 +286,8 @@ PanelWindow {
                         radius: 4
                         color: root.config.bg
                         border.width: root.selectedIndex === tile.index ? 2 : 1
-                        border.color: root.config.accent
+                        border.color: Qt.alpha(root.config.accent,
+                            root.selectedIndex === tile.index ? 1 : 0.5)
 
                         Image {
                             anchors.left: parent.left
