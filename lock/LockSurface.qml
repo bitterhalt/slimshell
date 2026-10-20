@@ -350,45 +350,4 @@ Rectangle {
 
     }
 
-    Column {
-        visible: root.context.pamActivated
-        spacing: 6
-
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-            bottom: parent.bottom
-            bottomMargin: 40
-        }
-
-        Button {
-            implicitWidth: 48
-            implicitHeight: 48
-            onClicked: root.context.cancelPam()
-
-            contentItem: Text {
-                text: "✕"
-                color: root.config.muted
-                font.pointSize: 16
-                font.weight: Font.Bold
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
-
-            background: Rectangle {
-                color: root.surface
-                radius: width / 2
-            }
-
-        }
-
-        Text {
-            renderType: Text.NativeRendering
-            text: "Cancel"
-            color: root.config.muted
-            font.pointSize: 9
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-
-    }
-
 }
