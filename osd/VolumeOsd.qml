@@ -42,8 +42,8 @@ Item {
         if (sinkAudio.muted && delta > 0)
             sinkAudio.muted = false
 
-        // Max 150%; rounded so repeated steps don't drift (0.4999...).
-        sinkAudio.volume = Math.max(0, Math.min(1.5,
+        // Rounded so repeated steps don't drift (0.4999...).
+        sinkAudio.volume = Math.max(0, Math.min(config.maxVolume,
             Math.round((sinkAudio.volume + delta) * 100) / 100))
 
         showVolumeOsd()
@@ -170,11 +170,12 @@ Item {
                                 bottom: parent.bottom
                             }
 
-                            // The shell currently allows output volume up to 150%.
+                            // Fill at the configured ceiling, including a zero limit.
                             width: {
                                 const volume =
                                     Pipewire.defaultAudioSink?.audio.volume ?? 0
-                                return parent.width * Math.min(volume / 1.5, 1.0)
+                                return osd.config.maxVolume > 0
+                                    ? parent.width * Math.max(0, Math.min(volume / osd.config.maxVolume, 1.0)) : 0
                             }
 
                             radius: parent.radius

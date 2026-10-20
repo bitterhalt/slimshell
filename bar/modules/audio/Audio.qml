@@ -69,20 +69,23 @@ Item {
     function setVolume(id, value) {
         const node = nodeForId(id);
         if (!node || !node.audio || !Number.isFinite(value))
-            return;
-        node.audio.volume = Model.clampVolume(value);
+            return ;
+
+        node.audio.volume = Model.clampVolume(value, root.config.maxVolume);
     }
 
     function adjustVolume(id, delta) {
         const node = nodeForId(id);
         if (node && node.audio)
             setVolume(id, node.audio.volume + delta);
+
     }
 
     function toggleMute(id) {
         const node = nodeForId(id);
         if (!node || !node.audio)
-            return;
+            return ;
+
         node.audio.muted = !node.audio.muted;
     }
 
@@ -90,22 +93,23 @@ Item {
         popupManager.closeHost("audio");
     }
 
+    width: 24
+    height: barWindow.height
+
     Connections {
-        target: root.uiService
         function onAudioActionRequested(action) {
             if (action === "close" || root.barWindow.screen !== root.uiService.targetScreen) {
                 root.closePopup();
-                return;
+                return ;
             }
             if (action === "open")
                 root.popupManager.openHost("audio", audioPopupComponent, root, true);
             else if (action === "toggle")
                 root.popupManager.toggleHost("audio", audioPopupComponent, root, true);
         }
-    }
 
-    width: 24
-    height: barWindow.height
+        target: root.uiService
+    }
 
     PwObjectTracker {
         objects: root.trackedNodes
@@ -125,24 +129,26 @@ Item {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         cursorShape: Qt.PointingHandCursor
         onClicked: (mouse) => {
-            if (mouse.button === Qt.LeftButton) {
+            if (mouse.button === Qt.LeftButton)
                 popupManager.toggleHost("audio", audioPopupComponent, root, true);
-            } else if (root.sinkAudio) {
+            else if (root.sinkAudio)
                 root.sinkAudio.muted = !root.sinkAudio.muted;
-            }
         }
         onWheel: (wheel) => {
             if (!root.sinkAudio)
                 return ;
 
             var next = root.sinkAudio.volume + (wheel.angleDelta.y > 0 ? 0.05 : -0.05);
-            root.sinkAudio.volume = Math.max(0, Math.min(1.5, next));
+            root.sinkAudio.volume = Model.clampVolume(next, root.config.maxVolume);
         }
     }
 
     Component {
         id: profileBackendComponent
-        AudioProfiles {}
+
+        AudioProfiles {
+        }
+
     }
 
     Component {

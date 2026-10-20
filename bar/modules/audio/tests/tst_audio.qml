@@ -118,10 +118,29 @@ Item {
             controls.setTab(2);
             press(Qt.Key_Left); compare(fixture.streamAudio.volume, 0.55);
             press(Qt.Key_M); compare(fixture.streamAudio.muted, true);
-            fixture.streamAudio.volume = 1.49;
-            press(Qt.Key_Right); compare(fixture.streamAudio.volume, 1.5);
+            fixture.streamAudio.volume = 1.09;
+            press(Qt.Key_Right); compare(fixture.streamAudio.volume, 1.1);
             fixture.streamAudio.volume = 0.01;
             press(Qt.Key_Left); compare(fixture.streamAudio.volume, 0);
+        }
+
+        function test_configurable_volume_ceiling() {
+            compare(Model.clampVolume(1.5, 1.1), 1.1);
+            compare(Model.clampVolume(-0.1, 1.1), 0);
+            compare(Model.clampVolume(1, 0), 0);
+            fixture.config.maxVolume = 0.8;
+            fixture.speakerAudio.volume = 0.79;
+            press(Qt.Key_Right);
+            compare(fixture.speakerAudio.volume, 0.8);
+            popup = createTemporaryObject(popupComponent, host, {audioItem: fixture, profileBackend: profileComponent});
+            const slider = findChild(popup, "audioVolumeSlider");
+            verify(slider !== null);
+            compare(slider.to, 0.8);
+            fixture.config.maxVolume = 1.25;
+            compare(slider.to, 1.25);
+            const popupControls = findChild(popup, "audioPopupState");
+            popupControls.helpOpen = true;
+            verify(findText(popup, "Volume range: 0–125% · keyboard step: 5%") !== null);
         }
 
         function test_default_selection_survives_reordering() {
@@ -242,7 +261,8 @@ Item {
             waitForPolish(host.Window.window);
             const slider = findChild(popup, "audioVolumeSlider");
             mouseClick(slider, slider.width * 0.8, slider.height / 2);
-            verify(fixture.speakerAudio.volume > 1);
+            verify(fixture.speakerAudio.volume > 0.8);
+            verify(fixture.speakerAudio.volume <= fixture.config.maxVolume);
             verify(keyboard.activeFocus);
             const playbackTab = findText(popup, "Playback");
             verify(playbackTab !== null);

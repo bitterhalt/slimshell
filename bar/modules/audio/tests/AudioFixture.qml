@@ -9,6 +9,7 @@ Item {
         property color fg: "#eeeeee"
         property color muted: "#888888"
         property color accent: "#6699cc"
+        property real maxVolume: 1.1
         property color urgent: "#cc3333"
         property color surface: "#222222"
         property string iconFontFamily: "sans-serif"
@@ -45,7 +46,7 @@ Item {
         const node = nodeForId(id);
         if (!node || !node.audio)
             return;
-        node.audio.volume = Model.clampVolume(value);
+        node.audio.volume = Model.clampVolume(value, config.maxVolume);
         calls = calls.concat([{action: "volume", id: id, value: node.audio.volume}]);
     }
     function adjustVolume(id, delta) {

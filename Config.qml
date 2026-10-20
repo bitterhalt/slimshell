@@ -9,6 +9,8 @@ Item {
     property real fontScale: 1
     property real iconScale: 1
     property string iconFontFamily: "Symbols Nerd Font Mono"
+    // Audio control ceiling: 1.0 = 100%, 1.1 = 110%.
+    property real maxVolume: 1.1
     // Bar geometry
     property int barHeight: 32
     property int barEdgeMargin: 14

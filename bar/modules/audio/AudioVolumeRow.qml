@@ -126,7 +126,7 @@ Item {
         anchors.bottomMargin: 4
         height: 18
         from: 0
-        to: 1.5
+        to: Math.max(0, root.config.maxVolume)
         stepSize: 0.01
         focusPolicy: Qt.NoFocus
         enabled: root.nodeAudio !== null
@@ -174,7 +174,9 @@ Item {
         anchors.right: parent.right
         anchors.rightMargin: 8
         anchors.verticalCenter: slider.verticalCenter
-        width: Math.ceil(volumeMetrics.advanceWidth("150%"))
+        width: Math.ceil(volumeMetrics.advanceWidth(Math.max(
+            Math.round(root.config.maxVolume * 100),
+            root.nodeAudio ? Math.round(root.nodeAudio.volume * 100) : 0) + "%"))
         horizontalAlignment: Text.AlignRight
         color: root.config.muted
         font.pointSize: root.config.fontSize(0.78)

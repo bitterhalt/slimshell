@@ -86,6 +86,8 @@ qs -p .
 
 `Config.qml` holds settings such as font scale, bar geometry, popup spacing, and idle defaults. This is a personal configuration rather than a drop-in setup for every machine.
 
+`maxVolume` sets the ceiling for Slimshell's audio controls (default `1.1`, or 110%). Other apps can still set higher volumes.
+
 ## Structure
 
 ```text

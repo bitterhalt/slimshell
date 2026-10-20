@@ -75,6 +75,6 @@ function selectionIndex(rows, key) {
   return index < 0 ? 0 : index;
 }
 
-function clampVolume(value) {
-  return Math.max(0, Math.min(1.5, value));
+function clampVolume(value, maximum) {
+  return Math.max(0, Math.min(maximum, value));
 }
