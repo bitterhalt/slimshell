@@ -11,6 +11,7 @@ Button {
     implicitWidth: label.implicitWidth + 20
     focusPolicy: Qt.StrongFocus
     padding: 8
+
     contentItem: Text {
         id: label
 
@@ -22,11 +23,12 @@ Button {
         verticalAlignment: Text.AlignVCenter
         elide: Text.ElideRight
     }
+
     background: Rectangle {
         radius: 4
-        color: root.down || root.hovered || root.activeFocus
-            ? root.config.borderColor : "transparent"
+        color: root.down || root.hovered || root.activeFocus ? root.config.accent : "transparent"
         border.width: root.activeFocus ? 1 : 0
         border.color: root.config.accent
     }
+
 }

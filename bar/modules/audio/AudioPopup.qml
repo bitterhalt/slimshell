@@ -292,7 +292,7 @@ PopoutPanel {
                 anchors.top: parent.top
                 width: parent.width
                 height: 1
-                color: root.config.borderColor
+                color: root.config.accent
             }
             Row {
                 anchors.left: parent.left
@@ -312,10 +312,9 @@ PopoutPanel {
                             anchors.margins: 2
                             radius: 4
                             color: popupState.tabIndex === tab.index ? root.config.bg
-                                : tabMouse.containsMouse ? root.config.borderColor : "transparent"
+                                : tabMouse.containsMouse ? root.config.accent : "transparent"
                             border.width: 1
-                            border.color: popupState.tabIndex === tab.index
-                                ? root.config.accent : root.config.borderColor
+                            border.color: root.config.accent
                         }
                         Text {
                             renderType: Text.NativeRendering

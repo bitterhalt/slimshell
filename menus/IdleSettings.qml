@@ -239,12 +239,12 @@ Item {
             radius: 4
             color: "transparent"
             border.width: 1
-            border.color: input.activeFocus ? row.config.accent : row.config.borderColor
+            border.color: row.config.accent
 
             TextInput {
-                renderType: Text.NativeRendering
                 id: input
 
+                renderType: Text.NativeRendering
                 anchors.fill: parent
                 anchors.leftMargin: 8
                 anchors.rightMargin: 8
@@ -267,15 +267,15 @@ Item {
         required property bool focused
 
         radius: 4
-        color: hovered || focused ? config.borderColor : "transparent"
+        color: hovered || focused ? config.accent : "transparent"
         border.width: 1
-        border.color: focused ? config.accent : config.borderColor
+        border.color: config.accent
     }
 
     component ButtonLabel: Text {
-        renderType: Text.NativeRendering
         required property var config
 
+        renderType: Text.NativeRendering
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         color: config.fg

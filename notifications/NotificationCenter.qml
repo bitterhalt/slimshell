@@ -53,7 +53,7 @@ FocusScope {
     Rectangle {
         anchors.fill: parent
         color: root.config.surface
-        border.color: root.config.borderColor
+        border.color: root.config.accent
         border.width: 1
         radius: root.config.popupRadius
     }
@@ -187,7 +187,7 @@ FocusScope {
             anchors.right: parent.right
             anchors.top: parent.top
             height: 1
-            color: root.config.borderColor
+            color: root.config.accent
         }
 
         Text {

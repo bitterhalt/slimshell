@@ -103,7 +103,7 @@ Item {
                 anchors.fill: parent
 
                 color: config.surface
-                border.color: config.borderColor
+                border.color: config.accent
                 border.width: 1
                 radius: config.popupRadius
 

@@ -356,7 +356,7 @@ Item {
 
                         height: 1
                         visible: menuItem.isSeparator
-                        color: root.config.borderColor
+                        color: root.config.accent
                     }
 
                     Rectangle {
@@ -364,7 +364,7 @@ Item {
                         visible: !menuItem.isSeparator
                         radius: 4
                         color: menuItem.selected || itemMouse.containsMouse
-                            ? root.config.borderColor
+                            ? root.config.accent
                             : "transparent"
                     }
 
@@ -452,9 +452,7 @@ Item {
                 radius: 4
                 color: "transparent"
                 border.width: 1
-                border.color: saveInput.activeFocus
-                    ? root.config.accent
-                    : root.config.borderColor
+                border.color: root.config.accent
 
                 TextInput {
                     renderType: Text.NativeRendering

@@ -14,7 +14,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         radius: height / 2
-        color: control.checked ? control.config.accent : control.config.borderColor
+        color: control.config.accent
     }
 
     Rectangle {

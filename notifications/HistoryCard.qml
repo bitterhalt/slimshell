@@ -37,8 +37,7 @@ Rectangle {
         anchors.bottomMargin: 8
         width: 2
         radius: 1
-        color: root.critical ? root.criticalMarkerColor
-            : root.selected ? root.config.accent : root.config.borderColor
+        color: root.critical ? root.criticalMarkerColor : root.config.accent
         opacity: root.critical && !root.selected ? 0.5 : 1
     }
 
@@ -182,9 +181,9 @@ Rectangle {
                     width: Math.min(actions.width, caption.implicitWidth + 16)
                     height: 26
                     radius: 3
-                    color: actionMouse.containsMouse ? root.config.borderColor : root.config.bg
+                    color: actionMouse.containsMouse ? root.config.accent : root.config.bg
                     border.width: 1
-                    border.color: root.config.borderColor
+                    border.color: root.config.accent
                     Text {
                         id: caption
                         anchors.centerIn: parent

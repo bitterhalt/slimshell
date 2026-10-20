@@ -41,7 +41,7 @@ Rectangle {
     }
     radius: config.popupRadius
     color: config.bg
-    border.color: critical ? criticalBorderColor : config.borderColor
+    border.color: critical ? criticalBorderColor : config.accent
     border.width: 1
 
     HoverHandler {
@@ -135,9 +135,9 @@ Rectangle {
     }
 
     Text {
-        renderType: Text.NativeRendering
         id: timeText
 
+        renderType: Text.NativeRendering
         visible: !root.compact
         anchors.right: closeButton.left
         anchors.rightMargin: 4
@@ -214,7 +214,7 @@ Rectangle {
                 width: (actionsRow.width - 6 * (root.actionCount - 1)) / root.actionCount
                 height: 26
                 radius: 3
-                color: actionMouse.containsMouse ? config.borderColor : config.surface
+                color: actionMouse.containsMouse ? config.accent : config.surface
 
                 Text {
                     renderType: Text.NativeRendering

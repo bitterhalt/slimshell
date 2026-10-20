@@ -10,7 +10,6 @@ Item {
         property color muted: "#888888"
         property color accent: "#6699cc"
         property color urgent: "#cc3333"
-        property color borderColor: "#333333"
         property color surface: "#222222"
         property string iconFontFamily: "sans-serif"
         property real iconSize: 10

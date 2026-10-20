@@ -28,7 +28,7 @@ Item {
   Rectangle {
     anchors.fill: parent
     color: config.surface
-    border.color: config.borderColor
+    border.color: config.accent
     border.width: 1
     radius: root.popupRadius
 
@@ -137,7 +137,7 @@ Item {
       Rectangle {
         width: parent.width
         height: 1
-        color: config.borderColor
+        color: config.accent
       }
 
       // Basic details from the old Waybar tooltip.
@@ -193,7 +193,7 @@ Item {
       Rectangle {
         width: parent.width
         height: 1
-        color: config.borderColor
+        color: config.accent
       }
 
       Row {
@@ -222,7 +222,7 @@ Item {
       Rectangle {
         width: parent.width
         height: 1
-        color: config.borderColor
+        color: config.accent
       }
 
       Text {

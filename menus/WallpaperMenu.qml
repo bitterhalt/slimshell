@@ -209,7 +209,7 @@ PanelWindow {
     Rectangle {
         anchors.fill: parent
         color: root.config.surface
-        border.color: root.config.borderColor
+        border.color: root.config.accent
         border.width: 1
         radius: root.config.popupRadius
 
@@ -239,7 +239,7 @@ PanelWindow {
                 background: Rectangle {
                     color: "transparent"
                     radius: 4
-                    border.color: search.activeFocus ? root.config.accent : root.config.borderColor
+                    border.color: root.config.accent
                 }
                 Keys.onPressed: event => {
                     switch (event.key) {
@@ -286,7 +286,7 @@ PanelWindow {
                         radius: 4
                         color: root.config.bg
                         border.width: root.selectedIndex === tile.index ? 2 : 1
-                        border.color: root.selectedIndex === tile.index ? root.config.accent : root.config.borderColor
+                        border.color: root.config.accent
 
                         Image {
                             anchors.left: parent.left
@@ -374,7 +374,7 @@ PanelWindow {
                     background: Rectangle {
                         radius: 4
                         color: "transparent"
-                        border.color: backgroundInput.activeFocus ? root.config.accent : root.config.borderColor
+                        border.color: root.config.accent
                     }
                 }
                 Text {
@@ -388,7 +388,7 @@ PanelWindow {
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 1
-                color: root.config.borderColor
+                color: root.config.accent
             }
 
             Item {
@@ -435,7 +435,7 @@ PanelWindow {
                                 anchors.fill: parent
                                 anchors.margins: -4
                                 radius: 4
-                                color: hint.hovered ? root.config.borderColor : "transparent"
+                                color: hint.hovered ? root.config.accent : "transparent"
                             }
 
                             Row {
@@ -452,13 +452,13 @@ PanelWindow {
                                 KeyCap {
                                     visible: hint.modelData.control
                                     label: "Ctrl"
-                                    edgeColor: hint.hovered ? root.config.accent : root.config.borderColor
+                                    edgeColor: root.config.accent
                                     textColor: root.config.muted
                                     fontPointSize: root.config.fontSize(0.74)
                                 }
                                 KeyCap {
                                     label: hint.modelData.key
-                                    edgeColor: hint.hovered ? root.config.accent : root.config.borderColor
+                                    edgeColor: root.config.accent
                                     textColor: root.config.muted
                                     fontPointSize: root.config.fontSize(0.74)
                                 }

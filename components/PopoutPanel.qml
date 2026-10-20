@@ -21,7 +21,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         color: panel.config.surface
-        border.color: panel.config.borderColor
+        border.color: panel.config.accent
         border.width: 1
         radius: panel.config.popupRadius
 

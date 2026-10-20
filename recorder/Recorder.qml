@@ -270,7 +270,7 @@ Item {
             anchors.fill: parent
             radius: 4
             color: menuItem.selected || itemMouse.containsMouse
-                ? root.config.borderColor
+                ? root.config.accent
                 : "transparent"
         }
 

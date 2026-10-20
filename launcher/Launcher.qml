@@ -880,7 +880,7 @@ Item {
 
             anchors.fill: parent
             color: root.config.surface
-            border.color: root.config.borderColor
+            border.color: root.config.accent
             border.width: 1
             radius: root.config.popupRadius
             clip: true
@@ -904,7 +904,7 @@ Item {
                 color: root.config.bg
                 radius: 4
                 border.width: 1
-                border.color: searchInput.activeFocus ? root.config.accent : root.config.borderColor
+                border.color: root.config.accent
             }
 
             TextInput {
@@ -1073,7 +1073,7 @@ Item {
                     Rectangle {
                         anchors.fill: parent
                         radius: 4
-                        color: resultRow.index === root.selectedIndex || rowMouse.containsMouse ? root.config.borderColor : "transparent"
+                        color: resultRow.index === root.selectedIndex || rowMouse.containsMouse ? root.config.accent : "transparent"
                     }
 
                     IconImage {
@@ -1195,7 +1195,7 @@ Item {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     height: 1
-                    color: root.config.borderColor
+                    color: root.config.accent
                 }
 
                 Row {

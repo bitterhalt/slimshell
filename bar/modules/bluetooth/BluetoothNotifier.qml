@@ -121,7 +121,7 @@ Item {
             anchors.fill: parent
             radius: root.config.popupRadius
             color: root.batteryAlert ? root.config.bg : root.config.surface
-            border.color: root.batteryAlert ? root.criticalBorderColor : root.config.borderColor
+            border.color: root.batteryAlert ? root.criticalBorderColor : root.config.accent
             border.width: 1
 
             Item {

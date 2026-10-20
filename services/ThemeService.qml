@@ -8,7 +8,6 @@ Item {
 
     readonly property color fallbackBg: "#100f0f"
     readonly property color fallbackSurface: "#1c1b1a"
-    readonly property color fallbackBorder: "#343331"
     readonly property color fallbackFg: "#cecdc3"
     readonly property color fallbackMuted: "#878580"
     readonly property color fallbackAccent: "#205ea6"
@@ -16,7 +15,6 @@ Item {
 
     property color bg: fallbackBg
     property color surface: fallbackSurface
-    property color borderColor: fallbackBorder
     property color fg: fallbackFg
     property color muted: fallbackMuted
     property color accent: fallbackAccent
@@ -30,7 +28,6 @@ Item {
     function applyFallback(): void {
         bg = fallbackBg
         surface = fallbackSurface
-        borderColor = fallbackBorder
         fg = fallbackFg
         muted = fallbackMuted
         accent = fallbackAccent
@@ -59,8 +56,7 @@ Item {
             "foreground",
             "color0",
             "color1",
-            "color3",
-            "color4"
+            "color3"
         ]
 
         for (let i = 0; i < required.length; ++i) {
@@ -81,10 +77,9 @@ Item {
 
         bg = colors.background
         surface = colors.color0
-        borderColor = colors.color1
         fg = colors.foreground
         muted = Qt.alpha(fg, mutedOpacity)
-        accent = colors.color4
+        accent = colors.color1
         urgent = colors.color3
         pywalActive = true
     }

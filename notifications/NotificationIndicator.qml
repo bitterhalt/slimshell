@@ -24,7 +24,7 @@ Item {
 
         color: notificationService.dnd
             || notificationService.notificationCount > 0
-            ? config.borderColor
+            ? config.accent
             : config.muted
 
         font.family: config.iconFontFamily

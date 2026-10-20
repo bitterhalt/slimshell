@@ -249,7 +249,7 @@ PanelWindow {
         anchors.horizontalCenter: parent.horizontalCenter
 
         color: root.config.surface
-        border.color: root.config.borderColor
+        border.color: root.config.accent
         border.width: 1
         radius: root.config.popupRadius
         clip: true
@@ -351,7 +351,7 @@ PanelWindow {
             width: root.historyWidth
             height: 1
             z: 1
-            color: root.config.borderColor
+            color: root.config.accent
         }
 
         Row {
@@ -392,7 +392,7 @@ PanelWindow {
                             radius: 5
                             color: entryRow.index === root.selectedIndex
                                 || rowMouse.containsMouse
-                                ? root.config.borderColor
+                                ? root.config.accent
                                 : "transparent"
                         }
 
@@ -449,7 +449,7 @@ PanelWindow {
             Rectangle {
                 width: 1
                 height: parent.height
-                color: root.config.borderColor
+                color: root.config.accent
             }
 
             Item {
@@ -511,7 +511,7 @@ PanelWindow {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 height: 1
-                color: root.config.borderColor
+                color: root.config.accent
             }
 
             Row {
@@ -553,7 +553,7 @@ PanelWindow {
         Rectangle {
             anchors.fill: parent
             color: "transparent"
-            border.color: root.config.borderColor
+            border.color: root.config.accent
             border.width: 1
             radius: root.config.popupRadius
             z: 100

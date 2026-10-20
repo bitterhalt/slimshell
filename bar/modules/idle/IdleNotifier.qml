@@ -44,7 +44,7 @@ Item {
 
             radius: root.config.popupRadius
             color: root.config.surface
-            border.color: root.config.borderColor
+            border.color: root.config.accent
             border.width: 1
 
             Item {

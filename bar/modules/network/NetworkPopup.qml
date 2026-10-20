@@ -441,8 +441,8 @@ PopoutPanel {
                 background: Rectangle {
                     radius: 3
                     color: connectAction.hovered || connectAction.activeFocus || (root.actionMode && root.selectedActionIndex === 0)
-                        ? root.config.borderColor : "transparent"
-                    border.color: root.config.borderColor
+                        ? root.config.accent : "transparent"
+                    border.color: root.config.accent
                     border.width: 1
                 }
 
@@ -470,8 +470,8 @@ PopoutPanel {
                 background: Rectangle {
                     radius: 3
                     color: forgetAction.hovered || forgetAction.activeFocus || (root.actionMode && root.selectedActionIndex === 1)
-                        ? root.config.borderColor : "transparent"
-                    border.color: root.config.borderColor
+                        ? root.config.accent : "transparent"
+                    border.color: root.config.accent
                     border.width: 1
                 }
 
@@ -501,8 +501,8 @@ PopoutPanel {
             background: Rectangle {
                 radius: 3
                 color: cancelAction.hovered || cancelAction.activeFocus || (root.actionMode && root.selectedActionIndex === 2)
-                    ? root.config.borderColor : "transparent"
-                border.color: root.config.borderColor
+                    ? root.config.accent : "transparent"
+                border.color: root.config.accent
                 border.width: 1
             }
 
@@ -570,7 +570,7 @@ PopoutPanel {
 
             background: Rectangle {
                 color: root.config.bg
-                border.color: wifiPassword.activeFocus ? root.config.accent : root.config.borderColor
+                border.color: root.config.accent
                 border.width: 1
                 radius: root.config.popupRadius
             }
@@ -602,8 +602,8 @@ PopoutPanel {
 
                 background: Rectangle {
                     radius: 3
-                    color: cancelPassword.hovered || cancelPassword.activeFocus ? root.config.borderColor : "transparent"
-                    border.color: root.config.borderColor
+                    color: cancelPassword.hovered || cancelPassword.activeFocus ? root.config.accent : "transparent"
+                    border.color: root.config.accent
                     border.width: 1
                 }
 
@@ -641,7 +641,7 @@ PopoutPanel {
 
                 background: Rectangle {
                     radius: 3
-                    color: connectButton.activeFocus ? root.config.borderColor : (connectButton.enabled ? root.config.accent : root.config.borderColor)
+                    color: root.config.accent
                 }
 
                 contentItem: Text {
@@ -683,7 +683,7 @@ PopoutPanel {
             anchors.right: parent.right
             anchors.top: parent.top
             height: 1
-            color: root.config.borderColor
+            color: root.config.accent
         }
 
         Text {

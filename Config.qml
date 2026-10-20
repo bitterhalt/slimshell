@@ -37,7 +37,6 @@ Item {
     // ThemeService falls back to the hardcoded palette when Pywal is absent.
     readonly property color bg: theme.bg
     readonly property color surface: theme.surface
-    readonly property color borderColor: theme.borderColor
     readonly property color fg: theme.fg
     readonly property color muted: theme.muted
     readonly property color accent: theme.accent

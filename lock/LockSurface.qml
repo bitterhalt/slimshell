@@ -13,7 +13,6 @@ Rectangle {
     readonly property color bg: config.bg
     readonly property color fg: config.fg
     readonly property color surface: config.surface
-    readonly property color border: config.borderColor
     readonly property color accent: config.accent
     readonly property color error: config.urgent
 
@@ -150,9 +149,9 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter
 
             TextField {
-                renderType: Text.NativeRendering
                 id: passwordBox
 
+                renderType: Text.NativeRendering
                 horizontalAlignment: TextInput.AlignHCenter
                 cursorVisible: activeFocus && (length > 0 || preeditText.length > 0)
                 implicitWidth: 200
@@ -212,7 +211,7 @@ Rectangle {
                         anchors.fill: parent
                         color: "transparent"
                         border.width: 1
-                        border.color: Qt.rgba(root.border.r, root.border.g, root.border.b, 1)
+                        border.color: Qt.rgba(root.accent.r, root.accent.g, root.accent.b, 1)
                         radius: 6
                     }
 
@@ -310,9 +309,9 @@ Rectangle {
 
         // Status message
         Label {
-            renderType: Text.NativeRendering
             id: statusLabel
 
+            renderType: Text.NativeRendering
             visible: text !== ""
             text: {
                 if (root.context.errorText !== "")
@@ -335,9 +334,9 @@ Rectangle {
 
     // Hint label - shown before any auth attempt
     Label {
-        renderType: Text.NativeRendering
         id: hintLabel
 
+        renderType: Text.NativeRendering
         visible: !root.context.pamActivated
         text: "Click or press any key to unlock"
         color: root.config.muted

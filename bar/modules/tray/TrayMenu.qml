@@ -46,7 +46,7 @@ Item {
         anchors.fill: parent
 
         color: root.config.surface
-        border.color: root.config.borderColor
+        border.color: root.config.accent
         border.width: 1
         radius: root.config.popupRadius
 
@@ -67,7 +67,7 @@ Item {
                 Rectangle {
                     anchors.fill: parent
                     radius: 3
-                    color: backMouse.containsMouse ? root.config.borderColor : "transparent"
+                    color: backMouse.containsMouse ? root.config.accent : "transparent"
                 }
 
                 Text {
@@ -122,7 +122,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
 
                 height: 1
-                color: root.config.borderColor
+                color: root.config.accent
             }
         }
     }
@@ -140,7 +140,7 @@ Item {
             Rectangle {
                 anchors.fill: parent
                 radius: 3
-                color: rowMouse.containsMouse && entry.enabled ? root.config.borderColor : "transparent"
+                color: rowMouse.containsMouse && entry.enabled ? root.config.accent : "transparent"
             }
 
             Item {

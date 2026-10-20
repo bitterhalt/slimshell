@@ -368,11 +368,12 @@ Item {
                     anchors.right: parent.right
                     anchors.top: parent.top
                     height: 1
-                    color: root.config.borderColor
+                    color: root.config.accent
                 }
 
                 Text {
                     id: footerStatus
+
                     anchors.left: parent.left
                     anchors.top: parent.top
                     anchors.topMargin: bluetoothPopup.spacing
@@ -384,6 +385,7 @@ Item {
 
                 Text {
                     id: footerHint
+
                     anchors.right: parent.right
                     anchors.top: parent.top
                     anchors.topMargin: bluetoothPopup.spacing
