@@ -280,7 +280,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
 
             width: 22
-            color: root.config.accent
+            color: root.config.fg
             font.family: root.config.iconFontFamily
             font.pointSize: root.config.iconSize * 1.077
             horizontalAlignment: Text.AlignHCenter
