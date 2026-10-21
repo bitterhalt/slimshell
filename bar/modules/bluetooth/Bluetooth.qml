@@ -256,12 +256,6 @@ Item {
                 spacing: 2
                 visible: root.adapter && root.adapter.enabled
 
-                SectionHeader {
-                    config: root.config
-                    visible: root.connectedRows.length > 0
-                    text: "CONNECTED"
-                }
-
                 Repeater {
                     model: root.connectedRows
 
@@ -279,13 +273,6 @@ Item {
                         onActivated: root.toggleDevice(modelData)
                     }
 
-                }
-
-                SectionHeader {
-                    renderType: Text.NativeRendering
-                    config: root.config
-                    visible: root.pairedRows.length > 0
-                    text: "PAIRED"
                 }
 
                 Repeater {

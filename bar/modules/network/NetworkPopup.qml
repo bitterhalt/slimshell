@@ -172,7 +172,7 @@ PopoutPanel {
     }
 
     config: network.config
-    contentWidth: 240
+    contentWidth: 200
     focus: true
     Component.onCompleted: {
         if (selectableRows.length > 0)
