@@ -370,12 +370,9 @@ Item {
             if (deviceRow.row.pairing)
                 return "Pairing…";
 
-            if (deviceRow.row.connected) {
-                if (deviceRow.row.batteryAvailable)
-                    return `Connected  ·  ${Math.round(deviceRow.row.battery * 100)}%`;
-
+            if (deviceRow.row.connected)
                 return "Connected";
-            }
+
             if (deviceRow.row.paired)
                 return "Connect";
 
@@ -384,6 +381,7 @@ Item {
 
             return "";
         }
+        readonly property string batteryText: row.connected && row.batteryAvailable ? `${Math.round(row.battery * 100)}%` : ""
 
         signal activated()
         signal focused()
@@ -396,7 +394,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.topMargin: 3
             anchors.bottomMargin: 3
-            width: 2
+            width: 3
             radius: 1
             color: deviceRow.config.accent
             visible: deviceRow.selected
@@ -477,7 +475,7 @@ Item {
             anchors.rightMargin: 6
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            width: deviceRow.actionText === "" ? 0 : 72
+            width: deviceRow.actionText || deviceRow.batteryText ? 72 : 0
 
             Text {
                 renderType: Text.NativeRendering
@@ -485,10 +483,10 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width
                 horizontalAlignment: Text.AlignRight
-                color: deviceRow.highlighted ? deviceRow.config.accent : deviceRow.config.muted
+                color: deviceRow.config.muted
                 font.pointSize: deviceRow.config.fontSize(0.77)
                 elide: Text.ElideRight
-                text: deviceRow.actionText
+                text: deviceRow.actionText || deviceRow.batteryText
             }
 
         }

@@ -6,6 +6,12 @@ Item {
     required property var config
     required property var row
     property bool selected: false
+    property bool secured: true
+    readonly property string statusText: {
+        const state = root.row.connected ? "Connected" : (root.row.known ? "Saved" : "");
+        const security = root.secured ? "Secured" : "Open";
+        return state ? `${state}  ·  ${security}` : security;
+    }
 
     signal activated()
     signal focused()
@@ -31,7 +37,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.topMargin: 3
         anchors.bottomMargin: 3
-        width: 2
+        width: 3
         radius: 1
         color: root.config.accent
         visible: root.selected
@@ -51,15 +57,43 @@ Item {
         }
     }
 
-    Text {
-        renderType: Text.NativeRendering
+    Column {
         x: 38
-        width: parent.width - 44
+        width: Math.max(0, parent.width - x - signalLabel.width - 12)
         anchors.verticalCenter: parent.verticalCenter
-        color: root.config.fg
-        font.pointSize: root.config.fontSize(0.92)
-        elide: Text.ElideRight
-        text: root.row.ssid
+        spacing: 0
+
+        Text {
+            renderType: Text.NativeRendering
+            width: parent.width
+            color: rowMouse.containsMouse ? Qt.lighter(root.config.fg, 1.15) : root.config.fg
+            font.pointSize: root.config.fontSize(0.92)
+            font.weight: root.selected ? Font.DemiBold : Font.Normal
+            elide: Text.ElideRight
+            text: root.row.ssid
+        }
+
+        Text {
+            renderType: Text.NativeRendering
+            width: parent.width
+            color: root.config.muted
+            font.pointSize: root.config.fontSize(0.77)
+            elide: Text.ElideRight
+            text: root.statusText
+        }
+    }
+
+    Text {
+        id: signalLabel
+        renderType: Text.NativeRendering
+        anchors.right: parent.right
+        anchors.rightMargin: 6
+        anchors.verticalCenter: parent.verticalCenter
+        width: 44
+        horizontalAlignment: Text.AlignRight
+        color: root.config.muted
+        font.pointSize: root.config.fontSize(0.77)
+        text: `${Math.round(Math.max(0, Math.min(1, Number(root.row.strength) || 0)) * 100)}%`
     }
 
     MouseArea {

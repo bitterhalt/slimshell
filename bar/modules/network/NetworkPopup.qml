@@ -252,76 +252,32 @@ PopoutPanel {
 
         }
 
-        Item {
+        NetworkRow {
             width: parent.width
-            height: root.network.connectedWifi ? 30 : 0
+            height: root.network.connectedWifi ? 40 : 0
             visible: height > 0
-
-            Rectangle {
-                anchors.left: parent.left
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.topMargin: 3
-                anchors.bottomMargin: 3
-                width: 2
-                radius: 1
-                color: root.config.accent
-                visible: root.selectedSsid === root.network.connectedWifi?.name && !root.actionMode
-            }
-
-            Item {
-                x: 4
-                width: 28
-                height: parent.height
-
-                Text {
-                    anchors.centerIn: parent
-                    color: root.config.accent
-                    font.family: root.config.iconFontFamily
-                    font.pointSize: root.config.iconSize
-                    text: root.network.connectedWifi ? Model.strengthIcon(root.network.connectedWifi.signalStrength) : ""
+            config: root.config
+            row: root.network.connectedWifi ? ({
+                ssid: root.network.connectedWifi.name,
+                strength: root.network.connectedWifi.signalStrength,
+                connected: true,
+                known: true
+            }) : ({ ssid: "", strength: 0, connected: true })
+            secured: root.network.connectedWifi
+                ? root.network.connectedWifi.security !== WifiSecurityType.Open : true
+            selected: root.network.connectedWifi !== null
+                && root.selectedSsid === root.network.connectedWifi.name
+            onFocused: {
+                if (root.network.connectedWifi) {
+                    root.selectedSsid = root.network.connectedWifi.name;
+                    root.selectedNetworkIndex = root.selectableRows.findIndex(
+                        row => row.ssid === root.selectedSsid);
                 }
             }
-
-            Column {
-                x: 38
-                width: parent.width - 44
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 0
-
-                Text {
-                    renderType: Text.NativeRendering
-                    width: parent.width
-                    color: root.config.fg
-                    font.pointSize: root.config.fontSize(0.92)
-                    font.weight: Font.DemiBold
-                    elide: Text.ElideRight
-                    text: root.network.connectedWifi ? root.network.connectedWifi.name : ""
-                }
-
-            }
-
-            MouseArea {
-                id: connectedWifiMouse
-
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    if (!root.network.connectedWifi)
-                        return ;
-
+            onActivated: {
+                if (root.network.connectedWifi)
                     root.openRow({ssid: root.network.connectedWifi.name});
-                }
-                onEntered: {
-                    if (root.network.connectedWifi) {
-                        root.selectedSsid = root.network.connectedWifi.name;
-                        root.selectedNetworkIndex = root.selectableRows.findIndex(
-                            row => row.ssid === root.selectedSsid);
-                    }
-                }
             }
-
         }
 
         Repeater {
@@ -334,9 +290,10 @@ PopoutPanel {
                 required property int index
 
                 width: parent ? parent.width : 0
-                height: 30
+                height: 40
                 config: root.config
                 row: modelData
+                secured: modelData.security !== WifiSecurityType.Open
                 enabled: !modelData.stateChanging
                 selected: modelData.ssid === root.selectedSsid
                 onFocused: root.selectNetwork(root.selectableRows.findIndex(

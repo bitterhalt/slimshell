@@ -30,7 +30,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.topMargin: 6
         anchors.bottomMargin: 6
-        width: 2
+        width: 3
         radius: 1
         color: root.config.accent
         visible: root.selected
@@ -81,8 +81,7 @@ Item {
         renderType: Text.NativeRendering
         x: 38
         y: 6
-        width: Math.max(0, Math.min(slider.width,
-            parent.width - x - (defaultLabel.visible ? defaultLabel.width + 18 : 8)))
+        width: Math.max(0, Math.min(slider.width, parent.width - x - (defaultLabel.visible ? defaultLabel.width + 18 : 8)))
         color: rowHover.hovered ? Qt.lighter(root.config.fg, 1.15) : root.config.fg
         font.pointSize: root.config.fontSize(0.9)
         font.weight: root.selected ? Font.DemiBold : Font.Normal
@@ -174,9 +173,7 @@ Item {
         anchors.right: parent.right
         anchors.rightMargin: 8
         anchors.verticalCenter: slider.verticalCenter
-        width: Math.ceil(volumeMetrics.advanceWidth(Math.max(
-            Math.round(root.config.maxVolume * 100),
-            root.nodeAudio ? Math.round(root.nodeAudio.volume * 100) : 0) + "%"))
+        width: Math.ceil(volumeMetrics.advanceWidth(Math.max(Math.round(root.config.maxVolume * 100), root.nodeAudio ? Math.round(root.nodeAudio.volume * 100) : 0) + "%"))
         horizontalAlignment: Text.AlignRight
         color: root.config.muted
         font.pointSize: root.config.fontSize(0.78)

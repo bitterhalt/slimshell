@@ -12,7 +12,7 @@ FocusScope {
     required property var config
     required property var notificationService
     readonly property int popupWidth: 360
-    readonly property int popupMinHeight: 328
+    readonly property int popupMinHeight: 320
     readonly property int popupMaxHeight: 650
     readonly property int popupPadding: 10
 
@@ -20,7 +20,7 @@ FocusScope {
 
     implicitWidth: popupWidth
     implicitHeight: Math.min(Math.max(notificationService.notificationCount > 0
-        ? 80 + notificationService.notificationCount * 100 : 118, popupMinHeight), popupMaxHeight)
+        ? 44 + notificationService.notificationCount * 100 : 82, popupMinHeight), popupMaxHeight)
     width: implicitWidth
     height: implicitHeight
     focus: true
@@ -69,58 +69,16 @@ FocusScope {
         radius: root.config.popupRadius
     }
 
-    Item {
-        id: historyHeader
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.margins: root.popupPadding
-        height: 28
-
-        Text {
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-            renderType: Text.NativeRendering
-            color: root.config.fg
-            font.pointSize: root.config.fontSize(1)
-            font.weight: Font.DemiBold
-            text: "Notifications"
-        }
-
-        Row {
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: 8
-
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                renderType: Text.NativeRendering
-                color: root.notificationService.dnd ? root.config.accent : root.config.muted
-                font.pointSize: root.config.fontSize(0.8)
-                text: "DND"
-            }
-
-            ToggleSwitch {
-                config: root.config
-                checked: root.notificationService.dnd
-                onToggled: {
-                    root.notificationService.toggleDnd();
-                    root.forceActiveFocus();
-                }
-            }
-        }
-    }
-
     ListView {
         id: list
         objectName: "historyList"
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: historyHeader.bottom
+        anchors.top: parent.top
         anchors.bottom: history.helpOpen ? helpText.top : historyFooter.top
         anchors.leftMargin: root.popupPadding
         anchors.rightMargin: root.popupPadding
-        anchors.topMargin: 8
+        anchors.topMargin: root.popupPadding
         anchors.bottomMargin: 8
         visible: count > 0
         clip: true
@@ -191,7 +149,7 @@ FocusScope {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.margins: root.popupPadding
-        height: Math.max(helpHint.implicitHeight, footerActions.implicitHeight) + 8
+        height: Math.max(helpHint.implicitHeight, dndControls.implicitHeight) + 8
 
         Rectangle {
             anchors.left: parent.left
@@ -223,32 +181,26 @@ FocusScope {
         }
 
         Row {
-            id: footerActions
+            id: dndControls
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.topMargin: 8
-            spacing: 12
+            spacing: 8
 
             Text {
+                anchors.verticalCenter: parent.verticalCenter
                 renderType: Text.NativeRendering
-                text: "x Close"
-                color: root.config.muted
-                font.pointSize: root.config.fontSize(0.76)
+                text: "DND"
+                color: root.notificationService.dnd ? root.config.accent : root.config.muted
+                font.pointSize: root.config.fontSize(0.8)
             }
-            Text {
-                renderType: Text.NativeRendering
-                text: "Ctrl+C Clear all"
-                color: clearMouse.containsMouse ? root.config.fg : root.config.muted
-                font.pointSize: root.config.fontSize(0.76)
-                MouseArea {
-                    id: clearMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        root.notificationService.clearAll();
-                        root.forceActiveFocus();
-                    }
+
+            ToggleSwitch {
+                config: root.config
+                checked: root.notificationService.dnd
+                onToggled: {
+                    root.notificationService.toggleDnd();
+                    root.forceActiveFocus();
                 }
             }
         }
