@@ -7,12 +7,13 @@ PanelWindow {
 
     required property var config
     required property var targetScreen
-    readonly property int cardPadding: 14
+    readonly property int horizontalPadding: 28
+    readonly property int verticalPadding: 14
 
     screen: targetScreen
     color: "transparent"
-    implicitWidth: labels.width + cardPadding * 2
-    implicitHeight: labels.implicitHeight + cardPadding * 2
+    implicitWidth: labels.width + horizontalPadding * 2
+    implicitHeight: labels.implicitHeight + verticalPadding * 2
     exclusiveZone: 0
     focusable: false
     margins.top: config.zenCardMargin
@@ -43,8 +44,8 @@ PanelWindow {
     Column {
         id: labels
 
-        x: root.cardPadding
-        y: root.cardPadding
+        x: root.horizontalPadding
+        y: root.verticalPadding
         width: Math.max(timeText.implicitWidth, modeText.implicitWidth)
         spacing: 4
 
