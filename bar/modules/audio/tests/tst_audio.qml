@@ -140,7 +140,7 @@ Item {
             compare(slider.to, 1.25);
             const popupControls = findChild(popup, "audioPopupState");
             popupControls.helpOpen = true;
-            verify(findText(popup, "Volume range: 0–125% · keyboard step: 5%") !== null);
+            verify(findText(popup, "Volume range: 0–125% · keyboard step: 5% · ? Close help") !== null);
         }
 
         function test_default_selection_survives_reordering() {
@@ -317,6 +317,51 @@ Item {
             popupControls.selectRow(9);
             const list = findChild(popup, "audioRows");
             tryVerify(() => list.contentY > 0);
+        }
+
+        function test_keyboard_selection_scrolls_without_resizing_popup() {
+            const many = [];
+            for (let i = 0; i < 12; ++i)
+                many.push({id: 100 + i, name: "Device " + i,
+                    audio: fixture.speakerAudio, isSink: true, isStream: false});
+            fixture.allNodes = many;
+            popup = createTemporaryObject(popupComponent, host,
+                {audioItem: fixture, profileBackend: profileComponent});
+            const popupControls = findChild(popup, "audioPopupState");
+            const keyboard = findChild(popup, "audioKeyboard");
+            const list = findChild(popup, "audioRows");
+            tryVerify(() => keyboard.activeFocus);
+            waitForPolish(host.Window.window);
+            const height = popup.implicitHeight;
+            const keyboardHeight = keyboard.height;
+            popupControls.selectRow(11);
+            wait(0);
+            waitForPolish(host.Window.window);
+            tryVerify(() => list.contentY > 0);
+            compare(popup.implicitHeight, height);
+            compare(keyboard.height, keyboardHeight);
+            popupControls.selectRow(0);
+            wait(0);
+            waitForPolish(host.Window.window);
+            compare(popup.implicitHeight, height);
+            compare(keyboard.height, keyboardHeight);
+        }
+
+        function test_short_list_does_not_scroll_while_selecting() {
+            popup = createTemporaryObject(popupComponent, host,
+                {audioItem: fixture, profileBackend: profileComponent});
+            const popupControls = findChild(popup, "audioPopupState");
+            const list = findChild(popup, "audioRows");
+            waitForPolish(host.Window.window);
+            verify(list.contentHeight <= list.height + 1);
+            popupControls.selectRow(1);
+            wait(0);
+            waitForPolish(host.Window.window);
+            compare(list.contentY, 0);
+            popupControls.selectRow(0);
+            wait(0);
+            waitForPolish(host.Window.window);
+            compare(list.contentY, 0);
         }
 
         function test_single_row_list_hides_selection_marker() {

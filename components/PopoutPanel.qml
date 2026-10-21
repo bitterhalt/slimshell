@@ -4,8 +4,8 @@ Item {
     id: panel
 
     required property var config
-    property int contentWidth: 330
-    property int padding: 10
+    property int contentWidth: 300
+    property int padding: 12
     property int spacing: 8
     default property alias contentData: panelContent.data
 

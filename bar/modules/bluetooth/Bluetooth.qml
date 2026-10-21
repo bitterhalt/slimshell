@@ -177,7 +177,6 @@ Item {
             id: bluetoothPopup
 
             config: root.config
-            contentWidth: 330
             focus: true
             Component.onCompleted: {
                 root.cancelForget();
@@ -210,35 +209,6 @@ Item {
                 bluetoothService: root.bluetoothService
             }
 
-            Item {
-                width: parent.width
-                height: 28
-
-                Text {
-                    renderType: Text.NativeRendering
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    color: config.fg
-                    font.pointSize: config.fontSize(1)
-                    font.weight: Font.DemiBold
-                    text: "Bluetooth"
-                }
-
-                ToggleSwitch {
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    config: root.config
-                    checked: root.adapter && root.adapter.enabled
-                    enabled: root.adapter !== null
-                    onToggled: {
-                        if (root.adapter)
-                            root.adapter.enabled = !root.adapter.enabled;
-
-                    }
-                }
-
-            }
-
             Text {
                 renderType: Text.NativeRendering
                 width: parent.width
@@ -265,7 +235,6 @@ Item {
                         width: parent ? parent.width : 0
                         config: root.config
                         row: modelData
-                        actionText: "Disconnect"
                         highlighted: true
                         trusted: modelData.trusted
                         selected: modelData.address === root.selectedAddress
@@ -284,7 +253,7 @@ Item {
                         width: parent ? parent.width : 0
                         config: root.config
                         row: modelData
-                        actionText: modelData.pairing ? "Cancel" : "Connect"
+                        actionText: ""
                         trusted: modelData.trusted
                         selected: modelData.address === root.selectedAddress
                         onFocused: root.selectedAddress = modelData.address
@@ -302,7 +271,7 @@ Item {
                         width: parent ? parent.width : 0
                         config: root.config
                         row: modelData
-                        actionText: modelData.pairing ? "Cancel" : "Pair"
+                        actionText: modelData.pairing ? "Cancel" : ""
                         trusted: modelData.trusted
                         selected: modelData.address === root.selectedAddress
                         onFocused: root.selectedAddress = modelData.address
@@ -407,6 +376,12 @@ Item {
 
                 return "Connected";
             }
+            if (deviceRow.row.paired)
+                return "Connect";
+
+            if (!deviceRow.row.pairing)
+                return "Pair";
+
             return "";
         }
 
@@ -461,24 +436,24 @@ Item {
                 spacing: 4
 
                 Text {
-                    id: trustedStar
-
-                    width: deviceRow.trusted ? 12 : 0
-                    color: deviceRow.config.accent
-                    font.pointSize: deviceRow.config.fontSize(0.78)
-                    font.weight: Font.DemiBold
-                    text: "★"
-                    visible: deviceRow.trusted
-                }
-
-                Text {
                     renderType: Text.NativeRendering
-                    width: Math.max(0, parent.width - trustedStar.width - (deviceRow.trusted ? 4 : 0))
+                    width: Math.min(Math.max(0, parent.width - trustedStar.width - (deviceRow.trusted ? parent.spacing : 0)), implicitWidth)
                     color: deviceMouse.containsMouse ? Qt.lighter(deviceRow.config.fg, 1.15) : deviceRow.config.fg
                     font.pointSize: deviceRow.config.fontSize(0.92)
                     font.weight: deviceRow.selected || deviceRow.highlighted ? Font.DemiBold : Font.Normal
                     elide: Text.ElideRight
                     text: deviceRow.row.name
+                }
+
+                Text {
+                    id: trustedStar
+
+                    width: deviceRow.trusted ? implicitWidth : 0
+                    color: deviceRow.config.accent
+                    font.pointSize: deviceRow.config.fontSize(0.78)
+                    font.weight: Font.DemiBold
+                    text: "★"
+                    visible: deviceRow.trusted
                 }
 
             }
@@ -502,7 +477,7 @@ Item {
             anchors.rightMargin: 6
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            width: 72
+            width: deviceRow.actionText === "" ? 0 : 72
 
             Text {
                 renderType: Text.NativeRendering

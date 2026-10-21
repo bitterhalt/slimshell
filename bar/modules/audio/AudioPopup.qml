@@ -15,7 +15,7 @@ PopoutPanel {
     padding: 10
     readonly property int rowHeight: popupState.tabIndex === 3 ? 48 : 60
     readonly property int rowSpacing: 4
-    readonly property int chromeHeight: header.height + 12 + status.height + root.spacing + footer.height
+    readonly property int chromeHeight: 12 + status.height + root.spacing + footer.height
     readonly property real desiredBodyHeight: popupState.helpOpen ? helpRows.implicitHeight
         : popupState.contextOpen ? optionRows.implicitHeight
         : Math.max(rowHeight, popupState.rows.length * (rowHeight + rowSpacing) - rowSpacing)
@@ -31,10 +31,7 @@ PopoutPanel {
         profiles: profileLoader.item
         onTabIndexChanged: if (tabIndex === 3) root.profilesLoaded = true
         onCloseRequested: root.audioItem.closePopup()
-        onSelectionMoved: Qt.callLater(() => {
-            if (popupState.selectedIndex >= 0)
-                rowsView.positionViewAtIndex(popupState.selectedIndex, ListView.Contain);
-        })
+        onSelectionMoved: selectionViewTimer.restart()
     }
 
     Loader {
@@ -51,6 +48,19 @@ PopoutPanel {
         when: profileLoader.item !== null
     }
 
+    Timer {
+        id: selectionViewTimer
+        interval: 0
+        onTriggered: {
+            // ListView geometry can differ by a fraction of a pixel. Don't
+            // reposition a short list that already fits in the viewport.
+            if (rowsView.contentHeight <= rowsView.height + 1)
+                return
+            if (popupState.selectedIndex >= 0)
+                rowsView.positionViewAtIndex(popupState.selectedIndex, ListView.Contain)
+        }
+    }
+
     FocusScope {
         id: keyboardHandler
         objectName: "audioKeyboard"
@@ -64,53 +74,8 @@ PopoutPanel {
         }
 
         Item {
-            id: header
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: 24
-
-            Text {
-                renderType: Text.NativeRendering
-                anchors.left: parent.left
-                anchors.leftMargin: 6
-                anchors.right: helpHint.left
-                anchors.rightMargin: 8
-                anchors.verticalCenter: parent.verticalCenter
-                text: popupState.title
-                elide: Text.ElideRight
-                color: root.config.fg
-                font.pointSize: root.config.fontSize(0.94)
-                font.weight: Font.DemiBold
-            }
-            Text {
-                id: helpHint
-                renderType: Text.NativeRendering
-                anchors.right: parent.right
-                anchors.rightMargin: 6
-                anchors.verticalCenter: parent.verticalCenter
-                text: popupState.contextOpen || popupState.helpOpen || popupState.profileCardKey !== ""
-                    ? "Esc Back" : "? Help"
-                color: helpMouse.containsMouse ? root.config.fg : root.config.muted
-                font.pointSize: root.config.fontSize(0.74)
-                MouseArea {
-                    id: helpMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        keyboardHandler.forceActiveFocus();
-                        if (popupState.contextOpen || popupState.helpOpen || popupState.profileCardKey !== "")
-                            popupState.goBack();
-                        else
-                            popupState.helpOpen = true;
-                    }
-                }
-            }
-        }
-
-        Item {
             id: content
-            anchors.top: header.bottom
+            anchors.top: parent.top
             anchors.topMargin: 6
             anchors.left: parent.left
             anchors.right: parent.right
@@ -265,20 +230,33 @@ PopoutPanel {
             anchors.bottom: footer.top
             anchors.bottomMargin: root.spacing
             height: 18
-            text: popupState.helpOpen ? "Volume range: 0–" + Math.round(root.config.maxVolume * 100) + "% · keyboard step: 5%"
+            text: popupState.helpOpen
+                ? "Volume range: 0–" + Math.round(root.config.maxVolume * 100) + "% · keyboard step: 5% · ? Close help"
                 : popupState.tabIndex === 3
                     ? (popupState.profiles && (popupState.profiles.errorText
                         || (popupState.profiles.changing ? "Applying profile…" : "")
                         || (popupState.profiles.loading ? "Loading cards…" : "")))
-                        || (popupState.profileCardKey !== "" ? "Enter Apply profile · Esc Back" : "Enter Profiles")
-                : popupState.selectedRow && popupState.selectedRow.kind !== "playback" && !popupState.selectedRow.active
-                    ? "← → Volume · m Mute · d Default · Enter Options"
-                    : "← → Volume · m Mute · Enter Options"
+                        || (popupState.profileCard
+                            ? popupState.profileCard.name + " · Enter Apply · Esc Back"
+                            : "Enter Profiles · ? Help")
+                : popupState.contextOpen
+                    ? "Options · " + (popupState.selectedRow ? popupState.selectedRow.name : "") + " · Esc Back · ? Help"
+                    : "? Help"
             color: popupState.tabIndex === 3 && popupState.profiles && popupState.profiles.errorText
                 ? root.config.urgent : root.config.muted
             font.pointSize: root.config.fontSize(0.72)
             elide: Text.ElideRight
             verticalAlignment: Text.AlignVCenter
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    popupState.helpOpen = !popupState.helpOpen;
+                    keyboardHandler.forceActiveFocus();
+                }
+            }
         }
 
         Item {

@@ -172,7 +172,6 @@ PopoutPanel {
     }
 
     config: network.config
-    contentWidth: 200
     focus: true
     Component.onCompleted: {
         if (selectableRows.length > 0)
@@ -189,7 +188,8 @@ PopoutPanel {
 
     Item {
         width: parent.width
-        height: 28
+        height: root.passwordMode || root.actionMode ? 28 : 0
+        visible: height > 0
 
         Text {
             renderType: Text.NativeRendering
@@ -403,7 +403,7 @@ PopoutPanel {
         readonly property var selectedNetwork: root.network.networkForSsid(root.selectedSsid)
 
         width: parent.width
-        spacing: 8
+        spacing: 5
         visible: root.actionMode
 
         Text {
@@ -423,69 +423,96 @@ PopoutPanel {
             text: parent.selectedNetwork && parent.selectedNetwork.connected ? "Connected" : "Saved network"
         }
 
-        Row {
+        Button {
+            id: connectAction
+            KeyNavigation.tab: forgetAction
+            KeyNavigation.backtab: cancelAction
+            onActiveFocusChanged: if (activeFocus) root.selectedActionIndex = 0
             width: parent.width
-            height: 30
-            spacing: 6
+            height: 32
+            readonly property bool actionHighlighted: hovered || activeFocus
+                || (root.actionMode && root.selectedActionIndex === 0)
+            text: actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "Disconnect" : "Connect"
+            onClicked: root.activateAction(0)
 
-            Button {
-                id: connectAction
-                KeyNavigation.tab: forgetAction
-                KeyNavigation.backtab: cancelAction
-                onActiveFocusChanged: if (activeFocus) root.selectedActionIndex = 0
-                width: (parent.width - 6) / 2
-                height: parent.height
-                text: actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "[d]isconnect" : "[c]onnect"
-                onClicked: root.activateAction(0)
+            background: Rectangle {
+                radius: 4
+                color: connectAction.actionHighlighted ? root.config.accent : "transparent"
+                border.color: root.config.accent
+                border.width: 1
+            }
 
-                background: Rectangle {
-                    radius: 3
-                    color: connectAction.hovered || connectAction.activeFocus || (root.actionMode && root.selectedActionIndex === 0)
-                        ? root.config.accent : "transparent"
-                    border.color: root.config.accent
-                    border.width: 1
-                }
-
-                contentItem: Text {
+            contentItem: Item {
+                Text {
+                    anchors.left: parent.left
+                    anchors.leftMargin: 10
+                    anchors.right: connectShortcut.left
+                    anchors.rightMargin: 8
+                    anchors.verticalCenter: parent.verticalCenter
                     renderType: Text.NativeRendering
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    color: root.config.fg
-                    font.pointSize: root.config.fontSize(0.85)
+                    textFormat: Text.PlainText
+                    color: connectAction.actionHighlighted ? root.config.bg : root.config.fg
+                    font.pointSize: root.config.fontSize(0.88)
                     text: connectAction.text
                 }
+                Text {
+                    id: connectShortcut
+                    anchors.right: parent.right
+                    anchors.rightMargin: 10
+                    anchors.verticalCenter: parent.verticalCenter
+                    renderType: Text.NativeRendering
+                    textFormat: Text.PlainText
+                    color: connectAction.actionHighlighted ? root.config.bg : root.config.muted
+                    font.pointSize: root.config.fontSize(0.76)
+                    text: actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "[d]" : "[c]"
+                }
+            }
+        }
 
+        Button {
+            id: forgetAction
+            KeyNavigation.tab: cancelAction
+            KeyNavigation.backtab: connectAction
+            onActiveFocusChanged: if (activeFocus) root.selectedActionIndex = 1
+            width: parent.width
+            height: 32
+            readonly property bool actionHighlighted: hovered || activeFocus
+                || (root.actionMode && root.selectedActionIndex === 1)
+            text: "Forget"
+            onClicked: root.activateAction(1)
+
+            background: Rectangle {
+                radius: 4
+                color: forgetAction.actionHighlighted ? root.config.accent : "transparent"
+                border.color: root.config.accent
+                border.width: 1
             }
 
-            Button {
-                id: forgetAction
-                KeyNavigation.tab: cancelAction
-                KeyNavigation.backtab: connectAction
-                onActiveFocusChanged: if (activeFocus) root.selectedActionIndex = 1
-                width: (parent.width - 6) / 2
-                height: parent.height
-                text: "[f]orget"
-                onClicked: root.activateAction(1)
-
-                background: Rectangle {
-                    radius: 3
-                    color: forgetAction.hovered || forgetAction.activeFocus || (root.actionMode && root.selectedActionIndex === 1)
-                        ? root.config.accent : "transparent"
-                    border.color: root.config.accent
-                    border.width: 1
-                }
-
-                contentItem: Text {
+            contentItem: Item {
+                Text {
+                    anchors.left: parent.left
+                    anchors.leftMargin: 10
+                    anchors.right: forgetShortcut.left
+                    anchors.rightMargin: 8
+                    anchors.verticalCenter: parent.verticalCenter
                     renderType: Text.NativeRendering
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    color: root.config.urgent
-                    font.pointSize: root.config.fontSize(0.85)
+                    textFormat: Text.PlainText
+                    color: forgetAction.actionHighlighted ? root.config.bg : root.config.urgent
+                    font.pointSize: root.config.fontSize(0.88)
                     text: forgetAction.text
                 }
-
+                Text {
+                    id: forgetShortcut
+                    anchors.right: parent.right
+                    anchors.rightMargin: 10
+                    anchors.verticalCenter: parent.verticalCenter
+                    renderType: Text.NativeRendering
+                    textFormat: Text.PlainText
+                    color: forgetAction.actionHighlighted ? root.config.bg : root.config.muted
+                    font.pointSize: root.config.fontSize(0.76)
+                    text: "[f]"
+                }
             }
-
         }
 
         Button {
@@ -494,25 +521,43 @@ PopoutPanel {
             KeyNavigation.backtab: forgetAction
             onActiveFocusChanged: if (activeFocus) root.selectedActionIndex = 2
             width: parent.width
-            height: 30
-            text: "Cancel [Esc]"
+            height: 32
+            readonly property bool actionHighlighted: hovered || activeFocus
+                || (root.actionMode && root.selectedActionIndex === 2)
+            text: "Back"
             onClicked: root.activateAction(2)
 
             background: Rectangle {
                 radius: 3
-                color: cancelAction.hovered || cancelAction.activeFocus || (root.actionMode && root.selectedActionIndex === 2)
-                    ? root.config.accent : "transparent"
+                color: cancelAction.actionHighlighted ? root.config.accent : "transparent"
                 border.color: root.config.accent
                 border.width: 1
             }
 
-            contentItem: Text {
-                renderType: Text.NativeRendering
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                color: root.config.fg
-                font.pointSize: root.config.fontSize(0.85)
-                text: cancelAction.text
+            contentItem: Item {
+                Text {
+                    anchors.left: parent.left
+                    anchors.leftMargin: 10
+                    anchors.right: backShortcut.left
+                    anchors.rightMargin: 8
+                    anchors.verticalCenter: parent.verticalCenter
+                    renderType: Text.NativeRendering
+                    textFormat: Text.PlainText
+                    color: cancelAction.actionHighlighted ? root.config.bg : root.config.fg
+                    font.pointSize: root.config.fontSize(0.88)
+                    text: "Back"
+                }
+                Text {
+                    id: backShortcut
+                    anchors.right: parent.right
+                    anchors.rightMargin: 10
+                    anchors.verticalCenter: parent.verticalCenter
+                    renderType: Text.NativeRendering
+                    textFormat: Text.PlainText
+                    color: cancelAction.actionHighlighted ? root.config.bg : root.config.muted
+                    font.pointSize: root.config.fontSize(0.76)
+                    text: "[Esc]"
+                }
             }
 
         }
