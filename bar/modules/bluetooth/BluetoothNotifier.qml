@@ -34,7 +34,8 @@ Item {
     }
 
     function showConnected(device) {
-        if (!device || shouldIgnore(device) || (toast.visible && batteryAlert))
+        if (!device || !device.connected || !device.paired || device.pairing
+                || shouldIgnore(device) || (toast.visible && batteryAlert))
             return ;
 
         deviceName = deviceLabel(device);
@@ -78,24 +79,10 @@ Item {
     Repeater {
         model: root.devices
 
-        delegate: Item {
-            id: connectionWatcher
+        delegate: ConnectionWatcher {
             required property var modelData
-
-            visible: false
-            width: 0
-            height: 0
-
-            Connections {
-                function onConnectedChanged() {
-                    if (connectionWatcher.modelData.connected)
-                        root.showConnected(connectionWatcher.modelData);
-
-                }
-
-                target: connectionWatcher.modelData
-            }
-
+            device: modelData
+            onConnectionReady: device => root.showConnected(device)
         }
 
     }
