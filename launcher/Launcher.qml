@@ -68,10 +68,8 @@ Item {
     }
 
     // Nerd font glyphs
-    readonly property string iconApps: String.fromCodePoint(0xF003B)
     readonly property string iconRun: String.fromCodePoint(0xF018D)
     readonly property string iconStar: String.fromCodePoint(0xF04CE)
-    readonly property string iconList: String.fromCodePoint(0xF0279)
 
     readonly property string placeholder: dmenuMode
         ? (dmenuPrompt !== "" ? dmenuPrompt : "Select")
@@ -89,8 +87,6 @@ Item {
     readonly property int maxVisibleRows: 7
     readonly property int rowHeight: 46
     readonly property int inputHeight: 50
-    readonly property int footerHeight: 38
-    readonly property int capHeight: 20
     readonly property int contentWidth: 400
     readonly property int contentSpacing: config.barModuleSpacing
     readonly property bool fileMode:
@@ -351,7 +347,7 @@ Item {
         fileProcess.running || fileSearchDebounce.running
     readonly property int availableDmenuRows: targetScreen
         ? Math.max(0, Math.floor((targetScreen.height - config.popupGap * 2
-            - inputHeight - contentSpacing * 2 - footerHeight - 2) / rowHeight))
+            - inputHeight - contentSpacing * 2 - 2) / rowHeight))
         : maxVisibleRows
     readonly property int visibleRows: dmenuMode
         ? Dmenu.visibleRows(dmenuLines, dmenuMinimalLines, dmenuItems.length, availableDmenuRows)
@@ -360,7 +356,6 @@ Item {
     readonly property int cardHeight: inputHeight
         + visibleRows * rowHeight
         + contentSpacing * 2
-        + footerHeight
         + 2
 
 
@@ -1049,12 +1044,12 @@ Item {
 
                 anchors.top: searchInput.bottom
                 anchors.topMargin: root.contentSpacing
-                anchors.bottom: footer.top
+                anchors.bottom: parent.bottom
                 anchors.bottomMargin: root.contentSpacing
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.leftMargin: 4
-                anchors.rightMargin: 4
+                anchors.leftMargin: searchBackground.anchors.leftMargin
+                anchors.rightMargin: searchBackground.anchors.rightMargin
                 visible: root.expanded
                 clip: true
                 interactive: contentHeight > height
@@ -1173,57 +1168,6 @@ Item {
                             : root.fileMode && root.fileSearching ? "Searching…"
                             : root.fileMode ? "No files found"
                             : "No applications found"
-            }
-
-            // Footer: current mode indicator.
-            Item {
-                id: footer
-
-                visible: root.expanded
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                height: root.footerHeight
-
-                // Keep clicks on the footer from reaching the dismiss area.
-                MouseArea {
-                    anchors.fill: parent
-                }
-
-                Rectangle {
-                    anchors.top: parent.top
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    height: 1
-                    color: root.config.accent
-                }
-
-                Row {
-                    anchors.left: parent.left
-                    anchors.leftMargin: 14
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 8
-
-                    Text {
-                        height: root.capHeight
-                        verticalAlignment: Text.AlignVCenter
-                        color: root.config.accent
-                        font.family: root.config.iconFontFamily
-                        font.pointSize: root.config.fontSize(0.9)
-                        text: root.dmenuMode ? root.iconList : root.emojiMode ? "😀" : root.timerMode ? "󰔛" : root.runMode ? root.iconRun : root.iconApps
-                    }
-
-                    Text {
-                        renderType: Text.NativeRendering
-                        height: root.capHeight
-                        verticalAlignment: Text.AlignVCenter
-                        color: root.config.muted
-                        font.pointSize: root.config.fontSize(0.8)
-                        text: root.dmenuMode ? "Dmenu" : root.emojiMode ? "Emoji" : root.timerMode ? "Timer" : root.runMode ? "Bin" : "Apps"
-                    }
-
-                }
-
             }
 
         }
