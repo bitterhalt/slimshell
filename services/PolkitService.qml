@@ -78,6 +78,7 @@ Scope {
                 root.clearResponse()
         }
 
+
         Rectangle {
             id: promptCard
 
@@ -87,6 +88,12 @@ Scope {
             border.width: 1
             radius: root.config.popupRadius
             implicitHeight: content.implicitHeight + 32
+
+             // Re-focus once the compositor actually gives the window keyboard focus
+            Window.onActiveChanged: {
+                if (Window.active)
+                    root.focusPrompt()
+            }
 
             Column {
                 id: content
@@ -178,6 +185,13 @@ Scope {
                     selectByMouse: true
                     activeFocusOnTab: true
                     onAccepted: root.submitResponse()
+
+                    // Grab focus as soon as the field actually appears
+                    onVisibleChanged: {
+                        if (visible)
+                            Qt.callLater(() => forceActiveFocus())
+                    }
+
                     Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
                             root.cancelRequest()
@@ -240,6 +254,17 @@ Scope {
             function onFlowChanged(): void {
                 root.clearResponse()
                 if (agent.isActive)
+                    Qt.callLater(() => root.focusPrompt())
+            }
+        }
+
+        // Refocus when PAM actually asks for input (often after the window is shown)
+        Connections {
+            target: root.flow
+            ignoreUnknownSignals: true
+
+            function onIsResponseRequiredChanged(): void {
+                if (root.flow && root.flow.isResponseRequired)
                     Qt.callLater(() => root.focusPrompt())
             }
         }
