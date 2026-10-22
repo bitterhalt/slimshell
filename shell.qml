@@ -145,10 +145,6 @@ ShellRoot {
     bluetoothService: appBluetoothService
   }
 
-  WeatherService {
-    id: appWeatherService
-  }
-
   BatteryService {
     id: appBatteryService
   }
@@ -241,12 +237,10 @@ ShellRoot {
       notificationService: appNotificationService
       notificationPopup: appNotificationPopup
       bluetoothService: appBluetoothService
-      weatherService: appWeatherService
       batteryService: appBatteryService
       idleService: appIdleService
       recorderService: appRecorderService
       uiService: shellUiService
-      powerMenu: mainMenu
 
       visible: root.barVisible
     }

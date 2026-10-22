@@ -9,7 +9,6 @@ Item {
 
     property var targetScreen: null
 
-    signal weatherActionRequested(string action)
     signal notificationCenterActionRequested(string action)
     signal audioActionRequested(string action)
     signal bluetoothActionRequested(string action)
@@ -34,22 +33,6 @@ Item {
         function toggle(): void { root.networkActionRequested("toggle") }
         function open(): void { root.networkActionRequested("open") }
         function close(): void { root.networkActionRequested("close") }
-    }
-
-    IpcHandler {
-        target: "weather"
-
-        function toggle(): void {
-            root.weatherActionRequested("toggle")
-        }
-
-        function open(): void {
-            root.weatherActionRequested("open")
-        }
-
-        function close(): void {
-            root.weatherActionRequested("close")
-        }
     }
 
     IpcHandler {

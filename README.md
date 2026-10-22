@@ -25,7 +25,7 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 
 |                     | What's included                                                                                              |
 | ------------------- | ------------------------------------------------------------------------------------------------------------ |
-| **Desktop**         | Per-screen bar, workspaces, window title, clock, weather, battery, and system tray                           |
+| **Desktop**         | Per-screen bar, workspaces, window title, clock, battery, and system tray                                    |
 | **Controls**        | Keyboard-driven menus for Bluetooth, Wi-Fi, audio, and notifications                                         |
 | **Launch & pick**   | Application launcher, file search, calculator, binary runner, emoji, timers, and a stdin-driven dmenu picker |
 | **Everyday tools**  | Clipboard history, DeepL translation, and fullscreen or region recording                                     |
@@ -57,7 +57,6 @@ Menus and shell controls can also be driven with `qs ipc call <target> <method>`
 | `translator`         | `toggle`, `open`, `close`                                              | Control the translator                                   |
 | `volume`             | `up`, `down`, `mute`                                                   | Adjust or mute the default audio output; shows the OSD   |
 | `wallpaper`          | `toggle`, `open`, `close`, `refresh`                                   | Control the wallpaper picker or refresh wallpapers       |
-| `weather`            | `toggle`, `open`, `close`                                              | Show or hide the weather popup                           |
 
 For example, `qs ipc call volume up` raises the volume by one step. `launcher/dmenu-runner` uses the launcher's IPC internally; call the script to open a picker.
 
@@ -140,7 +139,6 @@ lock/           Lock screen components and PAM setup
 recorder/       Screen recording and region selection
 translator/     DeepL translator
 wallpaper/      Wallpaper helpers
-weather/        Weather popup and helper
 osd/            Volume overlay
 ```
 

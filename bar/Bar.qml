@@ -23,12 +23,10 @@ PanelWindow {
     required property var notificationService
     required property var notificationPopup
     required property var bluetoothService
-    required property var weatherService
     required property var batteryService
     required property var idleService
     required property var recorderService
     required property var uiService
-    required property var powerMenu
 
     screen: targetScreen
     implicitHeight: config.barHeight
@@ -84,9 +82,6 @@ PanelWindow {
         Clock {
             config: barWindow.config
             barWindow: barWindow
-            popupManager: popupManager
-            weatherData: barWindow.weatherService
-            uiService: barWindow.uiService
         }
 
         NotificationIndicator {
@@ -151,10 +146,10 @@ PanelWindow {
         }
 
         Tray {
+            visible: barWindow.config.showTray
             config: barWindow.config
             barWindow: barWindow
             popupManager: popupManager
-            powerMenu: barWindow.powerMenu
         }
 
     }

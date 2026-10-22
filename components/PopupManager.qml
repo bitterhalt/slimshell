@@ -95,8 +95,7 @@ Item {
         screen: managerRef.barWindow.screen
         visible: managerRef.hostVisible
             && (hostKey === ""
-                ? managerRef.activeKey !== "weather"
-                    && managerRef.activeKey !== "notificationCenter"
+                ? managerRef.activeKey !== "notificationCenter"
                     && !managerRef.barPopupActive
                 : hostKey === "barPopup" ? managerRef.barPopupActive
                 : managerRef.activeKey === hostKey)
@@ -135,12 +134,6 @@ Item {
                 sourceComponent: managerRef.hostComponent
             }
         }
-    }
-
-    PopupSurface {
-        managerRef: manager
-        hostKey: "weather"
-        surfaceNamespace: "slim-weather"
     }
 
     PopupSurface {

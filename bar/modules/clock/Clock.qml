@@ -1,55 +1,17 @@
 import QtQuick
 import Quickshell
 
-import "../../../weather"
+import "../../../components"
 
-Item {
+ItemRevealer {
   id: root
 
-  required property var config
-  required property var barWindow
-  required property var popupManager
-  required property var weatherData
-  required property var uiService
-
-  readonly property int revealDuration: 300
-  property real revealProgress: clockHover.hovered ? 1 : 0
-
-  readonly property real revealExtent:
-  revealRow.implicitWidth * revealProgress
-
-  readonly property real revealSpacing:
-  config.barModuleSpacing * revealProgress
-
-  height: barWindow.height
-
-  implicitWidth:
-  clockText.implicitWidth
-  + revealSpacing
-  + revealExtent
-
-  Behavior on revealProgress {
-    NumberAnimation {
-      duration: root.revealDuration
-      easing.type: Easing.OutCubic
-    }
-  }
-
-  HoverHandler {
-    id: clockHover
-  }
-
   Text {
-    id: clockText
-
     renderType: Text.NativeRendering
-    anchors.left: parent.left
-    anchors.verticalCenter: parent.verticalCenter
-
-    color: config.fg
-    font.pointSize: config.fontSize(1)
+    color: root.config.fg
+    font.pointSize: root.config.fontSize(1)
     font.weight: Font.DemiBold
-    text: Qt.formatDateTime(clock.date, config.clockFormat)
+    text: Qt.formatDateTime(clock.date, root.config.clockFormat)
 
     SystemClock {
       id: clock
@@ -57,130 +19,28 @@ Item {
     }
   }
 
-  Item {
-    id: weatherClip
+  revealData: [
+    Text {
+      renderType: Text.NativeRendering
+      color: root.config.fg
+      font.pointSize: root.config.fontSize(1)
+      font.weight: Font.DemiBold
+      textFormat: Text.RichText
 
-    x: clockText.implicitWidth + root.revealSpacing
-    anchors.verticalCenter: parent.verticalCenter
-
-    width: root.revealExtent
-    height: revealRow.implicitHeight
-    clip: true
-
-    Row {
-      id: revealRow
-
-      x: weatherClip.width - implicitWidth
-      anchors.verticalCenter: parent.verticalCenter
-      spacing: config.barModuleSpacing
-
-      Text {
-        id: dateText
-
-        renderType: Text.NativeRendering
-        color: config.fg
-        font.pointSize: config.fontSize(1)
-        font.weight: Font.DemiBold
-        textFormat: Text.RichText
-
-        text: {
-          const formatted = Qt.formatDateTime(
-            clock.date,
-            config.clockAlternativeFormat
-          )
-          const weekday = Qt.formatDateTime(clock.date, "dddd")
-
-          return formatted.replace(
-            weekday,
-            "<span style='color:" + config.accent + "'>"
-              + weekday
-              + "</span>"
-          )
-        }
-      }
-
-      Row {
-        id: weatherText
-
-        readonly property int separator: weatherData.text.indexOf(" ")
-
-        Text {
-          anchors.verticalCenter: parent.verticalCenter
-          color: config.fg
-          font.pointSize: config.fontSize(1)
-          font.weight: Font.DemiBold
-          text: weatherText.separator < 0 ? weatherData.text
-            : weatherData.text.slice(0, weatherText.separator)
-        }
-
-        Text {
-          renderType: Text.NativeRendering
-          anchors.verticalCenter: parent.verticalCenter
-          color: config.fg
-          font.pointSize: config.fontSize(1)
-          font.weight: Font.DemiBold
-          text: weatherText.separator < 0 ? "" : weatherData.text.slice(weatherText.separator)
-        }
-      }
-    }
-  }
-
-  MouseArea {
-    anchors.fill: weatherClip
-    enabled: weatherClip.width > 0
-    cursorShape: Qt.PointingHandCursor
-
-    onClicked:
-    popupManager.toggleHost(
-      "weather",
-      weatherPopupComponent,
-      root,
-      true,
-      true
-    )
-  }
-
-  Component {
-    id: weatherPopupComponent
-
-    WeatherPopup {
-      config: root.config
-      weatherData: root.weatherData
-      onCloseRequested: root.popupManager.closeHost("weather")
-    }
-  }
-
-  Connections {
-    target: uiService
-
-    function onWeatherActionRequested(action): void {
-      if (action === "close") {
-        popupManager.closeHost("weather")
-        return
-      }
-
-      if (barWindow.screen !== uiService.targetScreen) {
-        popupManager.closeHost("weather")
-        return
-      }
-
-      if (action === "toggle") {
-        popupManager.toggleHost(
-          "weather",
-          weatherPopupComponent,
-          root,
-          true,
-          true
+      text: {
+        const formatted = Qt.formatDateTime(
+          clock.date,
+          root.config.clockAlternativeFormat
         )
-      } else if (action === "open") {
-        popupManager.openHost(
-          "weather",
-          weatherPopupComponent,
-          root,
-          true,
-          true
+        const weekday = Qt.formatDateTime(clock.date, "dddd")
+
+        return formatted.replace(
+          weekday,
+          "<span style='color:" + root.config.accent + "'>"
+            + weekday
+            + "</span>"
         )
       }
     }
-  }
+  ]
 }
