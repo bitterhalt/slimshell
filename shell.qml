@@ -45,6 +45,11 @@ ShellRoot {
     theme: themeService
   }
 
+  PolkitService {
+    config: appConfig
+    targetScreen: root.activeScreen
+  }
+
   NiriService {
     id: niriService
 
