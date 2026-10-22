@@ -148,10 +148,10 @@ Check out [my config](https://github.com/bitterhalt/dotfiles).
 
 ## ISSUES 🔨
 
-- dmenu-runner can't display special symnbols (nerd fonts etc.)
+- dmenu-runner can't display special symbols (Nerd fonts etc.)
 - File structure is messy and files needs to be commented better
 - There are probably plenty of other things as well. Maybe yoy can show me how to fix them or do better :)
 
 ## TODO
 
-- [ ] A dedicated clock popup for barless mode, instead of opening notifications.
+- [ ] Put there something
