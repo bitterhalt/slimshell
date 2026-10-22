@@ -18,13 +18,15 @@ Item {
     property string page: ""
     property int selectedIndex: 0
     property var menuScreen: null
+    property var confirmItem: null
+    property int confirmIndex: -1
 
     readonly property var powerItems: [
         { label: "Lock", icon: "󰌾", shortcut: "l", action: "lock" },
-        { label: "Log out", icon: "󰍃", shortcut: "E", command: "niri msg action quit" },
+        { label: "Log out", icon: "󰍃", shortcut: "e", command: "niri msg action quit", confirm: true },
         { label: "Sleep", icon: "󰤄", shortcut: "z", action: "suspend" },
-        { label: "Restart", icon: "󰜉", shortcut: "R", command: "systemctl reboot" },
-        { label: "Shut down", icon: "󰐥", shortcut: "S", command: "systemctl poweroff" }
+        { label: "Restart", icon: "󰜉", shortcut: "r", command: "systemctl reboot", confirm: true },
+        { label: "Shut down", icon: "󰐥", shortcut: "s", command: "systemctl poweroff", confirm: true }
     ]
 
 
@@ -66,6 +68,12 @@ Item {
     ]
 
     readonly property var currentItems: {
+        if (confirmItem)
+            return [
+                { label: "Yes", icon: "󰄬", shortcut: "y" },
+                { label: "No", icon: "󰅖", shortcut: "n" }
+            ]
+
         switch (page) {
         case "power":
             return powerItems
@@ -104,6 +112,7 @@ Item {
     }
 
     function openPage(name, screen): void {
+        cancelConfirmation()
         page = name
         menuScreen = screen || targetScreen
         selectedIndex = 0
@@ -113,6 +122,7 @@ Item {
     }
 
     function closeMenu(): void {
+        cancelConfirmation()
         menuWindow.visible = false
         menuScreen = null
     }
@@ -124,7 +134,22 @@ Item {
             openPage("power", screen)
     }
 
+    function cancelConfirmation(): void {
+        if (!confirmItem)
+            return
+
+        selectedIndex = confirmIndex
+        confirmItem = null
+        confirmIndex = -1
+        menuCard.prepareLayout()
+    }
+
     function back(): void {
+        if (confirmItem) {
+            cancelConfirmation()
+            return
+        }
+
         if (page === "monitor") {
             page = "system"
             selectedIndex = 0
@@ -152,10 +177,30 @@ Item {
     }
 
     function activateIndex(index): void {
+        if (confirmItem) {
+            const pending = confirmItem
+            if (index === 0) {
+                closeMenu()
+                if (pending.command)
+                    config.run(pending.command)
+            } else {
+                cancelConfirmation()
+            }
+            return
+        }
+
         if (index < 0 || index >= currentItems.length)
             return
 
         const item = currentItems[index]
+
+        if (item.confirm) {
+            confirmItem = item
+            confirmIndex = index
+            selectedIndex = 1
+            menuCard.prepareLayout()
+            return
+        }
 
         if (item.action === "wallpaper") {
             const screen = menuWindow.screen
@@ -283,7 +328,7 @@ Item {
                     return
                 }
 
-                const key = root.page === "power" ? event.text : event.text.toLowerCase()
+                const key = event.text.toLowerCase()
 
                 for (let i = 0; i < root.currentItems.length; ++i) {
                     if (root.currentItems[i].shortcut === key) {
@@ -308,6 +353,17 @@ Item {
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
 
+
+            Text {
+                renderType: Text.NativeRendering
+                width: parent.width
+                visible: root.confirmItem !== null
+                color: root.config.urgent
+                font.pointSize: root.config.fontSize(0.9)
+                font.weight: Font.Medium
+                wrapMode: Text.WordWrap
+                text: root.confirmItem ? root.confirmItem.label + "?" : ""
+            }
 
             Repeater {
                 model: root.currentItems
