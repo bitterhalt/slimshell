@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell.Io
 import Quickshell.Services.Notifications
 import "../notifications/ToastPolicy.js" as ToastPolicy
+import "../notifications/HistoryPolicy.js" as HistoryPolicy
 
 Item {
     id: root
@@ -15,7 +16,9 @@ Item {
     property var receivedTimes: ({})
 
     readonly property var notifications: server.trackedNotifications.values
-    readonly property int notificationCount: notifications.length
+    readonly property var historyNotifications:
+        HistoryPolicy.visibleNotifications(notifications, config.notificationHistoryExcludedApps)
+    readonly property int notificationCount: historyNotifications.length
 
     onNotificationsChanged: Qt.callLater(root.maintainHistory)
     Connections {
@@ -28,13 +31,14 @@ Item {
 
     function maintainHistory() {
         const limit = Math.max(1, config.notificationHistoryLimit)
-        const excess = notifications.length - limit
+        const history = historyNotifications
+        const excess = history.length - limit
 
         if (excess > 0) {
             // Work on a snapshot: expiring an entry mutates the tracked model.
             // Prefer keeping critical alerts, but still enforce a hard limit
             // when the entire history consists of critical notifications.
-            const oldest = notifications.slice().sort((left, right) => {
+            const oldest = history.slice().sort((left, right) => {
                 // Do not immediately remove the newest visible alert when
                 // older history happens to consist entirely of criticals.
                 const leftToast = left === root.toastNotification
@@ -57,6 +61,14 @@ Item {
     }
 
     function receive(notification): void {
+        // An excluded notification that will not be toasted should not remain
+        // tracked. Toasted exclusions stay tracked until the toast finishes.
+        if (isHistoryExcluded(notification)
+                && !ToastPolicy.shouldShow(notification, dnd)) {
+            notification.tracked = false
+            return
+        }
+
         // Keep notifications alive so they can appear in the notification center.
         notification.tracked = true
 
@@ -69,6 +81,10 @@ Item {
             toastNotification = notification
             toastSerial += 1
         }
+    }
+
+    function isHistoryExcluded(notification): bool {
+        return HistoryPolicy.isExcluded(notification, config.notificationHistoryExcludedApps)
     }
 
     function receivedAt(notification): real {
@@ -118,7 +134,7 @@ Item {
     }
 
     function finishToast(notification): void {
-        if (notification && notification.transient) {
+        if (notification && (notification.transient || isHistoryExcluded(notification))) {
             removeReceivedTime(notification)
             notification.expire()
         }

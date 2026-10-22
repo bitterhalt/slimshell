@@ -1,5 +1,6 @@
 import ".."
 import "../HistoryModel.js" as Model
+import "../HistoryPolicy.js" as HistoryPolicy
 import "../ToastPolicy.js" as ToastPolicy
 import QtQuick
 import QtQuick.Window
@@ -333,6 +334,22 @@ Item {
             verify(!ToastPolicy.shouldShow({urgency: 0, lastGeneration: false}, true));
             verify(!ToastPolicy.shouldShow({urgency: 1, lastGeneration: true}, false));
             verify(!ToastPolicy.shouldShow(null, false));
+        }
+
+        function test_history_exclusions_match_app_id_or_app_name() {
+            const excludedApps = ["org.example.Chat", "Quiet Sender"];
+            const byDesktopEntry = {desktopEntry: "org.example.Chat", appName: "Chat"};
+            const byAppName = {desktopEntry: "", appName: "Quiet Sender"};
+            const tagged = {desktopEntry: "", appName: "nohistory"};
+            const normal = {desktopEntry: "org.example.Mail", appName: "Mail"};
+
+            verify(HistoryPolicy.isExcluded(byDesktopEntry, excludedApps));
+            verify(HistoryPolicy.isExcluded(byAppName, excludedApps));
+            verify(HistoryPolicy.isExcluded(tagged, excludedApps));
+            verify(!HistoryPolicy.isExcluded(normal, excludedApps));
+            compare(HistoryPolicy.visibleNotifications(
+                [byDesktopEntry, byAppName, tagged, normal], excludedApps), [normal]);
+            verify(ToastPolicy.shouldShow(tagged, false));
         }
 
         function test_critical_history_colors() {

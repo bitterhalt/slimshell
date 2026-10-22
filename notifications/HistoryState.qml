@@ -5,7 +5,8 @@ Item {
     id: root
 
     required property var notificationService
-    readonly property var rows: notificationService.notifications.slice().reverse()
+    readonly property var rows: (notificationService.historyNotifications
+        ?? notificationService.notifications).slice().reverse()
     property string selectedId: ""
     property int fallbackIndex: 0
     property bool helpOpen: false

@@ -28,6 +28,8 @@ Item {
     property int popupRadius: 4
     // History is bounded; ordinary entries are expired before critical ones.
     property int notificationHistoryLimit: 100
+    // Match desktopEntry or appName. `notify-send -a nohistory` is also supported.
+    property var notificationHistoryExcludedApps: ["time-noti"]
     // Bluetooth battery percentages; 0 disables a warning. Keep critical <= low.
     property int bluetoothBatteryWarningPercent: 20
     property int bluetoothBatteryCriticalPercent: 10

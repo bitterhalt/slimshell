@@ -75,7 +75,7 @@ Scope {
         while (next.length > maxToasts) {
             const overflowed = next.pop()
 
-            if (overflowed.transient)
+            if (overflowed.transient || notificationService.isHistoryExcluded(overflowed))
                 notificationService.finishToast(overflowed)
             else
                 overflowedNotifications =
