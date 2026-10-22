@@ -269,6 +269,19 @@ PanelWindow {
             width: root.historyWidth
             height: 42
             z: 1
+
+            Rectangle {
+                anchors.fill: parent
+                anchors.leftMargin: 8
+                anchors.rightMargin: 8
+                anchors.topMargin: 5
+                anchors.bottomMargin: 5
+                color: root.config.bg
+                radius: 4
+                border.width: 1
+                border.color: root.config.accent
+            }
+
             TextInput {
                 id: searchInput
 
