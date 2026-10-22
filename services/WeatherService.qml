@@ -9,6 +9,7 @@ Item {
 
     property string text: ""
     property var data: ({})
+    readonly property bool refreshing: weatherProcess.running
     readonly property string scriptPath:
         Quickshell.env("HOME") + "/.config/quickshell/weather/weather.py"
 

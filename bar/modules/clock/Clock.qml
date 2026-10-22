@@ -135,7 +135,7 @@ Item {
       "weather",
       weatherPopupComponent,
       root,
-      false,
+      true,
       true
     )
   }
@@ -146,6 +146,7 @@ Item {
     WeatherPopup {
       config: root.config
       weatherData: root.weatherData
+      onCloseRequested: root.popupManager.closeHost("weather")
     }
   }
 
@@ -168,7 +169,7 @@ Item {
           "weather",
           weatherPopupComponent,
           root,
-          false,
+          true,
           true
         )
       } else if (action === "open") {
@@ -176,7 +177,7 @@ Item {
           "weather",
           weatherPopupComponent,
           root,
-          false,
+          true,
           true
         )
       }

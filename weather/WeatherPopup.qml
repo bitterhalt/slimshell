@@ -1,15 +1,27 @@
 import QtQuick
-import QtQuick.Controls
-import QtQuick.Layouts
-import Quickshell
-import Quickshell.Io
-import Quickshell.Widgets
 
-Item {
+FocusScope {
   id: root
 
   required property var config
   required property var weatherData
+
+  signal closeRequested()
+
+  focus: true
+  Component.onCompleted: Qt.callLater(() => forceActiveFocus())
+  Keys.onPressed: event => {
+    if (event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier))
+      return;
+    if (event.key === Qt.Key_F5) {
+      if (!weatherData.refreshing && !event.isAutoRepeat)
+        weatherData.refresh(true);
+      event.accepted = true;
+    } else if (event.key === Qt.Key_Escape) {
+      root.closeRequested();
+      event.accepted = true;
+    }
+  }
 
   // Popup geometry from Config.qml
   readonly property int popupRadius: config.popupRadius
@@ -39,10 +51,9 @@ Item {
       spacing: root.popupSpacing
 
       // Current conditions
-      Row {
+      Item {
         width: parent.width
         height: 64
-        spacing: 12
 
         Text {
           width: 54
@@ -54,13 +65,14 @@ Item {
         }
 
         Column {
-          width: parent.width - 102
+          x: 66
+          width: parent.width - x
           anchors.verticalCenter: parent.verticalCenter
           spacing: 1
 
           Text {
             renderType: Text.NativeRendering
-            width: parent.width
+            width: Math.max(0, parent.width - refreshHint.implicitWidth - 8)
             color: config.fg
             font.pointSize: config.fontSize(1.154)
             font.weight: Font.DemiBold
@@ -104,33 +116,15 @@ Item {
           }
         }
 
-        Item {
-          width: 24
-          height: parent.height
-
-          Text {
-            id: refreshIcon
-
-            anchors.top: parent.top
-            anchors.topMargin: -1
-            anchors.right: parent.right
-            anchors.rightMargin: 6
-            color: refreshMouse.containsMouse ? config.fg : config.muted
-            font.family: config.iconFontFamily
-            font.pointSize: config.iconSize * 0.9
-            text: "󰑐"
-          }
-
-          MouseArea {
-            id: refreshMouse
-
-            anchors.centerIn: refreshIcon
-            width: 30
-            height: 30
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: weatherData.refresh(true)
-          }
+        Text {
+          id: refreshHint
+          objectName: "weatherRefreshHint"
+          anchors.top: parent.top
+          anchors.right: parent.right
+          renderType: Text.NativeRendering
+          color: config.muted
+          font.pointSize: config.fontSize(0.72)
+          text: weatherData.refreshing ? "Refreshing…" : "F5 Refresh"
         }
       }
 

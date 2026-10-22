@@ -157,4 +157,3 @@ Check out [my config](https://github.com/bitterhalt/dotfiles).
 ## TODO
 
 - [ ] A dedicated clock popup for barless mode, instead of opening notifications.
-- [ ] A visual refresh for the weather widget.
