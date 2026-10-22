@@ -10,7 +10,9 @@ Item {
     property alias revealData: revealRow.data
 
     readonly property int revealDuration: 300
-    property real revealProgress: revealHover.hovered ? 1 : 0
+    property int hoverRevealDelay: 0
+    property bool revealActive: false
+    property real revealProgress: revealActive ? 1 : 0
     readonly property real revealExtent: revealRow.implicitWidth * revealProgress
     readonly property real revealSpacing: config.barModuleSpacing * revealProgress
 
@@ -26,6 +28,28 @@ Item {
 
     HoverHandler {
         id: revealHover
+
+        onHoveredChanged: {
+            if (hovered) {
+                if (root.hoverRevealDelay <= 0)
+                    root.revealActive = true
+                else
+                    revealTimer.restart()
+            } else {
+                revealTimer.stop()
+                root.revealActive = false
+            }
+        }
+    }
+
+    Timer {
+        id: revealTimer
+
+        interval: root.hoverRevealDelay
+        onTriggered: {
+            if (revealHover.hovered)
+                root.revealActive = true
+        }
     }
 
     Row {
