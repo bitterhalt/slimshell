@@ -254,6 +254,7 @@ Item {
                 selectedTextColor: row.config.bg
                 font.pointSize: row.config.fontSize(0.92)
                 selectByMouse: true
+                activeFocusOnTab: true
                 onAccepted: row.accepted()
             }
 
