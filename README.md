@@ -22,15 +22,13 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 
 ## Features
 
-|                     | What's included                                                                                              |
-| ------------------- | ------------------------------------------------------------------------------------------------------------ |
-| **Desktop**         | Per-screen bar, workspaces, window title, clock, battery, and system tray                                    |
-| **Controls**        | Keyboard-driven menus for Bluetooth, Wi-Fi, audio, and notifications                                         |
-| **Launch & pick**   | Application launcher, file search, calculator, binary runner, emoji, timers, and a stdin-driven dmenu picker |
-| **Everyday tools**  | Clipboard history, DeepL translation, and fullscreen or region recording                                     |
-| **Session & style** | Lock screen, power menu, idle timeouts, wallpaper picker, and Pywal themes                                   |
-
-Menus and shell controls can also be driven with `qs ipc call <target> <method>`. Expand for the full IPC reference.
+|                     | What's included                                                                                 |
+| ------------------- | ----------------------------------------------------------------------------------------------- |
+| **Desktop**         | Per-screen bar, workspaces, window title, clock, battery, and system tray                       |
+| **Controls**        | Keyboard-driven menus for Bluetooth, Wi-Fi, audio, and notifications                            |
+| **Launch & pick**   | Application launcher with: file search, calculator, binary runner, emoji, timers and dmenu-mode |
+| **Everyday tools**  | Clipboard history, DeepL translation, and screen recording                                      |
+| **Session & style** | Lock screen, power menu, idle timeouts, wallpaper picker, and Pywal integration                 |
 
 <details>
 <summary>IPC reference</summary>
@@ -63,7 +61,7 @@ For example, `qs ipc call volume up` raises the volume by one step. `launcher/dm
 
 ## Launcher
 
-One launcher, four modes. Switch directly with the shortcuts below, or cycle with **Ctrl+← / Ctrl+→**.
+Launcher modes. Switch directly with the shortcuts below, or cycle with **Ctrl+← / Ctrl+→**.
 
 | Mode  | Shortcut | What it does                                             |
 | ----- | -------- | -------------------------------------------------------- |
@@ -72,9 +70,7 @@ One launcher, four modes. Switch directly with the shortcuts below, or cycle wit
 | Emoji | `Ctrl+E` | Search by name and copy the selected emoji               |
 | Timer | `Ctrl+T` | Start timers such as `25m Focus`, `45s`, `1:30`, or `2h` |
 
-In Apps mode, `/needle` searches files and `=expression` calculates with `qalc`. Plain math works too.
-
-**Enter** activates the selected result; **Esc** closes the launcher. Selecting a running timer cancels it.
+In Apps mode, `/<word>` searches files and `=expression` calculates with `qalc`. Plain math works too.
 
 ## Dmenu mode
 
@@ -86,7 +82,6 @@ printf '%s\n' Search 'New Note' TODO Delete | ./launcher/dmenu-runner -p "Notes"
 
 - Supported options: `-p` / `--prompt`, `-l N` / `--lines N` (default 7), `--minimal-lines`, and `--index` (return the original zero-based input index; typed text returns `-1`).
 - Enter selects, Shift+Enter returns typed text, and Esc cancels with status 1. `-l 0` opens an input-only picker.
-- Nerd Font and other special symbols in dmenu entries may not render correctly.
 
 Slimshell must be running. This is a small dmenu-compatible runner, not a full dmenu/rofi replacement.
 
@@ -150,6 +145,12 @@ This repository is mainly for hobby and learning, so don't expect everything to 
 ## Screenshots and more
 
 Check out [my config](https://github.com/bitterhalt/dotfiles).
+
+## ISSUES 🔨
+
+- dmenu-runner can't display special symnbols (nerd fonts etc.)
+- File structure is messy and files needs to be commented better
+- There are probably plenty of other things as well. Maybe yoy can show me how to fix them or do better :)
 
 ## TODO
 
