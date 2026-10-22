@@ -15,7 +15,7 @@ Item {
     property int barHeight: 32
     property int barEdgeMargin: 14
     property int barModuleSpacing: 8
-    property int workspaceTitleGap: 10
+    property int workspaceTitleGap: 18
     property string workspaceLayout: "dots" // "dots" or "minimal"
     property bool showTray: true
     // Clock
@@ -30,7 +30,7 @@ Item {
     // History is bounded; ordinary entries are expired before critical ones.
     property int notificationHistoryLimit: 100
     // Match desktopEntry or appName. `notify-send -a nohistory` is also supported.
-    property var notificationHistoryExcludedApps: ["time-noti"]
+    property var notificationHistoryExcludedApps: ["time-noti", "niri", "thunar", "Media-notify", "wl-color-picker"]
     // Bluetooth battery percentages; 0 disables a warning. Keep critical <= low.
     property int bluetoothBatteryWarningPercent: 20
     property int bluetoothBatteryCriticalPercent: 10

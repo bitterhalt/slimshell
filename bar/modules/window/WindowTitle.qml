@@ -1,4 +1,6 @@
 import QtQuick
+import Quickshell
+import Quickshell.Widgets
 
 Item {
     id: root
@@ -6,23 +8,43 @@ Item {
     required property var config
     required property var barWindow
     required property var niri
+    readonly property var focusedWindow: niri.windows[niri.focusedWindowId] ?? null
+    readonly property string focusedAppIcon: {
+        const appId = focusedWindow ? String(focusedWindow.app_id || "") : "";
+        if (appId === "")
+            return "";
 
-    implicitWidth: Math.min(windowTitle.implicitWidth + 20 + config.workspaceTitleGap, 560)
+        const entry = DesktopEntries.byId(appId) || DesktopEntries.heuristicLookup(appId);
+        return entry ? entry.icon || "" : "";
+    }
+    readonly property string focusedAppIconSource: focusedAppIcon !== "" ? Quickshell.iconPath(focusedAppIcon, true) : ""
+    readonly property int titleLeft: config.workspaceTitleGap + (focusedAppIconSource !== "" ? 27 : 0)
+
+    implicitWidth: Math.min(windowTitle.implicitWidth + titleLeft + 10, 560)
     height: barWindow.height
+
+    IconImage {
+        anchors.left: parent.left
+        anchors.leftMargin: root.config.workspaceTitleGap
+        anchors.verticalCenter: parent.verticalCenter
+        implicitSize: 20
+        visible: root.focusedAppIconSource !== ""
+        source: root.focusedAppIconSource
+    }
 
     Text {
         id: windowTitle
 
         renderType: Text.NativeRendering
         anchors.left: parent.left
-        anchors.leftMargin: config.workspaceTitleGap
+        anchors.leftMargin: root.titleLeft
         anchors.verticalCenter: parent.verticalCenter
-        width: parent.width - 10 - config.workspaceTitleGap
-        color: config.fg
-        font.pointSize: config.fontSize(1)
+        width: parent.width - 10 - root.titleLeft
+        color: root.config.fg
+        font.pointSize: root.config.fontSize(1)
         elide: Text.ElideRight
         text: {
-            const win = niri.windows[niri.focusedWindowId];
+            const win = root.focusedWindow;
             return win && win.title ? win.title : "";
         }
     }
