@@ -19,7 +19,6 @@ Item {
 
     property bool opened: false
     property bool quitOnClose: false
-    property bool keyboardNavigationActive: false
     // Mode order for Ctrl+← / Ctrl+→ cycling.
     readonly property var modes: ["apps", "run", "emoji", "timer"]
     property string mode: "apps"
@@ -925,12 +924,10 @@ Item {
                 onTextChanged: {
                     root.query = text;
                     root.selectedIndex = 0;
-                    root.keyboardNavigationActive = true;
                     root.updateCalculator();
                     root.updateFileSearch();
                 }
                 Keys.onPressed: (event) => {
-                    root.keyboardNavigationActive = true;
                     const control = event.modifiers & Qt.ControlModifier;
                     switch (event.key) {
                     case Qt.Key_Left:
@@ -1040,8 +1037,6 @@ Item {
                 text: root.placeholder
             }
 
-
-
             ListView {
                 id: resultList
 
@@ -1055,7 +1050,7 @@ Item {
                 anchors.rightMargin: searchBackground.anchors.rightMargin
                 visible: root.expanded
                 clip: true
-                interactive: contentHeight > height
+                interactive: false
                 model: root.results
                 currentIndex: root.selectedIndex
 
@@ -1069,14 +1064,11 @@ Item {
                     height: root.rowHeight
 
                     readonly property bool selected: index === root.selectedIndex
-                    readonly property bool hovered:
-                        !root.keyboardNavigationActive && rowMouse.containsMouse
 
                     Rectangle {
                         anchors.fill: parent
                         radius: 4
-                        color: resultRow.selected || resultRow.hovered
-                            ? root.config.accent : "transparent"
+                        color: resultRow.selected ? root.config.accent : "transparent"
                     }
 
                     IconImage {
@@ -1095,8 +1087,7 @@ Item {
                         anchors.leftMargin: 12
                         anchors.verticalCenter: parent.verticalCenter
                         visible: modelData.type === "calculator" || modelData.type === "file" || modelData.type === "binary" || modelData.type === "emoji" || modelData.type === "timer-start" || modelData.type === "timer-active"
-                        color: resultRow.selected || resultRow.hovered
-                            ? root.config.fg : root.config.accent
+                        color: resultRow.selected ? root.config.fg : root.config.accent
                         font.family: modelData.type === "emoji" ? root.config.textFontFamily : root.config.iconFontFamily
                         font.pointSize: root.config.iconSize * 1.5
                         text: modelData.type === "emoji" ? modelData.emoji : modelData.type === "file" ? "󰈔" : modelData.type === "binary" ? (modelData.recent ? root.iconStar : root.iconRun) : modelData.type === "timer-start" || modelData.type === "timer-active" ? "󰔛" : "󰃬"
@@ -1139,27 +1130,6 @@ Item {
                                 : modelData.subtitle || ""
                         }
 
-                    }
-
-                    MouseArea {
-                        id: rowMouse
-
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onEntered: {
-                            root.keyboardNavigationActive = false;
-                            root.selectedIndex = resultRow.index;
-                        }
-                        onPositionChanged: {
-                            root.keyboardNavigationActive = false;
-                            root.selectedIndex = resultRow.index;
-                        }
-                        onClicked: {
-                            root.keyboardNavigationActive = false;
-                            root.selectedIndex = resultRow.index;
-                            root.activateSelected();
-                        }
                     }
 
                 }
