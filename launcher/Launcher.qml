@@ -1107,10 +1107,13 @@ Item {
                             width: parent.width
                             color: root.config.fg
                             font.pointSize: root.config.fontSize(0.96)
+                            font.family: root.config.textFontFamily
                             font.weight: Font.Medium
                             elide: Text.ElideRight
-                            textFormat: modelData.type === "dmenu" ? Text.PlainText : Text.AutoText
-                            text: modelData.text
+                            textFormat: modelData.type === "dmenu" ? Text.RichText : Text.AutoText
+                            text: modelData.type === "dmenu"
+                                ? Dmenu.richTextWithSymbols(modelData.text, root.config.iconFontFamily)
+                                : modelData.text
                         }
 
                         Text {

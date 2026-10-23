@@ -23,6 +23,15 @@ TestCase {
         compare(Dmenu.outputValue(matches[1].text, true, matches[1].index), "1");
     }
 
+    function test_nerd_symbols_use_icon_font_and_keep_text_safe() {
+        compare(Dmenu.richTextWithSymbols("󰐥 Power off", "Symbols Nerd Font Mono"),
+            '<font face="Symbols Nerd Font Mono">󰐥</font>&nbsp; Power off');
+        compare(Dmenu.richTextWithSymbols("<b>󰐥</b>", "Symbols Nerd Font Mono"),
+            '&lt;b&gt;<font face="Symbols Nerd Font Mono">󰐥</font>&nbsp;&lt;/b&gt;');
+        compare(Dmenu.richTextWithSymbols("plain text", "Symbols Nerd Font Mono"),
+            "plain text");
+    }
+
     function test_row_counts() {
         compare(Dmenu.visibleRows(7, false, 2, 20), 7);
         compare(Dmenu.visibleRows(7, true, 2, 20), 2);

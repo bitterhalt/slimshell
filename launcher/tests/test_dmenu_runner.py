@@ -149,6 +149,13 @@ class DmenuRunnerTests(unittest.TestCase):
         self.assertEqual(result.stdout, choice + "\n")
         self.assertEqual(json.loads((self.base / "request.json").read_text())["items"], "\n" + choice + "\n\n")
 
+    def test_nerd_font_unicode_rows_are_preserved(self):
+        rows = "󰐥  Power off\n󰤄  Sleep\n󰌾  Lock\n"
+        result = self.run_runner(choice="󰤄  Sleep", data=rows)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "󰤄  Sleep\n")
+        self.assertEqual(json.loads((self.base / "request.json").read_text())["items"], rows)
+
     def test_ipc_error(self):
         self.assertEqual(self.run_runner(kind="ipc-error").returncode, 1)
 
