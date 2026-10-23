@@ -212,7 +212,6 @@ Item {
                 icon: "󰑋"
                 label: "Fullscreen"
                 keyHint: "f"
-                onTriggered: root.fullscreen()
             }
 
             RecorderMenuItem {
@@ -220,7 +219,6 @@ Item {
                 icon: "󰩬"
                 label: "Region"
                 keyHint: "r"
-                onTriggered: root.region()
             }
 
             RecorderMenuItem {
@@ -230,7 +228,6 @@ Item {
                 keyHint: "s"
                 visible: root.runningNow
                 height: root.runningNow ? 32 : 0
-                onTriggered: root.stop()
             }
         }
 
@@ -261,15 +258,13 @@ Item {
         readonly property bool selected:
             root.selectedIndex === menuItem.index
 
-        signal triggered()
-
         width: parent ? parent.width : 0
         height: 32
 
         Rectangle {
             anchors.fill: parent
             radius: 4
-            color: menuItem.selected || itemMouse.containsMouse
+            color: menuItem.selected
                 ? root.config.accent
                 : "transparent"
         }
@@ -313,16 +308,6 @@ Item {
             text: menuItem.keyHint
         }
 
-        MouseArea {
-            id: itemMouse
-
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-
-            onEntered: root.selectedIndex = menuItem.index
-            onClicked: menuItem.triggered()
-        }
     }
 
     Connections {

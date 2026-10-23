@@ -356,7 +356,7 @@ Item {
 
                         height: 1
                         visible: menuItem.isSeparator
-                        color: menuItem.selected || itemMouse.containsMouse
+                        color: menuItem.selected
                             ? root.config.fg : root.config.accent
                     }
 
@@ -364,7 +364,7 @@ Item {
                         anchors.fill: parent
                         visible: !menuItem.isSeparator
                         radius: 4
-                        color: menuItem.selected || itemMouse.containsMouse
+                        color: menuItem.selected
                             ? root.config.accent
                             : "transparent"
                     }
@@ -405,22 +405,6 @@ Item {
                             : ""
                     }
 
-                    MouseArea {
-                        id: itemMouse
-
-                        anchors.fill: parent
-                        enabled: !menuItem.isSeparator
-                        hoverEnabled: enabled
-                        cursorShape: enabled
-                            ? Qt.PointingHandCursor
-                            : Qt.ArrowCursor
-
-                        onEntered:
-                            root.selectedIndex = menuItem.index
-
-                        onClicked:
-                            root.applyTheme(menuItem.modelData.name)
-                    }
                 }
             }
         }

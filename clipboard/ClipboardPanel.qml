@@ -404,7 +404,6 @@ PanelWindow {
                             anchors.fill: parent
                             radius: 5
                             color: entryRow.index === root.selectedIndex
-                                || rowMouse.containsMouse
                                 ? root.config.accent
                                 : "transparent"
                         }
@@ -447,14 +446,6 @@ PanelWindow {
                             }
                         }
 
-                        MouseArea {
-                            id: rowMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onEntered: root.select(entryRow.index)
-                            onClicked: root.copySelected()
-                        }
                     }
                 }
             }

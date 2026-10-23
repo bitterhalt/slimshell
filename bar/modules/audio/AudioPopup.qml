@@ -188,6 +188,7 @@ PopoutPanel {
                     model: [
                         {name: "Select row", key: "↑ / ↓   k / j"},
                         {name: "Adjust volume", key: "← / →   h / l"},
+                        {name: "Set volume", key: "` / 1–0"},
                         {name: "Toggle mute", key: "m"},
                         {name: "Set default output / input", key: "d"},
                         {name: "Open options", key: "Enter / c"},

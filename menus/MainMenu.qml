@@ -383,7 +383,7 @@ Item {
                     Rectangle {
                         anchors.fill: parent
                         radius: 4
-                        color: menuItem.selected || itemMouse.containsMouse
+                        color: menuItem.selected
                             ? root.config.accent
                             : "transparent"
                     }
@@ -396,7 +396,7 @@ Item {
                         width: 22
                         horizontalAlignment: Text.AlignHCenter
 
-                        color: menuItem.selected || itemMouse.containsMouse
+                        color: menuItem.selected
                             ? root.config.fg : root.config.accent
                         font.family: root.config.iconFontFamily
                         font.pointSize: root.config.iconSize * 1.077
@@ -424,7 +424,7 @@ Item {
                         anchors.rightMargin: 8
                         anchors.verticalCenter: parent.verticalCenter
 
-                        color: menuItem.selected || itemMouse.containsMouse
+                        color: menuItem.selected
                             ? root.config.fg : root.config.muted
                         font.family: root.config.iconFontFamily
                         font.pointSize: root.config.iconSize
@@ -446,16 +446,6 @@ Item {
                         text: modelData.shortcut ?? ""
                     }
 
-                    MouseArea {
-                        id: itemMouse
-
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-
-                        onEntered: root.selectedIndex = menuItem.index
-                        onClicked: root.activateIndex(menuItem.index)
-                    }
                 }
             }
         }

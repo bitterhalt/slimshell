@@ -115,6 +115,11 @@ Item {
 
     }
 
+    function setVolumePercent(value) {
+        if (selectedRow && tabIndex !== 3)
+            audioItem.setVolume(selectedRow.id, value);
+    }
+
     function activateSelected() {
         if (tabIndex === 3) {
             if (!selectedRow || !profiles || profiles.changing)
@@ -191,6 +196,16 @@ Item {
             activateSelected();
         else if (contextOpen)
             return false;
+        else if (tabIndex !== 3 && selectedRow
+                && (key === Qt.Key_QuoteLeft || text === "`"))
+            setVolumePercent(0);
+        else if (tabIndex !== 3 && selectedRow
+                && !(modifiers & Qt.ShiftModifier)
+                && key >= Qt.Key_1 && key <= Qt.Key_9)
+            setVolumePercent((key - Qt.Key_0) / 10);
+        else if (tabIndex !== 3 && selectedRow
+                && !(modifiers & Qt.ShiftModifier) && key === Qt.Key_0)
+            setVolumePercent(1);
         else if (key === Qt.Key_Left || key === Qt.Key_H)
             adjustVolume(-0.05);
         else if (key === Qt.Key_Right || key === Qt.Key_L)

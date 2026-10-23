@@ -124,6 +124,17 @@ Item {
             press(Qt.Key_Left); compare(fixture.streamAudio.volume, 0);
         }
 
+        function test_number_keys_set_absolute_volume() {
+            press(Qt.Key_1); compare(fixture.speakerAudio.volume, 0.1);
+            press(Qt.Key_4); compare(fixture.speakerAudio.volume, 0.4);
+            press(Qt.Key_9); compare(fixture.speakerAudio.volume, 0.9);
+            press(Qt.Key_0); compare(fixture.speakerAudio.volume, 1);
+            press(Qt.Key_QuoteLeft); compare(fixture.speakerAudio.volume, 0);
+
+            fixture.config.maxVolume = 0.8;
+            press(Qt.Key_0); compare(fixture.speakerAudio.volume, 0.8);
+        }
+
         function test_configurable_volume_ceiling() {
             compare(Model.clampVolume(1.5, 1.1), 1.1);
             compare(Model.clampVolume(-0.1, 1.1), 0);
@@ -189,11 +200,11 @@ Item {
             verify(controls.helpOpen);
             press(Qt.Key_M);
             compare(fixture.calls.length, 0);
+            verify(!press(Qt.Key_9));
             press(Qt.Key_Escape);
             verify(!controls.helpOpen);
             verify(!fixture.closed);
             verify(!press(Qt.Key_Q));
-            verify(!press(Qt.Key_9));
             verify(!press(Qt.Key_M, Qt.ControlModifier));
             compare(fixture.calls.length, 0);
         }
