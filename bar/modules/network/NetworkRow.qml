@@ -39,7 +39,7 @@ Item {
         anchors.bottomMargin: 3
         width: 3
         radius: 1
-        color: root.config.accent
+        color: root.config.selectionBackground
         visible: root.selected
     }
 

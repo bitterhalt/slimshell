@@ -12,8 +12,6 @@ Rectangle {
     required property var config
     readonly property color bg: config.bg
     readonly property color fg: config.fg
-    readonly property color surface: config.surface
-    readonly property color accent: config.accent
     readonly property color error: config.urgent
 
     function focusPassword() {
@@ -160,8 +158,8 @@ Rectangle {
                 echoMode: TextInput.Password
                 inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
                 color: enabled ? root.fg : root.config.muted
-                selectionColor: root.accent
-                selectedTextColor: bg
+                selectionColor: root.config.selectionBackground
+                selectedTextColor: root.config.selectionForeground
                 placeholderTextColor: root.config.muted
                 onTextChanged: root.context.currentText = this.text
                 onAccepted: {
@@ -203,7 +201,7 @@ Rectangle {
                 background: Item {
                     Rectangle {
                         anchors.fill: parent
-                        color: Qt.rgba(root.surface.r, root.surface.g, root.surface.b, 0.3)
+                        color: Qt.rgba(root.config.bg.r, root.config.bg.g, root.config.bg.b, 0.3)
                         radius: 6
                     }
 
@@ -211,7 +209,7 @@ Rectangle {
                         anchors.fill: parent
                         color: "transparent"
                         border.width: 1
-                        border.color: Qt.rgba(root.accent.r, root.accent.g, root.accent.b, 1)
+                        border.color: Qt.rgba(root.config.selectionBackground.r, root.config.selectionBackground.g, root.config.selectionBackground.b, 1)
                         radius: 6
                     }
 
@@ -243,7 +241,7 @@ Rectangle {
                         var ctx = getContext("2d");
                         ctx.reset();
                         ctx.lineWidth = 2;
-                        ctx.strokeStyle = root.accent;
+                        ctx.strokeStyle = root.config.selectionBackground;
                         ctx.lineCap = "round";
                         ctx.beginPath();
                         ctx.arc(width / 2, height / 2, width / 2 - 1, 0, Math.PI * 1.5);
@@ -291,7 +289,7 @@ Rectangle {
                 }
 
                 background: Rectangle {
-                    color: root.surface
+                    color: root.config.bg
                     radius: width / 2
                 }
 

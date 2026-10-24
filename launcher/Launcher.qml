@@ -874,8 +874,8 @@ Item {
             id: card
 
             anchors.fill: parent
-            color: root.config.surface
-            border.color: root.config.accent
+            color: root.config.bg
+            border.color: root.config.selectionBackground
             border.width: 1
             radius: root.config.popupRadius
             clip: true
@@ -899,7 +899,7 @@ Item {
                 color: root.config.bg
                 radius: 4
                 border.width: 1
-                border.color: root.config.accent
+                border.color: root.config.selectionBackground
             }
 
             TextInput {
@@ -917,8 +917,8 @@ Item {
                 focus: true
                 verticalAlignment: TextInput.AlignVCenter
                 color: root.config.fg
-                selectionColor: root.config.accent
-                selectedTextColor: root.config.bg
+                selectionColor: root.config.selectionBackground
+                selectedTextColor: root.config.selectionForeground
                 font.pointSize: root.config.fontSize(1)
                 clip: true
                 onTextChanged: {
@@ -1068,7 +1068,8 @@ Item {
                     Rectangle {
                         anchors.fill: parent
                         radius: 4
-                        color: resultRow.selected ? root.config.accent : "transparent"
+                        color: resultRow.selected
+                            ? root.config.selectionBackground : "transparent"
                     }
 
                     IconImage {
@@ -1087,7 +1088,8 @@ Item {
                         anchors.leftMargin: 12
                         anchors.verticalCenter: parent.verticalCenter
                         visible: modelData.type === "calculator" || modelData.type === "file" || modelData.type === "binary" || modelData.type === "emoji" || modelData.type === "timer-start" || modelData.type === "timer-active"
-                        color: resultRow.selected ? root.config.fg : root.config.accent
+                        color: resultRow.selected
+                            ? root.config.selectionForeground : root.config.selectionBackground
                         font.family: modelData.type === "emoji" ? root.config.textFontFamily : root.config.iconFontFamily
                         font.pointSize: root.config.iconSize * 1.5
                         text: modelData.type === "emoji" ? modelData.emoji : modelData.type === "file" ? "󰈔" : modelData.type === "binary" ? (modelData.recent ? root.iconStar : root.iconRun) : modelData.type === "timer-start" || modelData.type === "timer-active" ? "󰔛" : "󰃬"
@@ -1104,7 +1106,8 @@ Item {
                         Text {
                             renderType: Text.NativeRendering
                             width: parent.width
-                            color: root.config.fg
+                            color: resultRow.selected
+                                ? root.config.selectionForeground : root.config.fg
                             font.pointSize: root.config.fontSize(0.96)
                             font.family: root.config.textFontFamily
                             font.weight: Font.Medium
@@ -1120,7 +1123,8 @@ Item {
                             width: parent.width
                             visible: modelData.type === "timer-active"
                                 || (modelData.subtitle || "") !== ""
-                            color: root.config.muted
+                            color: resultRow.selected
+                                ? root.config.selectionForeground : root.config.muted
                             font.pointSize: root.config.fontSize(0.74)
                             elide: Text.ElideRight
                             // The model does not depend on the clock: only

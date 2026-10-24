@@ -82,7 +82,7 @@ Item {
         id: recordingLabel
 
         anchors.centerIn: parent
-        color: config.accent
+        color: config.selectionBackground
         font.pointSize: config.fontSize(1)
         font.weight: Font.DemiBold
         text: "REC"
@@ -265,7 +265,7 @@ Item {
             anchors.fill: parent
             radius: 4
             color: menuItem.selected
-                ? root.config.accent
+                ? root.config.selectionBackground
                 : "transparent"
         }
 
@@ -275,7 +275,8 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
 
             width: 22
-            color: root.config.fg
+            color: menuItem.selected
+                ? root.config.selectionForeground : root.config.fg
             font.family: root.config.iconFontFamily
             font.pointSize: root.config.iconSize * 1.077
             horizontalAlignment: Text.AlignHCenter
@@ -288,7 +289,8 @@ Item {
             anchors.leftMargin: 38
             anchors.verticalCenter: parent.verticalCenter
 
-            color: root.config.fg
+            color: menuItem.selected
+                ? root.config.selectionForeground : root.config.fg
             font.pointSize: root.config.fontSize(1)
             font.weight: Font.Medium
             text: menuItem.label
@@ -302,7 +304,8 @@ Item {
 
             width: 21
             horizontalAlignment: Text.AlignHCenter
-            color: root.config.fg
+            color: menuItem.selected
+                ? root.config.selectionForeground : root.config.fg
             font.pointSize: root.config.fontSize(0.846)
             font.weight: Font.Normal
             text: menuItem.keyHint

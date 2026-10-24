@@ -14,7 +14,8 @@ Item {
         property string workspaceLayout: "dots"
         property int barModuleSpacing: 8
         property color urgent: "red"
-        property color accent: "orange"
+        property color selectionBackground: "orange"
+        property color selectionForeground: "black"
         property color fg: "white"
         property var commands: []
 
@@ -76,10 +77,10 @@ Item {
             const chip = findChild(workspaces, "activeWorkspaceChip");
             const activeName = findChild(workspaces, "activeWorkspaceName");
             compare(activeName.text, "Web");
-            compare(chip.color, fixtureConfig.accent);
+            compare(chip.color, fixtureConfig.selectionBackground);
             compare(chip.radius, 4);
             compare(chip.height, 26);
-            compare(activeName.color, fixtureConfig.fg);
+            compare(activeName.color, fixtureConfig.selectionForeground);
             verify(findChild(workspaces, "workspace-dot-1") === null
                 || !findChild(workspaces, "workspace-dot-1").visible);
 
@@ -97,7 +98,7 @@ Item {
             compare(codeName.parent.opacity, 0.8);
             const notesName = findChild(workspaces, "workspace-name-3");
             verify(notesName !== null);
-            compare(notesName.parent.color, fixtureConfig.accent);
+            compare(notesName.parent.color, fixtureConfig.selectionBackground);
             compare(notesName.parent.opacity, 0.8);
             mouseClick(codeName, codeName.width / 2, codeName.height / 2);
             compare(fixtureConfig.commands, ["niri msg action focus-workspace 2"]);

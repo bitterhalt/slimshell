@@ -107,8 +107,8 @@ Item {
         Rectangle {
             anchors.fill: parent
             radius: root.config.popupRadius
-            color: root.batteryAlert ? root.config.bg : root.config.surface
-            border.color: root.batteryAlert ? root.criticalBorderColor : root.config.accent
+            color: root.batteryAlert ? root.config.bg : root.config.bg
+            border.color: root.batteryAlert ? root.criticalBorderColor : root.config.selectionBackground
             border.width: 1
 
             Item {
@@ -132,7 +132,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     visible: !imageIcon.visible
-                    color: root.batteryAlert ? root.criticalTextColor : root.config.accent
+                    color: root.batteryAlert ? root.criticalTextColor : root.config.selectionBackground
                     font.family: root.config.iconFontFamily
                     font.pointSize: root.config.iconSize
                     text: root.batteryAlert ? "󰀧" : "󰂯"

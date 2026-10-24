@@ -9,8 +9,8 @@ Item {
 
     QtObject {
         id: fixtureConfig
-        property color surface: "#222222"
-        property color accent: "#444444"
+        property color bg: "#222222"
+        property color selectionBackground: "#444444"
         property int popupRadius: 4
     }
 

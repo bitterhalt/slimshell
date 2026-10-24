@@ -57,7 +57,7 @@ PanelWindow {
         visible: root.selecting
         color: "transparent"
         border.width: 2
-        border.color: root.config.accent
+        border.color: root.config.selectionBackground
         radius: 2
     }
 

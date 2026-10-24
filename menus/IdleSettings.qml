@@ -163,6 +163,7 @@ Item {
 
                     contentItem: ButtonLabel {
                         config: root.config
+                        highlighted: toggleButton.hovered || toggleButton.activeFocus
                         text: toggleButton.text
                     }
 
@@ -185,6 +186,7 @@ Item {
 
                     contentItem: ButtonLabel {
                         config: root.config
+                        highlighted: applyButton.hovered || applyButton.activeFocus
                         text: applyButton.text
                     }
 
@@ -239,7 +241,7 @@ Item {
             radius: 4
             color: "transparent"
             border.width: 1
-            border.color: row.config.accent
+            border.color: row.config.selectionBackground
 
             TextInput {
                 id: input
@@ -250,8 +252,8 @@ Item {
                 anchors.rightMargin: 8
                 verticalAlignment: TextInput.AlignVCenter
                 color: row.config.fg
-                selectionColor: row.config.accent
-                selectedTextColor: row.config.bg
+                selectionColor: row.config.selectionBackground
+                selectedTextColor: row.config.selectionForeground
                 font.pointSize: row.config.fontSize(0.92)
                 selectByMouse: true
                 activeFocusOnTab: true
@@ -268,18 +270,19 @@ Item {
         required property bool focused
 
         radius: 4
-        color: hovered || focused ? config.accent : "transparent"
+        color: hovered || focused ? config.selectionBackground : "transparent"
         border.width: 1
-        border.color: config.accent
+        border.color: config.selectionBackground
     }
 
     component ButtonLabel: Text {
         required property var config
+        property bool highlighted: false
 
         renderType: Text.NativeRendering
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        color: config.fg
+        color: highlighted ? config.selectionForeground : config.fg
         font.pointSize: config.fontSize(0.88)
     }
 

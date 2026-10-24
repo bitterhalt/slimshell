@@ -324,7 +324,7 @@ Item {
                     anchors.right: parent.right
                     anchors.top: parent.top
                     height: 1
-                    color: root.config.accent
+                    color: root.config.selectionBackground
                 }
 
                 Text {
@@ -396,7 +396,7 @@ Item {
             anchors.bottomMargin: 3
             width: 3
             radius: 1
-            color: deviceRow.config.accent
+            color: deviceRow.config.selectionBackground
             visible: deviceRow.selected
         }
 
@@ -415,7 +415,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 visible: !deviceRow.row.icon
-                color: deviceRow.highlighted ? deviceRow.config.accent : deviceRow.config.fg
+                color: deviceRow.config.selectionBackground
                 font.family: deviceRow.config.iconFontFamily
                 font.pointSize: deviceRow.config.iconSize
                 text: "󰂯"
@@ -447,7 +447,7 @@ Item {
                     id: trustedStar
 
                     width: deviceRow.trusted ? implicitWidth : 0
-                    color: deviceRow.config.accent
+                    color: deviceRow.config.selectionBackground
                     font.pointSize: deviceRow.config.fontSize(0.78)
                     font.weight: Font.DemiBold
                     text: "★"

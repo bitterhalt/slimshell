@@ -14,7 +14,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         radius: height / 2
-        color: control.config.accent
+        color: control.config.selectionBackground
     }
 
     Rectangle {
@@ -23,7 +23,7 @@ Item {
         radius: 7
         y: 2
         x: control.checked ? 16 : 2
-        color: control.config.fg
+        color: control.config.selectionForeground
     }
 
     MouseArea {

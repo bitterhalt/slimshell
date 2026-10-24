@@ -8,10 +8,10 @@ Item {
         property color bg: "#101010"
         property color fg: "#eeeeee"
         property color muted: "#888888"
-        property color accent: "#6699cc"
+        property color selectionBackground: "#6699cc"
+        property color selectionForeground: "#ffffff"
         property real maxVolume: 1.1
         property color urgent: "#cc3333"
-        property color surface: "#222222"
         property string iconFontFamily: "sans-serif"
         property real iconSize: 10
         property int popupGap: 16

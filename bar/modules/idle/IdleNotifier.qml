@@ -43,8 +43,8 @@ Item {
             anchors.fill: parent
 
             radius: root.config.popupRadius
-            color: root.config.surface
-            border.color: root.config.accent
+            color: root.config.bg
+            border.color: root.config.selectionBackground
             border.width: 1
 
             Item {
@@ -59,7 +59,7 @@ Item {
 
                 Text {
                     anchors.centerIn: parent
-                    color: root.config.accent
+                    color: root.config.selectionBackground
                     font.family: root.config.iconFontFamily
                     font.pointSize: root.config.iconSize
                     text: "󱐋"

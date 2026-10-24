@@ -45,8 +45,8 @@ Item {
     Rectangle {
         anchors.fill: parent
 
-        color: root.config.surface
-        border.color: root.config.accent
+        color: root.config.bg
+        border.color: root.config.selectionBackground
         border.width: 1
         radius: root.config.popupRadius
 
@@ -67,7 +67,7 @@ Item {
                 Rectangle {
                     anchors.fill: parent
                     radius: 3
-                    color: backMouse.containsMouse ? root.config.accent : "transparent"
+                    color: backMouse.containsMouse ? root.config.selectionBackground : "transparent"
                 }
 
                 Text {
@@ -122,7 +122,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
 
                 height: 1
-                color: root.config.accent
+                color: root.config.selectionBackground
             }
         }
     }
@@ -140,7 +140,7 @@ Item {
             Rectangle {
                 anchors.fill: parent
                 radius: 3
-                color: rowMouse.containsMouse && entry.enabled ? root.config.accent : "transparent"
+                color: rowMouse.containsMouse && entry.enabled ? root.config.selectionBackground : "transparent"
             }
 
             Item {
@@ -162,7 +162,8 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     visible: entry.icon === "" && entry.buttonType !== QsMenuButtonType.None
-                    color: root.config.accent
+                    color: rowMouse.containsMouse && entry.enabled
+                        ? root.config.selectionForeground : root.config.selectionBackground
                     font.pointSize: root.config.fontSize(0.9)
                     text: entry.checkState === Qt.Checked ? "✓" : ""
                 }

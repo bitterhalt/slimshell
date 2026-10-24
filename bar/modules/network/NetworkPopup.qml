@@ -220,7 +220,7 @@ PopoutPanel {
 
                 Text {
                     anchors.centerIn: parent
-                    color: root.config.accent
+                    color: root.config.selectionBackground
                     font.family: root.config.iconFontFamily
                     font.pointSize: root.config.iconSize
                     text: "󰈀"
@@ -394,8 +394,8 @@ PopoutPanel {
 
             background: Rectangle {
                 radius: 4
-                color: connectAction.actionHighlighted ? root.config.accent : "transparent"
-                border.color: root.config.accent
+                color: connectAction.actionHighlighted ? root.config.selectionBackground : "transparent"
+                border.color: root.config.selectionBackground
                 border.width: 1
             }
 
@@ -408,7 +408,8 @@ PopoutPanel {
                     anchors.verticalCenter: parent.verticalCenter
                     renderType: Text.NativeRendering
                     textFormat: Text.PlainText
-                    color: connectAction.actionHighlighted ? root.config.bg : root.config.fg
+                    color: connectAction.actionHighlighted
+                        ? root.config.selectionForeground : root.config.fg
                     font.pointSize: root.config.fontSize(0.88)
                     text: connectAction.text
                 }
@@ -419,7 +420,8 @@ PopoutPanel {
                     anchors.verticalCenter: parent.verticalCenter
                     renderType: Text.NativeRendering
                     textFormat: Text.PlainText
-                    color: connectAction.actionHighlighted ? root.config.bg : root.config.muted
+                    color: connectAction.actionHighlighted
+                        ? root.config.selectionForeground : root.config.muted
                     font.pointSize: root.config.fontSize(0.76)
                     text: actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "[d]" : "[c]"
                 }
@@ -440,8 +442,8 @@ PopoutPanel {
 
             background: Rectangle {
                 radius: 4
-                color: forgetAction.actionHighlighted ? root.config.accent : "transparent"
-                border.color: root.config.accent
+                color: forgetAction.actionHighlighted ? root.config.selectionBackground : "transparent"
+                border.color: root.config.selectionBackground
                 border.width: 1
             }
 
@@ -454,7 +456,8 @@ PopoutPanel {
                     anchors.verticalCenter: parent.verticalCenter
                     renderType: Text.NativeRendering
                     textFormat: Text.PlainText
-                    color: forgetAction.actionHighlighted ? root.config.bg : root.config.urgent
+                    color: forgetAction.actionHighlighted
+                        ? root.config.selectionForeground : root.config.urgent
                     font.pointSize: root.config.fontSize(0.88)
                     text: forgetAction.text
                 }
@@ -465,7 +468,8 @@ PopoutPanel {
                     anchors.verticalCenter: parent.verticalCenter
                     renderType: Text.NativeRendering
                     textFormat: Text.PlainText
-                    color: forgetAction.actionHighlighted ? root.config.bg : root.config.muted
+                    color: forgetAction.actionHighlighted
+                        ? root.config.selectionForeground : root.config.muted
                     font.pointSize: root.config.fontSize(0.76)
                     text: "[f]"
                 }
@@ -486,8 +490,8 @@ PopoutPanel {
 
             background: Rectangle {
                 radius: 3
-                color: cancelAction.actionHighlighted ? root.config.accent : "transparent"
-                border.color: root.config.accent
+                color: cancelAction.actionHighlighted ? root.config.selectionBackground : "transparent"
+                border.color: root.config.selectionBackground
                 border.width: 1
             }
 
@@ -500,7 +504,8 @@ PopoutPanel {
                     anchors.verticalCenter: parent.verticalCenter
                     renderType: Text.NativeRendering
                     textFormat: Text.PlainText
-                    color: cancelAction.actionHighlighted ? root.config.bg : root.config.fg
+                    color: cancelAction.actionHighlighted
+                        ? root.config.selectionForeground : root.config.fg
                     font.pointSize: root.config.fontSize(0.88)
                     text: "Back"
                 }
@@ -511,7 +516,8 @@ PopoutPanel {
                     anchors.verticalCenter: parent.verticalCenter
                     renderType: Text.NativeRendering
                     textFormat: Text.PlainText
-                    color: cancelAction.actionHighlighted ? root.config.bg : root.config.muted
+                    color: cancelAction.actionHighlighted
+                        ? root.config.selectionForeground : root.config.muted
                     font.pointSize: root.config.fontSize(0.76)
                     text: "[Esc]"
                 }
@@ -564,15 +570,15 @@ PopoutPanel {
             placeholderText: "Password"
             color: root.config.fg
             placeholderTextColor: root.config.muted
-            selectionColor: root.config.accent
-            selectedTextColor: root.config.fg
+            selectionColor: root.config.selectionBackground
+            selectedTextColor: root.config.selectionForeground
             font.pointSize: root.config.fontSize(0.92)
             Keys.onReturnPressed: if (connectButton.enabled) connectButton.clicked()
             Keys.onEnterPressed: if (connectButton.enabled) connectButton.clicked()
 
             background: Rectangle {
                 color: root.config.bg
-                border.color: root.config.accent
+                border.color: root.config.selectionBackground
                 border.width: 1
                 radius: root.config.popupRadius
             }
@@ -604,8 +610,8 @@ PopoutPanel {
 
                 background: Rectangle {
                     radius: 3
-                    color: cancelPassword.hovered || cancelPassword.activeFocus ? root.config.accent : "transparent"
-                    border.color: root.config.accent
+                    color: cancelPassword.hovered || cancelPassword.activeFocus ? root.config.selectionBackground : "transparent"
+                    border.color: root.config.selectionBackground
                     border.width: 1
                 }
 
@@ -613,7 +619,8 @@ PopoutPanel {
                     renderType: Text.NativeRendering
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
-                    color: root.config.fg
+                    color: cancelPassword.hovered || cancelPassword.activeFocus
+                        ? root.config.selectionForeground : root.config.fg
                     font.pointSize: root.config.fontSize(0.85)
                     text: cancelPassword.text
                 }
@@ -643,15 +650,15 @@ PopoutPanel {
 
                 background: Rectangle {
                     radius: 3
-                    color: root.config.accent
+                    color: root.config.selectionBackground
                 }
 
                 contentItem: Text {
                     renderType: Text.NativeRendering
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
-                    color: root.config.fg
-                    opacity: connectButton.enabled ? 1 : 0.5
+                    color: connectButton.enabled
+                        ? root.config.selectionForeground : root.config.muted
                     font.pointSize: root.config.fontSize(0.85)
                     text: connectButton.text
                 }
@@ -685,7 +692,7 @@ PopoutPanel {
             anchors.right: parent.right
             anchors.top: parent.top
             height: 1
-            color: root.config.accent
+            color: root.config.selectionBackground
         }
 
         Text {

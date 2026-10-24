@@ -24,9 +24,9 @@ Item {
         property color fg: "white"
         property color muted: "#888888"
         property color bg: "#111111"
-        property color surface: "#151515"
-        property color accent: "orange"
         property color urgent: "red"
+        property color selectionBackground: "#b8865e"
+        property color selectionForeground: "#18120d"
         property string textFontFamily: "sans-serif"
         property string iconFontFamily: "sans-serif"
         property real iconSize: 10
@@ -290,6 +290,7 @@ Item {
             waitForPolish(host.Window.window);
             verify(card.implicitHeight > 0);
             compare(findText(card, "Test").color, config.muted);
+            compare(findText(card, "Test").opacity, 1);
             compare(findText(card, "12:34").color, config.muted);
             compare(findText(card, "×").color, config.muted);
             compare(findText(card, note.summary).textFormat, Text.PlainText);
@@ -381,26 +382,27 @@ Item {
             const note = notification(1);
             card = createTemporaryObject(cardComponent, host, {width: 340, config: config,
                 notification: note});
-            compare(card.color, Qt.alpha(config.bg, 0.3));
+            compare(card.color, config.bg);
             compare(card.border.width, 1);
             compare(card.border.color, config.muted);
-            compare(card.opacity, 0.72);
+            compare(card.opacity, 1);
             const hover = findChild(card, "historyHoverHandler");
             verify(hover !== null);
             mouseMove(card, card.width / 2, card.height / 2);
             tryVerify(() => hover.hovered);
-            compare(card.color, Qt.alpha(config.accent, 0.16));
+            compare(card.color, config.bg);
             compare(card.opacity, 1);
-            compare(card.border.color, config.accent);
+            compare(card.border.color, config.selectionBackground);
             mouseMove(host, host.width - 1, host.height - 1);
             tryVerify(() => !hover.hovered);
-            compare(card.opacity, 0.72);
+            compare(card.opacity, 1);
             compare(card.border.color, config.muted);
             // Assert selected treatment directly; hover itself is driven by
             // HoverHandler in the actual UI.
             card.selected = true;
-            compare(card.color, Qt.alpha(config.accent, 0.12));
-            compare(card.border.color, config.accent);
+            compare(card.color, config.bg);
+            compare(card.border.color, config.selectionBackground);
+            compare(findText(card, note.summary).color, config.fg);
         }
 
         function test_actionless_notification_has_no_button_row() {

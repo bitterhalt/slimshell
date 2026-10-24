@@ -248,8 +248,8 @@ PanelWindow {
         anchors.topMargin: root.config.popupGap
         anchors.horizontalCenter: parent.horizontalCenter
 
-        color: root.config.surface
-        border.color: root.config.accent
+        color: root.config.bg
+        border.color: root.config.selectionBackground
         border.width: 1
         radius: root.config.popupRadius
         clip: true
@@ -279,7 +279,7 @@ PanelWindow {
                 color: root.config.bg
                 radius: 4
                 border.width: 1
-                border.color: root.config.accent
+                border.color: root.config.selectionBackground
             }
 
             TextInput {
@@ -294,8 +294,8 @@ PanelWindow {
                 height: 40
                 verticalAlignment: TextInput.AlignVCenter
                 color: root.config.fg
-                selectionColor: root.config.accent
-                selectedTextColor: root.config.bg
+                selectionColor: root.config.selectionBackground
+                selectedTextColor: root.config.selectionForeground
                 font.pointSize: root.config.fontSize(1.04)
                 focus: true
                 clip: true
@@ -364,7 +364,7 @@ PanelWindow {
             width: root.historyWidth
             height: 1
             z: 1
-            color: root.config.accent
+            color: root.config.selectionBackground
         }
 
         Row {
@@ -404,7 +404,7 @@ PanelWindow {
                             anchors.fill: parent
                             radius: 5
                             color: entryRow.index === root.selectedIndex
-                                ? root.config.accent
+                                ? root.config.selectionBackground
                                 : "transparent"
                         }
 
@@ -412,7 +412,8 @@ PanelWindow {
                             anchors.left: parent.left
                             anchors.leftMargin: 10
                             anchors.verticalCenter: parent.verticalCenter
-                            color: root.config.accent
+                            color: entryRow.index === root.selectedIndex
+                                ? root.config.selectionForeground : root.config.selectionBackground
                             font.family: root.config.iconFontFamily
                             font.pointSize: root.config.iconSize
                             text: entryRow.modelData.isImage
@@ -430,7 +431,8 @@ PanelWindow {
                             Text {
                                 renderType: Text.NativeRendering
                                 width: parent.width
-                                color: root.config.fg
+                                color: entryRow.index === root.selectedIndex
+                                    ? root.config.selectionForeground : root.config.fg
                                 font.pointSize: root.config.fontSize(0.88)
                                 elide: Text.ElideRight
                                 text: entryRow.modelData.preview || "(empty)"
@@ -439,7 +441,8 @@ PanelWindow {
                             Text {
                                 renderType: Text.NativeRendering
                                 width: parent.width
-                                color: root.config.muted
+                                color: entryRow.index === root.selectedIndex
+                                    ? root.config.selectionForeground : root.config.muted
                                 font.pointSize: root.config.fontSize(0.70)
                                 elide: Text.ElideRight
                                 text: entryRow.modelData.mime
@@ -453,7 +456,7 @@ PanelWindow {
             Rectangle {
                 width: 1
                 height: parent.height
-                color: root.config.accent
+                color: root.config.selectionBackground
             }
 
             Item {
@@ -515,7 +518,7 @@ PanelWindow {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 height: 1
-                color: root.config.accent
+                color: root.config.selectionBackground
             }
 
             Row {
@@ -557,7 +560,7 @@ PanelWindow {
         Rectangle {
             anchors.fill: parent
             color: "transparent"
-            border.color: root.config.accent
+            border.color: root.config.selectionBackground
             border.width: 1
             radius: root.config.popupRadius
             z: 100

@@ -47,7 +47,7 @@ Item {
                 radius: 4
                 color: workspaceDot.modelData.is_urgent ? root.config.urgent
                     : workspaceDot.modelData.is_active
-                        ? root.config.accent : root.config.fg
+                        ? root.config.selectionBackground : root.config.fg
                 opacity: workspaceDot.modelData.is_active ? 1 : 0.7
 
                 MouseArea {
@@ -73,7 +73,7 @@ Item {
             width: activeName.implicitWidth + 16
             height: 26
             radius: 4
-            color: root.config.accent
+            color: root.config.selectionBackground
 
             Text {
                 id: activeName
@@ -81,7 +81,7 @@ Item {
                 renderType: Text.NativeRendering
 
                 anchors.centerIn: parent
-                color: root.config.fg
+                color: root.config.selectionForeground
                 font.pointSize: root.config.fontSize(1)
                 font.weight: Font.DemiBold
                 text: root.activeWorkspace
@@ -109,7 +109,7 @@ Item {
                     height: 26
                     radius: 4
                     color: workspaceItem.modelData.is_urgent
-                        ? root.config.urgent : root.config.accent
+                        ? root.config.urgent : root.config.selectionBackground
                     opacity: 0.8
 
                     Text {
@@ -118,7 +118,8 @@ Item {
                         renderType: Text.NativeRendering
 
                         anchors.centerIn: parent
-                        color: root.config.fg
+                        color: workspaceItem.modelData.is_urgent
+                            ? root.config.fg : root.config.selectionForeground
                         font.pointSize: root.config.fontSize(1)
                         font.weight: Font.DemiBold
                         text: workspaceItem.modelData.name

@@ -116,8 +116,8 @@ Item {
             Rectangle {
                 anchors.fill: parent
 
-                color: config.surface
-                border.color: config.accent
+                color: config.bg
+                border.color: config.selectionBackground
                 border.width: 1
                 radius: config.popupRadius
 
@@ -179,7 +179,7 @@ Item {
                             }
 
                             radius: parent.radius
-                            color: config.accent
+                            color: config.selectionBackground
                         }
                     }
 

@@ -271,7 +271,7 @@ PopoutPanel {
                 anchors.top: parent.top
                 width: parent.width
                 height: 1
-                color: root.config.accent
+                color: root.config.selectionBackground
             }
             Row {
                 anchors.left: parent.left
@@ -290,16 +290,17 @@ PopoutPanel {
                             anchors.fill: parent
                             anchors.margins: 2
                             radius: 4
-                            color: popupState.tabIndex === tab.index ? root.config.bg
-                                : tabMouse.containsMouse ? root.config.accent : "transparent"
+                            color: popupState.tabIndex === tab.index ? root.config.selectionBackground
+                                : tabMouse.containsMouse ? root.config.selectionBackground : "transparent"
                             border.width: 1
-                            border.color: root.config.accent
+                            border.color: root.config.selectionBackground
                         }
                         Text {
                             renderType: Text.NativeRendering
                             anchors.centerIn: parent
                             text: tab.modelData
-                            color: popupState.tabIndex === tab.index ? root.config.accent : root.config.muted
+                            color: popupState.tabIndex === tab.index
+                                ? root.config.selectionForeground : root.config.muted
                             font.pointSize: root.config.fontSize(0.82)
                             font.weight: popupState.tabIndex === tab.index ? Font.DemiBold : Font.Normal
                         }
@@ -337,7 +338,7 @@ PopoutPanel {
             anchors.bottomMargin: 6
             width: 2
             radius: 1
-            color: choice.config.accent
+            color: choice.config.selectionBackground
             visible: choice.selected
         }
         Column {
@@ -351,7 +352,8 @@ PopoutPanel {
                 renderType: Text.NativeRendering
                 width: parent.width
                 text: choice.title
-                color: choiceMouse.containsMouse ? Qt.lighter(choice.config.fg, 1.15) : choice.config.fg
+                color: choiceMouse.containsMouse
+                    ? choice.config.selectionBackground : choice.config.fg
                 font.pointSize: choice.config.fontSize(0.88)
                 font.weight: choice.selected ? Font.DemiBold : Font.Normal
                 elide: Text.ElideRight

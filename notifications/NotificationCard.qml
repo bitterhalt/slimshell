@@ -49,7 +49,7 @@ Rectangle {
     }
     radius: config.popupRadius
     color: config.bg
-    border.color: critical ? criticalBorderColor : config.accent
+    border.color: critical ? criticalBorderColor : config.selectionBackground
     border.width: 1
 
     HoverHandler {
@@ -93,7 +93,8 @@ Rectangle {
         Text {
             anchors.centerIn: parent
             visible: root.critical || root.timerNotification || (!root.hasImage && !appIcon.visible)
-            color: root.critical ? root.criticalTextColor : root.timerNotification ? config.accent : config.muted
+            color: root.critical ? root.criticalTextColor
+                : root.timerNotification ? config.selectionBackground : config.muted
             font.family: root.timerNotification ? config.textFontFamily : config.iconFontFamily
             font.pointSize: config.iconSize
             text: root.critical ? "󰀧" : root.timerNotification ? "⏰" : "󰂚"
@@ -135,8 +136,7 @@ Rectangle {
             renderType: Text.NativeRendering
             width: parent.width
             visible: text.length > 0
-            color: root.critical ? root.criticalTextColor : config.fg
-            opacity: 0.85
+            color: root.critical ? root.criticalTextColor : config.muted
             font.pointSize: config.fontSize(0.86)
             textFormat: Text.PlainText
             wrapMode: Text.Wrap
@@ -227,7 +227,7 @@ Rectangle {
                 width: (actionsRow.width - 6 * (root.actionCount - 1)) / root.actionCount
                 height: 26
                 radius: 3
-                color: actionMouse.containsMouse ? config.accent : config.surface
+                color: actionMouse.containsMouse ? config.selectionBackground : config.bg
 
                 Text {
                     renderType: Text.NativeRendering

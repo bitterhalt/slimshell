@@ -9,7 +9,6 @@ Item {
     id: root
 
     required property var config
-    required property var themeMenu
     required property var targetScreen
     required property var lockService
     required property var idleService
@@ -39,7 +38,7 @@ Item {
     readonly property var settingsItems: [
         { label: "Niri", icon: "󰖲", shortcut: "n", command: "foot sh -c 'cd ~/.config/niri/ && nvim *'" },
         { label: "Nvim", icon: "", shortcut: "v", command: "foot sh -c 'cd ~/.config/nvim && vopen .'" },
-        { label: "Pywal", icon: "󰏘", shortcut: "p", command: "foot -e nvim ~/.local/bin/setbg ~/.config/wal/templates/*" },
+        { label: "Hellwal", icon: "󰏘", shortcut: "p", command: "foot -e nvim ~/.local/bin/setbg ~/.config/hellwal/templates/*" },
         { label: "Quickshell", icon: "󰆍", shortcut: "q", command: "foot sh -c 'cd ~/.config/quickshell && vopen .'" },
     ]
 
@@ -61,12 +60,6 @@ Item {
         { label: "Combined", icon: "󰕮", shortcut: "c", command: "foot -a Sysmon -T Sysmon -e ~/.local/bin/tmux-sysmon.sh" }
     ]
 
-    readonly property var themingItems: [
-        { label: "Set wallpaper", icon: "󰸉", shortcut: "w", action: "wallpaper" },
-        { label: "Set theme", icon: "󰏘", shortcut: "t", action: "theme" },
-        { label: "Save theme", icon: "󰆓", shortcut: "s", action: "saveTheme" }
-    ]
-
     readonly property var currentItems: {
         if (confirmItem)
             return [
@@ -85,8 +78,6 @@ Item {
             return systemItems
         case "monitor":
             return monitorItems
-        case "theming":
-            return themingItems
         default:
             return []
         }
@@ -104,8 +95,6 @@ Item {
             return "Settings"
         case "monitor":
             return "Monitor"
-        case "theming":
-            return "Theming"
         default:
             return ""
         }
@@ -232,18 +221,6 @@ Item {
             page = item.page
             selectedIndex = 0
             menuCard.prepareLayout()
-            return
-        }
-
-        if (item.action === "theme") {
-            closeMenu()
-            Qt.callLater(() => root.themeMenu.openMenu())
-            return
-        }
-
-        if (item.action === "saveTheme") {
-            closeMenu()
-            Qt.callLater(() => root.themeMenu.openSavePrompt())
             return
         }
 
@@ -384,7 +361,7 @@ Item {
                         anchors.fill: parent
                         radius: 4
                         color: menuItem.selected
-                            ? root.config.accent
+                            ? root.config.selectionBackground
                             : "transparent"
                     }
 
@@ -397,7 +374,7 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
 
                         color: menuItem.selected
-                            ? root.config.fg : root.config.accent
+                            ? root.config.selectionForeground : root.config.selectionBackground
                         font.family: root.config.iconFontFamily
                         font.pointSize: root.config.iconSize * 1.077
                         text: modelData.icon ?? ""
@@ -411,7 +388,8 @@ Item {
                         anchors.rightMargin: 8
                         anchors.verticalCenter: parent.verticalCenter
 
-                        color: root.config.fg
+                        color: menuItem.selected
+                            ? root.config.selectionForeground : root.config.fg
                         font.pointSize: root.config.fontSize(1)
                         font.weight: Font.Medium
                         elide: Text.ElideRight
@@ -425,7 +403,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
 
                         color: menuItem.selected
-                            ? root.config.fg : root.config.muted
+                            ? root.config.selectionForeground : root.config.muted
                         font.family: root.config.iconFontFamily
                         font.pointSize: root.config.iconSize
                         text: "󰅂"
@@ -441,7 +419,8 @@ Item {
 
                         width: 21
                         horizontalAlignment: Text.AlignHCenter
-                        color: root.config.fg
+                        color: menuItem.selected
+                            ? root.config.selectionForeground : root.config.fg
                         font.pointSize: root.config.fontSize(0.846)
                         text: modelData.shortcut ?? ""
                     }
@@ -495,9 +474,6 @@ Item {
             root.openPage("system")
         }
 
-        function theming(): void {
-            root.openPage("theming")
-        }
         function close(): void {
             root.closeMenu()
         }

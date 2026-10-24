@@ -36,7 +36,7 @@ ItemRevealer {
 
         return formatted.replace(
           weekday,
-          "<span style='color:" + root.config.accent + "'>"
+          "<span style='color:" + root.config.selectionBackground + "'>"
             + weekday
             + "</span>"
         )

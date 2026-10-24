@@ -256,8 +256,8 @@ Scope {
         Rectangle {
             anchors.fill: parent
             radius: root.config.popupRadius
-            color: root.config.surface
-            border.color: root.config.accent
+            color: root.config.bg
+            border.color: root.config.selectionBackground
             border.width: 1
 
             Text {

@@ -34,11 +34,12 @@ class WallpaperTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             setbg.resolution({"off": OUTPUTS["off"]})
 
-    def test_background_validation(self):
-        self.assertEqual(setbg.background_color("#aBc123"), "aBc123")
-        for value in ("red", "123", "1234567", "12;456"):
+    def test_dark_offset_validation(self):
+        self.assertEqual(setbg.dark_offset("0.3"), 0.3)
+        self.assertEqual(setbg.dark_offset("1"), 1)
+        for value in ("red", "-0.1", "1.1", "nan", "inf"):
             with self.assertRaises(argparse.ArgumentTypeError):
-                setbg.background_color(value)
+                setbg.dark_offset(value)
 
     def test_recursive_images_only(self):
         (self.folder / "nested").mkdir()
@@ -92,9 +93,9 @@ class WallpaperTests(unittest.TestCase):
 
     @patch.object(setbg.subprocess, "run")
     def test_command_failure_propagates(self, run):
-        run.return_value = subprocess.CompletedProcess([], 1, "", "wal failed")
-        with self.assertRaisesRegex(RuntimeError, "wal failed"):
-            setbg.run(["wal", "-n"])
+        run.return_value = subprocess.CompletedProcess([], 1, "", "hellwal failed")
+        with self.assertRaisesRegex(RuntimeError, "hellwal failed"):
+            setbg.run(["hellwal", "-i", "wall.png"])
 
     def fake_run(self, cmd, **kwargs):
         self.calls.append(cmd)
@@ -110,8 +111,7 @@ class WallpaperTests(unittest.TestCase):
         image.touch()
         wall_dir = self.folder / "wall"
         with patch.object(setbg, "WALL_DIR", wall_dir), \
-                patch.object(setbg, "run", side_effect=self.fake_run), \
-                patch.object(setbg, "refresh_env") as refresh:
+                patch.object(setbg, "run", side_effect=self.fake_run):
             setbg.apply_wallpaper(image)
         self.assertTrue((wall_dir / "wallpaper.png").is_file())
         self.assertTrue((wall_dir / "lockscreen.png").is_file())
@@ -119,65 +119,40 @@ class WallpaperTests(unittest.TestCase):
                          ["niri", "magick", "magick", "awww", "awww"])
         self.assertIn("2560x1440^", self.calls[1])
         self.assertEqual(self.calls[1][1], str(image) + "[0]")
-        refresh.assert_not_called()
 
-    def test_pywal_failure_propagates_and_does_not_refresh(self):
+    def test_hellwal_failure_propagates(self):
         self.calls = []
         image = self.folder / "image.png"
         image.touch()
 
         def run(cmd, **kwargs):
-            if cmd[0] == "wal":
-                self.assertEqual(cmd[-2:], ["-b", "121212"])
-                raise RuntimeError("wal failed")
+            if cmd[0] == "hellwal":
+                self.assertEqual(cmd[-2:], ["--dark-offset", "0.3"])
+                raise RuntimeError("hellwal failed")
             return self.fake_run(cmd, **kwargs)
 
         with patch.object(setbg, "WALL_DIR", self.folder / "wall"), \
-                patch.object(setbg, "run", side_effect=run), \
-                patch.object(setbg, "refresh_env") as refresh:
-            with self.assertRaisesRegex(RuntimeError, "wal failed"):
-                setbg.apply_wallpaper(image, True, "121212")
-        refresh.assert_not_called()
+                patch.object(setbg, "run", side_effect=run):
+            with self.assertRaisesRegex(RuntimeError, "hellwal failed"):
+                setbg.apply_wallpaper(image, True)
 
-    def test_pywal_success_refreshes_theme_environment(self):
+    def test_hellwal_uses_comfort_mode_and_offset(self):
         self.calls = []
         image = self.folder / "image.png"
         image.touch()
         with patch.object(setbg, "WALL_DIR", self.folder / "wall"), \
-                patch.object(setbg, "run", side_effect=self.fake_run), \
-                patch.object(setbg, "refresh_env") as refresh:
-            setbg.apply_wallpaper(image, True)
-        self.assertEqual(self.calls[-1][0], "wal")
-        self.assertNotIn("-b", self.calls[-1])
-        refresh.assert_called_once_with()
+                patch.object(setbg, "run", side_effect=self.fake_run):
+            setbg.apply_wallpaper(image, True, 0.45)
+        self.assertEqual(self.calls[-1], [
+            "hellwal", "-i", str(self.folder / "wall/wallpaper.png"),
+            "--comfort-mode", "--dark-offset", "0.45"
+        ])
 
-    def test_fixed_pywal_success_passes_background(self):
-        self.calls = []
+    def test_dark_offset_requires_hellwal_range_in_apply(self):
         image = self.folder / "image.png"
         image.touch()
-        with patch.object(setbg, "WALL_DIR", self.folder / "wall"), \
-                patch.object(setbg, "run", side_effect=self.fake_run), \
-                patch.object(setbg, "refresh_env"):
-            setbg.apply_wallpaper(image, True, "abcdef")
-        self.assertEqual(self.calls[-1][-2:], ["-b", "abcdef"])
-
-    def test_refresh_only_merges_xresources(self):
-        with patch.dict(os.environ, {"DISPLAY": ":0"}), \
-                patch.object(setbg.shutil, "which", return_value="/usr/bin/xrdb"), \
-                patch.object(setbg.subprocess, "run") as process, \
-                patch.object(setbg, "run") as run:
-            setbg.refresh_env()
-        process.assert_not_called()
-        self.assertEqual(run.call_count, 1)
-        self.assertEqual(run.call_args.args[0][:4], ["xrdb", "-merge", "-quiet",
-                         str(Path(os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache")
-                             / "wal/colors.Xresources")])
-
-    def test_headless_refresh_does_nothing(self):
-        with patch.dict(os.environ, {"DISPLAY": ""}), \
-                patch.object(setbg, "run") as run:
-            setbg.refresh_env()
-        run.assert_not_called()
+        with self.assertRaisesRegex(ValueError, "dark offset"):
+            setbg.apply_wallpaper(image, True, 1.1)
 
     def test_concurrent_apply_is_rejected_before_desktop_commands(self):
         output = io.StringIO()

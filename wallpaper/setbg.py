@@ -9,10 +9,9 @@ import argparse
 import fcntl
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
-import re
-import shutil
 import signal
 import subprocess
 import sys
@@ -143,28 +142,22 @@ def resolution(outputs):
     return max(sizes, key=lambda size: size[0] * size[1])
 
 
-def background_color(value):
-    value = value.lstrip("#")
-    if not re.fullmatch(r"[0-9a-fA-F]{6}", value):
-        raise argparse.ArgumentTypeError("Background must be a six-digit hex colour")
-    return value
+def dark_offset(value):
+    try:
+        offset = float(value)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError("dark offset must be between 0 and 1") from error
+    if not math.isfinite(offset) or not 0 <= offset <= 1:
+        raise argparse.ArgumentTypeError("dark offset must be between 0 and 1")
+    return offset
 
 
-def refresh_env():
-    # QuickShell watches colors.css itself. Never restart shells or portals here.
-    if os.environ.get("DISPLAY") and shutil.which("xrdb"):
-        wal_cache = (
-            Path(os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache") / "wal"
-        )
-        run(["xrdb", "-merge", "-quiet", str(wal_cache / "colors.Xresources")])
-
-
-def apply_wallpaper(source, pywal=False, background=None):
+def apply_wallpaper(source, hellwal=False, dark_offset_value=0.3):
     source = source.expanduser().resolve(strict=True)
     if not source.is_file():
         raise ValueError("Selected wallpaper is not a file")
-    if background and not pywal:
-        raise ValueError("A fixed background requires Pywal")
+    if not math.isfinite(dark_offset_value) or not 0 <= dark_offset_value <= 1:
+        raise ValueError("Hellwal dark offset must be between 0 and 1")
     width, height = resolution(json.loads(run(["niri", "msg", "-j", "outputs"])))
     WALL_DIR.mkdir(parents=True, exist_ok=True)
     wallpaper = WALL_DIR / "wallpaper.png"
@@ -211,10 +204,11 @@ def apply_wallpaper(source, pywal=False, background=None):
         ]
     )
     run(["awww", "img", "-n", "overview", str(lockscreen), "--transition-type=none"])
-    if pywal:
-        extra = ["-b", background] if background else []
-        run(["wal", "-e", "-n", "-i", str(wallpaper), *extra], timeout=180)
-        refresh_env()
+    if hellwal:
+        run([
+            "hellwal", "-i", str(wallpaper), "--comfort-mode",
+            "--dark-offset", str(dark_offset_value),
+        ], timeout=180)
 
 
 def main():
@@ -227,8 +221,8 @@ def main():
     listing.add_argument("--cache", type=Path, default=CACHE_DIR / "thumbnails")
     apply = commands.add_parser("apply", help="Set wallpaper and blurred lockscreen")
     apply.add_argument("path", type=Path)
-    apply.add_argument("--pywal", action="store_true")
-    apply.add_argument("--background", type=background_color)
+    apply.add_argument("--hellwal", action="store_true")
+    apply.add_argument("--dark-offset", type=dark_offset, default=0.3)
     args = parser.parse_args()
     try:
         if args.command == "list":
@@ -242,7 +236,7 @@ def main():
                     raise RuntimeError(
                         "Another wallpaper change is still running"
                     ) from None
-                apply_wallpaper(args.path, args.pywal, args.background)
+                apply_wallpaper(args.path, args.hellwal, args.dark_offset)
             emit({"ok": True})
         return 0
     except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:

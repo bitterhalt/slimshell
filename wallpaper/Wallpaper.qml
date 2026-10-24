@@ -14,7 +14,7 @@ Item {
     property bool opened: false
     property string errorText: ""
     property string noticeText: ""
-    property string fixedBackground: "121212"
+    property real hellwalDarkOffset: 0.3
     property bool replyReceived: false
     readonly property bool busy: applyProcess.running
     readonly property string directory: Quickshell.env("HOME") + "/Pictures/wallpaper"
@@ -47,17 +47,17 @@ Item {
             openMenu(targetScreen)
     }
 
-    function apply(path, pywal, background) {
+    function apply(path, hellwal, darkOffset) {
         if (busy || !path)
             return
         errorText = ""
         noticeText = ""
         replyReceived = false
         const command = ["python3", helperPath, "apply", path]
-        if (pywal)
-            command.push("--pywal")
-        if (pywal && background)
-            command.push("--background", background)
+        if (hellwal) {
+            command.push("--hellwal", "--dark-offset",
+                String(darkOffset === undefined ? hellwalDarkOffset : darkOffset))
+        }
         applyProcess.command = command
         applyProcess.running = true
     }

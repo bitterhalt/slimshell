@@ -39,14 +39,14 @@ Item {
     property int idleLockTimeout: 1200
     property int idleOffTimeout: 1800
     property int idleSuspendTimeout: 7200
-    // Semantic palette supplied by ThemeService.
-    // ThemeService falls back to the hardcoded palette when Pywal is absent.
+    // Semantic palette supplied by ThemeService, with its own fallback palette.
     readonly property color bg: theme.bg
-    readonly property color surface: theme.surface
     readonly property color fg: theme.fg
     readonly property color muted: theme.muted
-    readonly property color accent: theme.accent
     readonly property color urgent: theme.urgent
+    readonly property color selectionBackground: theme.selectionBackground
+    readonly property color selectionForeground: theme.selectionForeground
+    readonly property color cursorText: theme.cursorText
     readonly property string textFontFamily: systemFontMetrics.font.family
     readonly property real systemFontPointSize: systemFontMetrics.font.pointSize > 0 ? systemFontMetrics.font.pointSize : 10
     readonly property real iconSize: systemFontPointSize * fontScale * iconScale

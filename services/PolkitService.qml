@@ -83,8 +83,8 @@ Scope {
             id: promptCard
 
             anchors.fill: parent
-            color: root.config.surface
-            border.color: root.config.accent
+            color: root.config.bg
+            border.color: root.config.selectionBackground
             border.width: 1
             radius: root.config.popupRadius
             implicitHeight: content.implicitHeight + 32
@@ -177,8 +177,8 @@ Scope {
                     visible: !!root.flow && root.flow.isResponseRequired
                     placeholderText: root.flow ? root.flow.inputPrompt : ""
                     color: root.config.fg
-                    selectionColor: root.config.accent
-                    selectedTextColor: root.config.bg
+                    selectionColor: root.config.selectionBackground
+                    selectedTextColor: root.config.selectionForeground
                     font.pointSize: root.config.fontSize(0.9)
                     echoMode: root.flow && root.flow.responseVisible
                         ? TextInput.Normal : TextInput.Password
@@ -204,7 +204,7 @@ Scope {
                         radius: 4
                         border.width: 1
                         border.color: responseField.activeFocus
-                            ? root.config.accent : root.config.muted
+                            ? root.config.selectionBackground : root.config.muted
                     }
                 }
 

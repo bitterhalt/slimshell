@@ -18,12 +18,12 @@ PanelWindow {
     property string scanNotice: ""
     property bool scanFinished: false
     property string selectedPath: ""
-    property bool fixedPrompt: false
+    property bool darkOffsetPrompt: false
     property string promptError: ""
     readonly property var actions: [
         { label: "Set Wallpaper", key: "b", action: "wallpaper", control: false },
-        { label: "Pywal", key: "p", action: "pywal", control: false },
-        { label: "Pywal Fixed", key: "P", action: "fixed", control: true }
+        { label: "Hellwal", key: "h", action: "hellwal", control: false },
+        { label: "Hellwal Offset", key: "H", action: "offset", control: true }
     ]
     readonly property int selectedIndex: {
         if (visibleEntries.count === 0)
@@ -71,47 +71,48 @@ PanelWindow {
         grid.positionViewAtIndex(index, GridView.Contain)
     }
 
-    function applySelection(pywal) {
+    function applySelection(hellwal) {
         if (selected)
-            controller.apply(selected.path, pywal)
+            controller.apply(selected.path, hellwal, controller.hellwalDarkOffset)
     }
 
-    function openFixedPrompt() {
+    function openDarkOffsetPrompt() {
         if (!selected || controller.busy)
             return
         promptError = ""
-        backgroundInput.text = controller.fixedBackground
-        fixedPrompt = true
+        darkOffsetInput.text = String(controller.hellwalDarkOffset)
+        darkOffsetPrompt = true
         Qt.callLater(() => {
-            backgroundInput.forceActiveFocus()
-            backgroundInput.selectAll()
+            darkOffsetInput.forceActiveFocus()
+            darkOffsetInput.selectAll()
         })
     }
 
-    function applyFixed() {
+    function applyDarkOffset() {
         if (!selected || controller.busy)
             return
-        const color = backgroundInput.text.trim().replace(/^#/, "")
-        if (!/^[0-9a-fA-F]{6}$/.test(color)) {
-            promptError = "Enter a six-digit hex colour, e.g. 121212"
+        const text = darkOffsetInput.text.trim()
+        const offset = Number(text)
+        if (text === "" || !Number.isFinite(offset) || offset < 0 || offset > 1) {
+            promptError = "Enter a dark offset between 0 and 1, e.g. 0.3"
             return
         }
-        controller.fixedBackground = color
-        controller.apply(selected.path, true, color)
-        fixedPrompt = false
+        controller.hellwalDarkOffset = offset
+        controller.apply(selected.path, true, offset)
+        darkOffsetPrompt = false
         grid.forceActiveFocus()
     }
 
     function activateAction(action) {
-        if (action === "fixed")
-            openFixedPrompt()
+        if (action === "offset")
+            openDarkOffsetPrompt()
         else
-            applySelection(action === "pywal")
+            applySelection(action === "hellwal")
     }
 
     function handleEscape() {
-        if (fixedPrompt) {
-            fixedPrompt = false
+        if (darkOffsetPrompt) {
+            darkOffsetPrompt = false
             promptError = ""
             grid.forceActiveFocus()
         } else if (search.activeFocus) {
@@ -157,18 +158,18 @@ PanelWindow {
     Shortcut { sequence: "Escape"; onActivated: root.handleEscape() }
     Shortcut {
         sequence: "B"
-        enabled: !search.activeFocus && !root.fixedPrompt && !!root.selected && !root.controller.busy
+        enabled: !search.activeFocus && !root.darkOffsetPrompt && !!root.selected && !root.controller.busy
         onActivated: root.applySelection(false)
     }
     Shortcut {
-        sequence: "P"
-        enabled: !search.activeFocus && !root.fixedPrompt && !!root.selected && !root.controller.busy
+        sequence: "H"
+        enabled: !search.activeFocus && !root.darkOffsetPrompt && !!root.selected && !root.controller.busy
         onActivated: root.applySelection(true)
     }
     Shortcut {
-        sequence: "Ctrl+P"
-        enabled: !root.fixedPrompt && !!root.selected && !root.controller.busy
-        onActivated: root.openFixedPrompt()
+        sequence: "Ctrl+H"
+        enabled: !root.darkOffsetPrompt && !!root.selected && !root.controller.busy
+        onActivated: root.openDarkOffsetPrompt()
     }
 
     Process {
@@ -208,8 +209,8 @@ PanelWindow {
 
     Rectangle {
         anchors.fill: parent
-        color: root.config.surface
-        border.color: root.config.accent
+        color: root.config.bg
+        border.color: root.config.selectionBackground
         border.width: 1
         radius: root.config.popupRadius
 
@@ -226,11 +227,11 @@ PanelWindow {
                 placeholderText: "Search wallpapers…"
                 color: root.config.fg
                 placeholderTextColor: root.config.muted
-                selectionColor: root.config.accent
-                selectedTextColor: root.config.bg
+                selectionColor: root.config.selectionBackground
+                selectedTextColor: root.config.selectionForeground
                 font.pointSize: root.config.fontSize(0.92)
                 selectByMouse: true
-                enabled: !root.fixedPrompt
+                enabled: !root.darkOffsetPrompt
                 KeyNavigation.priority: KeyNavigation.BeforeItem
                 KeyNavigation.tab: grid
                 KeyNavigation.backtab: grid
@@ -239,7 +240,7 @@ PanelWindow {
                 background: Rectangle {
                     color: "transparent"
                     radius: 4
-                    border.color: root.config.accent
+                    border.color: root.config.selectionBackground
                 }
                 Keys.onPressed: event => {
                     switch (event.key) {
@@ -264,7 +265,7 @@ PanelWindow {
                 keyNavigationEnabled: false
                 reuseItems: true
                 cacheBuffer: 145
-                enabled: !root.fixedPrompt
+                enabled: !root.darkOffsetPrompt
                 activeFocusOnTab: true
                 KeyNavigation.priority: KeyNavigation.BeforeItem
                 KeyNavigation.tab: search
@@ -286,7 +287,7 @@ PanelWindow {
                         radius: 4
                         color: root.config.bg
                         border.width: root.selectedIndex === tile.index ? 2 : 1
-                        border.color: Qt.alpha(root.config.accent,
+                        border.color: Qt.alpha(root.config.selectionBackground,
                             root.selectedIndex === tile.index ? 1 : 0.5)
 
                         Image {
@@ -348,34 +349,34 @@ PanelWindow {
 
             RowLayout {
                 Layout.fillWidth: true
-                visible: root.fixedPrompt
+                visible: root.darkOffsetPrompt
                 spacing: 8
 
                 Text {
                     renderType: Text.NativeRendering
-                    text: "Fixed background"
+                    text: "Hellwal dark offset (0–1)"
                     color: root.config.fg
                     font.pointSize: root.config.fontSize(0.85)
                 }
                 TextField {
                     renderType: Text.NativeRendering
-                    id: backgroundInput
+                    id: darkOffsetInput
                     Layout.fillWidth: true
                     Layout.preferredHeight: 32
-                    placeholderText: "121212"
+                    placeholderText: "0.3"
                     color: root.config.fg
                     placeholderTextColor: root.config.muted
-                    selectionColor: root.config.accent
-                    selectedTextColor: root.config.bg
+                    selectionColor: root.config.selectionBackground
+                    selectedTextColor: root.config.selectionForeground
                     font.pointSize: root.config.fontSize(0.9)
                     selectByMouse: true
                     enabled: !root.controller.busy
-                    onAccepted: root.applyFixed()
+                    onAccepted: root.applyDarkOffset()
                     onTextChanged: root.promptError = ""
                     background: Rectangle {
                         radius: 4
                         color: "transparent"
-                        border.color: root.config.accent
+                        border.color: root.config.selectionBackground
                     }
                 }
                 Text {
@@ -389,7 +390,7 @@ PanelWindow {
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 1
-                color: root.config.accent
+                color: root.config.selectionBackground
             }
 
             Item {
@@ -430,13 +431,13 @@ PanelWindow {
                             width: hintRow.width
                             height: 20
                             opacity: enabled ? 1 : 0.5
-                            enabled: !!root.selected && !root.controller.busy && !root.fixedPrompt
+                            enabled: !!root.selected && !root.controller.busy && !root.darkOffsetPrompt
 
                             Rectangle {
                                 anchors.fill: parent
                                 anchors.margins: -4
                                 radius: 4
-                                color: hint.hovered ? root.config.accent : "transparent"
+                                color: hint.hovered ? root.config.selectionBackground : "transparent"
                             }
 
                             Row {
@@ -447,20 +448,23 @@ PanelWindow {
                                     height: 20
                                     verticalAlignment: Text.AlignVCenter
                                     text: hint.modelData.label
-                                    color: hint.hovered ? root.config.fg : root.config.muted
+                                    color: hint.hovered
+                                        ? root.config.selectionForeground : root.config.muted
                                     font.pointSize: root.config.fontSize(0.8)
                                 }
                                 KeyCap {
                                     visible: hint.modelData.control
                                     label: "Ctrl"
-                                    edgeColor: root.config.accent
-                                    textColor: root.config.muted
+                                    edgeColor: root.config.selectionBackground
+                                    textColor: hint.hovered
+                                        ? root.config.selectionForeground : root.config.muted
                                     fontPointSize: root.config.fontSize(0.74)
                                 }
                                 KeyCap {
                                     label: hint.modelData.key
-                                    edgeColor: root.config.accent
-                                    textColor: root.config.muted
+                                    edgeColor: root.config.selectionBackground
+                                    textColor: hint.hovered
+                                        ? root.config.selectionForeground : root.config.muted
                                     fontPointSize: root.config.fontSize(0.74)
                                 }
                             }

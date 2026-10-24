@@ -28,7 +28,7 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 | **Controls**        | Keyboard-driven menus for Bluetooth, Wi-Fi, audio, and notifications                            |
 | **Launch & pick**   | Application launcher with: file search, calculator, binary runner, emoji, timers and dmenu-mode |
 | **Everyday tools**  | Clipboard history, DeepL translation, and screen recording                                      |
-| **Session & style** | Lock screen, power menu, idle timeouts, wallpaper picker, and Pywal integration                 |
+| **Session & style** | Lock screen, power menu, idle timeouts, wallpaper picker, and Hellwal colors                     |
 
 <details>
 <summary>IPC reference</summary>
@@ -43,14 +43,13 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 | `launcher`           | `toggle`, `open`, `close`                                              | Control the application launcher                         |
 | `lock`               | `lock`                                                                 | Lock the session                                         |
 | `locker`             | `isSecure`                                                             | Query whether the separate lock-screen process is secure |
-| `menu`               | `packages`, `settings`, `system`, `theming`, `close`                   | Open a main-menu page or close it                        |
+| `menu`               | `packages`, `settings`, `system`, `close`                              | Open a main-menu page or close it                        |
 | `network`            | `toggle`, `open`, `close`                                              | Show or hide the network popup                           |
 | `notificationCenter` | `toggle`, `open`, `close`                                              | Show or hide notification history                        |
 | `notifications`      | `toggleDnd`, `enableDnd`, `disableDnd`, `isDnd`, `clear`, `count`      | Control DND or notification history                      |
 | `power`              | `toggle`, `open`, `close`                                              | Control the power menu                                   |
 | `recorder`           | `toggle`, `open`, `close`, `fullscreen`, `region`, `stop`              | Control screen recording                                 |
-| `theme`              | `refresh`, `usingPywal`                                                | Reload or query the active theme                         |
-| `themeMenu`          | `toggle`, `open`, `close`, `save`, `refresh`                           | Control theme selection and saving                       |
+| `theme`              | `refresh`, `usingHellwal`                                              | Reload or query the active theme                         |
 | `translator`         | `toggle`, `open`, `close`                                              | Control the translator                                   |
 | `volume`             | `up`, `down`, `mute`                                                   | Adjust or mute the default audio output; shows the OSD   |
 | `wallpaper`          | `toggle`, `open`, `close`, `refresh`                                   | Control the wallpaper picker or refresh wallpapers       |
@@ -102,7 +101,7 @@ Slimshell must be running. This is a small dmenu-compatible runner, not a full d
 
 - Python, `wl-clipboard`, and `cliphist` for helper scripts and clipboard history
 - `gpu-screen-recorder` for screen recording
-- ImageMagick, `awww`, and Pywal for wallpaper tools and themes
+- ImageMagick, `awww`, and Hellwal for wallpaper colors
 - `qalc` for launcher calculations
 - `pactl` and PipeWire's PulseAudio compatibility service for audio card profiles
 - `DEEPL_API` in your environment for DeepL translation
@@ -126,7 +125,7 @@ bar/            Bar and its modules
 components/     Reusable UI and popup components
 services/       Shared desktop state and integrations
 launcher/       Launcher, dmenu runner, and search helpers
-menus/          System, theme, and wallpaper menus
+menus/          System and wallpaper menus
 notifications/  Notification popups and history
 clipboard/      Clipboard picker and previews
 lock/           Lock screen components and PAM setup

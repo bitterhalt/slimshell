@@ -63,8 +63,8 @@ FocusScope {
 
     Rectangle {
         anchors.fill: parent
-        color: root.config.surface
-        border.color: root.config.accent
+        color: root.config.bg
+        border.color: root.config.selectionBackground
         border.width: 1
         radius: root.config.popupRadius
     }
@@ -156,7 +156,7 @@ FocusScope {
             anchors.right: parent.right
             anchors.top: parent.top
             height: 1
-            color: root.config.accent
+            color: root.config.selectionBackground
         }
 
         Text {
@@ -191,7 +191,8 @@ FocusScope {
                 anchors.verticalCenter: parent.verticalCenter
                 renderType: Text.NativeRendering
                 text: "DND"
-                color: root.notificationService.dnd ? root.config.accent : root.config.muted
+                color: root.notificationService.dnd
+                    ? root.config.selectionBackground : root.config.muted
                 font.pointSize: root.config.fontSize(0.8)
             }
 

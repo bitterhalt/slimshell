@@ -13,7 +13,7 @@ Item {
 
     Text {
         anchors.centerIn: parent
-        color: config.accent
+        color: config.selectionBackground
         font.family: config.iconFontFamily
         font.pointSize: config.iconSize
         text: "󱐋"

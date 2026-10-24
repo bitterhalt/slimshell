@@ -20,8 +20,8 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: panel.config.surface
-        border.color: panel.config.accent
+        color: panel.config.bg
+        border.color: panel.config.selectionBackground
         border.width: 1
         radius: panel.config.popupRadius
 

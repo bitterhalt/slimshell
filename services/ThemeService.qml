@@ -7,56 +7,56 @@ Item {
     visible: false
 
     readonly property color fallbackBg: "#100f0f"
-    readonly property color fallbackSurface: "#1c1b1a"
     readonly property color fallbackFg: "#cecdc3"
-    readonly property color fallbackMuted: "#878580"
-    readonly property color fallbackAccent: "#205ea6"
+    readonly property real mutedOpacity: 0.65
+    readonly property color fallbackMuted: Qt.rgba(
+        fallbackFg.r, fallbackFg.g, fallbackFg.b, mutedOpacity)
+    readonly property color fallbackSelectionBackground: "#205ea6"
     readonly property color fallbackUrgent: "#bc5215"
+    readonly property color fallbackSelectionForeground: "#ffffff"
 
     property color bg: fallbackBg
-    property color surface: fallbackSurface
     property color fg: fallbackFg
     property color muted: fallbackMuted
-    property color accent: fallbackAccent
     property color urgent: fallbackUrgent
+    property color selectionBackground: fallbackSelectionBackground
+    property color selectionForeground: fallbackSelectionForeground
+    property color cursorText: fallbackBg
 
-    // Opacity applied to the foreground to produce the muted color (pywal only)
-    property real mutedOpacity: 0.6
-
-    property bool pywalActive: false
+    property bool hellwalActive: false
 
     function applyFallback(): void {
         bg = fallbackBg
-        surface = fallbackSurface
         fg = fallbackFg
         muted = fallbackMuted
-        accent = fallbackAccent
         urgent = fallbackUrgent
-        pywalActive = false
+        selectionBackground = fallbackSelectionBackground
+        selectionForeground = fallbackSelectionForeground
+        cursorText = fallbackBg
+        hellwalActive = false
     }
 
     function parsePalette(text): var {
         const colors = {}
         let match
 
-        let re = /@define-color\s+(background|foreground|color(?:1[0-5]|[0-9]))\s+(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)/g
+        let re = /@define-color\s+(background|foreground|selection_background|selection_foreground|cursor_text|color(?:1[0-5]|[0-9]))\s+(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)/g
         while ((match = re.exec(text)) !== null)
             colors[match[1]] = match[2]
 
-        re = /--(background|foreground|color(?:1[0-5]|[0-9]))\s*:\s*(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)/g
+        re = /--(background|foreground|selection_background|selection_foreground|cursor_text|color(?:1[0-5]|[0-9]))\s*:\s*(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)/g
         while ((match = re.exec(text)) !== null)
             colors[match[1]] = match[2]
 
-        re = /\$(background|foreground|color(?:1[0-5]|[0-9]))\s*:\s*(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)/g
+        re = /\$(background|foreground|selection_background|selection_foreground|cursor_text|color(?:1[0-5]|[0-9]))\s*:\s*(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)/g
         while ((match = re.exec(text)) !== null)
             colors[match[1]] = match[2]
 
         const required = [
             "background",
             "foreground",
-            "color0",
-            "color1",
-            "color3"
+            "color3",
+            "color6",
         ]
 
         for (let i = 0; i < required.length; ++i) {
@@ -76,12 +76,13 @@ Item {
         }
 
         bg = colors.background
-        surface = colors.color0
         fg = colors.foreground
-        muted = Qt.alpha(fg, mutedOpacity)
-        accent = colors.color1
+        muted = Qt.rgba(fg.r, fg.g, fg.b, mutedOpacity)
         urgent = colors.color3
-        pywalActive = true
+        selectionBackground = colors.selection_background || colors.color6
+        selectionForeground = colors.selection_foreground || fg
+        cursorText = colors.cursor_text || colors.background
+        hellwalActive = true
     }
 
     function refresh(): void {
@@ -91,7 +92,7 @@ Item {
     FileView {
         id: paletteFile
 
-        path: Quickshell.env("HOME") + "/.cache/wal/colors.css"
+        path: Quickshell.env("HOME") + "/.cache/hellwal/colors.css"
         watchChanges: true
         printErrors: false
 
@@ -107,8 +108,8 @@ Item {
             root.refresh()
         }
 
-        function usingPywal(): bool {
-            return root.pywalActive
+        function usingHellwal(): bool {
+            return root.hellwalActive
         }
     }
 }

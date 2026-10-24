@@ -55,16 +55,9 @@ ShellRoot {
 
   }
 
-  ThemeMenu {
-    id: themeMenu
-    config: appConfig
-    targetScreen: root.activeScreen
-  }
-
   MainMenu {
     id: mainMenu
     config: appConfig
-    themeMenu: themeMenu
     targetScreen: root.activeScreen
     lockService: appLockService
     idleService: appIdleService

@@ -225,8 +225,8 @@ PanelWindow {
 
     Rectangle {
         anchors.fill: parent
-        color: root.config.surface
-        border.color: root.config.accent
+        color: root.config.bg
+        border.color: root.config.selectionBackground
         border.width: 1
         radius: root.config.popupRadius
         clip: true
@@ -334,8 +334,8 @@ PanelWindow {
                         placeholderText: "Type or paste text…"
                         placeholderTextColor: root.config.muted
                         color: root.config.fg
-                        selectionColor: root.config.accent
-                        selectedTextColor: root.config.bg
+                        selectionColor: root.config.selectionBackground
+                        selectedTextColor: root.config.selectionForeground
                         font.pointSize: root.config.fontSize(1)
                         wrapMode: TextEdit.Wrap
                         textFormat: TextEdit.PlainText
@@ -368,7 +368,7 @@ PanelWindow {
                 Rectangle {
                     width: parent.width
                     height: 1
-                    color: root.config.accent
+                    color: root.config.selectionBackground
                 }
 
                 ScrollView {
@@ -385,8 +385,8 @@ PanelWindow {
                         placeholderText: root.busy ? "Translating…" : "Translation"
                         placeholderTextColor: root.config.muted
                         color: root.config.fg
-                        selectionColor: root.config.accent
-                        selectedTextColor: root.config.bg
+                        selectionColor: root.config.selectionBackground
+                        selectedTextColor: root.config.selectionForeground
                         font.pointSize: root.config.fontSize(1)
                         wrapMode: TextEdit.Wrap
                         textFormat: TextEdit.PlainText
@@ -422,8 +422,8 @@ PanelWindow {
                     placeholderText: "Search languages…"
                     color: root.config.fg
                     placeholderTextColor: root.config.muted
-                    selectionColor: root.config.accent
-                    selectedTextColor: root.config.bg
+                    selectionColor: root.config.selectionBackground
+                    selectedTextColor: root.config.selectionForeground
                     font.pointSize: root.config.fontSize(0.92)
                     onTextChanged: root.pickerIndex = 0
                     Keys.onPressed: (event) => {
@@ -450,7 +450,7 @@ PanelWindow {
                         color: root.config.bg
                         radius: 4
                         border.width: 1
-                        border.color: root.config.accent
+                        border.color: root.config.selectionBackground
                     }
 
                 }
@@ -471,7 +471,7 @@ PanelWindow {
                         width: ListView.view.width
                         height: 32
                         radius: 4
-                        color: index === root.pickerIndex ? root.config.accent : "transparent"
+                        color: index === root.pickerIndex ? root.config.selectionBackground : "transparent"
 
                         Text {
                             renderType: Text.NativeRendering
@@ -480,7 +480,8 @@ PanelWindow {
                             anchors.rightMargin: 10
                             verticalAlignment: Text.AlignVCenter
                             font.pointSize: root.config.fontSize(0.92)
-                            color: root.config.fg
+                            color: index === root.pickerIndex
+                                ? root.config.selectionForeground : root.config.fg
                             text: modelData.label
                         }
 
@@ -511,7 +512,7 @@ PanelWindow {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: root.config.accent
+                color: root.config.selectionBackground
             }
 
             Text {

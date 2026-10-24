@@ -13,6 +13,7 @@ Rectangle {
     property bool critical: false
     readonly property color criticalTextColor: "#ad8301"
     readonly property color criticalBorderColor: "#af3029"
+    readonly property bool highlighted: selected || hover.hovered
     property string timeLabel: ""
     property string appIconSource: ""
     property var actionEntries: []
@@ -28,11 +29,8 @@ Rectangle {
     radius: config.popupRadius
     border.width: 1
     border.color: root.critical ? root.criticalBorderColor
-        : root.selected || hover.hovered ? root.config.accent : root.config.muted
-    opacity: root.selected || hover.hovered ? 1 : 0.72
-    color: root.selected ? Qt.alpha(root.config.accent, 0.12)
-        : hover.hovered ? Qt.alpha(root.config.accent, 0.16)
-        : Qt.alpha(root.config.bg, 0.3)
+        : root.highlighted ? root.config.selectionBackground : root.config.muted
+    color: root.config.bg
 
     HoverHandler {
         id: hover
@@ -63,7 +61,8 @@ Rectangle {
         horizontalAlignment: Text.AlignHCenter
         visible: !thumbnail.visible
         text: root.critical ? "󰀧" : "󰂚"
-        color: root.critical ? root.criticalBorderColor : root.config.muted
+        color: root.critical ? root.criticalBorderColor
+            : root.highlighted ? root.config.fg : root.config.muted
         font.family: root.config.iconFontFamily
         font.pointSize: root.config.iconSize
     }
@@ -88,7 +87,8 @@ Rectangle {
                 renderType: Text.NativeRendering
                 textFormat: Text.PlainText
                 text: root.notification ? root.notification.appName || "Notification" : ""
-                color: root.critical ? root.criticalTextColor : root.selected ? root.config.fg : root.config.muted
+                color: root.critical ? root.criticalTextColor
+                    : root.highlighted ? root.config.fg : root.config.muted
                 font.pointSize: root.config.fontSize(0.78)
                 elide: Text.ElideRight
             }
@@ -99,7 +99,8 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 renderType: Text.NativeRendering
                 text: root.timeLabel
-                color: root.critical ? root.criticalTextColor : root.selected ? root.config.fg : root.config.muted
+                color: root.critical ? root.criticalTextColor
+                    : root.highlighted ? root.config.fg : root.config.muted
                 font.pointSize: root.config.fontSize(0.72)
             }
             Item {
@@ -113,7 +114,8 @@ Rectangle {
                     anchors.centerIn: parent
                     text: "×"
                     color: root.critical ? root.criticalTextColor
-                        : root.selected || closeMouse.containsMouse ? root.config.fg : root.config.muted
+                        : root.highlighted || closeMouse.containsMouse
+                            ? root.config.fg : root.config.muted
                     font.pointSize: root.config.fontSize(1)
                 }
                 MouseArea {
@@ -131,7 +133,8 @@ Rectangle {
             renderType: Text.NativeRendering
             textFormat: Text.PlainText
             text: root.notification ? root.notification.summary || "" : ""
-            color: root.critical ? root.criticalTextColor : root.config.fg
+            color: root.critical ? root.criticalTextColor
+                : root.config.fg
             font.pointSize: root.config.fontSize(0.96)
             font.weight: Font.Medium
             elide: Text.ElideRight
@@ -143,7 +146,8 @@ Rectangle {
             renderType: Text.NativeRendering
             textFormat: Text.PlainText
             text: root.notification ? root.notification.body || "" : ""
-            color: root.critical ? root.criticalTextColor : root.config.muted
+            color: root.critical ? root.criticalTextColor
+                : root.highlighted ? root.config.fg : root.config.muted
             font.pointSize: root.config.fontSize(0.85)
             wrapMode: Text.Wrap
             maximumLineCount: 3
@@ -181,9 +185,10 @@ Rectangle {
                     width: Math.min(actions.width, caption.implicitWidth + 16)
                     height: 26
                     radius: 3
-                    color: actionMouse.containsMouse ? root.config.accent : root.config.bg
+                    color: actionMouse.containsMouse
+                        ? root.config.selectionBackground : root.config.bg
                     border.width: 1
-                    border.color: root.config.accent
+                    border.color: root.config.selectionBackground
                     Text {
                         id: caption
                         anchors.centerIn: parent
@@ -191,7 +196,9 @@ Rectangle {
                         renderType: Text.NativeRendering
                         textFormat: Text.PlainText
                         text: (actionButton.modelData.key ? "[" + actionButton.modelData.key + "] " : "") + actionButton.modelData.label
-                        color: root.critical ? root.criticalTextColor : root.config.fg
+                        color: root.critical ? root.criticalTextColor
+                            : actionMouse.containsMouse
+                                ? root.config.selectionForeground : root.config.fg
                         font.pointSize: root.config.fontSize(0.78)
                         elide: Text.ElideRight
                     }

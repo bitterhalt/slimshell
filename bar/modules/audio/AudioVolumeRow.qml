@@ -32,7 +32,7 @@ Item {
         anchors.bottomMargin: 6
         width: 3
         radius: 1
-        color: root.config.accent
+        color: root.config.selectionBackground
         visible: root.selected
     }
 
@@ -98,7 +98,7 @@ Item {
         y: 7
         visible: !!root.row.active
         text: "Default"
-        color: root.config.accent
+        color: root.config.selectionBackground
         font.pointSize: root.config.fontSize(0.72)
     }
 
@@ -149,7 +149,7 @@ Item {
                 width: slider.visualPosition * parent.width
                 height: parent.height
                 radius: 2
-                color: root.config.accent
+                color: root.config.selectionBackground
             }
 
         }
@@ -160,7 +160,7 @@ Item {
             width: 12
             height: 12
             radius: 6
-            color: slider.pressed ? root.config.fg : root.config.accent
+            color: slider.pressed ? root.config.fg : root.config.selectionBackground
         }
 
     }
