@@ -19,6 +19,9 @@ Item {
     property int lockTimeout: config.idleLockTimeout
     property int offTimeout: config.idleOffTimeout
     property int suspendTimeout: config.idleSuspendTimeout
+    property string hellwalMode: "dark"
+    property real hellwalDarkOffset: 0
+    property real hellwalBrightOffset: 0
     readonly property bool automaticEnabled: settingsLoaded && !disabled && !applying
 
     signal notificationRequested(string message, var screen)
@@ -57,9 +60,24 @@ Item {
         return ""
     }
 
+    function saveHellwalSettings(mode, darkOffset, brightOffset) {
+        if (mode !== "dark" && mode !== "light")
+            return "Choose dark or light mode"
+        if (!Number.isFinite(darkOffset) || darkOffset < 0 || darkOffset > 1
+            || !Number.isFinite(brightOffset) || brightOffset < 0 || brightOffset > 1)
+            return "Offsets must be between 0 and 1"
+        if (!settingsLoaded)
+            return "Settings are still loading"
+        hellwalMode = mode
+        hellwalDarkOffset = darkOffset
+        hellwalBrightOffset = brightOffset
+        persistSettings()
+        return ""
+    }
+
     function persistSettings() {
         settingsFile.setText(JSON.stringify({lock: lockTimeout, off: offTimeout,
-            suspend: suspendTimeout}))
+            suspend: suspendTimeout, hellwalMode, hellwalDarkOffset, hellwalBrightOffset}))
     }
 
     function wakeScreens() {
@@ -172,6 +190,14 @@ Item {
                     root.suspendTimeout = saved.suspend
                     root.applying = false
                 }
+                if (saved.hellwalMode === "dark" || saved.hellwalMode === "light")
+                    root.hellwalMode = saved.hellwalMode
+                if (Number.isFinite(saved.hellwalDarkOffset)
+                    && saved.hellwalDarkOffset >= 0 && saved.hellwalDarkOffset <= 1)
+                    root.hellwalDarkOffset = saved.hellwalDarkOffset
+                if (Number.isFinite(saved.hellwalBrightOffset)
+                    && saved.hellwalBrightOffset >= 0 && saved.hellwalBrightOffset <= 1)
+                    root.hellwalBrightOffset = saved.hellwalBrightOffset
             } catch (error) {}
             root.settingsLoaded = true
         }

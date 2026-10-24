@@ -18,12 +18,12 @@ PanelWindow {
     property string scanNotice: ""
     property bool scanFinished: false
     property string selectedPath: ""
-    property bool darkOffsetPrompt: false
+    property bool settingsOpen: false
     property string promptError: ""
     readonly property var actions: [
         { label: "Set Wallpaper", key: "b", action: "wallpaper", control: false },
         { label: "Hellwal", key: "h", action: "hellwal", control: false },
-        { label: "Hellwal Offset", key: "H", action: "offset", control: true }
+        { label: "Settings", key: "s", action: "settings", control: false }
     ]
     readonly property int selectedIndex: {
         if (visibleEntries.count === 0)
@@ -73,46 +73,49 @@ PanelWindow {
 
     function applySelection(hellwal) {
         if (selected)
-            controller.apply(selected.path, hellwal, controller.hellwalDarkOffset)
+            controller.apply(selected.path, hellwal)
     }
 
-    function openDarkOffsetPrompt() {
-        if (!selected || controller.busy)
-            return
+    function openSettings() {
         promptError = ""
-        darkOffsetInput.text = String(controller.hellwalDarkOffset)
-        darkOffsetPrompt = true
+        modeInput.currentIndex = controller.settingsService.hellwalMode === "light" ? 1 : 0
+        darkOffsetInput.text = String(controller.settingsService.hellwalDarkOffset)
+        brightOffsetInput.text = String(controller.settingsService.hellwalBrightOffset)
+        settingsOpen = true
         Qt.callLater(() => {
-            darkOffsetInput.forceActiveFocus()
-            darkOffsetInput.selectAll()
+            modeInput.forceActiveFocus()
         })
     }
 
-    function applyDarkOffset() {
-        if (!selected || controller.busy)
+    function saveSettings() {
+        if (controller.busy)
             return
-        const text = darkOffsetInput.text.trim()
-        const offset = Number(text)
-        if (text === "" || !Number.isFinite(offset) || offset < 0 || offset > 1) {
-            promptError = "Enter a dark offset between 0 and 1, e.g. 0.3"
+        const dark = Number(darkOffsetInput.text.trim())
+        const bright = Number(brightOffsetInput.text.trim())
+        if (darkOffsetInput.text.trim() === "" || brightOffsetInput.text.trim() === ""
+            || !Number.isFinite(dark) || !Number.isFinite(bright)
+            || dark < 0 || dark > 1 || bright < 0 || bright > 1) {
+            promptError = "Offsets must be between 0 and 1"
             return
         }
-        controller.hellwalDarkOffset = offset
-        controller.apply(selected.path, true, offset)
-        darkOffsetPrompt = false
+        promptError = controller.settingsService.saveHellwalSettings(
+            modeInput.currentIndex === 1 ? "light" : "dark", dark, bright)
+        if (promptError !== "")
+            return
+        settingsOpen = false
         grid.forceActiveFocus()
     }
 
     function activateAction(action) {
-        if (action === "offset")
-            openDarkOffsetPrompt()
+        if (action === "settings")
+            openSettings()
         else
             applySelection(action === "hellwal")
     }
 
     function handleEscape() {
-        if (darkOffsetPrompt) {
-            darkOffsetPrompt = false
+        if (settingsOpen) {
+            settingsOpen = false
             promptError = ""
             grid.forceActiveFocus()
         } else if (search.activeFocus) {
@@ -158,18 +161,18 @@ PanelWindow {
     Shortcut { sequence: "Escape"; onActivated: root.handleEscape() }
     Shortcut {
         sequence: "B"
-        enabled: !search.activeFocus && !root.darkOffsetPrompt && !!root.selected && !root.controller.busy
+        enabled: !search.activeFocus && !root.settingsOpen && !!root.selected && !root.controller.busy
         onActivated: root.applySelection(false)
     }
     Shortcut {
         sequence: "H"
-        enabled: !search.activeFocus && !root.darkOffsetPrompt && !!root.selected && !root.controller.busy
+        enabled: !search.activeFocus && !root.settingsOpen && !!root.selected && !root.controller.busy
         onActivated: root.applySelection(true)
     }
     Shortcut {
-        sequence: "Ctrl+H"
-        enabled: !root.darkOffsetPrompt && !!root.selected && !root.controller.busy
-        onActivated: root.openDarkOffsetPrompt()
+        sequence: "S"
+        enabled: !search.activeFocus && !root.settingsOpen
+        onActivated: root.openSettings()
     }
 
     Process {
@@ -231,7 +234,7 @@ PanelWindow {
                 selectedTextColor: root.config.selectionForeground
                 font.pointSize: root.config.fontSize(0.92)
                 selectByMouse: true
-                enabled: !root.darkOffsetPrompt
+                enabled: !root.settingsOpen
                 KeyNavigation.priority: KeyNavigation.BeforeItem
                 KeyNavigation.tab: grid
                 KeyNavigation.backtab: grid
@@ -265,7 +268,7 @@ PanelWindow {
                 keyNavigationEnabled: false
                 reuseItems: true
                 cacheBuffer: 145
-                enabled: !root.darkOffsetPrompt
+                enabled: !root.settingsOpen
                 activeFocusOnTab: true
                 KeyNavigation.priority: KeyNavigation.BeforeItem
                 KeyNavigation.tab: search
@@ -349,41 +352,106 @@ PanelWindow {
 
             RowLayout {
                 Layout.fillWidth: true
-                visible: root.darkOffsetPrompt
-                spacing: 8
+                visible: root.settingsOpen
+                spacing: 6
 
-                Text {
-                    renderType: Text.NativeRendering
-                    text: "Hellwal dark offset (0–1)"
-                    color: root.config.fg
-                    font.pointSize: root.config.fontSize(0.85)
-                }
-                TextField {
-                    renderType: Text.NativeRendering
-                    id: darkOffsetInput
+                RowLayout {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 32
-                    placeholderText: "0.3"
-                    color: root.config.fg
-                    placeholderTextColor: root.config.muted
-                    selectionColor: root.config.selectionBackground
-                    selectedTextColor: root.config.selectionForeground
-                    font.pointSize: root.config.fontSize(0.9)
-                    selectByMouse: true
-                    enabled: !root.controller.busy
-                    onAccepted: root.applyDarkOffset()
-                    onTextChanged: root.promptError = ""
-                    background: Rectangle {
-                        radius: 4
-                        color: "transparent"
-                        border.color: root.config.selectionBackground
+                    Text {
+                        renderType: Text.NativeRendering
+                        text: "Settings"
+                        color: root.config.fg
+                        font.pointSize: root.config.fontSize(0.9)
+                    }
+                    Item { Layout.fillWidth: true }
+                    Text {
+                        renderType: Text.NativeRendering
+                        text: "Mode"
+                        color: root.config.muted
+                        font.pointSize: root.config.fontSize(0.8)
+                    }
+                    ComboBox {
+                        id: modeInput
+                        Layout.preferredWidth: 100
+                        model: ["dark", "light"]
+                        currentIndex: 0
+                        enabled: !root.controller.busy
+                        contentItem: Text {
+                            renderType: Text.NativeRendering
+                            leftPadding: 8
+                            verticalAlignment: Text.AlignVCenter
+                            text: modeInput.displayText
+                            color: root.config.fg
+                            font.pointSize: root.config.fontSize(0.85)
+                        }
+                        background: Rectangle {
+                            radius: 4
+                            color: "transparent"
+                            border.color: root.config.selectionBackground
+                        }
                     }
                 }
-                Text {
-                    renderType: Text.NativeRendering
-                    text: "Enter: apply · Esc: cancel"
-                    color: root.config.muted
-                    font.pointSize: root.config.fontSize(0.78)
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 8
+                    Text {
+                        renderType: Text.NativeRendering
+                        text: "Dark offset"
+                        color: root.config.muted
+                        font.pointSize: root.config.fontSize(0.8)
+                    }
+                    TextField {
+                        id: darkOffsetInput
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 30
+                        color: root.config.fg
+                        placeholderText: "0"
+                        placeholderTextColor: root.config.muted
+                        selectionColor: root.config.selectionBackground
+                        selectedTextColor: root.config.selectionForeground
+                        enabled: !root.controller.busy
+                        onTextChanged: root.promptError = ""
+                        background: Rectangle {
+                            radius: 4
+                            color: "transparent"
+                            border.color: root.config.selectionBackground
+                        }
+                    }
+                    Text {
+                        renderType: Text.NativeRendering
+                        text: "Bright offset"
+                        color: root.config.muted
+                        font.pointSize: root.config.fontSize(0.8)
+                    }
+                    TextField {
+                        id: brightOffsetInput
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 30
+                        color: root.config.fg
+                        placeholderText: "0"
+                        placeholderTextColor: root.config.muted
+                        selectionColor: root.config.selectionBackground
+                        selectedTextColor: root.config.selectionForeground
+                        enabled: !root.controller.busy
+                        onTextChanged: root.promptError = ""
+                        background: Rectangle {
+                            radius: 4
+                            color: "transparent"
+                            border.color: root.config.selectionBackground
+                        }
+                    }
+                    Text {
+                        renderType: Text.NativeRendering
+                        text: "Save"
+                        color: root.config.selectionBackground
+                        font.pointSize: root.config.fontSize(0.85)
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.saveSettings()
+                        }
+                    }
                 }
             }
 
@@ -431,7 +499,8 @@ PanelWindow {
                             width: hintRow.width
                             height: 20
                             opacity: enabled ? 1 : 0.5
-                            enabled: !!root.selected && !root.controller.busy && !root.darkOffsetPrompt
+                            enabled: (hint.modelData.action === "settings" || !!root.selected)
+                                && !root.controller.busy && !root.settingsOpen
 
                             Rectangle {
                                 anchors.fill: parent

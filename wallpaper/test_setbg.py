@@ -127,7 +127,7 @@ class WallpaperTests(unittest.TestCase):
 
         def run(cmd, **kwargs):
             if cmd[0] == "hellwal":
-                self.assertEqual(cmd[-2:], ["--dark-offset", "0.3"])
+                self.assertEqual(cmd[-4:], ["--dark-offset", "0", "--bright-offset", "0"])
                 raise RuntimeError("hellwal failed")
             return self.fake_run(cmd, **kwargs)
 
@@ -136,23 +136,24 @@ class WallpaperTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "hellwal failed"):
                 setbg.apply_wallpaper(image, True)
 
-    def test_hellwal_uses_comfort_mode_and_offset(self):
+    def test_hellwal_uses_mode_and_both_offsets(self):
         self.calls = []
         image = self.folder / "image.png"
         image.touch()
         with patch.object(setbg, "WALL_DIR", self.folder / "wall"), \
                 patch.object(setbg, "run", side_effect=self.fake_run):
-            setbg.apply_wallpaper(image, True, 0.45)
+            setbg.apply_wallpaper(image, True, "light", 0.45, 0.2)
         self.assertEqual(self.calls[-1], [
             "hellwal", "-i", str(self.folder / "wall/wallpaper.png"),
-            "--comfort-mode", "--dark-offset", "0.45"
+            "--comfort-mode", "--light", "--dark-offset", "0.45",
+            "--bright-offset", "0.2"
         ])
 
     def test_dark_offset_requires_hellwal_range_in_apply(self):
         image = self.folder / "image.png"
         image.touch()
-        with self.assertRaisesRegex(ValueError, "dark offset"):
-            setbg.apply_wallpaper(image, True, 1.1)
+        with self.assertRaisesRegex(ValueError, "offsets"):
+            setbg.apply_wallpaper(image, True, "dark", 1.1)
 
     def test_concurrent_apply_is_rejected_before_desktop_commands(self):
         output = io.StringIO()

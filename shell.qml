@@ -92,6 +92,7 @@ ShellRoot {
     id: appWallpaperPicker
     config: appConfig
     targetScreen: root.activeScreen
+    settingsService: appIdleService
   }
 
   NotificationService {

@@ -10,11 +10,11 @@ Item {
 
     required property var config
     required property var targetScreen
+    required property var settingsService
     property var menuScreen: null
     property bool opened: false
     property string errorText: ""
     property string noticeText: ""
-    property real hellwalDarkOffset: 0.3
     property bool replyReceived: false
     readonly property bool busy: applyProcess.running
     readonly property string directory: Quickshell.env("HOME") + "/Pictures/wallpaper"
@@ -47,7 +47,7 @@ Item {
             openMenu(targetScreen)
     }
 
-    function apply(path, hellwal, darkOffset) {
+    function apply(path, hellwal) {
         if (busy || !path)
             return
         errorText = ""
@@ -55,8 +55,9 @@ Item {
         replyReceived = false
         const command = ["python3", helperPath, "apply", path]
         if (hellwal) {
-            command.push("--hellwal", "--dark-offset",
-                String(darkOffset === undefined ? hellwalDarkOffset : darkOffset))
+            command.push("--hellwal", "--mode", settingsService.hellwalMode,
+                "--dark-offset", String(settingsService.hellwalDarkOffset),
+                "--bright-offset", String(settingsService.hellwalBrightOffset))
         }
         applyProcess.command = command
         applyProcess.running = true

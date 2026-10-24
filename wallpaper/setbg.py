@@ -152,12 +152,15 @@ def dark_offset(value):
     return offset
 
 
-def apply_wallpaper(source, hellwal=False, dark_offset_value=0.3):
+def apply_wallpaper(source, hellwal=False, mode="dark", dark_offset_value=0, bright_offset_value=0):
     source = source.expanduser().resolve(strict=True)
     if not source.is_file():
         raise ValueError("Selected wallpaper is not a file")
-    if not math.isfinite(dark_offset_value) or not 0 <= dark_offset_value <= 1:
-        raise ValueError("Hellwal dark offset must be between 0 and 1")
+    if mode not in {"dark", "light"}:
+        raise ValueError("Hellwal mode must be dark or light")
+    if (not math.isfinite(dark_offset_value) or not 0 <= dark_offset_value <= 1
+            or not math.isfinite(bright_offset_value) or not 0 <= bright_offset_value <= 1):
+        raise ValueError("Hellwal offsets must be between 0 and 1")
     width, height = resolution(json.loads(run(["niri", "msg", "-j", "outputs"])))
     WALL_DIR.mkdir(parents=True, exist_ok=True)
     wallpaper = WALL_DIR / "wallpaper.png"
@@ -207,7 +210,8 @@ def apply_wallpaper(source, hellwal=False, dark_offset_value=0.3):
     if hellwal:
         run([
             "hellwal", "-i", str(wallpaper), "--comfort-mode",
-            "--dark-offset", str(dark_offset_value),
+            "--" + mode, "--dark-offset", str(dark_offset_value),
+            "--bright-offset", str(bright_offset_value),
         ], timeout=180)
 
 
@@ -222,7 +226,9 @@ def main():
     apply = commands.add_parser("apply", help="Set wallpaper and blurred lockscreen")
     apply.add_argument("path", type=Path)
     apply.add_argument("--hellwal", action="store_true")
-    apply.add_argument("--dark-offset", type=dark_offset, default=0.3)
+    apply.add_argument("--mode", choices=("dark", "light"), default="dark")
+    apply.add_argument("--dark-offset", type=dark_offset, default=0)
+    apply.add_argument("--bright-offset", type=dark_offset, default=0)
     args = parser.parse_args()
     try:
         if args.command == "list":
@@ -236,7 +242,7 @@ def main():
                     raise RuntimeError(
                         "Another wallpaper change is still running"
                     ) from None
-                apply_wallpaper(args.path, args.hellwal, args.dark_offset)
+                apply_wallpaper(args.path, args.hellwal, args.mode, args.dark_offset, args.bright_offset)
             emit({"ok": True})
         return 0
     except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:
