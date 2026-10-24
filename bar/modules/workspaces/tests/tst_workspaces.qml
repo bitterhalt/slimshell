@@ -11,7 +11,6 @@ Item {
     QtObject {
         id: fixtureConfig
 
-        property string workspaceLayout: "dots"
         property int barModuleSpacing: 8
         property color urgent: "red"
         property color selectionBackground: "orange"
@@ -21,6 +20,16 @@ Item {
 
         function fontSize(scale) { return 12 * scale; }
         function run(command) { commands = commands.concat([command]); }
+    }
+
+    QtObject {
+        id: fixtureSettings
+        property string workspaceLayout: "dots"
+        property bool settingsLoaded: true
+        function saveWorkspaceLayout(layout) {
+            workspaceLayout = layout;
+            return "";
+        }
     }
 
     QtObject {
@@ -49,6 +58,7 @@ Item {
         config: fixtureConfig
         barWindow: fixtureBar
         niri: fixtureNiri
+        settingsService: fixtureSettings
     }
 
     TestCase {
@@ -56,8 +66,9 @@ Item {
         when: windowShown
 
         function init() {
-            fixtureConfig.workspaceLayout = "dots";
+            fixtureSettings.workspaceLayout = "dots";
             fixtureConfig.commands = [];
+            workspaces.layoutAnimationRequested = false;
         }
 
         function test_dots_remain_default_and_clickable() {
@@ -69,8 +80,15 @@ Item {
             compare(fixtureConfig.commands, ["niri msg action focus-workspace 2"]);
         }
 
+        function test_right_click_toggles_layout() {
+            mouseClick(workspaces, workspaces.width / 2, workspaces.height / 2, Qt.RightButton);
+            compare(fixtureSettings.workspaceLayout, "minimal");
+            mouseClick(workspaces, workspaces.width / 2, workspaces.height / 2, Qt.RightButton);
+            compare(fixtureSettings.workspaceLayout, "dots");
+        }
+
         function test_minimal_shows_active_name_and_reveals_rest() {
-            fixtureConfig.workspaceLayout = "minimal";
+            fixtureSettings.workspaceLayout = "minimal";
             wait(1);
 
             const revealer = findChild(workspaces, "workspaceRevealer");
@@ -81,12 +99,14 @@ Item {
             compare(chip.radius, 4);
             compare(chip.height, 26);
             compare(activeName.color, fixtureConfig.selectionForeground);
+            const dots = findChild(workspaces, "dotsRow");
+            tryCompare(dots, "opacity", 0, 300);
             verify(findChild(workspaces, "workspace-dot-1") === null
                 || !findChild(workspaces, "workspace-dot-1").visible);
 
             const collapsedWidth = workspaces.implicitWidth;
             mouseMove(workspaces, 4, workspaces.height / 2);
-            wait(40);
+            wait(150);
             compare(revealer.revealProgress, 0);
             tryCompare(revealer, "revealProgress", 1);
             verify(workspaces.implicitWidth > collapsedWidth);

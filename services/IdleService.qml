@@ -22,6 +22,7 @@ Item {
     property string hellwalMode: "dark"
     property real hellwalDarkOffset: 0
     property real hellwalBrightOffset: 0
+    property string workspaceLayout: "dots"
     readonly property bool automaticEnabled: settingsLoaded && !disabled && !applying
 
     signal notificationRequested(string message, var screen)
@@ -75,9 +76,20 @@ Item {
         return ""
     }
 
+    function saveWorkspaceLayout(layout) {
+        if (layout !== "dots" && layout !== "minimal")
+            return "Choose dots or minimal layout"
+        if (!settingsLoaded)
+            return "Settings are still loading"
+        workspaceLayout = layout
+        persistSettings()
+        return ""
+    }
+
     function persistSettings() {
         settingsFile.setText(JSON.stringify({lock: lockTimeout, off: offTimeout,
-            suspend: suspendTimeout, hellwalMode, hellwalDarkOffset, hellwalBrightOffset}))
+            suspend: suspendTimeout, hellwalMode, hellwalDarkOffset, hellwalBrightOffset,
+            workspaceLayout}))
     }
 
     function wakeScreens() {
@@ -177,7 +189,7 @@ Item {
     FileView {
         id: settingsFile
         path: (Quickshell.env("XDG_DATA_HOME") || Quickshell.env("HOME") + "/.local/share")
-            + "/quickshell-idle.json"
+            + "/quickshell-settings.json"
         atomicWrites: true
         printErrors: false
         onLoaded: {
@@ -198,6 +210,8 @@ Item {
                 if (Number.isFinite(saved.hellwalBrightOffset)
                     && saved.hellwalBrightOffset >= 0 && saved.hellwalBrightOffset <= 1)
                     root.hellwalBrightOffset = saved.hellwalBrightOffset
+                if (saved.workspaceLayout === "dots" || saved.workspaceLayout === "minimal")
+                    root.workspaceLayout = saved.workspaceLayout
             } catch (error) {}
             root.settingsLoaded = true
         }

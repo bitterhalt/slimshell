@@ -60,6 +60,7 @@ PanelWindow {
             config: barWindow.config
             barWindow: barWindow
             niri: barWindow.niri
+            settingsService: barWindow.idleService
         }
 
         WindowTitle {

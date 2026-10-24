@@ -16,7 +16,6 @@ Item {
     property int barEdgeMargin: 14
     property int barModuleSpacing: 8
     property int workspaceTitleGap: 18
-    property string workspaceLayout: "dots" // "dots" or "minimal"
     property bool showTray: true
     // Clock
     property string clockFormat: "HH:mm"

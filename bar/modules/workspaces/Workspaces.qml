@@ -9,8 +9,9 @@ Item {
     required property var config
     required property var barWindow
     required property var niri
+    required property var settingsService
 
-    readonly property bool minimalLayout: config.workspaceLayout === "minimal"
+    readonly property bool minimalLayout: settingsService.workspaceLayout === "minimal"
     readonly property var outputWorkspaces: niri.workspaces
         .filter(workspace => workspace.output === barWindow.screen.name)
         .sort((a, b) => a.idx - b.idx)
@@ -18,9 +19,21 @@ Item {
         outputWorkspaces.find(workspace => workspace.is_active) ?? null
     readonly property var otherWorkspaces:
         outputWorkspaces.filter(workspace => !workspace.is_active)
+    property bool layoutAnimationRequested: false
 
     implicitWidth: minimalLayout ? workspaceRevealer.implicitWidth : dotsRow.implicitWidth
+    width: implicitWidth
     height: barWindow.height
+
+    TapHandler {
+        acceptedButtons: Qt.RightButton
+        enabled: root.settingsService.settingsLoaded
+        onTapped: {
+            root.layoutAnimationRequested = true
+            root.settingsService.saveWorkspaceLayout(
+                root.minimalLayout ? "dots" : "minimal")
+        }
+    }
 
     function focusWorkspace(workspace): void {
         if (workspace)
@@ -29,10 +42,23 @@ Item {
 
     Row {
         id: dotsRow
+        objectName: "dotsRow"
 
         anchors.centerIn: parent
         spacing: root.config.barModuleSpacing
-        visible: !root.minimalLayout
+        visible: opacity > 0
+        enabled: !root.minimalLayout
+        opacity: root.minimalLayout ? 0 : 1
+        scale: root.minimalLayout ? 0.88 : 1
+
+        Behavior on opacity {
+            NumberAnimation { duration: 160; easing.type: Easing.OutCubic }
+            enabled: root.layoutAnimationRequested
+        }
+        Behavior on scale {
+            NumberAnimation { duration: 160; easing.type: Easing.OutCubic }
+            enabled: root.layoutAnimationRequested
+        }
 
         Repeater {
             model: root.outputWorkspaces
@@ -65,8 +91,20 @@ Item {
 
         config: root.config
         barWindow: root.barWindow
-        hoverRevealDelay: 100
-        visible: root.minimalLayout
+        hoverRevealDelay: 350
+        visible: opacity > 0
+        enabled: root.minimalLayout
+        opacity: root.minimalLayout ? 1 : 0
+        scale: root.minimalLayout ? 1 : 0.88
+
+        Behavior on opacity {
+            NumberAnimation { duration: 160; easing.type: Easing.OutCubic }
+            enabled: root.layoutAnimationRequested
+        }
+        Behavior on scale {
+            NumberAnimation { duration: 160; easing.type: Easing.OutCubic }
+            enabled: root.layoutAnimationRequested
+        }
 
         Rectangle {
             objectName: "activeWorkspaceChip"
