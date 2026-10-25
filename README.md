@@ -28,7 +28,7 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 | **Controls**        | Keyboard-driven menus for Bluetooth, Wi-Fi, audio, and notifications                            |
 | **Launch & pick**   | Application launcher with: file search, calculator, binary runner, emoji, timers and dmenu-mode |
 | **Everyday tools**  | Clipboard history, DeepL translation, and screen recording                                      |
-| **Session & style** | Lock screen, power menu, idle timeouts, wallpaper picker, and Hellwal colors                     |
+| **Session & style** | Lock screen, power menu, idle timeouts, wallpaper picker, and Hellwal colors                    |
 
 <details>
 <summary>IPC reference</summary>
@@ -147,7 +147,7 @@ Check out [my config](https://github.com/bitterhalt/dotfiles).
 
 ## ISSUES 🔨
 
-- dmenu-runner can't display special symbols (Nerd fonts etc.)
+- ~~dmenu-runner can't display special symbols (Nerd fonts etc.)~~
 - File structure is messy and files needs to be commented better
 - There are probably plenty of other things as well. Maybe yoy can show me how to fix them or do better :)
 
