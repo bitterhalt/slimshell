@@ -4,15 +4,22 @@ import argparse
 import contextlib
 import fcntl
 import io
+import importlib.util
 import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
 
-import setbg
+helper_spec = importlib.util.spec_from_file_location(
+    "wallpaper_helper", Path(__file__).with_name("wallpaper-helper.py")
+)
+setbg = importlib.util.module_from_spec(helper_spec)
+sys.modules[helper_spec.name] = setbg
+helper_spec.loader.exec_module(setbg)
 
 
 OUTPUTS = {
@@ -160,7 +167,7 @@ class WallpaperTests(unittest.TestCase):
         with (self.folder / "apply.lock").open("w") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
             with patch.object(setbg, "CACHE_DIR", self.folder), \
-                    patch("sys.argv", ["setbg.py", "apply", "image.png"]), \
+                    patch("sys.argv", ["wallpaper-helper.py", "apply", "image.png"]), \
                     patch.object(setbg, "apply_wallpaper") as apply, \
                     contextlib.redirect_stdout(output):
                 self.assertEqual(setbg.main(), 1)

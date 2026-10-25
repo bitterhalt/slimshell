@@ -18,7 +18,7 @@ Item {
     property bool replyReceived: false
     readonly property bool busy: applyProcess.running
     readonly property string directory: Quickshell.env("HOME") + "/Pictures/wallpaper"
-    readonly property string helperPath: Quickshell.env("HOME") + "/.config/quickshell/wallpaper/setbg.py"
+    readonly property string helperPath: Quickshell.env("HOME") + "/.config/quickshell/wallpaper/wallpaper-helper.py"
 
     onOpenedChanged: if (!opened) noticeText = ""
     onNoticeTextChanged: {

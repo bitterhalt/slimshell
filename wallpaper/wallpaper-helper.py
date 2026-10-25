@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Wallpaper picker backend, adapted from setbg.py. No interactive prompts.
+"""Wallpaper picker backend. No interactive prompts.
 
 `list` streams JSON thumbnail records; `apply` emits one JSON result.
 Only `apply` changes the desktop. Existing Bash/Fuzzel workflows are independent.
