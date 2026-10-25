@@ -25,7 +25,7 @@ PanelWindow {
 
     readonly property int panelWidth: 720
     readonly property int panelHeight: 420
-    readonly property int historyWidth: 280
+    readonly property int historyWidth: 160
     readonly property int rowHeight: 36
     readonly property string previewPath:
         (Quickshell.env("XDG_RUNTIME_DIR") || "/tmp")
@@ -266,7 +266,7 @@ PanelWindow {
             anchors.left: parent.left
             anchors.topMargin: 1
             anchors.leftMargin: 1
-            width: root.historyWidth
+            width: parent.width - 2
             height: 42
             z: 1
 
@@ -361,19 +361,20 @@ PanelWindow {
             anchors.top: header.bottom
             anchors.left: parent.left
             anchors.leftMargin: 1
-            width: root.historyWidth
+            anchors.right: parent.right
+            anchors.rightMargin: 1
             height: 1
             z: 1
             color: root.config.selectionBackground
         }
 
         Row {
-            anchors.top: parent.top
-            anchors.topMargin: 1
+            anchors.top: header.bottom
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.leftMargin: 1
             anchors.rightMargin: 1
+            anchors.topMargin: 1
             anchors.bottom: footer.top
 
             Rectangle {
@@ -386,7 +387,6 @@ PanelWindow {
 
                     anchors.fill: parent
                     anchors.margins: 8
-                    anchors.topMargin: header.height + 9
                     clip: true
                     spacing: 2
                     model: root.filteredEntries
@@ -420,33 +420,17 @@ PanelWindow {
                                 ? "󰋩" : "󰉢"
                         }
 
-                        Column {
+                        Text {
+                            renderType: Text.NativeRendering
                             anchors.left: parent.left
                             anchors.leftMargin: 42
                             anchors.right: parent.right
                             anchors.rightMargin: 8
                             anchors.verticalCenter: parent.verticalCenter
-                            spacing: 2
-
-                            Text {
-                                renderType: Text.NativeRendering
-                                width: parent.width
-                                color: entryRow.index === root.selectedIndex
-                                    ? root.config.selectionForeground : root.config.fg
-                                font.pointSize: root.config.fontSize(0.88)
-                                elide: Text.ElideRight
-                                text: entryRow.modelData.preview || "(empty)"
-                            }
-
-                            Text {
-                                renderType: Text.NativeRendering
-                                width: parent.width
-                                color: entryRow.index === root.selectedIndex
-                                    ? root.config.selectionForeground : root.config.muted
-                                font.pointSize: root.config.fontSize(0.70)
-                                elide: Text.ElideRight
-                                text: entryRow.modelData.mime
-                            }
+                            color: entryRow.index === root.selectedIndex
+                                ? root.config.selectionForeground : root.config.fg
+                            font.pointSize: root.config.fontSize(0.88)
+                            text: entryRow.modelData.isImage ? "Image" : "Text"
                         }
 
                     }
