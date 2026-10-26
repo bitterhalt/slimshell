@@ -120,44 +120,50 @@ Item {
         objects: root.trackedNodes
     }
 
-    Canvas {
-        id: volumeRing
-
+    Loader {
         anchors.centerIn: parent
         width: 24
         height: 24
-        visible: root.circleStyle
-        onPaint: {
-            const context = getContext("2d");
-            const center = width / 2;
-            const radius = center - 1.5;
-            const start = -Math.PI / 2;
-            context.clearRect(0, 0, width, height);
-            context.beginPath();
-            context.arc(center, center, radius, 0, Math.PI * 2, false);
-            context.lineWidth = 2;
-            context.lineCap = "round";
-            context.globalAlpha = 0.35;
-            context.strokeStyle = root.config.muted.toString();
-            context.stroke();
-            if (root.volumeLevel > 0) {
-                context.beginPath();
-                context.arc(center, center, radius, start, start + Math.PI * 2 * root.volumeLevel, false);
-                context.globalAlpha = 1;
-                context.strokeStyle = root.config.selectionBackground.toString();
-                context.stroke();
+        active: root.circleStyle
+
+        sourceComponent: Component {
+            Canvas {
+                id: volumeRing
+                anchors.fill: parent
+
+                onPaint: {
+                    const context = getContext("2d");
+                    const center = width / 2;
+                    const radius = center - 1.5;
+                    const start = -Math.PI / 2;
+                    context.clearRect(0, 0, width, height);
+                    context.beginPath();
+                    context.arc(center, center, radius, 0, Math.PI * 2, false);
+                    context.lineWidth = 2;
+                    context.lineCap = "round";
+                    context.globalAlpha = 0.35;
+                    context.strokeStyle = root.config.muted.toString();
+                    context.stroke();
+                    if (root.volumeLevel > 0) {
+                        context.beginPath();
+                        context.arc(center, center, radius, start,
+                            start + Math.PI * 2 * root.volumeLevel, false);
+                        context.globalAlpha = 1;
+                        context.strokeStyle = root.config.selectionBackground.toString();
+                        context.stroke();
+                    }
+                    context.globalAlpha = 1;
+                }
+
+                Connections {
+                    function onVolumeLevelChanged() {
+                        volumeRing.requestPaint();
+                    }
+
+                    target: root
+                }
             }
-            context.globalAlpha = 1;
         }
-
-        Connections {
-            function onVolumeLevelChanged() {
-                volumeRing.requestPaint();
-            }
-
-            target: root
-        }
-
     }
 
     Text {
