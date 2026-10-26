@@ -16,7 +16,7 @@ Item {
         id: trayItems
 
         anchors.verticalCenter: parent.verticalCenter
-        spacing: config.barModuleSpacing
+        spacing: 8
 
         Repeater {
             model: SystemTray.items

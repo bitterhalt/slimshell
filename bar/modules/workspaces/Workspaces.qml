@@ -45,7 +45,7 @@ Item {
         objectName: "dotsRow"
 
         anchors.centerIn: parent
-        spacing: root.config.barModuleSpacing
+        spacing: 8
         visible: opacity > 0
         enabled: !root.minimalLayout
         opacity: root.minimalLayout ? 0 : 1

@@ -1,18 +1,18 @@
 import "../components"
+import "../notifications"
+import "../recorder"
+import QtQuick
+import Quickshell
+import Quickshell.Wayland
 import "modules/audio"
 import "modules/battery"
 import "modules/bluetooth"
 import "modules/clock"
 import "modules/idle"
 import "modules/network"
-import "../notifications"
 import "modules/tray"
 import "modules/window"
 import "modules/workspaces"
-import "../recorder"
-import QtQuick
-import Quickshell
-import Quickshell.Wayland
 
 PanelWindow {
     id: barWindow
@@ -52,9 +52,9 @@ PanelWindow {
     // ---------------------------------------------------------
     Row {
         anchors.left: parent.left
-        anchors.leftMargin: config.barEdgeMargin
+        anchors.leftMargin: 16
         anchors.verticalCenter: parent.verticalCenter
-        spacing: config.barModuleSpacing
+        spacing: 8
 
         Workspaces {
             config: barWindow.config
@@ -78,7 +78,7 @@ PanelWindow {
     Row {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
-        spacing: config.barModuleSpacing
+        spacing: 8
 
         Clock {
             config: barWindow.config
@@ -108,9 +108,9 @@ PanelWindow {
     // ---------------------------------------------------------
     Row {
         anchors.right: parent.right
-        anchors.rightMargin: config.barEdgeMargin
+        anchors.rightMargin: 14
         anchors.verticalCenter: parent.verticalCenter
-        spacing: config.barModuleSpacing
+        spacing: 8
 
         Network {
             config: barWindow.config

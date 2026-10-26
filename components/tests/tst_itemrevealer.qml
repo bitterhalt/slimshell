@@ -11,7 +11,6 @@ Item {
     QtObject {
         id: fixtureConfig
 
-        property int barModuleSpacing: 8
     }
 
     QtObject {

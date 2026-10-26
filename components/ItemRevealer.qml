@@ -5,26 +5,17 @@ Item {
 
     required property var config
     required property var barWindow
-
     default property alias contentData: primaryRow.data
     property alias revealData: revealRow.data
-
     readonly property int revealDuration: 300
     property int hoverRevealDelay: 0
     property bool revealActive: false
     property real revealProgress: revealActive ? 1 : 0
     readonly property real revealExtent: revealRow.implicitWidth * revealProgress
-    readonly property real revealSpacing: config.barModuleSpacing * revealProgress
+    readonly property real revealSpacing: 8 * revealProgress
 
     implicitWidth: primaryRow.implicitWidth + revealSpacing + revealExtent
     height: barWindow.height
-
-    Behavior on revealProgress {
-        NumberAnimation {
-            duration: root.revealDuration
-            easing.type: Easing.OutCubic
-        }
-    }
 
     HoverHandler {
         id: revealHover
@@ -32,12 +23,12 @@ Item {
         onHoveredChanged: {
             if (hovered) {
                 if (root.hoverRevealDelay <= 0)
-                    root.revealActive = true
+                    root.revealActive = true;
                 else
-                    revealTimer.restart()
+                    revealTimer.restart();
             } else {
-                revealTimer.stop()
-                root.revealActive = false
+                revealTimer.stop();
+                root.revealActive = false;
             }
         }
     }
@@ -48,7 +39,8 @@ Item {
         interval: root.hoverRevealDelay
         onTriggered: {
             if (revealHover.hovered)
-                root.revealActive = true
+                root.revealActive = true;
+
         }
     }
 
@@ -57,7 +49,7 @@ Item {
 
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
-        spacing: root.config.barModuleSpacing
+        spacing: 8
     }
 
     Item {
@@ -74,7 +66,17 @@ Item {
 
             x: revealClip.width - implicitWidth
             anchors.verticalCenter: parent.verticalCenter
-            spacing: root.config.barModuleSpacing
+            spacing: 8
         }
+
     }
+
+    Behavior on revealProgress {
+        NumberAnimation {
+            duration: root.revealDuration
+            easing.type: Easing.OutCubic
+        }
+
+    }
+
 }

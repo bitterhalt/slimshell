@@ -88,7 +88,7 @@ Item {
     readonly property int rowHeight: 46
     readonly property int inputHeight: 50
     readonly property int contentWidth: 400
-    readonly property int contentSpacing: config.barModuleSpacing
+    readonly property int contentSpacing: 8
     readonly property bool fileMode:
         !runMode && !emojiMode && !timerMode && !dmenuMode
         && query.trim().startsWith("/")

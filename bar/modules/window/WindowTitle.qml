@@ -18,14 +18,14 @@ Item {
         return entry ? entry.icon || "" : "";
     }
     readonly property string focusedAppIconSource: focusedAppIcon !== "" ? Quickshell.iconPath(focusedAppIcon, true) : ""
-    readonly property int titleLeft: config.workspaceTitleGap + (focusedAppIconSource !== "" ? 27 : 0)
+    readonly property int titleLeft: 18 + (focusedAppIconSource !== "" ? 27 : 0)
 
     implicitWidth: Math.min(windowTitle.implicitWidth + titleLeft + 10, 560)
     height: barWindow.height
 
     IconImage {
         anchors.left: parent.left
-        anchors.leftMargin: root.config.workspaceTitleGap
+        anchors.leftMargin: 18
         anchors.verticalCenter: parent.verticalCenter
         implicitSize: 20
         visible: root.focusedAppIconSource !== ""

@@ -259,7 +259,7 @@ PanelWindow {
             anchors.right: parent.right
             anchors.margins: 8
             height: 34
-            spacing: root.config.barModuleSpacing
+            spacing: 8
 
             TranslatorButton {
                 id: sourceButton
@@ -306,7 +306,7 @@ PanelWindow {
             id: body
 
             anchors.top: header.bottom
-            anchors.topMargin: root.config.barModuleSpacing
+            anchors.topMargin: 8
             anchors.bottom: footer.top
             anchors.left: parent.left
             anchors.right: parent.right
@@ -317,7 +317,7 @@ PanelWindow {
             Column {
                 anchors.fill: parent
                 visible: root.picker === ""
-                spacing: root.config.barModuleSpacing
+                spacing: 8
 
                 ScrollView {
                     id: sourceScroll
@@ -480,8 +480,7 @@ PanelWindow {
                             anchors.rightMargin: 10
                             verticalAlignment: Text.AlignVCenter
                             font.pointSize: root.config.fontSize(0.92)
-                            color: index === root.pickerIndex
-                                ? root.config.selectionForeground : root.config.fg
+                            color: index === root.pickerIndex ? root.config.selectionForeground : root.config.fg
                             text: modelData.label
                         }
 
@@ -534,7 +533,7 @@ PanelWindow {
                 anchors.right: parent.right
                 anchors.rightMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: root.config.barModuleSpacing
+                spacing: 8
 
                 TranslatorButton {
                     id: translateButton

@@ -14,9 +14,6 @@ Item {
     property string audioStyle: "classic" // "classic" or "circle"
     // Bar geometry
     property int barHeight: 32
-    property int barEdgeMargin: 14
-    property int barModuleSpacing: 8
-    property int workspaceTitleGap: 18
     property bool showTray: true
     // Disable the built-in launcher when using a third-party launcher.
     property bool launcherEnabled: true
