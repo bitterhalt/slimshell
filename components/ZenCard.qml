@@ -16,8 +16,8 @@ PanelWindow {
     implicitHeight: labels.implicitHeight + verticalPadding * 2
     exclusiveZone: 0
     focusable: false
-    margins.top: config.zenCardMargin
-    margins.right: config.zenCardMargin
+    margins.top: 32
+    margins.right: 32
     WlrLayershell.layer: WlrLayer.Bottom
     WlrLayershell.namespace: "slim-zen-card"
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
@@ -37,7 +37,7 @@ PanelWindow {
     Rectangle {
         anchors.fill: parent
         color: root.config.bg
-        opacity: root.config.zenCardOpacity
+        opacity: 0.45
         radius: root.config.popupRadius
     }
 
