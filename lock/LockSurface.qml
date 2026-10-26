@@ -117,7 +117,8 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             renderType: Text.NativeRendering
             font.pointSize: 24
-            color: Qt.alpha(root.fg, 0.7)
+            color: root.config.fg
+            opacity: 0.7
             text: Qt.formatDateTime(systemClock.date, "dddd, d MMMM yyyy")
         }
 
@@ -127,7 +128,8 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             renderType: Text.NativeRendering
             font.pointSize: 80
-            color: Qt.alpha(root.fg, 0.7)
+            color: root.config.fg
+            opacity: 0.7
             text: Qt.formatTime(systemClock.date, "HH:mm")
         }
 
@@ -152,7 +154,7 @@ Rectangle {
                 renderType: Text.NativeRendering
                 horizontalAlignment: TextInput.AlignHCenter
                 cursorVisible: activeFocus && (length > 0 || preeditText.length > 0)
-                implicitWidth: 200
+                implicitWidth: 180
                 padding: 12
                 enabled: !root.context.unlockInProgress
                 echoMode: TextInput.Password
@@ -201,16 +203,9 @@ Rectangle {
                 background: Item {
                     Rectangle {
                         anchors.fill: parent
-                        color: Qt.rgba(root.config.bg.r, root.config.bg.g, root.config.bg.b, 0.3)
-                        radius: 6
-                    }
-
-                    Rectangle {
-                        anchors.fill: parent
-                        color: "transparent"
-                        border.width: 1
-                        border.color: Qt.rgba(root.config.selectionBackground.r, root.config.selectionBackground.g, root.config.selectionBackground.b, 1)
-                        radius: 6
+                        color: root.config.bg
+                        opacity: 0.6
+                        radius: 4
                     }
 
                 }
