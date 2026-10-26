@@ -9,7 +9,6 @@ Item {
         ?? notificationService.notifications).slice().reverse()
     property string selectedId: ""
     property int fallbackIndex: 0
-    property bool helpOpen: false
     readonly property int selectedIndex: Model.selectionIndex(rows, selectedId, fallbackIndex)
     readonly property var selectedNotification: selectedIndex >= 0 ? rows[selectedIndex] : null
     readonly property var actions: Model.actionsFor(selectedNotification ? selectedNotification.actions : [])
@@ -59,21 +58,14 @@ Item {
     }
 
     function handleKey(key, modifiers, text) {
-        if (key === Qt.Key_X && modifiers === Qt.ControlModifier && !helpOpen) {
+        if (key === Qt.Key_X && modifiers === Qt.ControlModifier) {
             notificationService.clearAll();
             return true;
         }
         if (modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier))
             return false;
         if (key === Qt.Key_Escape) {
-            if (helpOpen)
-                helpOpen = false;
-            else
-                closeRequested();
-        } else if (key === Qt.Key_Question || text === "?") {
-            helpOpen = !helpOpen;
-        } else if (helpOpen) {
-            return false;
+            closeRequested();
         } else if (key === Qt.Key_Up || key === Qt.Key_K || key === Qt.Key_Backtab
                 || (key === Qt.Key_Tab && (modifiers & Qt.ShiftModifier))) {
             move(-1);

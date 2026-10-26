@@ -75,7 +75,7 @@ FocusScope {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.bottom: history.helpOpen ? helpText.top : historyFooter.top
+        anchors.bottom: historyFooter.top
         anchors.leftMargin: root.popupPadding
         anchors.rightMargin: root.popupPadding
         anchors.topMargin: root.popupPadding
@@ -124,27 +124,13 @@ FocusScope {
         font.pointSize: root.config.fontSize(0.9)
     }
 
-    Text {
-        id: helpText
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: historyFooter.top
-        anchors.margins: root.popupPadding
-        visible: history.helpOpen
-        renderType: Text.NativeRendering
-        wrapMode: Text.WordWrap
-        color: root.config.muted
-        font.pointSize: root.config.fontSize(0.78)
-        text: "↑/↓ or j/k Select · Tab Next · Enter Default action · x Dismiss · Ctrl+X Clear all · Lettered buttons invoke actions · Esc Back/Close"
-    }
-
     Item {
         id: historyFooter
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.margins: root.popupPadding
-        height: Math.max(helpHint.implicitHeight, dndControls.implicitHeight) + 8
+        height: Math.max(shortcutHint.implicitHeight, dndControls.implicitHeight) + 8
 
         Rectangle {
             anchors.left: parent.left
@@ -155,35 +141,14 @@ FocusScope {
         }
 
         Text {
-            id: helpHint
+            id: shortcutHint
             anchors.left: parent.left
             anchors.top: parent.top
-            anchors.topMargin: 8
-            renderType: Text.NativeRendering
-            color: helpMouse.containsMouse ? root.config.fg : root.config.muted
-            font.pointSize: root.config.fontSize(0.76)
-            text: history.helpOpen ? "Esc Back" : "? Help"
-            MouseArea {
-                id: helpMouse
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    history.helpOpen = !history.helpOpen;
-                    root.forceActiveFocus();
-                }
-            }
-        }
-
-        Text {
-            anchors.left: helpHint.right
-            anchors.leftMargin: 14
-            anchors.top: parent.top
-            anchors.topMargin: 8
+            anchors.topMargin: 10
             renderType: Text.NativeRendering
             color: root.config.muted
             font.pointSize: root.config.fontSize(0.76)
-            text: "x Dismiss"
+            text: "x Dismiss · Ctrl+x Clear all"
         }
 
         Row {
@@ -191,10 +156,10 @@ FocusScope {
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.topMargin: 8
-            spacing: 8
 
             Text {
                 anchors.verticalCenter: parent.verticalCenter
+                visible: root.notificationService.dnd
                 renderType: Text.NativeRendering
                 text: "DND"
                 color: root.notificationService.dnd

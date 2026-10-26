@@ -254,15 +254,8 @@ Item {
             compare(Model.actionsFor([]), []);
         }
 
-        function test_help_escape_and_modifiers() {
-            press(Qt.Key_Question, Qt.ShiftModifier, "?");
-            verify(state.helpOpen);
-            verify(!press(Qt.Key_X));
-            compare(service.calls.length, 0);
-            verify(!press(Qt.Key_X, Qt.ControlModifier));
-            press(Qt.Key_Escape);
-            verify(!state.helpOpen);
-            compare(closes, 0);
+        function test_escape_and_modifiers() {
+            verify(!press(Qt.Key_Question, Qt.ShiftModifier, "?"));
             verify(!press(Qt.Key_C, Qt.ControlModifier));
             press(Qt.Key_X, Qt.ControlModifier);
             compare(service.calls, ["clear"]);
