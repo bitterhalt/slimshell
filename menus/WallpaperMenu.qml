@@ -19,10 +19,12 @@ PanelWindow {
     property bool scanFinished: false
     property string selectedPath: ""
     property bool settingsOpen: false
+    property bool backgroundPrompt: false
     property string promptError: ""
     readonly property var actions: [
         { label: "Set Wallpaper", key: "b", action: "wallpaper", control: false },
         { label: "Hellwal", key: "h", action: "hellwal", control: false },
+        { label: "Hellwal fixed bg", key: "g", action: "background", control: false },
         { label: "Settings", key: "s", action: "settings", control: false }
     ]
     readonly property int selectedIndex: {
@@ -87,6 +89,31 @@ PanelWindow {
         })
     }
 
+    function openBackgroundPrompt() {
+        if (!selected || controller.busy)
+            return
+        promptError = ""
+        backgroundInput.text = "#111111"
+        backgroundPrompt = true
+        Qt.callLater(() => {
+            backgroundInput.forceActiveFocus()
+            backgroundInput.selectAll()
+        })
+    }
+
+    function applyStaticBackground() {
+        if (!selected || controller.busy)
+            return
+        const color = backgroundInput.text.trim()
+        if (!/^#[0-9a-fA-F]{6}$/.test(color)) {
+            promptError = "Enter a hex color like #111111"
+            return
+        }
+        backgroundPrompt = false
+        controller.apply(selected.path, true, color)
+        grid.forceActiveFocus()
+    }
+
     function saveSettings() {
         if (controller.busy)
             return
@@ -109,6 +136,8 @@ PanelWindow {
     function activateAction(action) {
         if (action === "settings")
             openSettings()
+        else if (action === "background")
+            openBackgroundPrompt()
         else
             applySelection(action === "hellwal")
     }
@@ -116,6 +145,10 @@ PanelWindow {
     function handleEscape() {
         if (settingsOpen) {
             settingsOpen = false
+            promptError = ""
+            grid.forceActiveFocus()
+        } else if (backgroundPrompt) {
+            backgroundPrompt = false
             promptError = ""
             grid.forceActiveFocus()
         } else if (search.activeFocus) {
@@ -161,17 +194,23 @@ PanelWindow {
     Shortcut { sequence: "Escape"; onActivated: root.handleEscape() }
     Shortcut {
         sequence: "B"
-        enabled: !search.activeFocus && !root.settingsOpen && !!root.selected && !root.controller.busy
+        enabled: !search.activeFocus && !root.settingsOpen && !root.backgroundPrompt && !!root.selected && !root.controller.busy
         onActivated: root.applySelection(false)
     }
     Shortcut {
         sequence: "H"
-        enabled: !search.activeFocus && !root.settingsOpen && !!root.selected && !root.controller.busy
+        enabled: !search.activeFocus && !root.settingsOpen && !root.backgroundPrompt && !!root.selected && !root.controller.busy
         onActivated: root.applySelection(true)
     }
     Shortcut {
+        sequence: "G"
+        enabled: !search.activeFocus && !root.settingsOpen && !root.backgroundPrompt
+            && !!root.selected && !root.controller.busy
+        onActivated: root.openBackgroundPrompt()
+    }
+    Shortcut {
         sequence: "S"
-        enabled: !search.activeFocus && !root.settingsOpen
+        enabled: !search.activeFocus && !root.settingsOpen && !root.backgroundPrompt
         onActivated: root.openSettings()
     }
 
@@ -234,7 +273,7 @@ PanelWindow {
                 selectedTextColor: root.config.selectionForeground
                 font.pointSize: root.config.fontSize(0.92)
                 selectByMouse: true
-                enabled: !root.settingsOpen
+                enabled: !root.settingsOpen && !root.backgroundPrompt
                 KeyNavigation.priority: KeyNavigation.BeforeItem
                 KeyNavigation.tab: grid
                 KeyNavigation.backtab: grid
@@ -268,7 +307,7 @@ PanelWindow {
                 keyNavigationEnabled: false
                 reuseItems: true
                 cacheBuffer: 145
-                enabled: !root.settingsOpen
+                enabled: !root.settingsOpen && !root.backgroundPrompt
                 activeFocusOnTab: true
                 KeyNavigation.priority: KeyNavigation.BeforeItem
                 KeyNavigation.tab: search
@@ -347,6 +386,48 @@ PanelWindow {
                         : allEntries.count ? "No matching wallpapers" : "No wallpapers found"
                     color: root.config.muted
                     font.pointSize: root.config.fontSize(0.9)
+                }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                visible: root.backgroundPrompt
+                spacing: 8
+
+                Text {
+                    renderType: Text.NativeRendering
+                    text: "Static background"
+                    color: root.config.fg
+                    font.pointSize: root.config.fontSize(0.85)
+                }
+                TextField {
+                    id: backgroundInput
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 30
+                    color: root.config.fg
+                    placeholderText: "#111111"
+                    placeholderTextColor: root.config.muted
+                    selectionColor: root.config.selectionBackground
+                    selectedTextColor: root.config.selectionForeground
+                    enabled: !root.controller.busy
+                    onAccepted: root.applyStaticBackground()
+                    onTextChanged: root.promptError = ""
+                    background: Rectangle {
+                        radius: 4
+                        color: "transparent"
+                        border.color: root.config.selectionBackground
+                    }
+                }
+                Text {
+                    renderType: Text.NativeRendering
+                    text: "Apply"
+                    color: root.config.selectionBackground
+                    font.pointSize: root.config.fontSize(0.85)
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.applyStaticBackground()
+                    }
                 }
             }
 
@@ -500,7 +581,7 @@ PanelWindow {
                             height: 20
                             opacity: enabled ? 1 : 0.5
                             enabled: (hint.modelData.action === "settings" || !!root.selected)
-                                && !root.controller.busy && !root.settingsOpen
+                                && !root.controller.busy && !root.settingsOpen && !root.backgroundPrompt
 
                             Rectangle {
                                 anchors.fill: parent

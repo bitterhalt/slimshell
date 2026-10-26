@@ -48,6 +48,12 @@ class WallpaperTests(unittest.TestCase):
             with self.assertRaises(argparse.ArgumentTypeError):
                 setbg.dark_offset(value)
 
+    def test_static_background_requires_six_digit_hex(self):
+        self.assertEqual(setbg.static_background("#111111"), "#111111")
+        for value in ("111111", "#123", "#gg0000"):
+            with self.assertRaises(argparse.ArgumentTypeError):
+                setbg.static_background(value)
+
     def test_recursive_images_only(self):
         (self.folder / "nested").mkdir()
         for name in ("b.PNG", "nested/a image.webp", "notes.txt"):
@@ -155,6 +161,17 @@ class WallpaperTests(unittest.TestCase):
             "--comfort-mode", "--light", "--dark-offset", "0.45",
             "--bright-offset", "0.2"
         ])
+
+    def test_hellwal_accepts_one_off_static_background(self):
+        self.calls = []
+        image = self.folder / "image.png"
+        image.touch()
+        with patch.object(setbg, "WALL_DIR", self.folder / "wall"), \
+                patch.object(setbg, "run", side_effect=self.fake_run):
+            setbg.apply_wallpaper(
+                image, True, static_background_value="#111111"
+            )
+        self.assertEqual(self.calls[-1][-2:], ["--static-background", "#111111"])
 
     def test_dark_offset_requires_hellwal_range_in_apply(self):
         image = self.folder / "image.png"

@@ -47,7 +47,7 @@ Item {
             openMenu(targetScreen)
     }
 
-    function apply(path, hellwal) {
+    function apply(path, hellwal, staticBackground) {
         if (busy || !path)
             return
         errorText = ""
@@ -58,6 +58,8 @@ Item {
             command.push("--hellwal", "--mode", settingsService.hellwalMode,
                 "--dark-offset", String(settingsService.hellwalDarkOffset),
                 "--bright-offset", String(settingsService.hellwalBrightOffset))
+            if (staticBackground)
+                command.push("--static-background", staticBackground)
         }
         applyProcess.command = command
         applyProcess.running = true

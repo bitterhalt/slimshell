@@ -12,6 +12,7 @@ import json
 import math
 import os
 from pathlib import Path
+import re
 import signal
 import subprocess
 import sys
@@ -152,7 +153,16 @@ def dark_offset(value):
     return offset
 
 
-def apply_wallpaper(source, hellwal=False, mode="dark", dark_offset_value=0, bright_offset_value=0):
+def static_background(value):
+    if not re.fullmatch(r"#[0-9a-fA-F]{6}", value):
+        raise argparse.ArgumentTypeError("static background must be a #RRGGBB color")
+    return value
+
+
+def apply_wallpaper(
+    source, hellwal=False, mode="dark", dark_offset_value=0,
+    bright_offset_value=0, static_background_value=None
+):
     source = source.expanduser().resolve(strict=True)
     if not source.is_file():
         raise ValueError("Selected wallpaper is not a file")
@@ -212,6 +222,8 @@ def apply_wallpaper(source, hellwal=False, mode="dark", dark_offset_value=0, bri
             "hellwal", "-i", str(wallpaper), "--comfort-mode",
             "--" + mode, "--dark-offset", str(dark_offset_value),
             "--bright-offset", str(bright_offset_value),
+            *(["--static-background", static_background_value]
+              if static_background_value else []),
         ], timeout=180)
 
 
@@ -229,6 +241,7 @@ def main():
     apply.add_argument("--mode", choices=("dark", "light"), default="dark")
     apply.add_argument("--dark-offset", type=dark_offset, default=0)
     apply.add_argument("--bright-offset", type=dark_offset, default=0)
+    apply.add_argument("--static-background", type=static_background)
     args = parser.parse_args()
     try:
         if args.command == "list":
@@ -242,7 +255,10 @@ def main():
                     raise RuntimeError(
                         "Another wallpaper change is still running"
                     ) from None
-                apply_wallpaper(args.path, args.hellwal, args.mode, args.dark_offset, args.bright_offset)
+                apply_wallpaper(
+                    args.path, args.hellwal, args.mode, args.dark_offset,
+                    args.bright_offset, args.static_background
+                )
             emit({"ok": True})
         return 0
     except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:
