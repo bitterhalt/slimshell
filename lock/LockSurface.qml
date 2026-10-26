@@ -263,43 +263,6 @@ Rectangle {
 
         }
 
-        // Retry button - shown after failed auth
-        Column {
-            visible: root.context.pamActivated && root.context.showFailure && !root.context.unlockInProgress
-            spacing: 6
-            Layout.alignment: Qt.AlignHCenter
-
-            Button {
-                implicitWidth: 48
-                implicitHeight: 48
-                onClicked: root.context.tryUnlock()
-
-                contentItem: Text {
-                    text: "↻"
-                    color: root.config.muted
-                    font.pointSize: 16
-                    font.weight: Font.Bold
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-
-                background: Rectangle {
-                    color: root.config.bg
-                    radius: width / 2
-                }
-
-            }
-
-            Text {
-                renderType: Text.NativeRendering
-                text: "Retry"
-                color: root.config.muted
-                font.pointSize: 9
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-
-        }
-
         // Status message
         Label {
             id: statusLabel
