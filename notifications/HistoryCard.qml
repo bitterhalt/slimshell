@@ -17,12 +17,8 @@ Rectangle {
     property string timeLabel: ""
     property string appIconSource: ""
     property var actionEntries: []
-    readonly property string previewSource: HistoryModel.previewImageSource(
-        notification ? notification.image : "")
-    readonly property bool hasImage: previewSource !== ""
 
     signal picked()
-    signal closeRequested()
     signal actionRequested(var entry)
 
     implicitHeight: Math.max(46, content.implicitHeight) + 20
@@ -38,52 +34,56 @@ Rectangle {
     }
     TapHandler { onTapped: root.picked() }
 
-    Image {
-        id: thumbnail
-        objectName: "historyAppIcon"
-        x: 12
-        y: 12
-        width: 30
-        height: 30
-        source: root.critical ? "" : root.appIconSource
-        sourceSize.width: Math.ceil(width * Screen.devicePixelRatio * 2)
-        sourceSize.height: Math.ceil(height * Screen.devicePixelRatio * 2)
-        fillMode: Image.PreserveAspectFit
-        smooth: true
-        asynchronous: true
-        visible: status === Image.Ready
-    }
+    Item {
+        id: imageBox
+        objectName: "historyIconBox"
 
-    Text {
-        x: 12
-        y: 14
-        width: 30
-        horizontalAlignment: Text.AlignHCenter
-        visible: !thumbnail.visible
-        text: root.critical ? "󰀧" : "󰂚"
-        color: root.critical ? root.criticalBorderColor
-            : root.highlighted ? root.config.fg : root.config.muted
-        font.family: root.config.iconFontFamily
-        font.pointSize: root.config.iconSize
+        anchors.right: parent.right
+        anchors.rightMargin: 16
+        anchors.verticalCenter: parent.verticalCenter
+        width: 36
+        height: 36
+
+        Image {
+            id: thumbnail
+            objectName: "historyAppIcon"
+            anchors.fill: parent
+            source: root.critical ? "" : root.appIconSource
+            sourceSize.width: Math.ceil(width * Screen.devicePixelRatio * 2)
+            sourceSize.height: Math.ceil(height * Screen.devicePixelRatio * 2)
+            fillMode: Image.PreserveAspectFit
+            smooth: true
+            asynchronous: true
+            visible: status === Image.Ready
+        }
+
+        Text {
+            anchors.centerIn: parent
+            visible: !thumbnail.visible
+            text: root.critical ? "󰀧" : "󰂚"
+            color: root.critical ? root.criticalBorderColor
+                : root.highlighted ? root.config.fg : root.config.muted
+            font.family: root.config.iconFontFamily
+            font.pointSize: root.config.iconSize
+        }
     }
 
     Column {
         id: content
-        x: 50
+        x: 16
         y: 10
-        width: Math.max(0, root.width - x - 10)
+        width: Math.max(0, imageBox.x - x - 12)
         spacing: 4
 
         Item {
             width: parent.width
-            height: Math.max(appName.implicitHeight, timestamp.implicitHeight, 18)
+            height: Math.max(appName.implicitHeight, 18)
 
             Text {
                 id: appName
                 anchors.left: parent.left
-                anchors.right: timestamp.left
-                anchors.rightMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
+                width: Math.max(0, timestamp.x - content.x - 8)
                 renderType: Text.NativeRendering
                 textFormat: Text.PlainText
                 text: root.notification ? root.notification.appName || "Notification" : ""
@@ -91,40 +91,6 @@ Rectangle {
                     : root.highlighted ? root.config.fg : root.config.muted
                 font.pointSize: root.config.fontSize(0.78)
                 elide: Text.ElideRight
-            }
-            Text {
-                id: timestamp
-                anchors.right: closeButton.left
-                anchors.rightMargin: 6
-                anchors.verticalCenter: parent.verticalCenter
-                renderType: Text.NativeRendering
-                text: root.timeLabel
-                color: root.critical ? root.criticalTextColor
-                    : root.highlighted ? root.config.fg : root.config.muted
-                font.pointSize: root.config.fontSize(0.72)
-            }
-            Item {
-                id: closeButton
-                objectName: "historyCloseButton"
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                width: 18
-                height: 18
-                Text {
-                    anchors.centerIn: parent
-                    text: "×"
-                    color: root.critical ? root.criticalTextColor
-                        : root.highlighted || closeMouse.containsMouse
-                            ? root.config.fg : root.config.muted
-                    font.pointSize: root.config.fontSize(1)
-                }
-                MouseArea {
-                    id: closeMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.closeRequested()
-                }
             }
         }
 
@@ -152,23 +118,6 @@ Rectangle {
             wrapMode: Text.Wrap
             maximumLineCount: 3
             elide: Text.ElideRight
-        }
-
-        Image {
-            id: preview
-            objectName: "historyImagePreview"
-            readonly property real aspectRatio: implicitWidth > 0 && implicitHeight > 0
-                ? implicitWidth / implicitHeight : 1
-            width: root.selected && root.hasImage ? Math.min(content.width, 240, 120 * aspectRatio) : 0
-            height: width > 0 ? width / aspectRatio : 0
-            visible: root.selected && root.hasImage && status === Image.Ready
-            source: root.selected && root.hasImage ? root.previewSource : ""
-            sourceSize.width: Math.ceil(Math.min(content.width, 240) * Screen.devicePixelRatio * 2)
-            sourceSize.height: Math.ceil(120 * Screen.devicePixelRatio * 2)
-            fillMode: Image.PreserveAspectFit
-            horizontalAlignment: Image.AlignLeft
-            smooth: true
-            asynchronous: true
         }
 
         Flow {
@@ -213,4 +162,18 @@ Rectangle {
             }
         }
     }
+
+    Text {
+        id: timestamp
+        anchors.right: parent.right
+        anchors.rightMargin: 14
+        anchors.top: parent.top
+        anchors.topMargin: 10
+        renderType: Text.NativeRendering
+        text: root.timeLabel
+        color: root.critical ? root.criticalTextColor
+            : root.highlighted ? root.config.fg : root.config.muted
+        font.pointSize: root.config.fontSize(0.72)
+    }
+
 }

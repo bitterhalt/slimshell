@@ -107,11 +107,6 @@ FocusScope {
                 history.select(index);
                 root.forceActiveFocus();
             }
-            onCloseRequested: {
-                history.select(index);
-                history.dismissSelected();
-                root.forceActiveFocus();
-            }
             onActionRequested: entry => {
                 history.select(index);
                 history.invoke(entry);
@@ -140,7 +135,7 @@ FocusScope {
         wrapMode: Text.WordWrap
         color: root.config.muted
         font.pointSize: root.config.fontSize(0.78)
-        text: "↑/↓ or j/k Select · Tab Next · Enter Default action · x Close · Ctrl+C Clear all · Lettered buttons invoke actions · Esc Back/Close"
+        text: "↑/↓ or j/k Select · Tab Next · Enter Default action · x Dismiss · Ctrl+X Clear all · Lettered buttons invoke actions · Esc Back/Close"
     }
 
     Item {
@@ -178,6 +173,17 @@ FocusScope {
                     root.forceActiveFocus();
                 }
             }
+        }
+
+        Text {
+            anchors.left: helpHint.right
+            anchors.leftMargin: 14
+            anchors.top: parent.top
+            anchors.topMargin: 8
+            renderType: Text.NativeRendering
+            color: root.config.muted
+            font.pointSize: root.config.fontSize(0.76)
+            text: "x Dismiss"
         }
 
         Row {

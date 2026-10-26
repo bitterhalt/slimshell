@@ -59,7 +59,7 @@ Item {
     }
 
     function handleKey(key, modifiers, text) {
-        if (key === Qt.Key_C && modifiers === Qt.ControlModifier) {
+        if (key === Qt.Key_X && modifiers === Qt.ControlModifier && !helpOpen) {
             notificationService.clearAll();
             return true;
         }

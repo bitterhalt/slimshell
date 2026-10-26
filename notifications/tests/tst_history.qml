@@ -162,13 +162,15 @@ Item {
             compare(state.selectedNotification.id, 3);
         }
 
-        function test_x_dismisses_and_ctrl_c_clears() {
+        function test_x_dismisses_and_ctrl_x_clears() {
             verify(!press(Qt.Key_C));
             compare(service.calls, []);
             press(Qt.Key_X);
             compare(service.calls, ["dismiss:3"]);
             compare(service.notifications.length, 2);
-            press(Qt.Key_C, Qt.ControlModifier);
+            verify(!press(Qt.Key_C, Qt.ControlModifier));
+            compare(service.calls, ["dismiss:3"]);
+            press(Qt.Key_X, Qt.ControlModifier);
             compare(service.calls, ["dismiss:3", "clear"]);
             compare(state.selectedIndex, -1);
             compare(state.selectedNotification, null);
@@ -186,7 +188,7 @@ Item {
             compare(state.selectedNotification.id, 2);
             keyClick(Qt.Key_X);
             compare(service.calls, ["dismiss:2"]);
-            keyClick(Qt.Key_C, Qt.ControlModifier);
+            keyClick(Qt.Key_X, Qt.ControlModifier);
             compare(service.notifications.length, 0);
             keyClick(Qt.Key_Escape);
             compare(closes, 1);
@@ -215,7 +217,9 @@ Item {
             press(Qt.Key_C, Qt.NoModifier, "c");
             compare(service.calls, ["action:copy"]);
             compare(service.notifications.length, 1);
-            press(Qt.Key_C, Qt.ControlModifier);
+            verify(!press(Qt.Key_C, Qt.ControlModifier));
+            compare(service.calls, ["action:copy"]);
+            press(Qt.Key_X, Qt.ControlModifier);
             compare(service.calls, ["action:copy", "clear"]);
         }
 
@@ -255,10 +259,13 @@ Item {
             verify(state.helpOpen);
             verify(!press(Qt.Key_X));
             compare(service.calls.length, 0);
+            verify(!press(Qt.Key_X, Qt.ControlModifier));
             press(Qt.Key_Escape);
             verify(!state.helpOpen);
             compare(closes, 0);
-            verify(!press(Qt.Key_X, Qt.ControlModifier));
+            verify(!press(Qt.Key_C, Qt.ControlModifier));
+            press(Qt.Key_X, Qt.ControlModifier);
+            compare(service.calls, ["clear"]);
             press(Qt.Key_Escape);
             compare(closes, 1);
         }
@@ -292,7 +299,6 @@ Item {
             compare(findText(card, "Test").color, config.muted);
             compare(findText(card, "Test").opacity, 1);
             compare(findText(card, "12:34").color, config.muted);
-            compare(findText(card, "×").color, config.muted);
             compare(findText(card, note.summary).textFormat, Text.PlainText);
             compare(findText(card, "[o] Open"), null);
             const unselectedHeight = card.implicitHeight;
@@ -300,32 +306,27 @@ Item {
             waitForPolish(host.Window.window);
             compare(findText(card, "Test").color, config.fg);
             compare(findText(card, "12:34").color, config.fg);
-            compare(findText(card, "×").color, config.fg);
             verify(findText(card, "[o] Open") !== null);
             compare(findText(card, "[c] Close"), null);
             verify(card.implicitHeight > unselectedHeight);
         }
 
-        function test_icon_hints_stay_small_while_photos_preview() {
-            compare(Model.iconFromImage("image://icon/dialog-warning"), "dialog-warning");
-            compare(Model.previewImageSource("image://icon/dialog-warning"), "");
-            compare(Model.previewImageSource("image://icon//usr/share/icons/warning.png"),
-                "file:///usr/share/icons/warning.png");
-            verify(Model.previewImageSource("image://qsimage/notification-data") !== "");
-            verify(Model.previewImageSource("file:///tmp/screenshot.png") !== "");
+        function test_image_hints_are_icons_not_large_previews() {
+            compare(Model.iconFromImage("image://icon/camera"), "camera");
 
             const note = notification(1);
-            note.image = "image://icon/dialog-warning";
+            note.image = "file:///tmp/screenshot.png";
             const fallbackIcon = "data:image/svg+xml," + encodeURIComponent(
                 '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="blue"/></svg>');
             card = createTemporaryObject(cardComponent, host, {
-                width: 340, config: config, selected: true,
+                width: 340, height: 100, config: config, selected: true,
                 notification: note, appIconSource: fallbackIcon
             });
-            compare(card.previewSource, "");
-            compare(card.hasImage, false);
             verify(findChild(card, "historyAppIcon").source.toString().startsWith("data:image/svg+xml,"));
-            verify(!findChild(card, "historyImagePreview").visible);
+            compare(findChild(card, "historyImagePreview"), null);
+            const iconBox = findChild(card, "historyIconBox");
+            verify(iconBox.x > card.width / 2);
+            compare(iconBox.y + iconBox.height / 2, card.height / 2);
         }
 
         function test_low_urgency_toast_policy() {
@@ -371,7 +372,7 @@ Item {
             compare(icon.color, card.criticalBorderColor);
             verify(!findChild(card, "historyAppIcon").visible);
             compare(card.border.color, card.criticalBorderColor);
-            for (const label of ["Test", "12:34", "×", note.summary, note.body]) compare(findText(card, label).color, card.criticalTextColor)
+            for (const label of ["Test", "12:34", note.summary, note.body]) compare(findText(card, label).color, card.criticalTextColor)
             card.selected = true;
             waitForPolish(host.Window.window);
             compare(card.border.color, card.criticalBorderColor);
@@ -416,10 +417,10 @@ Item {
             });
             waitForPolish(host.Window.window);
             compare(findText(card, "[c] Close"), null);
-            verify(findChild(card, "historyCloseButton") !== null);
+            compare(findChild(card, "historyCloseButton"), null);
         }
 
-        function test_history_image_preview_is_bounded_and_aspect_correct() {
+        function test_history_photo_does_not_expand_card() {
             const note = notification(1);
             note.image = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900"><rect width="1600" height="900" fill="orange"/></svg>');
             card = createTemporaryObject(cardComponent, host, {
@@ -428,60 +429,12 @@ Item {
                 "selected": true,
                 "notification": note
             });
-            const preview = findChild(card, "historyImagePreview");
-            verify(preview !== null);
-            tryCompare(preview, "status", Image.Ready);
             waitForPolish(host.Window.window);
-            verify(preview.visible);
-            verify(preview.width > 200 && preview.width <= 240);
-            verify(preview.height <= 120);
-            verify(Math.abs(preview.width / preview.height - 16 / 9) < 0.01);
-            verify(card.implicitHeight > preview.height);
+            compare(findChild(card, "historyImagePreview"), null);
+            verify(card.implicitHeight < 100);
         }
 
-        function test_portrait_preview_and_missing_image() {
-            const note = notification(1);
-            note.image = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="800"><rect width="400" height="800" fill="orange"/></svg>');
-            card = createTemporaryObject(cardComponent, host, {
-                "width": 340,
-                "config": config,
-                "selected": true,
-                "notification": note
-            });
-            const preview = findChild(card, "historyImagePreview");
-            tryCompare(preview, "status", Image.Ready);
-            waitForPolish(host.Window.window);
-            verify(preview.height <= 120);
-            verify(Math.abs(preview.width / preview.height - 0.5) < 0.01);
-            const withImage = card.implicitHeight;
-            card.notification = notification(2);
-            waitForPolish(host.Window.window);
-            verify(!preview.visible);
-            verify(card.implicitHeight < withImage);
-        }
-
-        function test_unselected_image_is_not_expanded() {
-            const note = notification(1);
-            note.image = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900"><rect width="1600" height="900" fill="orange"/></svg>');
-            card = createTemporaryObject(cardComponent, host, {
-                "width": 340,
-                "config": config,
-                "notification": note
-            });
-            const preview = findChild(card, "historyImagePreview");
-            verify(preview !== null);
-            compare(preview.source.toString(), "");
-            verify(!preview.visible);
-            const compactHeight = card.implicitHeight;
-            verify(compactHeight < 100);
-            card.selected = true;
-            tryCompare(preview, "status", Image.Ready);
-            waitForPolish(host.Window.window);
-            verify(preview.visible);
-            verify(card.implicitHeight > compactHeight);
-        }
-
-        function test_card_mouse_actions_and_close() {
+        function test_card_actions_without_per_item_close_button() {
             const note = notification(1, [action("default", "Open")]);
             card = createTemporaryObject(cardComponent, host, {
                 "width": 340,
@@ -490,9 +443,6 @@ Item {
                 "notification": note,
                 "actionEntries": Model.actionsFor(note.actions)
             });
-            card.closeRequested.connect(() => {
-                return closes++;
-            });
             card.actionRequested.connect((entry) => {
                 return entry.action ? entry.action.invoke() : closes++;
             });
@@ -500,9 +450,7 @@ Item {
             const button = findChild(card, "historyAction-o");
             mouseClick(button, button.width / 2, button.height / 2);
             compare(service.calls, ["action:default"]);
-            const close = findChild(card, "historyCloseButton");
-            mouseClick(close, close.width / 2, close.height / 2);
-            compare(closes, 1);
+            compare(findChild(card, "historyCloseButton"), null);
         }
 
         name: "NotificationHistory"
