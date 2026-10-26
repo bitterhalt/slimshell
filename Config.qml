@@ -17,6 +17,8 @@ Item {
     property int barModuleSpacing: 8
     property int workspaceTitleGap: 18
     property bool showTray: true
+    // Disable the built-in launcher when using a third-party launcher.
+    property bool launcherEnabled: true
     // Clock
     property string clockFormat: "HH:mm"
     property string clockAlternativeFormat: "dddd, d MMMM"

@@ -76,7 +76,8 @@ Item {
                     anchors.leftMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
 
-                    color: root.config.muted
+                    color: backMouse.containsMouse
+                        ? root.config.selectionForeground : root.config.muted
                     font.pointSize: root.config.fontSize(0.9)
                     text: "‹  Back"
                 }
@@ -136,11 +137,12 @@ Item {
             width: menuColumn.width
             height: 34
             opacity: entry.enabled ? 1.0 : 0.45
+            readonly property bool highlighted: rowMouse.containsMouse && entry.enabled
 
             Rectangle {
                 anchors.fill: parent
                 radius: 3
-                color: rowMouse.containsMouse && entry.enabled ? root.config.selectionBackground : "transparent"
+                color: row.highlighted ? root.config.selectionBackground : "transparent"
             }
 
             Item {
@@ -162,7 +164,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     visible: entry.icon === "" && entry.buttonType !== QsMenuButtonType.None
-                    color: rowMouse.containsMouse && entry.enabled
+                    color: row.highlighted
                         ? root.config.selectionForeground : root.config.selectionBackground
                     font.pointSize: root.config.fontSize(0.9)
                     text: entry.checkState === Qt.Checked ? "✓" : ""
@@ -177,7 +179,8 @@ Item {
                 anchors.rightMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
 
-                color: root.config.fg
+                color: row.highlighted
+                    ? root.config.selectionForeground : root.config.fg
                 font.pointSize: root.config.fontSize(0.92)
                 elide: Text.ElideRight
                 text: entry.text
@@ -191,7 +194,8 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
 
                 visible: entry.hasChildren
-                color: root.config.muted
+                color: row.highlighted
+                    ? root.config.selectionForeground : root.config.muted
                 font.family: root.config.iconFontFamily
                 font.pointSize: root.config.iconSize
                 text: "󰅂"

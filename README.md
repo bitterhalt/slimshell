@@ -114,7 +114,7 @@ qs -p .
 
 ## Settings
 
-`Config.qml` holds settings such as font scale, bar geometry, popup spacing, and idle defaults.
+Lives inside `Config.qml` holds settings such as font scale, bar geometry, popup spacing, and idle defaults.
 
 ## Structure
 
@@ -147,7 +147,7 @@ Check out [my config](https://github.com/bitterhalt/dotfiles).
 
 ## ISSUES 🔨
 
-- ~~dmenu-runner can't display special symbols (Nerd fonts etc.)~~
+- dmenu-runner can't display special symbols (Nerd fonts etc.)
 - File structure is messy and files needs to be commented better
 - There are probably plenty of other things as well. Maybe yoy can show me how to fix them or do better :)
 

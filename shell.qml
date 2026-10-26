@@ -72,10 +72,16 @@ ShellRoot {
     id: appTimerService
   }
 
-  Launcher {
-    config: appConfig
-    targetScreen: root.activeScreen
-    timerService: appTimerService
+  Loader {
+    active: appConfig.launcherEnabled
+
+    sourceComponent: Component {
+      Launcher {
+        config: appConfig
+        targetScreen: root.activeScreen
+        timerService: appTimerService
+      }
+    }
   }
 
   Clipboard {
