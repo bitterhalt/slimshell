@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="#features">Features</a> · <a href="#launcher">Launcher</a> · <a href="#dmenu-mode">Dmenu mode</a> · <a href="#getting-started">Getting started</a>
+  <a href="#features">Features</a> · <a href="#gallery">Gallery</a> · <a href="#launcher">Launcher</a> · <a href="#dmenu-mode">Dmenu mode</a> · <a href="#getting-started">Getting started</a>
 </p>
 
 ## Slimshell
@@ -141,9 +141,30 @@ This shell was developed with LLM assistance under my supervision. I direct the 
 
 This repository is mainly for hobby and learning, so don't expect everything to work out of the box.
 
-## Screenshots and more
+## Gallery
 
-Check out [my config](https://github.com/bitterhalt/dotfiles).
+<p align="center">
+  <img src="assets/desk.png" alt="Slimshell desktop" width="100%">
+</p>
+
+<table>
+  <tr>
+    <td width="50%"><img src="assets/clip.png" alt="Clipboard picker" width="100%"><br><sub>Clipboard picker</sub></td>
+    <td width="50%"><img src="assets/translator.png" alt="Translator" width="100%"><br><sub>Translator</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="assets/wallselect.png" alt="Wallpaper picker" width="100%"><br><sub>Wallpaper picker</sub></td>
+    <td width="50%"><img src="assets/audio.png" alt="Audio controls" width="100%"><br><sub>Audio controls</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="assets/bt.png" alt="Bluetooth menu" width="100%"><br><sub>Bluetooth menu</sub></td>
+    <td width="50%"><img src="assets/net.png" alt="Network menu" width="100%"><br><sub>Network menu</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="assets/history.png" alt="Notification history" width="100%"><br><sub>Notification history</sub></td>
+    <td width="50%"></td>
+  </tr>
+</table>
 
 ## ISSUES 🔨
 
