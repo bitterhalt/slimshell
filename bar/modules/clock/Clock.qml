@@ -6,6 +6,7 @@ import "../../../components"
 ItemRevealer {
   id: root
 
+  // Primary bar time; the alternative date format is revealed on hover.
   Text {
     renderType: Text.NativeRendering
     color: root.config.fg

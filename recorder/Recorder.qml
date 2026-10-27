@@ -105,6 +105,7 @@ Item {
         onClicked: root.toggleMenu()
     }
 
+    // Full-screen drag selector used by the Region menu action.
     RegionSelector {
         id: regionSelector
 
@@ -116,6 +117,7 @@ Item {
         }
     }
 
+    // Keyboard-driven recorder action menu.
     PanelWindow {
         id: recorderMenu
 
@@ -207,6 +209,7 @@ Item {
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
 
+            // Fullscreen, region, and stop actions.
             RecorderMenuItem {
                 index: 0
                 icon: "󰑋"

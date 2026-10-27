@@ -79,6 +79,7 @@ Scope {
         }
 
 
+        // Authentication prompt surface and focus handling.
         Rectangle {
             id: promptCard
 
@@ -170,6 +171,7 @@ Scope {
                     text: root.flow ? root.flow.supplementaryMessage : ""
                 }
 
+                // PAM response field; identity and supplementary prompts appear above it.
                 TextField {
                     id: responseField
 
@@ -208,6 +210,7 @@ Scope {
                     }
                 }
 
+                // Confirm or cancel the authentication request.
                 Row {
                     width: parent.width
                     spacing: 8

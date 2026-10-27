@@ -21,6 +21,7 @@ PanelWindow {
     property bool settingsOpen: false
     property bool backgroundPrompt: false
     property string promptError: ""
+    // Footer actions and their single-key shortcuts.
     readonly property var actions: [
         { label: "Set Wallpaper", key: "b", action: "wallpaper", control: false },
         { label: "Hellwal", key: "h", action: "hellwal", control: false },
@@ -44,6 +45,7 @@ PanelWindow {
     ListModel { id: allEntries }
     ListModel { id: visibleEntries }
 
+    // Search, selection, and wallpaper-apply actions.
     function matches(entry) {
         return entry.name.toLowerCase().includes(search.text.trim().toLowerCase())
     }
@@ -261,6 +263,7 @@ PanelWindow {
             anchors.margins: 12
             spacing: 8
 
+            // Search field spans the picker above the thumbnail list and preview.
             TextField {
                 renderType: Text.NativeRendering
                 id: search
@@ -296,6 +299,7 @@ PanelWindow {
                 }
             }
 
+            // Wallpaper thumbnails on the left; selected image preview on the right.
             GridView {
                 id: grid
                 Layout.fillWidth: true
@@ -389,6 +393,7 @@ PanelWindow {
                 }
             }
 
+            // One-off static Hellwal background prompt; not persisted.
             RowLayout {
                 Layout.fillWidth: true
                 visible: root.backgroundPrompt
@@ -431,6 +436,7 @@ PanelWindow {
                 }
             }
 
+            // Persistent Hellwal mode and offset settings.
             RowLayout {
                 Layout.fillWidth: true
                 visible: root.settingsOpen
@@ -542,6 +548,7 @@ PanelWindow {
                 color: root.config.selectionBackground
             }
 
+            // Status, errors, and action/shortcut hints.
             Item {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 30

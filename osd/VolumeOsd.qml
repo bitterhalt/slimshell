@@ -113,6 +113,7 @@ Item {
             // Do not steal mouse input from whatever is underneath the OSD.
             mask: Region {}
 
+            // Speaker state, volume level, and numeric percentage.
             Rectangle {
                 anchors.fill: parent
 

@@ -47,6 +47,7 @@ PanelWindow {
         visible = false
     }
 
+    // Selection outline follows the drag rectangle.
     Rectangle {
         x: Math.min(root.startX, root.endX)
         y: Math.min(root.startY, root.endY)
@@ -61,6 +62,7 @@ PanelWindow {
         radius: 2
     }
 
+    // Drag to select a region; right-click or a tiny rectangle cancels.
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton

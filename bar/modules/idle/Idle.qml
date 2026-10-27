@@ -11,6 +11,7 @@ Item {
     height: barWindow.height
     visible: width > 0
 
+    // Clickable idle-state indicator; tooltip/settings live in the notifier.
     Text {
         anchors.centerIn: parent
         color: config.selectionBackground

@@ -104,6 +104,7 @@ Rectangle {
         target: root.context
     }
 
+    // Date and time above the password prompt.
     Column {
         id: clockGroup
 
@@ -135,6 +136,7 @@ Rectangle {
 
     }
 
+    // PAM input, verification spinner, failure/status text, and actions.
     ColumnLayout {
         spacing: 16
 

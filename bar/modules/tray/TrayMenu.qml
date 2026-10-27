@@ -59,6 +59,7 @@ Item {
             anchors.margins: 6
             spacing: 2
 
+            // Back row appears only when a submenu is open.
             Item {
                 width: parent.width
                 height: root.menuStack.length > 0 ? 34 : 0
@@ -92,6 +93,7 @@ Item {
                 }
             }
 
+            // Current menu entries supplied by the system tray item.
             Repeater {
                 model: opener.children
 
@@ -201,6 +203,7 @@ Item {
                 text: "󰅂"
             }
 
+            // Open nested menus or trigger the selected tray action.
             MouseArea {
                 id: rowMouse
 

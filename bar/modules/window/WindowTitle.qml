@@ -23,6 +23,7 @@ Item {
     implicitWidth: Math.min(windowTitle.implicitWidth + titleLeft + 10, 560)
     height: barWindow.height
 
+    // Focused application's icon and title, elided to fit the bar.
     IconImage {
         anchors.left: parent.left
         anchors.leftMargin: 18

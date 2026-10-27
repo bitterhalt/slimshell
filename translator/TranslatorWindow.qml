@@ -251,6 +251,7 @@ PanelWindow {
             onActivated: root.picker !== "" ? root.closePicker() : root.closeRequested()
         }
 
+        // Source/target language controls and swap action.
         Row {
             id: header
 
@@ -314,6 +315,7 @@ PanelWindow {
             anchors.rightMargin: 1
             anchors.bottomMargin: 1
 
+            // Input text and translated result panes.
             Column {
                 anchors.fill: parent
                 visible: root.picker === ""
@@ -500,6 +502,7 @@ PanelWindow {
 
         }
 
+        // Translate/copy buttons and current status.
         Item {
             id: footer
 

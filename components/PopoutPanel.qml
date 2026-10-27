@@ -18,6 +18,7 @@ Item {
     width: implicitWidth
     height: implicitHeight
 
+    // Shared popup surface; children supplied by callers go into panelContent.
     Rectangle {
         anchors.fill: parent
         color: panel.config.bg

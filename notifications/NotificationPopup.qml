@@ -133,6 +133,7 @@ Scope {
     Variants {
         model: root.toasts
 
+        // Each toast is its own card-sized surface so shadows follow its shape.
         delegate: PanelWindow {
             id: toastWindow
 

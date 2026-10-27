@@ -85,6 +85,7 @@ Item {
         return Math.round((screenWidth - popupWidth) / 2)
     }
 
+    // Bounded popup windows; the active key chooses which host is shown.
     component PopupSurface: PanelWindow {
         id: popupSurface
 
@@ -156,6 +157,7 @@ Item {
 
     // The full-screen surface only catches outside clicks. It lives below the
     // card-sized overlay surfaces and intentionally has no shadow namespace.
+    // Full-screen click catcher, kept below the bounded popup surfaces.
     PanelWindow {
         screen: manager.barWindow.screen
         visible: manager.hostVisible

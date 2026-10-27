@@ -69,6 +69,7 @@ FocusScope {
         radius: root.config.popupRadius
     }
 
+    // Scrollable history; selecting a card exposes its actions inline.
     ListView {
         id: list
         objectName: "historyList"
@@ -124,6 +125,7 @@ FocusScope {
         font.pointSize: root.config.fontSize(0.9)
     }
 
+    // Persistent keyboard hints and the DND toggle.
     Item {
         id: historyFooter
         anchors.left: parent.left

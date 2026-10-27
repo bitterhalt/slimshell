@@ -1,5 +1,6 @@
 import QtQuick
 
+// Consistent small heading for grouped popup content.
 Text {
     renderType: Text.NativeRendering
     required property var config

@@ -48,6 +48,7 @@ Rectangle {
         id: cardHover
     }
 
+    // App/icon hint on the right; text content stays in the left column.
     Item {
         id: imageBox
 
@@ -77,6 +78,7 @@ Rectangle {
 
     }
 
+    // Summary and body; bodyLineLimit controls how much message text is shown.
     Column {
         id: contentColumn
 
@@ -113,6 +115,7 @@ Rectangle {
 
     }
 
+    // Time and close affordance occupy the top-right corner.
     Text {
         id: timeText
 
@@ -172,6 +175,7 @@ Rectangle {
         }
     }
 
+    // Optional action buttons at the bottom of non-compact notifications.
     Row {
         id: actionsRow
 

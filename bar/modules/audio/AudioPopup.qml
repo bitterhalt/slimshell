@@ -61,6 +61,7 @@ PopoutPanel {
         }
     }
 
+    // Keyboard navigation, device rows, context actions, and help content.
     FocusScope {
         id: keyboardHandler
         objectName: "audioKeyboard"
@@ -82,6 +83,7 @@ PopoutPanel {
             anchors.bottom: status.top
             anchors.bottomMargin: 6
 
+            // Main tab content; row delegate changes by the active tab.
             ListView {
                 id: rowsView
                 objectName: "audioRows"
@@ -153,6 +155,7 @@ PopoutPanel {
                 }
             }
 
+            // Actions for the currently selected playback or device row.
             Column {
                 id: optionRows
                 anchors.left: parent.left
@@ -178,6 +181,7 @@ PopoutPanel {
                 }
             }
 
+            // Keyboard help shown in place of the row list.
             Column {
                 id: helpRows
                 anchors.left: parent.left
@@ -223,6 +227,7 @@ PopoutPanel {
             }
         }
 
+        // Status line above the tab bar.
         Text {
             id: status
             renderType: Text.NativeRendering
@@ -260,6 +265,7 @@ PopoutPanel {
             }
         }
 
+        // Footer separator and output/input/playback/profile tabs.
         Item {
             id: footer
             anchors.left: parent.left
@@ -286,23 +292,24 @@ PopoutPanel {
                         required property int index
                         width: parent.width / popupState.tabs.length
                         height: 26
+                        readonly property bool highlighted:
+                            popupState.tabIndex === index || tabMouse.containsMouse
+
                         Rectangle {
                             anchors.fill: parent
                             anchors.margins: 2
                             radius: 4
-                            color: popupState.tabIndex === tab.index ? root.config.selectionBackground
-                                : tabMouse.containsMouse ? root.config.selectionBackground : "transparent"
-                            border.width: 1
-                            border.color: root.config.selectionBackground
+                            color: tab.highlighted ? root.config.selectionBackground : "transparent"
                         }
                         Text {
                             renderType: Text.NativeRendering
                             anchors.centerIn: parent
+                            objectName: "audioTabLabel-" + tab.modelData
                             text: tab.modelData
-                            color: popupState.tabIndex === tab.index
+                            color: tab.highlighted
                                 ? root.config.selectionForeground : root.config.muted
                             font.pointSize: root.config.fontSize(0.82)
-                            font.weight: popupState.tabIndex === tab.index ? Font.DemiBold : Font.Normal
+                            font.weight: tab.highlighted ? Font.DemiBold : Font.Normal
                         }
                         MouseArea {
                             id: tabMouse

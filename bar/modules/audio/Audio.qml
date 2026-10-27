@@ -12,6 +12,7 @@ Item {
     required property var barWindow
     required property var popupManager
     required property var uiService
+    // Read the current default devices; trackedNodes keeps their controls writable.
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var sinkAudio: sink ? sink.audio : null
     readonly property var source: Pipewire.defaultAudioSource
@@ -120,6 +121,7 @@ Item {
         objects: root.trackedNodes
     }
 
+    // Circle style's level ring is loaded only when selected in Config.qml.
     Loader {
         anchors.centerIn: parent
         width: 24
@@ -175,6 +177,7 @@ Item {
         text: root.icon
     }
 
+    // Left-click opens controls, right-click toggles mute, and the wheel adjusts volume.
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -194,6 +197,7 @@ Item {
         }
     }
 
+    // Device-profile backend is loaded only when the profile tab is visited.
     Component {
         id: profileBackendComponent
 

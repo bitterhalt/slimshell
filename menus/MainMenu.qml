@@ -20,6 +20,7 @@ Item {
     property var confirmItem: null
     property int confirmIndex: -1
 
+    // Page contents and keyboard shortcuts. Edit labels/actions here.
     readonly property var powerItems: [
         { label: "Lock", icon: "󰌾", shortcut: "l", action: "lock" },
         { label: "Log out", icon: "󰍃", shortcut: "e", command: "niri msg action quit", confirm: true },
@@ -234,6 +235,7 @@ Item {
         activateIndex(selectedIndex)
     }
 
+    // Popup frame and keyboard focus scope for the selected page.
     PanelWindow {
         id: menuWindow
 
@@ -342,6 +344,7 @@ Item {
                 text: root.confirmItem ? root.confirmItem.label + "?" : ""
             }
 
+            // Highlighted row, icon, label, and shortcut hint.
             Repeater {
                 model: root.currentItems
 

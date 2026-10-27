@@ -11,6 +11,7 @@ Item {
     height: barWindow.height
     visible: battery.present
 
+    // Battery percentage and charging/status icon.
     Row {
         id: batteryText
 

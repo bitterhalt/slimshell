@@ -25,6 +25,7 @@ Item {
     width: implicitWidth
     height: barWindow.height
 
+    // Right-click the workspace module to switch its persisted layout.
     TapHandler {
         acceptedButtons: Qt.RightButton
         enabled: root.settingsService.settingsLoaded
@@ -40,6 +41,7 @@ Item {
             config.run(`niri msg action focus-workspace ${workspace.idx}`)
     }
 
+    // Dots layout: active, urgent, and inactive workspaces for this output.
     Row {
         id: dotsRow
         objectName: "dotsRow"
@@ -85,6 +87,7 @@ Item {
         }
     }
 
+    // Minimal layout: active workspace chip, with other workspaces revealed on hover.
     ItemRevealer {
         id: workspaceRevealer
         objectName: "workspaceRevealer"

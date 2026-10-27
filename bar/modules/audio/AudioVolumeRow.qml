@@ -50,6 +50,7 @@ Item {
         onDoubleClicked: root.optionsRequested()
     }
 
+    // Device icon and mute affordance.
     Item {
         x: 6
         y: 3
@@ -77,6 +78,7 @@ Item {
 
     }
 
+    // Name and secondary device/media status.
     Text {
         renderType: Text.NativeRendering
         x: 38
@@ -113,6 +115,7 @@ Item {
         text: root.row.media || (root.nodeAudio && root.nodeAudio.muted ? "Muted" : "")
     }
 
+    // Per-device volume control and current percentage.
     Slider {
         id: slider
 

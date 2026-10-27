@@ -87,6 +87,7 @@ Item {
 
     }
 
+    // Short-lived connection or battery alert card beside the bar.
     PanelWindow {
         id: toast
 

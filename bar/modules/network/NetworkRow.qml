@@ -43,6 +43,7 @@ Item {
         visible: root.selected
     }
 
+    // Signal/lock icon beside the network name and status.
     Item {
         x: 4
         width: 28
@@ -57,6 +58,7 @@ Item {
         }
     }
 
+    // Network name, security, and connection state.
     Column {
         x: 38
         width: Math.max(0, parent.width - x - signalLabel.width - 12)

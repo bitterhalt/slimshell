@@ -132,6 +132,7 @@ Item {
     width: 24
     height: barWindow.height
 
+    // Open or close the popup in response to bar/IPC actions.
     Connections {
         function onBluetoothActionRequested(action) {
             if (root.barWindow.screen !== root.uiService.targetScreen) {
@@ -149,6 +150,7 @@ Item {
         target: root.uiService
     }
 
+    // Bluetooth bar icon reflects adapter and connection state.
     Text {
         anchors.centerIn: parent
         color: config.fg
@@ -170,6 +172,7 @@ Item {
         }
     }
 
+    // Device manager popup: connected, paired, and discovered devices.
     Component {
         id: bluetoothPopupComponent
 
@@ -226,6 +229,7 @@ Item {
                 spacing: 2
                 visible: root.adapter && root.adapter.enabled
 
+                // Connected devices, then paired devices, then nearby devices.
                 Repeater {
                     model: root.connectedRows
 
@@ -294,6 +298,7 @@ Item {
 
             }
 
+            // Forget confirmation and keyboard help replace the normal footer.
             Text {
                 renderType: Text.NativeRendering
                 width: parent.width
@@ -314,6 +319,7 @@ Item {
                 wrapMode: Text.WordWrap
             }
 
+            // Device count/status and discovery controls.
             Item {
                 width: parent.width
                 height: Math.max(footerStatus.implicitHeight, footerHint.implicitHeight) + bluetoothPopup.spacing
@@ -357,6 +363,7 @@ Item {
 
     }
 
+    // Shared device row used for connected, paired, and discovered devices.
     component DeviceRow: Item {
         id: deviceRow
 

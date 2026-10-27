@@ -17,6 +17,7 @@ Item {
     readonly property string statusText: idleService.disabled ? "Idle paused" : "Idle active"
     readonly property string toggleLabel: idleService.disabled ? "Enable" : "Pause"
 
+    // Load saved values before showing the editor; invalid values stay in-place for correction.
     function openMenu(screen) {
         menuScreen = screen || targetScreen;
         validationError = "";
@@ -48,6 +49,7 @@ Item {
         root.idleService.toggle(root.menuScreen);
     }
 
+    // Compact timeout editor and idle toggle.
     PanelWindow {
         id: menuWindow
 
@@ -91,6 +93,7 @@ Item {
                 text: root.statusText
             }
 
+            // Lock, monitor-off and suspend thresholds (seconds or short units).
             DurationRow {
                 id: lockRow
 
@@ -139,6 +142,7 @@ Item {
                 text: root.validationError || root.idleService.errorText
             }
 
+            // Pause/resume idle handling or save the edited timeouts.
             Row {
                 anchors.left: parent.left
                 anchors.right: parent.right

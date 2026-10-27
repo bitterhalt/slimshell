@@ -12,6 +12,7 @@ Item {
     height: barWindow.height
     implicitWidth: trayItems.implicitWidth
 
+    // System-tray icons, preceded by a separator only when items exist.
     Row {
         id: trayItems
 
@@ -35,6 +36,7 @@ Item {
                     source: trayItem.modelData.icon
                 }
 
+                // Left-click activates; right-click opens the item's menu.
                 MouseArea {
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton

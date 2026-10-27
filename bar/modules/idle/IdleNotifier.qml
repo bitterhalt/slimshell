@@ -18,6 +18,7 @@ Item {
         toastTimer.restart()
     }
 
+    // Small idle status popup shown next to the bar module.
     PanelWindow {
         id: toast
 

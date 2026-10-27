@@ -259,6 +259,7 @@ PanelWindow {
             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
         }
 
+        // Full-width search header above both the history list and preview.
         Item {
             id: header
 
@@ -368,6 +369,7 @@ PanelWindow {
             color: root.config.selectionBackground
         }
 
+        // Left: compact history rows. Right: preview for the selected entry.
         Row {
             anchors.top: header.bottom
             anchors.left: parent.left
@@ -490,6 +492,7 @@ PanelWindow {
             }
         }
 
+        // Footer with item count and keyboard actions.
         Item {
             id: footer
             anchors.left: parent.left

@@ -41,6 +41,7 @@ PanelWindow {
         radius: root.config.popupRadius
     }
 
+    // Large date and time shown while the bar is hidden.
     Column {
         id: labels
 

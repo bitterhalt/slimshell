@@ -22,6 +22,7 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
+    // Dismiss only when a click lands outside the owning popup surface.
     MouseArea {
         anchors.fill: parent
         onClicked: root.dismissed()

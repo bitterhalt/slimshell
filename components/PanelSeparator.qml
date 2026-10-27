@@ -1,5 +1,6 @@
 import QtQuick
 
+// One-pixel themed divider for popup sections.
 Rectangle {
     required property var config
 

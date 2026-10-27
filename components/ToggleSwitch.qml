@@ -11,6 +11,7 @@ Item {
     implicitWidth: 32
     implicitHeight: 18
 
+    // Track and thumb; checked controls the thumb position and track fill.
     Rectangle {
         anchors.fill: parent
         radius: height / 2

@@ -34,6 +34,7 @@ Rectangle {
     }
     TapHandler { onTapped: root.picked() }
 
+    // Notification icon on the right; app photos are not expanded here.
     Item {
         id: imageBox
         objectName: "historyIconBox"
@@ -75,6 +76,7 @@ Rectangle {
         width: Math.max(0, imageBox.x - x - 12)
         spacing: 4
 
+        // Summary and timestamp share the first line, followed by the message body.
         Item {
             width: parent.width
             height: Math.max(title.implicitHeight, timestamp.implicitHeight, 18)
@@ -122,6 +124,7 @@ Rectangle {
             elide: Text.ElideRight
         }
 
+        // Selected notification actions appear below the message.
         Flow {
             id: actions
             width: parent.width

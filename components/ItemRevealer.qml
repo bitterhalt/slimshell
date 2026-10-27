@@ -44,6 +44,7 @@ Item {
         }
     }
 
+    // Always-visible clock/workspace content.
     Row {
         id: primaryRow
 
@@ -52,6 +53,7 @@ Item {
         spacing: 8
     }
 
+    // Clipped row revealed on hover; revealProgress also drives its spacing.
     Item {
         id: revealClip
 

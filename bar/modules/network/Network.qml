@@ -10,6 +10,7 @@ Item {
     required property var barWindow
     required property var popupManager
     required property var uiService
+    // Current adapters, selected network, and the icon shown in the bar.
     readonly property var networkDevices: Networking.devices ? Networking.devices.values : []
     readonly property var wifiDevice: findDevice(DeviceType.Wifi)
     readonly property var wiredDevice: findDevice(DeviceType.Wired)
@@ -47,6 +48,7 @@ Item {
         return "󰤯";
     }
 
+    // IPC actions open/close the popup on the screen that owns the bar.
     Connections {
         target: root.uiService
         function onNetworkActionRequested(action) {
@@ -96,6 +98,7 @@ Item {
         text: root.icon
     }
 
+    // Click the bar icon to open the network popup.
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton

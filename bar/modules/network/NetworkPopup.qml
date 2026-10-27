@@ -186,6 +186,7 @@ PopoutPanel {
         }
     }
 
+    // Page title shown for connect/password/action subpages.
     Item {
         width: parent.width
         height: root.passwordMode || root.actionMode ? 28 : 0
@@ -203,6 +204,7 @@ PopoutPanel {
 
     }
 
+    // Connected Ethernet/Wi-Fi and nearby access points.
     Column {
         width: parent.width
         spacing: 2
@@ -354,6 +356,7 @@ PopoutPanel {
 
     }
 
+    // Connect, forget, and back actions for a selected network.
     Column {
         id: actionPage
 
@@ -527,6 +530,7 @@ PopoutPanel {
 
     }
 
+    // Password entry and connection feedback.
     Column {
         width: parent.width
         spacing: 8
@@ -669,6 +673,7 @@ PopoutPanel {
 
     }
 
+    // Keyboard help for the scan and popup shortcuts.
     Text {
         renderType: Text.NativeRendering
         width: parent.width
@@ -682,6 +687,7 @@ PopoutPanel {
             : "↑/↓ or j/k Select · Enter Connect · Ctrl+S Scan/Stop · ?/Esc Help/Close"
     }
 
+    // Bottom connection status and scan controls.
     Item {
         width: parent.width
         height: Math.max(footerStatus.implicitHeight, footerHint.implicitHeight) + root.spacing
