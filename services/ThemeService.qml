@@ -8,9 +8,7 @@ Item {
 
     readonly property color fallbackBg: "#100f0f"
     readonly property color fallbackFg: "#cecdc3"
-    readonly property real mutedOpacity: 0.65
-    readonly property color fallbackMuted: Qt.rgba(
-        fallbackFg.r, fallbackFg.g, fallbackFg.b, mutedOpacity)
+    readonly property color fallbackMuted: Qt.alpha(fallbackFg, 0.65)
     readonly property color fallbackSelectionBackground: "#205ea6"
     readonly property color fallbackUrgent: "#bc5215"
     readonly property color fallbackSelectionForeground: "#ffffff"
@@ -77,7 +75,7 @@ Item {
 
         bg = colors.background
         fg = colors.foreground
-        muted = Qt.rgba(fg.r, fg.g, fg.b, mutedOpacity)
+        muted = Qt.alpha(fg, 0.65)
         urgent = colors.color3
         selectionBackground = colors.selection_background || colors.color6
         selectionForeground = colors.selection_foreground || fg

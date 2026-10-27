@@ -162,6 +162,18 @@ Item {
             compare(state.selectedNotification.id, 3);
         }
 
+        function test_expansion_state_tracks_notification_id() {
+            state.select(1);
+            state.toggleExpanded(state.selectedNotification.id);
+            compare(state.expandedId, "2");
+            state.toggleExpanded(state.selectedNotification.id);
+            compare(state.expandedId, "");
+
+            state.toggleExpanded(2);
+            service.notifications = [notification(1)];
+            compare(state.expandedId, "");
+        }
+
         function test_x_dismisses_and_ctrl_x_clears() {
             verify(!press(Qt.Key_C));
             compare(service.calls, []);
@@ -425,6 +437,36 @@ Item {
             waitForPolish(host.Window.window);
             compare(findChild(card, "historyImagePreview"), null);
             verify(card.implicitHeight < 100);
+        }
+
+        function test_long_body_can_expand() {
+            const note = notification(1);
+            note.body = "This message should expand and reveal its extra wrapped lines. ".repeat(4);
+            card = createTemporaryObject(cardComponent, host, {
+                width: 340, height: 120, config: config, notification: note
+            });
+            verify(card !== null);
+            waitForPolish(host.Window.window);
+            const body = findChild(card, "historyBodyText");
+            const hint = findChild(card, "historyExpandHint");
+            verify(body.truncated);
+            verify(hint.visible);
+            compare(hint.opacity, 0.5);
+            const collapsedHeight = card.implicitHeight;
+
+            card.selected = true;
+            compare(hint.color, config.selectionBackground);
+            compare(hint.opacity, 1);
+            card.expandRequested.connect(() => card.expanded = !card.expanded);
+            mouseClick(card, card.width / 2, 12);
+            verify(card.expanded);
+            waitForPolish(host.Window.window);
+            compare(body.truncated, false);
+            verify(card.implicitHeight > collapsedHeight);
+            compare(hint.text, "󰅃");
+
+            mouseClick(card, card.width / 2, 12);
+            verify(!card.expanded);
         }
 
         function test_card_actions_without_per_item_close_button() {

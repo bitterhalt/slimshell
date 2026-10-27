@@ -26,13 +26,36 @@ FocusScope {
     focus: true
     Component.onCompleted: Qt.callLater(() => forceActiveFocus())
     Keys.onPressed: event => {
+        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+            const selectedCard = list.itemAtIndex(history.selectedIndex);
+            if (selectedCard && selectedCard.expandableBody) {
+                history.toggleExpanded(selectedCard.notification.id);
+                event.accepted = true;
+                return;
+            }
+        }
         if (history.handleKey(event.key, event.modifiers, event.text))
             event.accepted = true;
     }
 
     function keepSelectionVisible() {
-        if (history.selectedIndex >= 0 && history.selectedIndex < list.count)
+        if (history.selectedIndex < 0 || history.selectedIndex >= list.count)
+            return;
+
+        const item = list.itemAtIndex(history.selectedIndex);
+        if (!item) {
             list.positionViewAtIndex(history.selectedIndex, ListView.Contain);
+            return;
+        }
+
+        const viewTop = list.contentY;
+        const viewBottom = viewTop + list.height;
+        if (item.height >= list.height)
+            list.contentY = item.y;
+        else if (item.y < viewTop)
+            list.contentY = item.y;
+        else if (item.y + item.height > viewBottom)
+            list.contentY = item.y + item.height - list.height;
     }
 
     function iconSource(icon) {
@@ -99,6 +122,7 @@ FocusScope {
             config: root.config
             notification: modelData
             selected: index === history.selectedIndex
+            expanded: String(modelData.id) === history.expandedId
             critical: modelData.urgency === NotificationUrgency.Critical
             timeLabel: root.notificationService.timeLabel(modelData)
             appIconSource: root.historyIconSource(modelData)
@@ -108,6 +132,7 @@ FocusScope {
                 history.select(index);
                 root.forceActiveFocus();
             }
+            onExpandRequested: history.toggleExpanded(modelData.id)
             onActionRequested: entry => {
                 history.select(index);
                 history.invoke(entry);
@@ -126,8 +151,8 @@ FocusScope {
     }
 
     // Persistent keyboard hints and the DND toggle.
-    Item {
-        id: historyFooter
+        Item {
+            id: historyFooter
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -158,6 +183,7 @@ FocusScope {
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.topMargin: 8
+            spacing: 8
 
             Text {
                 anchors.verticalCenter: parent.verticalCenter
@@ -172,6 +198,7 @@ FocusScope {
             ToggleSwitch {
                 config: root.config
                 checked: root.notificationService.dnd
+                opacity: checked ? 1 : 0.8
                 onToggled: {
                     root.notificationService.toggleDnd();
                     root.forceActiveFocus();

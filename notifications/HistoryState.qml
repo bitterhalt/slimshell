@@ -8,6 +8,7 @@ Item {
     readonly property var rows: (notificationService.historyNotifications
         ?? notificationService.notifications).slice().reverse()
     property string selectedId: ""
+    property string expandedId: ""
     property int fallbackIndex: 0
     readonly property int selectedIndex: Model.selectionIndex(rows, selectedId, fallbackIndex)
     readonly property var selectedNotification: selectedIndex >= 0 ? rows[selectedIndex] : null
@@ -21,6 +22,8 @@ Item {
         // Resolve against the new rows directly: dependent bindings may still
         // hold the previous index while this change handler is running.
         select(Model.selectionIndex(rows, selectedId, fallbackIndex));
+        if (expandedId !== "" && !rows.some(row => String(row.id) === expandedId))
+            expandedId = "";
         selectionMoved();
     }
     onSelectedIndexChanged: selectionMoved()
@@ -46,6 +49,11 @@ Item {
             return;
         fallbackIndex = selectedIndex;
         notificationService.dismiss(selectedNotification);
+    }
+
+    function toggleExpanded(id) {
+        const key = String(id || "");
+        expandedId = expandedId === key ? "" : key;
     }
 
     function invoke(entry) {

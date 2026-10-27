@@ -11,14 +11,19 @@ Rectangle {
     required property var notification
     property bool selected: false
     property bool critical: false
+    property bool expanded: false
     readonly property color criticalTextColor: "#ad8301"
     readonly property color criticalBorderColor: "#af3029"
     readonly property bool highlighted: selected || hover.hovered
+    readonly property int expandedBodyLineLimit: 8
+    readonly property bool expandableBody:
+        bodyText.truncated || bodyText.text.length > 80 || expanded
     property string timeLabel: ""
     property string appIconSource: ""
     property var actionEntries: []
 
     signal picked()
+    signal expandRequested()
     signal actionRequested(var entry)
 
     implicitHeight: Math.max(46, content.implicitHeight) + 20
@@ -32,7 +37,16 @@ Rectangle {
         id: hover
         objectName: "historyHoverHandler"
     }
-    TapHandler { onTapped: root.picked() }
+    TapHandler {
+        onTapped: {
+            const wasSelected = root.selected;
+            root.picked();
+            if (root.expandableBody
+                    && (!wasSelected || root.actionEntries.length === 0
+                        || point.position.y < content.y + actions.y))
+                root.expandRequested();
+        }
+    }
 
     // Notification icon on the right; app photos are not expanded here.
     Item {
@@ -86,7 +100,8 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 width: Math.min(implicitWidth,
-                    Math.max(0, parent.width - timestamp.implicitWidth - 8))
+                    Math.max(0, parent.width - timestamp.implicitWidth
+                        - (expandHint.visible ? expandHint.implicitWidth + 14 : 8)))
                 renderType: Text.NativeRendering
                 textFormat: Text.PlainText
                 text: root.notification ? root.notification.summary || "Notification" : ""
@@ -108,9 +123,25 @@ Rectangle {
                     : root.highlighted ? root.config.fg : root.config.muted
                 font.pointSize: root.config.fontSize(0.72)
             }
+
+            Text {
+                id: expandHint
+                objectName: "historyExpandHint"
+                anchors.left: timestamp.right
+                anchors.leftMargin: 6
+                anchors.verticalCenter: parent.verticalCenter
+                visible: root.expandableBody
+                color: root.config.selectionBackground
+                opacity: root.highlighted ? 1 : 0.5
+                font.family: root.config.iconFontFamily
+                font.pointSize: root.config.iconSize * 0.95
+                text: root.expanded ? "󰅃" : "󰅀"
+            }
         }
 
         Text {
+            id: bodyText
+            objectName: "historyBodyText"
             width: parent.width
             visible: text.length > 0
             renderType: Text.NativeRendering
@@ -120,8 +151,8 @@ Rectangle {
                 : root.highlighted ? root.config.fg : root.config.muted
             font.pointSize: root.config.fontSize(0.85)
             wrapMode: Text.Wrap
-            maximumLineCount: 3
-            elide: Text.ElideRight
+            maximumLineCount: root.expanded ? root.expandedBodyLineLimit : 3
+            elide: root.expanded ? Text.ElideNone : Text.ElideRight
         }
 
         // Selected notification actions appear below the message.

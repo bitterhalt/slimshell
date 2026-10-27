@@ -10,7 +10,7 @@ Rectangle {
     required property var config
     property var notification: null
     property bool compact: false
-    property int bodyLineLimit: 5
+    property int bodyLineLimit: 3
     readonly property int appIconSize: 36
     readonly property string imageIcon: HistoryModel.iconFromImage(notification ? notification.image : "")
     readonly property bool critical: notification && notification.urgency === NotificationUrgency.Critical
