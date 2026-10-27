@@ -168,7 +168,7 @@ This shell was developed with LLM assistance under my supervision. I direct the 
 This repository is mainly for hobby and learning, so don't expect everything to work out of the box.
 ## ISSUES 🔨
 
-- dmenu-runner can't display special symbols (Nerd fonts etc.)
+- ~~dmenu-runner can't display special symbols (Nerd fonts etc.)~~
 - File structure is messy and files needs to be commented better
 - There are probably plenty of other things as well. Maybe yoy can show me how to fix them or do better :)
 
