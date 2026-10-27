@@ -135,12 +135,6 @@ wallpaper/      Wallpaper helpers
 osd/            Volume overlay
 ```
 
-## Transparency
-
-This shell was developed with LLM assistance under my supervision. I direct the design, review the changes, and test them on my own desktop. These are personal dotfiles, so review and adapt them before using them on yours.
-
-This repository is mainly for hobby and learning, so don't expect everything to work out of the box.
-
 ## Gallery
 
 <p align="center">
@@ -166,6 +160,12 @@ This repository is mainly for hobby and learning, so don't expect everything to 
   </tr>
 </table>
 
+
+## Transparency
+
+This shell was developed with LLM assistance under my supervision. I direct the design, review the changes, and test them on my own desktop. These are personal dotfiles, so review and adapt them before using them on yours.
+
+This repository is mainly for hobby and learning, so don't expect everything to work out of the box.
 ## ISSUES 🔨
 
 - dmenu-runner can't display special symbols (Nerd fonts etc.)
