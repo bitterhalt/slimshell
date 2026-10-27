@@ -9,10 +9,7 @@ Rectangle {
 
     required property var config
     property var notification: null
-    property var notificationService: null
     property bool compact: false
-    property bool showClose: true
-    property bool dismissOnClick: false
     property int bodyLineLimit: 5
     readonly property int appIconSize: 36
     readonly property string imageIcon: HistoryModel.iconFromImage(notification ? notification.image : "")
@@ -43,10 +40,6 @@ Rectangle {
     color: config.bg
     border.color: critical ? criticalBorderColor : config.selectionBackground
     border.width: 1
-
-    HoverHandler {
-        id: cardHover
-    }
 
     // App/icon hint on the right; text content stays in the left column.
     Item {
@@ -113,66 +106,6 @@ Rectangle {
             text: root.notification ? (root.notification.body || "") : ""
         }
 
-    }
-
-    // Time and close affordance occupy the top-right corner.
-    Text {
-        id: timeText
-
-        renderType: Text.NativeRendering
-        visible: !root.compact
-        anchors.right: closeButton.left
-        anchors.rightMargin: 4
-        anchors.top: parent.top
-        anchors.topMargin: 10
-        color: root.critical ? root.criticalTextColor : config.muted
-        font.pointSize: config.fontSize(0.74)
-        text: root.notificationService ? root.notificationService.timeLabel(root.notification) : ""
-    }
-
-    Item {
-        id: closeButton
-
-        anchors.right: parent.right
-        anchors.rightMargin: 4
-        anchors.top: parent.top
-        anchors.topMargin: 4
-        width: root.showClose ? 24 : 0
-        height: 24
-        visible: root.showClose
-        opacity: root.compact || cardHover.hovered ? 1 : 0.45
-
-        Text {
-            anchors.centerIn: parent
-            color: root.critical ? root.criticalTextColor : config.muted
-            font.pointSize: config.fontSize(1)
-            text: "×"
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.PointingHandCursor
-            onClicked: {
-                if (root.notificationService)
-                    root.notificationService.dismiss(root.notification);
-                else if (root.notification)
-                    root.notification.dismiss();
-            }
-        }
-
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        visible: root.dismissOnClick
-        cursorShape: Qt.PointingHandCursor
-        z: 10
-        onClicked: {
-            if (root.notificationService)
-                root.notificationService.dismiss(root.notification);
-            else if (root.notification)
-                root.notification.dismiss();
-        }
     }
 
     // Optional action buttons at the bottom of non-compact notifications.

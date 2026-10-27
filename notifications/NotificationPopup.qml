@@ -176,11 +176,8 @@ Scope {
 
                 config: root.config
                 notification: toastWindow.modelData
-                notificationService: root.notificationService
 
                 compact: true
-                showClose: false
-                dismissOnClick: false
                 onHeightChanged: root.recordHeight(toastWindow.modelData, height)
                 Component.onCompleted: root.recordHeight(toastWindow.modelData, height)
             }
