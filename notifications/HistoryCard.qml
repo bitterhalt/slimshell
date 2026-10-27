@@ -77,33 +77,35 @@ Rectangle {
 
         Item {
             width: parent.width
-            height: Math.max(appName.implicitHeight, 18)
+            height: Math.max(title.implicitHeight, timestamp.implicitHeight, 18)
 
             Text {
-                id: appName
+                id: title
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                width: Math.max(0, timestamp.x - content.x - 8)
+                width: Math.min(implicitWidth,
+                    Math.max(0, parent.width - timestamp.implicitWidth - 8))
                 renderType: Text.NativeRendering
                 textFormat: Text.PlainText
-                text: root.notification ? root.notification.appName || "Notification" : ""
+                text: root.notification ? root.notification.summary || "Notification" : ""
                 color: root.critical ? root.criticalTextColor
-                    : root.highlighted ? root.config.fg : root.config.muted
-                font.pointSize: root.config.fontSize(0.78)
+                    : root.config.fg
+                font.pointSize: root.config.fontSize(0.96)
+                font.weight: Font.Medium
                 elide: Text.ElideRight
             }
-        }
 
-        Text {
-            width: parent.width
-            renderType: Text.NativeRendering
-            textFormat: Text.PlainText
-            text: root.notification ? root.notification.summary || "" : ""
-            color: root.critical ? root.criticalTextColor
-                : root.config.fg
-            font.pointSize: root.config.fontSize(0.96)
-            font.weight: Font.Medium
-            elide: Text.ElideRight
+            Text {
+                id: timestamp
+                anchors.left: title.right
+                anchors.leftMargin: 8
+                anchors.verticalCenter: parent.verticalCenter
+                renderType: Text.NativeRendering
+                text: root.timeLabel
+                color: root.critical ? root.criticalTextColor
+                    : root.highlighted ? root.config.fg : root.config.muted
+                font.pointSize: root.config.fontSize(0.72)
+            }
         }
 
         Text {
@@ -161,19 +163,6 @@ Rectangle {
                 }
             }
         }
-    }
-
-    Text {
-        id: timestamp
-        anchors.right: parent.right
-        anchors.rightMargin: 14
-        anchors.top: parent.top
-        anchors.topMargin: 10
-        renderType: Text.NativeRendering
-        text: root.timeLabel
-        color: root.critical ? root.criticalTextColor
-            : root.highlighted ? root.config.fg : root.config.muted
-        font.pointSize: root.config.fontSize(0.72)
     }
 
 }

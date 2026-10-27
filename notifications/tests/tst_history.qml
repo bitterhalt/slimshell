@@ -289,15 +289,15 @@ Item {
             verify(card !== null);
             waitForPolish(host.Window.window);
             verify(card.implicitHeight > 0);
-            compare(findText(card, "Test").color, config.muted);
-            compare(findText(card, "Test").opacity, 1);
+            compare(findText(card, "Test"), null);
+            compare(findText(card, note.summary).color, config.fg);
             compare(findText(card, "12:34").color, config.muted);
             compare(findText(card, note.summary).textFormat, Text.PlainText);
             compare(findText(card, "[o] Open"), null);
             const unselectedHeight = card.implicitHeight;
             card.selected = true;
             waitForPolish(host.Window.window);
-            compare(findText(card, "Test").color, config.fg);
+            compare(findText(card, note.summary).color, config.fg);
             compare(findText(card, "12:34").color, config.fg);
             verify(findText(card, "[o] Open") !== null);
             compare(findText(card, "[c] Close"), null);
@@ -365,7 +365,7 @@ Item {
             compare(icon.color, card.criticalBorderColor);
             verify(!findChild(card, "historyAppIcon").visible);
             compare(card.border.color, card.criticalBorderColor);
-            for (const label of ["Test", "12:34", note.summary, note.body]) compare(findText(card, label).color, card.criticalTextColor)
+            for (const label of ["12:34", note.summary, note.body]) compare(findText(card, label).color, card.criticalTextColor)
             card.selected = true;
             waitForPolish(host.Window.window);
             compare(card.border.color, card.criticalBorderColor);

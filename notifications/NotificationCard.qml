@@ -1,8 +1,8 @@
+import "HistoryModel.js" as HistoryModel
 import QtQuick
 import Quickshell
 import Quickshell.Services.Notifications
 import Quickshell.Widgets
-import "HistoryModel.js" as HistoryModel
 
 Rectangle {
     id: root
@@ -13,7 +13,7 @@ Rectangle {
     property bool compact: false
     property bool showClose: true
     property bool dismissOnClick: false
-    property int bodyLineLimit: 3
+    property int bodyLineLimit: 5
     readonly property int appIconSize: 36
     readonly property string imageIcon: HistoryModel.iconFromImage(notification ? notification.image : "")
     readonly property bool critical: notification && notification.urgency === NotificationUrgency.Critical
@@ -33,7 +33,7 @@ Rectangle {
     }
 
     implicitHeight: {
-        let h = Math.max(compact ? 84 : 92, contentColumn.implicitHeight + 20);
+        let h = Math.max(compact ? 84 : 92, contentColumn.implicitHeight + 32);
         if (actionCount > 0)
             h += 34;
 
@@ -50,8 +50,8 @@ Rectangle {
 
     Item {
         id: imageBox
-        objectName: "notificationIconBox"
 
+        objectName: "notificationIconBox"
         anchors.right: parent.right
         anchors.rightMargin: 22
         y: root.compact ? Math.round((parent.height - height) / 2) : 30
@@ -69,8 +69,7 @@ Rectangle {
         Text {
             anchors.centerIn: parent
             visible: root.critical || root.timerNotification || !appIcon.visible
-            color: root.critical ? root.criticalTextColor
-                : root.timerNotification ? config.selectionBackground : config.muted
+            color: root.critical ? root.criticalTextColor : root.timerNotification ? config.selectionBackground : config.muted
             font.family: root.timerNotification ? config.textFontFamily : config.iconFontFamily
             font.pointSize: config.iconSize
             text: root.critical ? "󰀧" : root.timerNotification ? "⏰" : "󰂚"
@@ -86,17 +85,8 @@ Rectangle {
         anchors.right: imageBox.left
         anchors.rightMargin: 10
         anchors.top: parent.top
-        anchors.topMargin: 10
+        anchors.topMargin: 22
         spacing: 2
-
-        Text {
-            renderType: Text.NativeRendering
-            width: parent.width
-            color: root.critical ? root.criticalTextColor : config.muted
-            font.pointSize: config.fontSize(0.78)
-            elide: Text.ElideRight
-            text: root.notification ? (root.notification.appName || "Notification") : ""
-        }
 
         Text {
             renderType: Text.NativeRendering
