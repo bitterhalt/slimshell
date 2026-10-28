@@ -19,7 +19,7 @@ Item {
     property int lockTimeout: config.idleLockTimeout
     property int offTimeout: config.idleOffTimeout
     property int suspendTimeout: config.idleSuspendTimeout
-    property string hellwalMode: "dark-comfort"
+    property string hellwalMode: "dark"
     property real hellwalDarkOffset: 0
     property real hellwalBrightOffset: 0
     property string workspaceLayout: "dots"
@@ -62,8 +62,8 @@ Item {
     }
 
     function saveHellwalSettings(mode, darkOffset, brightOffset) {
-        if (!(["dark", "light", "dark-comfort", "light-comfort"].includes(mode)))
-            return "Choose a Hellwal mode"
+        if (mode !== "dark" && mode !== "light")
+            return "Choose dark or light mode"
         if (!Number.isFinite(darkOffset) || darkOffset < 0 || darkOffset > 1
             || !Number.isFinite(brightOffset) || brightOffset < 0 || brightOffset > 1)
             return "Offsets must be between 0 and 1"
@@ -89,7 +89,7 @@ Item {
     function persistSettings() {
         settingsFile.setText(JSON.stringify({lock: lockTimeout, off: offTimeout,
             suspend: suspendTimeout, hellwalMode, hellwalDarkOffset, hellwalBrightOffset,
-            hellwalModeVersion: 2, workspaceLayout}))
+            workspaceLayout}))
     }
 
     function wakeScreens() {
@@ -202,15 +202,10 @@ Item {
                     root.suspendTimeout = saved.suspend
                     root.applying = false
                 }
-                if (saved.hellwalModeVersion === 2) {
-                    if (["dark", "light", "dark-comfort", "light-comfort"].includes(saved.hellwalMode))
-                        root.hellwalMode = saved.hellwalMode
-                } else if (saved.hellwalMode === "dark") {
-                    // Older settings used dark/light to mean comfort mode.
-                    root.hellwalMode = "dark-comfort"
-                } else if (saved.hellwalMode === "light") {
-                    root.hellwalMode = "light-comfort"
-                }
+                if (saved.hellwalMode === "dark" || saved.hellwalMode === "dark-comfort")
+                    root.hellwalMode = "dark"
+                else if (saved.hellwalMode === "light" || saved.hellwalMode === "light-comfort")
+                    root.hellwalMode = "light"
                 if (Number.isFinite(saved.hellwalDarkOffset)
                     && saved.hellwalDarkOffset >= 0 && saved.hellwalDarkOffset <= 1)
                     root.hellwalDarkOffset = saved.hellwalDarkOffset

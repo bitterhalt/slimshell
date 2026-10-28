@@ -151,7 +151,7 @@ class WallpaperTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "hellwal failed"):
                 setbg.apply_wallpaper(image, True)
 
-    def test_hellwal_normal_mode_uses_both_offsets(self):
+    def test_hellwal_mode_uses_comfort_mode_and_both_offsets(self):
         self.calls = []
         image = self.folder / "image.png"
         image.touch()
@@ -160,21 +160,8 @@ class WallpaperTests(unittest.TestCase):
             setbg.apply_wallpaper(image, True, "light", 0.45, 0.2)
         self.assertEqual(self.calls[-1], [
             "hellwal", "-i", str(self.folder / "wall/wallpaper.png"),
-            "--light", "--dark-offset", "0.45",
+            "--comfort-mode", "--light", "--dark-offset", "0.45",
             "--bright-offset", "0.2"
-        ])
-
-    def test_hellwal_comfort_mode_is_explicit(self):
-        self.calls = []
-        image = self.folder / "image.png"
-        image.touch()
-        with patch.object(setbg, "WALL_DIR", self.folder / "wall"), \
-                patch.object(setbg, "run", side_effect=self.fake_run):
-            setbg.apply_wallpaper(image, True, "light-comfort", 0.3, 0.1)
-        self.assertEqual(self.calls[-1], [
-            "hellwal", "-i", str(self.folder / "wall/wallpaper.png"),
-            "--comfort-mode", "--light", "--dark-offset", "0.3",
-            "--bright-offset", "0.1"
         ])
 
     def test_hellwal_accepts_one_off_static_background(self):

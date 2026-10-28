@@ -30,9 +30,7 @@ PanelWindow {
     ]
     readonly property var hellwalModes: [
         {value: "dark", label: "Dark"},
-        {value: "light", label: "Light"},
-        {value: "dark-comfort", label: "Dark comfort"},
-        {value: "light-comfort", label: "Light comfort"}
+        {value: "light", label: "Light"}
     ]
     readonly property int selectedIndex: {
         if (visibleEntries.count === 0)
@@ -90,11 +88,9 @@ PanelWindow {
         promptError = ""
         const savedMode = hellwalModes.findIndex(
             option => option.value === controller.settingsService.hellwalMode)
-        modeInput.currentIndex = savedMode >= 0 ? savedMode : 2
-        darkOffsetInput.text = savedMode >= 2
-            ? String(controller.settingsService.hellwalDarkOffset) : "0"
-        brightOffsetInput.text = savedMode >= 2
-            ? String(controller.settingsService.hellwalBrightOffset) : "0"
+        modeInput.currentIndex = savedMode >= 0 ? savedMode : 0
+        darkOffsetInput.text = String(controller.settingsService.hellwalDarkOffset)
+        brightOffsetInput.text = String(controller.settingsService.hellwalBrightOffset)
         settingsOpen = true
         Qt.callLater(() => {
             modeInput.forceActiveFocus()
@@ -130,12 +126,11 @@ PanelWindow {
         if (controller.busy)
             return
         const mode = hellwalModes[modeInput.currentIndex].value
-        const usesComfort = mode.endsWith("-comfort")
-        const dark = usesComfort ? Number(darkOffsetInput.text.trim()) : 0
-        const bright = usesComfort ? Number(brightOffsetInput.text.trim()) : 0
-        if (usesComfort && (darkOffsetInput.text.trim() === "" || brightOffsetInput.text.trim() === ""
+        const dark = Number(darkOffsetInput.text.trim())
+        const bright = Number(brightOffsetInput.text.trim())
+        if (darkOffsetInput.text.trim() === "" || brightOffsetInput.text.trim() === ""
             || !Number.isFinite(dark) || !Number.isFinite(bright)
-            || dark < 0 || dark > 1 || bright < 0 || bright > 1)) {
+            || dark < 0 || dark > 1 || bright < 0 || bright > 1) {
             promptError = "Offsets must be between 0 and 1"
             return
         }
@@ -475,19 +470,8 @@ PanelWindow {
                         Layout.preferredHeight: 30
                         model: root.hellwalModes
                         textRole: "label"
-                        currentIndex: 2
+                        currentIndex: 0
                         enabled: !root.controller.busy
-                        indicator: Item {
-                            implicitWidth: 0
-                            width: 0
-                            visible: false
-                        }
-                        onActivated: index => {
-                            if (index < 2) {
-                                darkOffsetInput.text = "0"
-                                brightOffsetInput.text = "0"
-                            }
-                        }
                         contentItem: Text {
                             renderType: Text.NativeRendering
                             leftPadding: 8
@@ -524,7 +508,7 @@ PanelWindow {
                         placeholderTextColor: root.config.muted
                         selectionColor: root.config.selectionBackground
                         selectedTextColor: root.config.selectionForeground
-                        enabled: !root.controller.busy && modeInput.currentIndex >= 2
+                        enabled: !root.controller.busy
                         onTextChanged: root.promptError = ""
                         background: Rectangle {
                             radius: 4
@@ -547,7 +531,7 @@ PanelWindow {
                         placeholderTextColor: root.config.muted
                         selectionColor: root.config.selectionBackground
                         selectedTextColor: root.config.selectionForeground
-                        enabled: !root.controller.busy && modeInput.currentIndex >= 2
+                        enabled: !root.controller.busy
                         onTextChanged: root.promptError = ""
                         background: Rectangle {
                             radius: 4
