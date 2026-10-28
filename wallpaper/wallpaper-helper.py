@@ -160,14 +160,20 @@ def static_background(value):
 
 
 def apply_wallpaper(
-    source, hellwal=False, mode="dark", dark_offset_value=0,
+    source, hellwal=False, mode="dark-comfort", dark_offset_value=0,
     bright_offset_value=0, static_background_value=None
 ):
     source = source.expanduser().resolve(strict=True)
     if not source.is_file():
         raise ValueError("Selected wallpaper is not a file")
-    if mode not in {"dark", "light"}:
-        raise ValueError("Hellwal mode must be dark or light")
+    hellwal_modes = {
+        "dark": (False, "dark"),
+        "light": (False, "light"),
+        "dark-comfort": (True, "dark"),
+        "light-comfort": (True, "light"),
+    }
+    if mode not in hellwal_modes:
+        raise ValueError("Hellwal mode must be dark, light, dark-comfort, or light-comfort")
     if (not math.isfinite(dark_offset_value) or not 0 <= dark_offset_value <= 1
             or not math.isfinite(bright_offset_value) or not 0 <= bright_offset_value <= 1):
         raise ValueError("Hellwal offsets must be between 0 and 1")
@@ -218,13 +224,18 @@ def apply_wallpaper(
     )
     run(["awww", "img", "-n", "overview", str(lockscreen), "--transition-type=none"])
     if hellwal:
-        run([
-            "hellwal", "-i", str(wallpaper), "--comfort-mode",
-            "--" + mode, "--dark-offset", str(dark_offset_value),
+        comfort_mode, color_mode = hellwal_modes[mode]
+        command = ["hellwal", "-i", str(wallpaper)]
+        if comfort_mode:
+            command.append("--comfort-mode")
+        command.extend([
+            "--" + color_mode,
+            "--dark-offset", str(dark_offset_value),
             "--bright-offset", str(bright_offset_value),
-            *(["--static-background", static_background_value]
-              if static_background_value else []),
-        ], timeout=180)
+        ])
+        if static_background_value:
+            command.extend(["--static-background", static_background_value])
+        run(command, timeout=180)
 
 
 def main():
@@ -238,7 +249,11 @@ def main():
     apply = commands.add_parser("apply", help="Set wallpaper and blurred lockscreen")
     apply.add_argument("path", type=Path)
     apply.add_argument("--hellwal", action="store_true")
-    apply.add_argument("--mode", choices=("dark", "light"), default="dark")
+    apply.add_argument(
+        "--mode",
+        choices=("dark", "light", "dark-comfort", "light-comfort"),
+        default="dark-comfort",
+    )
     apply.add_argument("--dark-offset", type=dark_offset, default=0)
     apply.add_argument("--bright-offset", type=dark_offset, default=0)
     apply.add_argument("--static-background", type=static_background)

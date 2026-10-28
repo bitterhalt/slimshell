@@ -19,7 +19,6 @@ Item {
     property color urgent: fallbackUrgent
     property color selectionBackground: fallbackSelectionBackground
     property color selectionForeground: fallbackSelectionForeground
-    property color cursorText: fallbackBg
 
     property bool hellwalActive: false
 
@@ -30,7 +29,6 @@ Item {
         urgent = fallbackUrgent
         selectionBackground = fallbackSelectionBackground
         selectionForeground = fallbackSelectionForeground
-        cursorText = fallbackBg
         hellwalActive = false
     }
 
@@ -38,15 +36,15 @@ Item {
         const colors = {}
         let match
 
-        let re = /@define-color\s+(background|foreground|selection_background|selection_foreground|cursor_text|color(?:1[0-5]|[0-9]))\s+(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)/g
+        let re = /@define-color\s+(background|foreground|selection_background|selection_foreground|color(?:1[0-5]|[0-9]))\s+(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)/g
         while ((match = re.exec(text)) !== null)
             colors[match[1]] = match[2]
 
-        re = /--(background|foreground|selection_background|selection_foreground|cursor_text|color(?:1[0-5]|[0-9]))\s*:\s*(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)/g
+        re = /--(background|foreground|selection_background|selection_foreground|color(?:1[0-5]|[0-9]))\s*:\s*(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)/g
         while ((match = re.exec(text)) !== null)
             colors[match[1]] = match[2]
 
-        re = /\$(background|foreground|selection_background|selection_foreground|cursor_text|color(?:1[0-5]|[0-9]))\s*:\s*(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)/g
+        re = /\$(background|foreground|selection_background|selection_foreground|color(?:1[0-5]|[0-9]))\s*:\s*(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)/g
         while ((match = re.exec(text)) !== null)
             colors[match[1]] = match[2]
 
@@ -79,7 +77,6 @@ Item {
         urgent = colors.color3
         selectionBackground = colors.selection_background || colors.color6
         selectionForeground = colors.selection_foreground || fg
-        cursorText = colors.cursor_text || colors.background
         hellwalActive = true
     }
 

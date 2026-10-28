@@ -43,7 +43,6 @@ Item {
     readonly property color urgent: theme.urgent
     readonly property color selectionBackground: theme.selectionBackground
     readonly property color selectionForeground: theme.selectionForeground
-    readonly property color cursorText: theme.cursorText
     readonly property string textFontFamily: systemFontMetrics.font.family
     readonly property real systemFontPointSize: systemFontMetrics.font.pointSize > 0 ? systemFontMetrics.font.pointSize : 10
     readonly property real iconSize: systemFontPointSize * fontScale * iconScale

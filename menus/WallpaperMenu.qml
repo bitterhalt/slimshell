@@ -28,6 +28,12 @@ PanelWindow {
         { label: "Hellwal fixed bg", key: "g", action: "background", control: false },
         { label: "Settings", key: "s", action: "settings", control: false }
     ]
+    readonly property var hellwalModes: [
+        {value: "dark", label: "Dark"},
+        {value: "light", label: "Light"},
+        {value: "dark-comfort", label: "Dark comfort"},
+        {value: "light-comfort", label: "Light comfort"}
+    ]
     readonly property int selectedIndex: {
         if (visibleEntries.count === 0)
             return -1
@@ -82,9 +88,13 @@ PanelWindow {
 
     function openSettings() {
         promptError = ""
-        modeInput.currentIndex = controller.settingsService.hellwalMode === "light" ? 1 : 0
-        darkOffsetInput.text = String(controller.settingsService.hellwalDarkOffset)
-        brightOffsetInput.text = String(controller.settingsService.hellwalBrightOffset)
+        const savedMode = hellwalModes.findIndex(
+            option => option.value === controller.settingsService.hellwalMode)
+        modeInput.currentIndex = savedMode >= 0 ? savedMode : 2
+        darkOffsetInput.text = savedMode >= 2
+            ? String(controller.settingsService.hellwalDarkOffset) : "0"
+        brightOffsetInput.text = savedMode >= 2
+            ? String(controller.settingsService.hellwalBrightOffset) : "0"
         settingsOpen = true
         Qt.callLater(() => {
             modeInput.forceActiveFocus()
@@ -119,16 +129,18 @@ PanelWindow {
     function saveSettings() {
         if (controller.busy)
             return
-        const dark = Number(darkOffsetInput.text.trim())
-        const bright = Number(brightOffsetInput.text.trim())
-        if (darkOffsetInput.text.trim() === "" || brightOffsetInput.text.trim() === ""
+        const mode = hellwalModes[modeInput.currentIndex].value
+        const usesComfort = mode.endsWith("-comfort")
+        const dark = usesComfort ? Number(darkOffsetInput.text.trim()) : 0
+        const bright = usesComfort ? Number(brightOffsetInput.text.trim()) : 0
+        if (usesComfort && (darkOffsetInput.text.trim() === "" || brightOffsetInput.text.trim() === ""
             || !Number.isFinite(dark) || !Number.isFinite(bright)
-            || dark < 0 || dark > 1 || bright < 0 || bright > 1) {
+            || dark < 0 || dark > 1 || bright < 0 || bright > 1)) {
             promptError = "Offsets must be between 0 and 1"
             return
         }
         promptError = controller.settingsService.saveHellwalSettings(
-            modeInput.currentIndex === 1 ? "light" : "dark", dark, bright)
+            mode, dark, bright)
         if (promptError !== "")
             return
         settingsOpen = false
@@ -460,16 +472,31 @@ PanelWindow {
                     ComboBox {
                         id: modeInput
                         Layout.preferredWidth: 100
-                        model: ["dark", "light"]
-                        currentIndex: 0
+                        Layout.preferredHeight: 30
+                        model: root.hellwalModes
+                        textRole: "label"
+                        currentIndex: 2
                         enabled: !root.controller.busy
+                        indicator: Item {
+                            implicitWidth: 0
+                            width: 0
+                            visible: false
+                        }
+                        onActivated: index => {
+                            if (index < 2) {
+                                darkOffsetInput.text = "0"
+                                brightOffsetInput.text = "0"
+                            }
+                        }
                         contentItem: Text {
                             renderType: Text.NativeRendering
                             leftPadding: 8
+                            rightPadding: 8
                             verticalAlignment: Text.AlignVCenter
-                            text: modeInput.displayText
+                            text: modeInput.currentText
                             color: root.config.fg
                             font.pointSize: root.config.fontSize(0.85)
+                            elide: Text.ElideRight
                         }
                         background: Rectangle {
                             radius: 4
@@ -497,7 +524,7 @@ PanelWindow {
                         placeholderTextColor: root.config.muted
                         selectionColor: root.config.selectionBackground
                         selectedTextColor: root.config.selectionForeground
-                        enabled: !root.controller.busy
+                        enabled: !root.controller.busy && modeInput.currentIndex >= 2
                         onTextChanged: root.promptError = ""
                         background: Rectangle {
                             radius: 4
@@ -520,7 +547,7 @@ PanelWindow {
                         placeholderTextColor: root.config.muted
                         selectionColor: root.config.selectionBackground
                         selectedTextColor: root.config.selectionForeground
-                        enabled: !root.controller.busy
+                        enabled: !root.controller.busy && modeInput.currentIndex >= 2
                         onTextChanged: root.promptError = ""
                         background: Rectangle {
                             radius: 4
