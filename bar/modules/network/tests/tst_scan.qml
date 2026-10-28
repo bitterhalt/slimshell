@@ -28,6 +28,22 @@ Item {
             verify(!wifi.scannerEnabled);
         }
 
+        function test_multiple_popups_share_scan_ownership() {
+            scan.toggle();
+            const second = createTemporaryObject(scanComponent, host,
+                {wifiDevice: wifi, allowed: true});
+            verify(wifi.scannerEnabled);
+            second.toggle();
+            scan.toggle();
+            verify(wifi.scannerEnabled);
+            scan.destroy();
+            scan = null;
+            wait(0);
+            verify(wifi.scannerEnabled);
+            second.toggle();
+            verify(!wifi.scannerEnabled);
+        }
+
         function test_stop_preserves_results() {
             verify(scan.handleKey(Qt.Key_S, Qt.ControlModifier));
             verify(scan.requested);

@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../components"
 import "../menus"
 
 Item {
@@ -19,6 +20,16 @@ Item {
     readonly property bool busy: applyProcess.running
     readonly property string directory: Quickshell.env("HOME") + "/Pictures/wallpaper"
     readonly property string helperPath: Quickshell.env("HOME") + "/.config/quickshell/wallpaper/wallpaper-helper.py"
+
+    PopupMotion {
+        id: popupMotion
+        openDuration: root.config.popupOpenDuration
+        slideDistance: root.config.popupSlideDistance
+        closeDuration: root.config.popupCloseDuration
+        shown: root.opened
+        animationsEnabled: root.config.popupAnimations
+        animationType: root.config.popupAnimationStyle
+    }
 
     onOpenedChanged: if (!opened) noticeText = ""
     onNoticeTextChanged: {
@@ -67,12 +78,13 @@ Item {
 
     // The picker is disposable; an apply operation survives closing/reopening it.
     LazyLoader {
-        active: root.opened
+        active: popupMotion.surfaceVisible
 
         WallpaperMenu {
             config: root.config
             targetScreen: root.menuScreen || root.targetScreen
             controller: root
+            popupMotion: popupMotion
             onCloseRequested: root.close()
         }
     }

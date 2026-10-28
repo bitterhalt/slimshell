@@ -24,6 +24,12 @@ Item {
     // Popup geometry
     property int popupGap: 16
     property int popupRadius: 4
+    property bool popupAnimations: true
+    property int popupOpenDuration: 100
+    property real popupSlideDistance: 8
+    property int popupCloseDuration: 70
+    property string popupAnimationStyle: "fade" // "slide" or "fade"
+    property string notificationAnimationStyle: "slide" // "slide" or "fade"
     // History is bounded; ordinary entries are expired before critical ones.
     property int notificationHistoryLimit: 100
     // Match desktopEntry or appName. `notify-send -a nohistory` is also supported.

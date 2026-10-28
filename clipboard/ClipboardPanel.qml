@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
+import "../components"
 
 PanelWindow {
     id: root
@@ -46,6 +47,17 @@ PanelWindow {
             ? filteredEntries[selectedIndex]
             : null
 
+    PopupMotion {
+        id: popupMotion
+        openDuration: root.config.popupOpenDuration
+        slideDistance: root.config.popupSlideDistance
+        closeDuration: root.config.popupCloseDuration
+        shown: root.opened
+        animationsEnabled: root.config.popupAnimations
+        animationType: root.config.popupAnimationStyle
+        onClosed: root.finishClose()
+    }
+
     function open(): void {
         query = ""
         entries = []
@@ -58,8 +70,19 @@ PanelWindow {
     }
 
     function close(): void {
+        if (!opened)
+            return
         opened = false
         previewDebounce.stop()
+        if (textPreviewProcess.running)
+            textPreviewProcess.signal(15)
+        if (imagePreviewProcess.running)
+            imagePreviewProcess.signal(15)
+    }
+
+    function finishClose(): void {
+        if (opened)
+            return
         selectedIndex = -1
         entries = []
         query = ""
@@ -68,8 +91,6 @@ PanelWindow {
         pendingImageId = ""
         pendingTextId = ""
         previewEntryId = ""
-        if (textPreviewProcess.running)
-            textPreviewProcess.signal(15)
         if (imagePreviewProcess.running)
             imagePreviewProcess.signal(15)
         else
@@ -79,38 +100,6 @@ PanelWindow {
     function refresh(): void {
         if (!listProcess.running)
             listProcess.running = true
-    }
-
-    function parseEntries(value): var {
-        const result = []
-
-        for (const line of value.split("\n")) {
-            const firstTab = line.indexOf("\t")
-
-            if (firstTab < 1)
-                continue
-
-            const id = line.slice(0, firstTab)
-            const rawPreview = line.slice(firstTab + 1)
-            const isImage = /^\[\[ binary data\b/.test(rawPreview)
-            const dimensions = rawPreview.match(/\b(\d{2,5}x\d{2,5})\b/)
-            const preview = isImage
-                ? `Image${dimensions ? ` (${dimensions[1]})` : ""}`
-                : rawPreview
-
-            if (!/^\d+$/.test(id))
-                continue
-
-            result.push({
-                id,
-                raw: line,
-                mime: isImage ? "image" : "text",
-                preview,
-                isImage
-            })
-        }
-
-        return result
     }
 
     function select(index): void {
@@ -217,10 +206,10 @@ PanelWindow {
     }
 
     screen: targetScreen
-    visible: opened
+    visible: popupMotion.surfaceVisible
     color: "transparent"
     exclusiveZone: 0
-    focusable: true
+    focusable: opened
 
     anchors {
         top: true
@@ -230,7 +219,7 @@ PanelWindow {
     }
 
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: visible
+    WlrLayershell.keyboardFocus: opened
         ? WlrKeyboardFocus.Exclusive
         : WlrKeyboardFocus.None
 
@@ -249,6 +238,11 @@ PanelWindow {
         anchors.horizontalCenter: parent.horizontalCenter
 
         color: root.config.bg
+        opacity: popupMotion.contentOpacity
+        enabled: root.opened
+        transform: Translate {
+            y: popupMotion.contentOffset
+        }
         border.color: root.config.selectionBackground
         border.width: 1
         radius: root.config.popupRadius
@@ -606,7 +600,6 @@ PanelWindow {
 
     Process {
         id: textPreviewProcess
-        property string entryId: ""
 
         stdout: StdioCollector {
             onStreamFinished: {
@@ -637,7 +630,7 @@ PanelWindow {
 
             if (root.pendingImageId !== "")
                 root.startPendingImagePreview()
-            else if (!root.opened)
+            else if (!root.opened && !popupMotion.closing)
                 cleanupPreview.running = true
         }
     }

@@ -54,7 +54,7 @@ Item {
         id: menuWindow
 
         screen: root.menuScreen || root.targetScreen
-        visible: root.opened
+        visible: popupMotion.surfaceVisible
         implicitWidth: card.implicitWidth
         implicitHeight: card.implicitHeight
         anchors.top: true
@@ -63,14 +63,30 @@ Item {
         margins.left: screen ? Math.max(0, Math.round((screen.width - width) / 2)) : 0
         color: "transparent"
         exclusiveZone: 0
-        focusable: true
+        focusable: root.opened
         WlrLayershell.namespace: "slim-barpopup"
         WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+        WlrLayershell.keyboardFocus: root.opened
+            ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+
+        PopupMotion {
+            id: popupMotion
+            openDuration: root.config.popupOpenDuration
+            slideDistance: root.config.popupSlideDistance
+            closeDuration: root.config.popupCloseDuration
+            shown: root.opened
+            animationsEnabled: root.config.popupAnimations
+            animationType: root.config.popupAnimationStyle
+        }
 
         PopoutPanel {
             id: card
 
+            enabled: root.opened
+            opacity: popupMotion.contentOpacity
+            transform: Translate {
+                y: popupMotion.contentOffset
+            }
             config: root.config
             contentWidth: 300
             padding: 10
@@ -204,7 +220,7 @@ Item {
 
     PopupCatcher {
         targetScreen: menuWindow.screen
-        visible: root.opened
+        visible: menuWindow.visible
         onDismissed: root.closeMenu()
     }
 

@@ -10,6 +10,7 @@ Item {
     property string outputFile: ""
     property string pendingTarget: ""
     property bool pendingAudio: false
+    property string pendingRegion: ""
     property var targetScreen: null
 
     readonly property bool runningNow: recorderProcess.running
@@ -49,25 +50,26 @@ Item {
         return false
     }
 
-    function prepare(target, withAudio): void {
+    function prepare(target, withAudio, regionGeometry): void {
         if (!canStart())
             return
 
         pendingTarget = target
         pendingAudio = withAudio
+        pendingRegion = regionGeometry || ""
         outputFile = makeOutputFile()
         prepareDirectory.running = true
     }
 
     function fullscreen(): void {
-        prepare("screen", true)
+        prepare(targetScreen ? targetScreen.name : "screen", true, "")
     }
 
     function startRegion(geometry): void {
         if (!geometry)
             return
 
-        prepare(geometry, false)
+        prepare("region", false, geometry)
     }
 
     function stop(): void {
@@ -89,11 +91,14 @@ Item {
 
         if (pendingAudio)
             command.push("-a", "default_output")
+        if (pendingRegion !== "")
+            command.push("-region", pendingRegion)
 
         command.push("-o", outputFile)
 
         pendingTarget = ""
         pendingAudio = false
+        pendingRegion = ""
         recorderProcess.command = command
         recorderProcess.running = true
     }
@@ -111,6 +116,7 @@ Item {
 
             root.pendingTarget = ""
             root.pendingAudio = false
+            root.pendingRegion = ""
             root.outputFile = ""
             root.notify(
                 "Screen record",

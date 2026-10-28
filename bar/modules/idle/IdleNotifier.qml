@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import "../../../components"
 
 Item {
     id: root
@@ -11,10 +12,21 @@ Item {
     visible: false
 
     property string state: ""
+    property bool toastShown: false
+
+    PopupMotion {
+        id: toastMotion
+        shown: root.toastShown
+        animationsEnabled: root.config.popupAnimations
+        animationType: root.config.notificationAnimationStyle
+        openDuration: root.config.popupOpenDuration
+        slideDistance: root.config.popupSlideDistance
+        closeDuration: root.config.popupCloseDuration
+    }
 
     function show(newState): void {
         state = newState
-        toast.visible = true
+        toastShown = true
         toastTimer.restart()
     }
 
@@ -36,12 +48,14 @@ Item {
         exclusiveZone: 0
         implicitWidth: 160
         implicitHeight: 62
-        visible: false
+        visible: toastMotion.surfaceVisible
         color: "transparent"
         mask: Region {}
 
         Rectangle {
             anchors.fill: parent
+            opacity: toastMotion.contentOpacity
+            transform: Translate { y: toastMotion.contentOffset }
 
             radius: root.config.popupRadius
             color: root.config.bg
@@ -100,6 +114,6 @@ Item {
 
         interval: 5000
         repeat: false
-        onTriggered: toast.visible = false
+        onTriggered: root.toastShown = false
     }
 }

@@ -62,14 +62,8 @@ Item {
             config: root.config
             notificationService: root.notificationService
             onCloseRequested: root.popupManager.closeHost("notificationCenter")
-        }
-    }
-
-    Connections {
-        target: notificationService
-
-        function onToastSerialChanged(): void {
-            popupManager.closeHost("notificationCenter")
+            Component.onCompleted: root.notificationService.historyOpenCount += 1
+            Component.onDestruction: root.notificationService.historyOpenCount -= 1
         }
     }
 

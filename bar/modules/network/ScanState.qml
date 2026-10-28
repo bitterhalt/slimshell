@@ -1,4 +1,5 @@
 import QtQuick
+import "ScanOwners.js" as ScanOwners
 
 Item {
     id: root
@@ -13,7 +14,7 @@ Item {
     visible: false
     onWifiDeviceChanged: {
         if (managedDevice && managedDevice !== wifiDevice)
-            managedDevice.scannerEnabled = false;
+            ScanOwners.update(managedDevice, root, false);
         managedDevice = wifiDevice;
         requested = false;
         resultsVisible = false;
@@ -23,7 +24,7 @@ Item {
     Component.onCompleted: updateScanner()
     Component.onDestruction: {
         if (managedDevice)
-            managedDevice.scannerEnabled = false;
+            ScanOwners.update(managedDevice, root, false);
     }
 
     function updateScanner() {
@@ -32,7 +33,7 @@ Item {
             resultsVisible = false;
         }
         if (wifiDevice)
-            wifiDevice.scannerEnabled = requested && canScan;
+            ScanOwners.update(wifiDevice, root, requested && canScan);
     }
 
     function toggle() {

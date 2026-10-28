@@ -12,15 +12,13 @@ FocusScope {
     required property var config
     required property var notificationService
     readonly property int popupWidth: 360
-    readonly property int popupMinHeight: 320
-    readonly property int popupMaxHeight: 650
+    readonly property int popupHeight: 520
     readonly property int popupPadding: 10
 
     signal closeRequested()
 
     implicitWidth: popupWidth
-    implicitHeight: Math.min(Math.max(notificationService.notificationCount > 0
-        ? 44 + notificationService.notificationCount * 100 : 82, popupMinHeight), popupMaxHeight)
+    implicitHeight: popupHeight
     width: implicitWidth
     height: implicitHeight
     focus: true

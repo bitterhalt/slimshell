@@ -15,6 +15,7 @@ Item {
     required property var wallpaperPicker
 
     property string page: ""
+    property bool menuOpened: false
     property int selectedIndex: 0
     property var menuScreen: null
     property var confirmItem: null
@@ -107,18 +108,17 @@ Item {
         menuScreen = screen || targetScreen
         selectedIndex = 0
         menuCard.prepareLayout()
-        menuWindow.visible = true
+        menuOpened = true
         Qt.callLater(() => keyboardHandler.forceActiveFocus())
     }
 
     function closeMenu(): void {
         cancelConfirmation()
-        menuWindow.visible = false
-        menuScreen = null
+        menuOpened = false
     }
 
     function togglePower(screen): void {
-        if (menuWindow.visible && page === "power")
+        if (menuOpened && page === "power")
             closeMenu()
         else
             openPage("power", screen)
@@ -252,22 +252,33 @@ Item {
         margins.left: screen
             ? Math.max(0, Math.round((screen.width - menuCard.implicitWidth) / 2)) : 0
 
-        visible: false
+        visible: popupMotion.surfaceVisible
         color: "transparent"
         exclusiveZone: 0
-        focusable: true
+        focusable: root.menuOpened
 
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.namespace: "slim-submenu"
-        WlrLayershell.keyboardFocus: visible
-            ? WlrKeyboardFocus.Exclusive
-            : WlrKeyboardFocus.None
+        WlrLayershell.keyboardFocus: root.menuOpened
+            ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+
+        PopupMotion {
+            id: popupMotion
+            openDuration: root.config.popupOpenDuration
+            slideDistance: root.config.popupSlideDistance
+            closeDuration: root.config.popupCloseDuration
+            shown: root.menuOpened
+            animationsEnabled: root.config.popupAnimations
+            animationType: root.config.popupAnimationStyle
+            onClosed: root.menuScreen = null
+        }
 
         FocusScope {
             id: keyboardHandler
 
             anchors.fill: parent
             focus: true
+            enabled: root.menuOpened
 
             Keys.onPressed: event => {
                 switch (event.key) {
@@ -322,6 +333,12 @@ Item {
 
         PopoutPanel {
             id: menuCard
+
+            enabled: root.menuOpened
+            opacity: popupMotion.contentOpacity
+            transform: Translate {
+                y: popupMotion.contentOffset
+            }
 
             z: 1
             config: root.config

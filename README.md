@@ -35,24 +35,24 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 
 | Target               | Calls                                                                  | Effect                                                   |
 | -------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------- |
-| `Audio`              | `toggle`, `open`, `close`                                              | Show or hide the audio popup                             |
-| `Bar`                | `toggle`, `hide`, `show`, `isVisible`                                  | Control or query bar visibility                          |
-| `Bluetooth`          | `toggle`, `open`, `close`                                              | Show or hide the Bluetooth popup                         |
-| `Clipboard`          | `toggle`, `open`, `close`, `refresh`, `copySelected`, `deleteSelected` | Control the clipboard picker                             |
-| `Idle`               | `toggle`, `isDisabled`, `settings`                                     | Control idle handling or open its settings               |
-| `Launcher`           | `toggle`, `open`, `close`                                              | Control the application launcher                         |
-| `Lock`               | `lock`                                                                 | Lock the session                                         |
-| `Locker`             | `isSecure`                                                             | Query whether the separate lock-screen process is secure |
-| `Menu`               | `packages`, `settings`, `system`, `close`                              | Open a main-menu page or close it                        |
-| `Network`            | `toggle`, `open`, `close`                                              | Show or hide the network popup                           |
-| `NotificationCenter` | `toggle`, `open`, `close`                                              | Show or hide notification history                        |
-| `Notifications`      | `toggleDnd`, `enableDnd`, `disableDnd`, `isDnd`, `clear`, `count`      | Control DND or notification history                      |
-| `Power`              | `toggle`, `open`, `close`                                              | Control the power menu                                   |
-| `Recorder`           | `toggle`, `open`, `close`, `fullscreen`, `region`, `stop`              | Control screen recording                                 |
-| `Theme`              | `refresh`, `usingHellwal`                                              | Reload or query the active theme                         |
-| `Translator`         | `toggle`, `open`, `close`                                              | Control the translator                                   |
-| `Volume`             | `up`, `down`, `mute`                                                   | Adjust or mute the default audio output; shows the OSD   |
-| `Wallpaper`          | `toggle`, `open`, `close`, `refresh`                                   | Control the wallpaper picker or refresh wallpapers       |
+| `audio`              | `toggle`, `open`, `close`                                              | Show or hide the audio popup                             |
+| `bar`                | `toggle`, `hide`, `show`, `isVisible`                                  | Control or query bar visibility                          |
+| `bluetooth`          | `toggle`, `open`, `close`                                              | Show or hide the Bluetooth popup                         |
+| `clipboard`          | `toggle`, `open`, `close`, `refresh`, `copySelected`, `deleteSelected` | Control the clipboard picker                             |
+| `idle`               | `toggle`, `isDisabled`, `settings`                                     | Control idle handling or open its settings               |
+| `launcher`           | `toggle`, `open`, `close`                                              | Control the application launcher                         |
+| `lock`               | `lock`                                                                 | Lock the session                                         |
+| `locker`             | `isSecure`                                                             | Query whether the separate lock-screen process is secure |
+| `menu`               | `packages`, `settings`, `system`, `close`                              | Open a main-menu page or close it                        |
+| `network`            | `toggle`, `open`, `close`                                              | Show or hide the network popup                           |
+| `notificationCenter` | `toggle`, `open`, `close`                                              | Show or hide notification history                        |
+| `notifications`      | `toggleDnd`, `enableDnd`, `disableDnd`, `isDnd`, `clear`, `count`      | Control DND or notification history                      |
+| `power`              | `toggle`, `open`, `close`                                              | Control the power menu                                   |
+| `recorder`           | `toggle`, `open`, `close`, `fullscreen`, `region`, `stop`              | Control screen recording                                 |
+| `theme`              | `refresh`, `usingHellwal`                                              | Reload or query the active theme                         |
+| `translator`         | `toggle`, `open`, `close`                                              | Control the translator                                   |
+| `volume`             | `up`, `down`, `mute`                                                   | Adjust or mute the default audio output; shows the OSD   |
+| `wallpaper`          | `toggle`, `open`, `close`                                              | Control the wallpaper picker                             |
 
 For example, `qs ipc call volume up` raises the volume by one step. `launcher/dmenu-runner` uses the launcher's IPC internally; call the script to open a picker.
 

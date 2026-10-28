@@ -14,6 +14,7 @@ PanelWindow {
     required property var config
     required property var targetScreen
     required property var controller
+    required property var popupMotion
     property string scanError: ""
     property string scanNotice: ""
     property bool scanFinished: false
@@ -35,6 +36,8 @@ PanelWindow {
     readonly property int selectedIndex: {
         if (visibleEntries.count === 0)
             return -1
+        if (selectedPath === "")
+            return 0
         for (let i = 0; i < visibleEntries.count; ++i) {
             if (visibleEntries.get(i).path === selectedPath)
                 return i
@@ -180,19 +183,20 @@ PanelWindow {
     }
 
     screen: targetScreen
-    visible: true
+    visible: root.popupMotion.surfaceVisible
     color: "transparent"
     implicitWidth: targetScreen ? Math.min(660, targetScreen.width - 32) : 660
     implicitHeight: targetScreen ? Math.min(570, targetScreen.height - config.popupGap - 24) : 570
     exclusiveZone: 0
-    focusable: true
+    focusable: root.popupMotion.shown
     anchors.top: true
     anchors.left: true
     margins.top: config.popupGap
     margins.left: targetScreen ? Math.max(0, Math.round((targetScreen.width - width) / 2)) : 0
     WlrLayershell.namespace: "slim-wallpaper-picker"
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+    WlrLayershell.keyboardFocus: root.popupMotion.shown
+        ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     Component.onCompleted: Qt.callLater(() => grid.forceActiveFocus())
     Component.onDestruction: {
@@ -260,6 +264,11 @@ PanelWindow {
 
     Rectangle {
         anchors.fill: parent
+        enabled: root.popupMotion.shown
+        opacity: root.popupMotion.contentOpacity
+        transform: Translate {
+            y: root.popupMotion.contentOffset
+        }
         color: root.config.bg
         border.color: root.config.selectionBackground
         border.width: 1

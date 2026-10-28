@@ -7,11 +7,16 @@ Item {
 
     required property var barWindow
     required property var config
-
-    width: 0
-    height: 0
-
-    property bool hostVisible: false
+    // Set each bar popup to "slide" or "fade" here.
+    property var popupAnimationTypes: ({
+        "audio": "fade",
+        "network": "fade",
+        "bluetooth": "fade",
+        "notificationCenter": "fade"
+    })
+    property bool hostRequested: false
+    readonly property bool hostVisible: hostMotion.surfaceVisible
+    readonly property bool hostClosing: hostMotion.closing
     property string activeKey: ""
     readonly property bool barPopupActive: ["audio", "bluetooth", "network"].includes(activeKey)
     property var hostComponent: null
@@ -19,151 +24,132 @@ Item {
     property var anchorRightOffsets: new Map()
     property bool hostFocusable: false
     property bool hostCentered: false
+    property string hostAnimationType: "slide"
+    readonly property bool hostMotionActive: config.popupAnimations && (barPopupActive || activeKey === "notificationCenter")
+
+    function animationTypeFor(key) : string {
+        const type = popupAnimationTypes[key];
+        return type === "slide" || type === "fade" ? type : "slide";
+    }
 
     function openHost(key, component, anchorItem, focusable, centered) {
-        activeKey = key
-        hostComponent = component
-        // The bar's backing window can disappear or lose its geometry while
-        // hidden. Keep a snapshot instead of querying that window in popupX().
-        const screenWidth = barWindow.screen ? barWindow.screen.width : 0
-        const savedOffset = anchorRightOffsets.get(key)
-        hostAnchorCenter = anchorItem && screenWidth > 0 && Number.isFinite(savedOffset)
-            ? screenWidth - savedOffset : -1
+        const wasRequested = hostRequested;
+        const switching = activeKey !== key;
+        // Cancel a pending exit before changing its animation policy.
+        if (hostClosing)
+            hostRequested = true;
+
+        activeKey = key;
+        hostComponent = component;
+        // The bar's backing window may be hidden. Preserve its last anchor.
+        const screenWidth = barWindow.screen ? barWindow.screen.width : 0;
+        const savedOffset = anchorRightOffsets.get(key);
+        hostAnchorCenter = anchorItem && screenWidth > 0 && Number.isFinite(savedOffset) ? screenWidth - savedOffset : -1;
         if (anchorItem && barWindow.visible && barWindow.backingWindowVisible) {
             try {
-                const pos = barWindow.itemPosition(anchorItem)
+                const pos = barWindow.itemPosition(anchorItem);
                 if (Number.isFinite(pos.x)) {
-                    hostAnchorCenter = pos.x + anchorItem.width / 2
+                    hostAnchorCenter = pos.x + anchorItem.width / 2;
                     if (screenWidth > 0)
-                        anchorRightOffsets.set(key, screenWidth - hostAnchorCenter)
+                        anchorRightOffsets.set(key, screenWidth - hostAnchorCenter);
+
                 }
-            } catch (_) {}
+            } catch (_) {
+            }
         }
-        hostFocusable = focusable === true
-        hostCentered = centered === true
-        hostVisible = true
+        hostFocusable = focusable === true;
+        hostCentered = centered === true;
+        hostAnimationType = animationTypeFor(key);
+        // Reopening reverses an exit from its current progress. Switching an
+        // already-open host starts a fresh entrance without unmapping it.
+        if (wasRequested || (hostRequested && switching))
+            hostMotion.restartEnter();
+        else
+            hostRequested = true;
     }
 
     function toggleHost(key, component, anchorItem, focusable, centered) {
-        if (hostVisible && activeKey === key) {
-            closeHost()
-            return
-        }
-
-        openHost(key, component, anchorItem, focusable, centered)
+        if (hostRequested && activeKey === key)
+            closeHost();
+        else
+            openHost(key, component, anchorItem, focusable, centered);
     }
 
     function closeHost(key) {
         if (key !== undefined && key !== "" && activeKey !== key)
-            return
+            return ;
 
-        hostVisible = false
-        hostFocusable = false
-        hostCentered = false
-        activeKey = ""
-        hostComponent = null
-        hostAnchorCenter = -1
+        hostRequested = false;
+    }
+
+    function finishClose() {
+        hostFocusable = false;
+        hostCentered = false;
+        activeKey = "";
+        hostComponent = null;
+        hostAnchorCenter = -1;
     }
 
     function popupX(popupWidth) {
-        const screenWidth = barWindow.screen
-            ? barWindow.screen.width
-            : popupWidth
-
+        const screenWidth = barWindow.screen ? barWindow.screen.width : popupWidth;
         if (hostCentered)
-            return Math.round((screenWidth - popupWidth) / 2)
+            return Math.round((screenWidth - popupWidth) / 2);
 
         if (hostAnchorCenter >= 0)
-            return Math.max(config.popupGap, Math.min(
-                screenWidth - popupWidth - config.popupGap,
-                hostAnchorCenter - popupWidth / 2
-            ))
+            return Math.max(config.popupGap, Math.min(screenWidth - popupWidth - config.popupGap, hostAnchorCenter - popupWidth / 2));
 
         if (barPopupActive)
-            return Math.max(config.popupGap, screenWidth - popupWidth - config.popupGap)
+            return Math.max(config.popupGap, screenWidth - popupWidth - config.popupGap);
 
-        return Math.round((screenWidth - popupWidth) / 2)
+        return Math.round((screenWidth - popupWidth) / 2);
     }
 
-    // Bounded popup windows; the active key chooses which host is shown.
-    component PopupSurface: PanelWindow {
-        id: popupSurface
+    width: 0
+    height: 0
 
-        required property var managerRef
-        required property string hostKey
-        required property string surfaceNamespace
+    PopupMotion {
+        id: hostMotion
+        openDuration: manager.config.popupOpenDuration
+        slideDistance: manager.config.popupSlideDistance
+        closeDuration: manager.config.popupCloseDuration
 
-        screen: managerRef.barWindow.screen
-        visible: managerRef.hostVisible
-            && (hostKey === ""
-                ? managerRef.activeKey !== "notificationCenter"
-                    && !managerRef.barPopupActive
-                : hostKey === "barPopup" ? managerRef.barPopupActive
-                : managerRef.activeKey === hostKey)
-        color: "transparent"
-        exclusiveZone: 0
-        focusable: managerRef.hostFocusable
-        implicitWidth: popupLoader.item
-            ? popupLoader.item.implicitWidth
-            : 0
-        implicitHeight: popupLoader.item
-            ? popupLoader.item.implicitHeight
-            : 0
-
-        anchors {
-            top: true
-            left: true
-        }
-
-        margins.top: managerRef.config.popupGap
-        margins.left: managerRef.popupX(implicitWidth)
-
-        WlrLayershell.namespace: surfaceNamespace
-        WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.keyboardFocus: visible
-            ? WlrKeyboardFocus.Exclusive
-            : WlrKeyboardFocus.None
-
-        Item {
-            anchors.fill: parent
-
-            Loader {
-                id: popupLoader
-
-                anchors.fill: parent
-                active: popupSurface.visible
-                sourceComponent: managerRef.hostComponent
-            }
-        }
+        shown: manager.hostRequested
+        animationsEnabled: manager.hostMotionActive
+        animationType: manager.hostAnimationType
+        onClosed: manager.finishClose()
     }
 
     PopupSurface {
         managerRef: manager
+        motion: hostMotion
         hostKey: "notificationCenter"
         surfaceNamespace: "slim-notification-center"
     }
 
     PopupSurface {
         managerRef: manager
+        motion: hostMotion
         hostKey: "barPopup"
         surfaceNamespace: "slim-barpopup"
     }
 
     PopupSurface {
         managerRef: manager
+        motion: hostMotion
         hostKey: ""
         surfaceNamespace: "slim-submenu"
     }
 
-    // The full-screen surface only catches outside clicks. It lives below the
-    // card-sized overlay surfaces and intentionally has no shadow namespace.
-    // Full-screen click catcher, kept below the bounded popup surfaces.
+    // Outside clicks are caught below the bounded overlay surfaces.
     PanelWindow {
         screen: manager.barWindow.screen
         visible: manager.hostVisible
         color: "transparent"
         exclusiveZone: 0
         focusable: false
+        WlrLayershell.namespace: "slim-popup-catcher"
+        WlrLayershell.layer: WlrLayer.Top
+        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
         anchors {
             top: true
@@ -172,14 +158,58 @@ Item {
             right: true
         }
 
-        WlrLayershell.namespace: "slim-popup-catcher"
-        WlrLayershell.layer: WlrLayer.Top
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-
         MouseArea {
             anchors.fill: parent
             onClicked: manager.closeHost()
         }
+
+    }
+
+    component PopupSurface: PanelWindow {
+        id: popupSurface
+
+        required property var managerRef
+        required property var motion
+        required property string hostKey
+        required property string surfaceNamespace
+
+        screen: managerRef.barWindow.screen
+        visible: managerRef.hostVisible && (hostKey === "" ? managerRef.activeKey !== "notificationCenter" && !managerRef.barPopupActive : hostKey === "barPopup" ? managerRef.barPopupActive : managerRef.activeKey === hostKey)
+        color: "transparent"
+        exclusiveZone: 0
+        focusable: managerRef.hostFocusable && managerRef.hostRequested
+        implicitWidth: popupLoader.item ? popupLoader.item.implicitWidth : 0
+        implicitHeight: popupLoader.item ? popupLoader.item.implicitHeight : 0
+        margins.top: managerRef.config.popupGap
+        margins.left: managerRef.popupX(implicitWidth)
+        WlrLayershell.namespace: surfaceNamespace
+        WlrLayershell.layer: WlrLayer.Overlay
+        WlrLayershell.keyboardFocus: visible && managerRef.hostRequested ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+
+        anchors {
+            top: true
+            left: true
+        }
+
+        Item {
+            anchors.fill: parent
+            enabled: popupSurface.managerRef.hostRequested
+            opacity: popupSurface.motion.contentOpacity
+
+            Loader {
+                id: popupLoader
+
+                anchors.fill: parent
+                active: popupSurface.visible
+                sourceComponent: popupSurface.managerRef.hostComponent
+            }
+
+            transform: Translate {
+                y: popupSurface.motion.contentOffset
+            }
+
+        }
+
     }
 
 }

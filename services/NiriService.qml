@@ -10,6 +10,7 @@ Item {
     property var windows: ({
     })
     property int focusedWindowId: -1
+    property int reconnectDelay: 1000
     readonly property string focusedOutput: {
         for (let i = 0; i < workspaces.length; ++i) {
             if (workspaces[i].is_focused)
@@ -100,6 +101,7 @@ Item {
 
         try {
             const event = JSON.parse(line);
+            reconnectDelay = 1000;
             if (event.WorkspacesChanged) {
                 workspaces = event.WorkspacesChanged.workspaces || [];
                 return ;
@@ -138,11 +140,21 @@ Item {
 
     visible: false
 
+    Timer {
+        id: reconnect
+        interval: service.reconnectDelay
+        onTriggered: {
+            service.reconnectDelay = Math.min(service.reconnectDelay * 2, 30000)
+            niriEvents.running = true
+        }
+    }
+
     Process {
         id: niriEvents
 
         running: true
         command: ["niri", "msg", "--json", "event-stream"]
+        onRunningChanged: if (!running) reconnect.restart()
 
         stdout: SplitParser {
             onRead: (data) => {

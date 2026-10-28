@@ -82,6 +82,8 @@ Item {
     property string query: ""
     property string calculatorResult: ""
     property var fileResults: []
+    property int fileSearchGeneration: 0
+    property bool fileSearchPending: false
     property int selectedIndex: 0
 
     readonly property int maxVisibleRows: 7
@@ -342,7 +344,6 @@ Item {
         Math.min(selectedIndex, results.length - 1))
 
     // Normal modes stay fixed; dmenu can choose a row count per request.
-    readonly property bool expanded: true
     readonly property bool fileSearching:
         fileProcess.running || fileSearchDebounce.running
     readonly property int availableDmenuRows: targetScreen
@@ -787,10 +788,21 @@ Item {
 
         if (!isText) {
             Quickshell.execDetached(["xdg-open", path])
-        } else if (home !== "" && path.startsWith(home + "/")) {
-            Quickshell.execDetached([terminal, "-e", editor, path])
+        } else if (home === "" || !path.startsWith(home + "/")) {
+            // Default to ordinary editing. Elevation requires an explicit
+            // choice, and paths/editor names remain positional arguments.
+            Quickshell.execDetached([
+                terminal, "-e", "sh", "-c",
+                'printf "File: %s\\n\\nEnter: edit normally\\ns: sudoedit (administrator)\\nAnything else: cancel\\n> " "$1"; '
+                + 'IFS= read -r choice || exit 0; '
+                + 'case "$choice" in '
+                + '"") exec "$2" "$1" ;; '
+                + 's|S) exec sudoedit -- "$1" ;; '
+                + '*) exit 0 ;; esac',
+                "launcher-edit", path, editor
+            ])
         } else {
-            Quickshell.execDetached([terminal, "-e", "sudoedit", path])
+            Quickshell.execDetached([terminal, "-e", editor, path])
         }
     }
 
@@ -815,6 +827,8 @@ Item {
     }
 
     function updateFileSearch(): void {
+        fileSearchGeneration += 1
+        fileSearchPending = opened && fileMode && fileNeedle.length >= 2
         fileResults = []
         fileSearchDebounce.stop()
 
@@ -823,7 +837,7 @@ Item {
             return
         }
 
-        if (fileMode && fileNeedle.length >= 2)
+        if (fileSearchPending)
             fileSearchDebounce.restart()
     }
 
@@ -879,15 +893,6 @@ Item {
             border.width: 1
             radius: root.config.popupRadius
             clip: true
-
-            Behavior on height {
-                enabled: root.opened
-
-                NumberAnimation {
-                    duration: 100
-                    easing.type: Easing.OutCubic
-                }
-            }
 
             Rectangle {
                 id: searchBackground
@@ -1048,7 +1053,6 @@ Item {
                 anchors.right: parent.right
                 anchors.leftMargin: searchBackground.anchors.leftMargin
                 anchors.rightMargin: searchBackground.anchors.rightMargin
-                visible: root.expanded
                 clip: true
                 interactive: false
                 model: root.results
@@ -1145,7 +1149,7 @@ Item {
                 anchors.top: searchInput.bottom
                 anchors.topMargin: 18
                 anchors.horizontalCenter: parent.horizontalCenter
-                visible: root.expanded && root.visibleRows > 0 && root.results.length === 0
+                visible: root.visibleRows > 0 && root.results.length === 0
                 color: root.config.muted
                 font.pointSize: root.config.fontSize(0.88)
                     text: root.dmenuMode ? "No matches"
@@ -1227,9 +1231,11 @@ Item {
         id: fileSearchDebounce
         interval: 180
         onTriggered: {
-            if (fileProcess.running || root.fileNeedle.length < 2)
+            if (fileProcess.running || !root.opened || !root.fileMode || root.fileNeedle.length < 2)
                 return
 
+            root.fileSearchPending = false
+            fileProcess.generation = root.fileSearchGeneration
             fileProcess.needle = root.fileNeedle
             fileProcess.command = [
                 "fd", "-H", "-t", "f",
@@ -1273,10 +1279,12 @@ Item {
         id: fileProcess
 
         property string needle: ""
+        property int generation: -1
 
         stdout: StdioCollector {
             onStreamFinished: {
-                if (fileProcess.needle !== root.fileNeedle)
+                if (!root.opened || !root.fileMode
+                        || fileProcess.generation !== root.fileSearchGeneration)
                     return
 
                 root.fileResults = text.trim()
@@ -1290,9 +1298,8 @@ Item {
         stderr: StdioCollector {}
 
         onExited: {
-            if (root.fileMode
-                    && root.fileNeedle.length >= 2
-                    && fileProcess.needle !== root.fileNeedle) {
+            if (root.fileSearchPending && root.opened && root.fileMode
+                    && root.fileNeedle.length >= 2) {
                 fileSearchDebounce.restart()
             }
         }

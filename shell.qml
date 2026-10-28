@@ -125,6 +125,10 @@ ShellRoot {
     target: appNotificationService
 
     function onToastSerialChanged(): void {
+      if (appNotificationService.historyOpenCount > 0) {
+        appNotificationService.finishToast(appNotificationService.toastNotification)
+        return
+      }
       if (!appNotificationService.dnd
           && appNotificationService.toastNotification) {
         appNotificationPopup.show(

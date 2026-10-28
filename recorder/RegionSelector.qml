@@ -121,7 +121,9 @@ PanelWindow {
             }
 
             root.accepted(
-                width + "x" + height + "+" + x + "+" + y
+                width + "x" + height + "+"
+                + (x + (root.targetScreen ? root.targetScreen.x : 0)) + "+"
+                + (y + (root.targetScreen ? root.targetScreen.y : 0))
             )
         }
     }

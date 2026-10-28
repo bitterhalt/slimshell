@@ -11,6 +11,7 @@ Item {
     required property var config
 
     property bool dnd: false
+    property int historyOpenCount: 0
     property var toastNotification: null
     property int toastSerial: 0
     property var receivedTimes: ({})
@@ -61,9 +62,9 @@ Item {
     }
 
     function receive(notification): void {
-        // An excluded notification that will not be toasted should not remain
-        // tracked. Toasted exclusions stay tracked until the toast finishes.
-        if (isHistoryExcluded(notification)
+        // Suppressed transients and history exclusions must not remain tracked.
+        // Toasted entries stay alive only until their toast finishes.
+        if ((notification.transient || isHistoryExcluded(notification))
                 && !ToastPolicy.shouldShow(notification, dnd)) {
             notification.tracked = false
             return

@@ -15,5 +15,5 @@ function isExcluded(notification, excludedApps) {
 
 function visibleNotifications(notifications, excludedApps) {
     return (notifications || []).filter(notification =>
-        !isExcluded(notification, excludedApps))
+        !notification.transient && !isExcluded(notification, excludedApps))
 }

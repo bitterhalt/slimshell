@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Widgets
+import "../../../components"
 
 Item {
     id: root
@@ -20,6 +21,18 @@ Item {
     readonly property color criticalBorderColor: "#af3029"
     readonly property color criticalTextColor: "#ad8301"
     property var batteryQueue: []
+    property bool toastShown: false
+
+    PopupMotion {
+        id: toastMotion
+        shown: root.toastShown
+        animationsEnabled: root.config.popupAnimations
+        animationType: root.config.notificationAnimationStyle
+        openDuration: root.config.popupOpenDuration
+        slideDistance: root.config.popupSlideDistance
+        closeDuration: root.config.popupCloseDuration
+        onClosed: root.batteryAlert = false
+    }
 
     function deviceLabel(device) {
         if (!device)
@@ -35,14 +48,14 @@ Item {
 
     function showConnected(device) {
         if (!device || !device.connected || !device.paired || device.pairing
-                || shouldIgnore(device) || (toast.visible && batteryAlert))
+                || shouldIgnore(device) || (toastShown && batteryAlert))
             return ;
 
         deviceName = deviceLabel(device);
         deviceIcon = device.icon || "";
         statusText = "Connected";
         batteryAlert = false;
-        toast.visible = true;
+        toastShown = true;
         toastTimer.restart();
     }
 
@@ -51,7 +64,7 @@ Item {
             name: deviceLabel(device), icon: device.icon || "",
             status: (critical ? "Battery critical" : "Battery low") + " · " + percent + "%"
         }
-        if (toast.visible && batteryAlert) {
+        if (toastShown && batteryAlert) {
             batteryQueue = batteryQueue.concat([warning]);
             return;
         }
@@ -63,7 +76,7 @@ Item {
         deviceIcon = warning.icon;
         statusText = warning.status;
         batteryAlert = true;
-        toast.visible = true;
+        toastShown = true;
         toastTimer.restart();
     }
 
@@ -98,7 +111,7 @@ Item {
         exclusiveZone: 0
         implicitWidth: root.batteryAlert ? 200 : 200
         implicitHeight: 62
-        visible: false
+        visible: toastMotion.surfaceVisible
         color: "transparent"
 
         // Anchored to the top edge only and sized to the card, so compositor
@@ -107,6 +120,8 @@ Item {
 
         Rectangle {
             anchors.fill: parent
+            opacity: toastMotion.contentOpacity
+            transform: Translate { y: toastMotion.contentOffset }
             radius: root.config.popupRadius
             color: root.batteryAlert ? root.config.bg : root.config.bg
             border.color: root.batteryAlert ? root.criticalBorderColor : root.config.selectionBackground
@@ -187,8 +202,7 @@ Item {
                 root.batteryQueue = root.batteryQueue.slice(1);
                 root.showBatteryToast(next);
             } else {
-                toast.visible = false;
-                root.batteryAlert = false;
+                root.toastShown = false;
             }
         }
     }

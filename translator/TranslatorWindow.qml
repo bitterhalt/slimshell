@@ -11,6 +11,7 @@ PanelWindow {
 
     required property var config
     required property var targetScreen
+    required property var popupMotion
     property string sourceLanguage: ""
     property string targetLanguage: "EN-GB"
     property string translation: ""
@@ -130,19 +131,20 @@ PanelWindow {
     }
 
     screen: targetScreen
-    visible: true
+    visible: root.popupMotion.surfaceVisible
     color: "transparent"
     implicitWidth: 520
     implicitHeight: 410
     exclusiveZone: 0
-    focusable: true
+    focusable: root.popupMotion.shown
     anchors.top: true
     anchors.left: true
     margins.top: config.popupGap
     margins.left: targetScreen ? Math.max(0, Math.round((targetScreen.width - width) / 2)) : 0
     WlrLayershell.namespace: "slim-translator"
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+    WlrLayershell.keyboardFocus: root.popupMotion.shown
+        ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     Component.onCompleted: Qt.callLater(() => {
         return sourceInput.forceActiveFocus();
     })
@@ -225,6 +227,11 @@ PanelWindow {
 
     Rectangle {
         anchors.fill: parent
+        enabled: root.popupMotion.shown
+        opacity: root.popupMotion.contentOpacity
+        transform: Translate {
+            y: root.popupMotion.contentOffset
+        }
         color: root.config.bg
         border.color: root.config.selectionBackground
         border.width: 1

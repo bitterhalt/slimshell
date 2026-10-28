@@ -1,6 +1,8 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import "../components"
+import "ToastPolicy.js" as ToastPolicy
 
 Scope {
     id: root
@@ -12,7 +14,25 @@ Scope {
     // Active toasts, newest first. Delegates are keyed by the notification
     // object, so each toast keeps its own timer while others come and go.
     property var toasts: []
-    property var toastHeights: ({})
+    // Retain outgoing delegates until their exit has completed.
+    property var renderedToasts: []
+    property var pendingFinish: []
+    onToastsChanged: {
+        const retained = ToastPolicy.retainForExit(toasts, renderedToasts, maxToasts)
+        const dropped = renderedToasts.filter(item => retained.indexOf(item) === -1)
+        renderedToasts = retained
+        // Bursts must not create an unbounded number of retiring windows.
+        for (const notification of dropped)
+            finishExit(notification)
+    }
+
+    function finishExit(notification) {
+        const finish = pendingFinish.indexOf(notification) !== -1
+        pendingFinish = pendingFinish.filter(item => item !== notification)
+        renderedToasts = renderedToasts.filter(item => item !== notification)
+        if (finish)
+            notificationService.finishToast(notification)
+    }
     // Non-transient toasts bumped off the stack remain in the center.
     property var overflowedNotifications: []
     readonly property int overflowCount: overflowedNotifications.length
@@ -21,40 +41,13 @@ Scope {
 
     readonly property int maxToasts: 3
     readonly property int toastWidth: 380
-    readonly property int defaultToastHeight: 84
+    readonly property int toastHeight: 100
     readonly property int toastSpacing: 8
     readonly property int chipHeight: 24
     readonly property int defaultToastTimeoutMs: 5000
 
-    onToastsChanged: {
-        const kept = {}
-        for (const notification of toasts) {
-            const key = String(notification.id)
-            if (toastHeights[key] !== undefined)
-                kept[key] = toastHeights[key]
-        }
-        toastHeights = kept
-    }
-
-    function recordHeight(notification, height) {
-        if (!notification || toasts.indexOf(notification) === -1)
-            return
-        const key = String(notification.id)
-        const measured = Math.ceil(height)
-        if (measured <= 0 || toastHeights[key] === measured)
-            return
-        const next = Object.assign({}, toastHeights)
-        next[key] = measured
-        toastHeights = next
-    }
-
     function toastOffset(index) {
-        let offset = 0
-        for (let i = 0; i < index && i < toasts.length; ++i) {
-            const key = String(toasts[i].id)
-            offset += (toastHeights[key] || defaultToastHeight) + toastSpacing
-        }
-        return offset
+        return index * (toastHeight + toastSpacing)
     }
 
     // expireTimeout is the raw D-Bus value in milliseconds (despite what the
@@ -76,7 +69,7 @@ Scope {
             const overflowed = next.pop()
 
             if (overflowed.transient || notificationService.isHistoryExcluded(overflowed))
-                notificationService.finishToast(overflowed)
+                pendingFinish = pendingFinish.concat([overflowed])
             else
                 overflowedNotifications =
                     overflowedNotifications.concat([overflowed])
@@ -103,19 +96,20 @@ Scope {
 
     // Remove from the stack and let the service finish it (expires transients).
     function dismissToast(notification): void {
+        if (toasts.indexOf(notification) === -1)
+            return
+        pendingFinish = pendingFinish.concat([notification])
         removeToast(notification)
-        notificationService.finishToast(notification)
     }
 
     // Hides every toast; notifications stay in the center.
     function hide(): void {
         const current = toasts
 
+        pendingFinish = pendingFinish.concat(current)
         toasts = []
         overflowedNotifications = []
 
-        for (let i = 0; i < current.length; ++i)
-            notificationService.finishToast(current[i])
     }
 
     Connections {
@@ -131,7 +125,7 @@ Scope {
     // (a niri shadow, say) then wrap each card, and the gaps between cards stay
     // empty instead of being filled by one big surface.
     Variants {
-        model: root.toasts
+        model: root.renderedToasts
 
         // Each toast is its own card-sized surface so shadows follow its shape.
         delegate: PanelWindow {
@@ -140,8 +134,21 @@ Scope {
             required property var modelData
 
             // Position in the stack (0 = newest, at the top).
-            readonly property int slot: Math.max(
-                0, root.toasts.indexOf(modelData))
+            readonly property int slot: Math.max(0, root.renderedToasts.indexOf(modelData))
+            readonly property int activeSlot: root.toasts.indexOf(modelData)
+            readonly property bool toastActive: activeSlot >= 0
+            visible: toastMotion.surfaceVisible
+
+            PopupMotion {
+                id: toastMotion
+                openDuration: root.config.popupOpenDuration
+                slideDistance: root.config.popupSlideDistance
+                closeDuration: root.config.popupCloseDuration
+                shown: toastWindow.toastActive
+                animationsEnabled: root.config.popupAnimations
+                animationType: root.config.notificationAnimationStyle
+                onClosed: root.finishExit(toastWindow.modelData)
+            }
 
             screen: root.targetScreen
             anchors.top: true
@@ -161,38 +168,61 @@ Scope {
 
             exclusiveZone: 0
             implicitWidth: root.toastWidth
-            implicitHeight: card.height
+            implicitHeight: root.toastHeight
             color: "transparent"
 
             HoverHandler {
                 id: hover
+                onHoveredChanged: {
+                    if (hovered) {
+                        if (expiry.running)
+                            toastWindow.remainingMs = Math.max(1,
+                                toastWindow.remainingMs - (Date.now() - toastWindow.startedAt))
+                        expiry.stop()
+                    } else if (toastWindow.toastActive && toastWindow.remainingMs > 0) {
+                        toastWindow.startedAt = Date.now()
+                        expiry.restart()
+                    }
+                }
             }
 
             NotificationCard {
                 id: card
 
                 width: parent.width
-                height: implicitHeight
+                height: root.toastHeight
+                opacity: toastMotion.contentOpacity
+                transform: Translate { y: toastMotion.contentOffset }
 
                 config: root.config
                 notification: toastWindow.modelData
 
-                compact: true
-                onHeightChanged: root.recordHeight(toastWindow.modelData, height)
-                Component.onCompleted: root.recordHeight(toastWindow.modelData, height)
             }
 
             MouseArea {
                 anchors.fill: parent
+                enabled: toastWindow.toastActive
                 cursorShape: Qt.PointingHandCursor
 
                 onClicked: root.dismissToast(toastWindow.modelData)
             }
 
-            // Hovering pauses the countdown; leaving restarts it.
+            property int remainingMs: root.toastTimeoutMs(modelData)
+            property double startedAt: 0
+            Component.onCompleted: {
+                if (activeSlot < 0)
+                    Qt.callLater(() => root.finishExit(toastWindow.modelData))
+                if (remainingMs > 0 && !hover.hovered) {
+                    startedAt = Date.now()
+                    expiry.start()
+                }
+            }
+            onToastActiveChanged: if (!toastActive) expiry.stop()
+
+            // Hovering preserves the remaining countdown.
             Timer {
-                interval: root.toastTimeoutMs(toastWindow.modelData)
-                running: interval > 0 && !hover.hovered
+                id: expiry
+                interval: Math.max(1, toastWindow.remainingMs)
                 repeat: false
 
                 onTriggered: root.dismissToast(toastWindow.modelData)
@@ -202,6 +232,10 @@ Scope {
                 target: toastWindow.modelData
 
                 function onClosed(): void {
+                    // Closed notification objects cannot safely be retained
+                    // for an exit; drop their surfaces immediately.
+                    root.pendingFinish = root.pendingFinish.filter(item => item !== toastWindow.modelData)
+                    root.renderedToasts = root.renderedToasts.filter(item => item !== toastWindow.modelData)
                     root.removeToast(toastWindow.modelData)
                 }
             }
@@ -215,7 +249,7 @@ Scope {
         screen: root.targetScreen
         anchors.top: true
         anchors.left: true
-        margins.top: root.config.popupGap + root.toastOffset(root.toasts.length)
+        margins.top: root.config.popupGap + root.toastOffset(root.renderedToasts.length)
         margins.left: root.targetScreen
             ? Math.max(
                 0,
@@ -229,8 +263,18 @@ Scope {
         exclusiveZone: 0
         implicitWidth: root.toastWidth
         implicitHeight: root.chipHeight
-        visible: root.toasts.length > 0 && root.overflowCount > 0
+        visible: chipMotion.surfaceVisible
         color: "transparent"
+
+        PopupMotion {
+            id: chipMotion
+            openDuration: root.config.popupOpenDuration
+            slideDistance: root.config.popupSlideDistance
+            closeDuration: root.config.popupCloseDuration
+            shown: root.toasts.length > 0 && root.overflowCount > 0
+            animationsEnabled: root.config.popupAnimations
+            animationType: root.config.notificationAnimationStyle
+        }
 
         // Stop tracking bumped notifications once they are closed elsewhere.
         Repeater {
@@ -253,6 +297,9 @@ Scope {
 
         Rectangle {
             anchors.fill: parent
+            enabled: chipMotion.shown
+            opacity: chipMotion.contentOpacity
+            transform: Translate { y: chipMotion.contentOffset }
             radius: root.config.popupRadius
             color: root.config.bg
             border.color: root.config.selectionBackground
