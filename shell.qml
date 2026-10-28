@@ -3,7 +3,6 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Quickshell.Services.Pipewire
 
 import "components"
 import "services"
@@ -45,6 +44,11 @@ ShellRoot {
     theme: themeService
   }
 
+  SettingsService {
+    id: appSettingsService
+    config: appConfig
+  }
+
   PolkitService {
     config: appConfig
     targetScreen: root.activeScreen
@@ -53,6 +57,15 @@ ShellRoot {
   NiriService {
     id: niriService
 
+  }
+
+  AudioService {
+    id: appAudioService
+    config: appConfig
+  }
+
+  NetworkService {
+    id: appNetworkService
   }
 
   MainMenu {
@@ -98,7 +111,7 @@ ShellRoot {
     id: appWallpaperPicker
     config: appConfig
     targetScreen: root.activeScreen
-    settingsService: appIdleService
+    settingsService: appSettingsService
   }
 
   NotificationService {
@@ -160,7 +173,7 @@ ShellRoot {
 
   IdleService {
     id: appIdleService
-    config: appConfig
+    settingsService: appSettingsService
     lockService: appLockService
     targetScreen: root.activeScreen
   }
@@ -169,12 +182,13 @@ ShellRoot {
     id: idleSettings
     config: appConfig
     idleService: appIdleService
+    settingsService: appSettingsService
     targetScreen: root.activeScreen
   }
 
   Connections {
     target: appIdleService
-    function onSettingsRequested(screen) { idleSettings.openMenu(screen) }
+    function onSettingsRequested(screen) { idleSettings.open(screen) }
   }
 
   RecorderService {
@@ -185,10 +199,6 @@ ShellRoot {
   ShellUiService {
     id: shellUiService
     targetScreen: root.activeScreen
-  }
-
-  PwObjectTracker {
-    objects: [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource]
   }
 
   VolumeOsd {
@@ -246,8 +256,11 @@ ShellRoot {
       notificationService: appNotificationService
       notificationPopup: appNotificationPopup
       bluetoothService: appBluetoothService
+      audioService: appAudioService
+      networkService: appNetworkService
       batteryService: appBatteryService
       idleService: appIdleService
+      settingsService: appSettingsService
       recorderService: appRecorderService
       uiService: shellUiService
 

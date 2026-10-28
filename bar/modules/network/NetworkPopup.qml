@@ -10,6 +10,7 @@ PopoutPanel {
     id: root
 
     required property var network
+    required property var popupManager
     property bool passwordMode: false
     property bool actionMode: false
     property string selectedSsid: ""
@@ -111,7 +112,7 @@ PopoutPanel {
             else if (actionMode) {
                 resetState();
             } else {
-                network.popupManager.closeHost("network");
+                popupManager.closeHost("network");
             }
         } else if (event.key === Qt.Key_Question || event.text === "?") {
             helpOpen = !helpOpen;
@@ -164,14 +165,13 @@ PopoutPanel {
             return ;
         }
         selectedSsid = row.ssid;
-        network.popupManager.hostFocusable = true;
+        popupManager.hostFocusable = true;
         passwordMode = true;
         Qt.callLater(() => {
             return wifiPassword.forceActiveFocus();
         });
     }
 
-    config: network.config
     focus: true
     Component.onCompleted: {
         if (selectableRows.length > 0)

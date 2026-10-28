@@ -4,7 +4,7 @@ import QtQuick
 Item {
     id: root
 
-    required property var audioItem
+    required property var audioService
     property var profiles: null
     readonly property var tabs: ["Outputs", "Inputs", "Playback", "Config"]
     property int tabIndex: 0
@@ -18,13 +18,13 @@ Item {
     property bool helpOpen: false
     readonly property var rows: {
         if (tabIndex === 0)
-            return audioItem.outputRows;
+            return audioService.outputRows;
 
         if (tabIndex === 1)
-            return audioItem.inputRows;
+            return audioService.inputRows;
 
         if (tabIndex === 2)
-            return audioItem.streamRows;
+            return audioService.streamRows;
 
         return profileCardKey !== "" ? (profileCard ? profileCard.profiles : []) : profiles ? profiles.cards : [];
     }
@@ -98,26 +98,26 @@ Item {
             return ;
 
         if (selectedRow.kind === "output")
-            audioItem.setOutput(selectedRow.id);
+            audioService.setOutput(selectedRow.id);
         else if (selectedRow.kind === "input")
-            audioItem.setInput(selectedRow.id);
+            audioService.setInput(selectedRow.id);
     }
 
     function toggleMute() {
         if (selectedRow && tabIndex !== 3)
-            audioItem.toggleMute(selectedRow.id);
+            audioService.toggleMute(selectedRow.id);
 
     }
 
     function adjustVolume(delta) {
         if (selectedRow && tabIndex !== 3)
-            audioItem.adjustVolume(selectedRow.id, delta);
+            audioService.adjustVolume(selectedRow.id, delta);
 
     }
 
     function setVolumePercent(value) {
         if (selectedRow && tabIndex !== 3)
-            audioItem.setVolume(selectedRow.id, value);
+            audioService.setVolume(selectedRow.id, value);
     }
 
     function activateSelected() {

@@ -23,8 +23,11 @@ PanelWindow {
     required property var notificationService
     required property var notificationPopup
     required property var bluetoothService
+    required property var audioService
+    required property var networkService
     required property var batteryService
     required property var idleService
+    required property var settingsService
     required property var recorderService
     required property var uiService
 
@@ -60,7 +63,7 @@ PanelWindow {
             config: barWindow.config
             barWindow: barWindow
             niri: barWindow.niri
-            settingsService: barWindow.idleService
+            settingsService: barWindow.settingsService
         }
 
         WindowTitle {
@@ -117,6 +120,7 @@ PanelWindow {
             barWindow: barWindow
             popupManager: popupManager
             uiService: barWindow.uiService
+            networkService: barWindow.networkService
         }
 
         Bluetooth {
@@ -132,6 +136,7 @@ PanelWindow {
             barWindow: barWindow
             popupManager: popupManager
             uiService: barWindow.uiService
+            audioService: barWindow.audioService
         }
 
         Idle {

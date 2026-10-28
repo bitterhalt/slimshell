@@ -19,14 +19,106 @@ Item {
         id: settings
         property int notificationHistoryLimit: 100
         property var notificationHistoryExcludedApps: []
+        property int idleLockTimeout: 1200
+        property int idleOffTimeout: 1800
+        property int idleSuspendTimeout: 7200
     }
     Component { id: notifications; NotificationService { config: settings } }
     Component { id: niri; NiriService {} }
     Component { id: recorder; RecorderService {} }
+    Component { id: preferences; SettingsService { config: settings } }
+    Component { id: idle; IdleService { lockService: lockStub } }
+    Component { id: enabledSpy; SignalSpy { signalName: "automaticEnabledChanged" } }
+    QtObject { id: lockStub; function lock() {} }
     TestCase {
         name: "ServiceRegressions"
         function process(service, binary) {
             return Array.from(service.data).find(child => child.command && child.command[0] === binary);
+        }
+        function file(service) {
+            return Array.from(service.data).find(child => child.path !== undefined);
+        }
+        function test_settings_restore_existing_format_and_legacy_mode() {
+            const service = createTemporaryObject(preferences, host);
+            const storage = file(service);
+            verify(storage.path.endsWith("/quickshell-settings.json"));
+            verify(storage.atomicWrites);
+            verify(!service.settingsLoaded);
+            storage.contents = JSON.stringify({lock: 60, off: 120, suspend: 300,
+                hellwalMode: "light-comfort", hellwalDarkOffset: 0.2,
+                hellwalBrightOffset: 0.4, workspaceLayout: "minimal"});
+            storage.loaded();
+            verify(service.settingsLoaded);
+            verify(!service.applying);
+            compare(service.lockTimeout, 60);
+            compare(service.offTimeout, 120);
+            compare(service.suspendTimeout, 300);
+            compare(service.hellwalMode, "light");
+            compare(service.hellwalDarkOffset, 0.2);
+            compare(service.hellwalBrightOffset, 0.4);
+            compare(service.workspaceLayout, "minimal");
+            compare(storage.written, "");
+        }
+        function test_settings_missing_and_malformed_keep_defaults() {
+            for (const malformed of [false, true]) {
+                const service = createTemporaryObject(preferences, host);
+                const storage = file(service);
+                if (malformed) {
+                    storage.contents = "invalid JSON";
+                    storage.loaded();
+                } else {
+                    storage.loadFailed();
+                }
+                verify(service.settingsLoaded);
+                verify(!service.applying);
+                compare(service.lockTimeout, 1200);
+                compare(service.offTimeout, 1800);
+                compare(service.suspendTimeout, 7200);
+                compare(service.workspaceLayout, "dots");
+                compare(storage.written, "");
+            }
+        }
+        function test_settings_saves_preserve_other_domains() {
+            const service = createTemporaryObject(preferences, host);
+            const storage = file(service);
+            verify(service.saveWorkspaceLayout("minimal") !== "");
+            compare(storage.written, "");
+            storage.loadFailed();
+            compare(service.saveWorkspaceLayout("minimal"), "");
+            compare(service.saveHellwalSettings("light", 0.2, 0.3), "");
+            compare(service.saveTimeouts(60, 120, 300), "");
+            const saved = JSON.parse(storage.written);
+            compare(saved.lock, 60);
+            compare(saved.off, 120);
+            compare(saved.suspend, 300);
+            compare(saved.hellwalMode, "light");
+            compare(saved.hellwalDarkOffset, 0.2);
+            compare(saved.hellwalBrightOffset, 0.3);
+            compare(saved.workspaceLayout, "minimal");
+            const previous = storage.written;
+            verify(service.saveTimeouts(-1, 120, 300) !== "");
+            verify(service.saveHellwalSettings("invalid", 0, 0) !== "");
+            verify(service.saveWorkspaceLayout("invalid") !== "");
+            compare(storage.written, previous);
+        }
+        function test_idle_follows_preferences_without_owning_persistence() {
+            const service = createTemporaryObject(preferences, host);
+            const runtime = createTemporaryObject(idle, host, {settingsService: service});
+            verify(!runtime.automaticEnabled);
+            file(service).loadFailed();
+            verify(runtime.automaticEnabled);
+            const spy = createTemporaryObject(enabledSpy, host, {target: runtime});
+            compare(service.saveTimeouts(60, 120, 300), "");
+            compare(runtime.lockTimeout, 60);
+            compare(runtime.offTimeout, 120);
+            compare(runtime.suspendTimeout, 300);
+            verify(runtime.automaticEnabled);
+            compare(spy.count, 2);
+            runtime.toggle(null);
+            verify(runtime.disabled);
+            verify(!runtime.automaticEnabled);
+            verify(runtime.workspaceLayout === undefined);
+            verify(runtime.saveTimeouts === undefined);
         }
         function test_suppressed_transient_is_not_retained() {
             const service = createTemporaryObject(notifications, host);
@@ -96,7 +188,8 @@ class ServiceTests(unittest.TestCase):
     def test_offline_service_lifecycles(self):
         with tempfile.TemporaryDirectory(prefix="shell-services-") as directory:
             base = Path(directory)
-            for name in ("NiriService", "RecorderService", "NotificationService"):
+            for name in ("NiriService", "RecorderService", "NotificationService",
+                         "SettingsService", "IdleService"):
                 source = (ROOT / "services" / f"{name}.qml").read_text()
                 source = "\n".join(
                     line for line in source.splitlines()
@@ -106,6 +199,10 @@ class ServiceTests(unittest.TestCase):
                 (base / f"{name}.qml").write_text('import "."\n' + source)
             for name in ("ToastPolicy.js", "HistoryPolicy.js"):
                 (base / name).write_text((ROOT / "notifications" / name).read_text())
+            (base / "idle").mkdir()
+            (base / "idle" / "Duration.js").write_text(
+                (ROOT / "services" / "idle" / "Duration.js").read_text()
+            )
             (base / "qmldir").write_text("singleton Quickshell 1.0 Quickshell.qml\n")
             (base / "Quickshell.qml").write_text(
                 'pragma Singleton\nimport QtQuick\nQtObject {\n'
@@ -121,6 +218,23 @@ class ServiceTests(unittest.TestCase):
                     signal exited(int exitCode)
                 }''',
                 "SplitParser": 'QtObject { signal read(string data) }',
+                "IdleMonitor": '''QtObject {
+                    property bool enabled: false
+                    property bool isIdle: false
+                    property int timeout: 0
+                    property bool respectInhibitors: false
+                }''',
+                "FileView": '''QtObject {
+                    property string path
+                    property bool atomicWrites
+                    property bool printErrors
+                    property string contents: ""
+                    property string written: ""
+                    function text() { return contents; }
+                    function setText(value) { written = value; }
+                    signal loaded()
+                    signal loadFailed()
+                }''',
                 "IpcHandler": 'QtObject { property string target }',
                 "NotificationServer": '''QtObject {
                     property var trackedNotifications: ({values: []})

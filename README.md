@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="#features">Features</a> · <a href="#gallery">Gallery</a> · <a href="#launcher">Launcher</a> · <a href="#dmenu-mode">Dmenu mode</a> · <a href="#getting-started">Getting started</a>
+  <a href="#features">Features</a> · <a href="#gallery">Gallery</a> · <a href="#launcher">Launcher</a> · <a href="#dmenu-mode">Dmenu mode</a> · <a href="assets/INSTALL.md">Installation</a>
 </p>
 
 ## Slimshell
@@ -86,35 +86,23 @@ Slimshell must be running. This is a small dmenu-compatible runner, not a full d
 
 ## Getting started
 
-### Required
-
-- 🧠 with some common sense
-- [Niri](https://github.com/YaLTeR/niri)
-- [Quickshell](https://quickshell.org/)
-- PipeWire
-- NetworkManager
-- BlueZ
-- UPower
-- Symbols Nerd Font Mono (icons)
-
-### Optional features
-
-- Python, `wl-clipboard`, and `cliphist` for helper scripts and clipboard history
-- `gpu-screen-recorder` for screen recording
-- ImageMagick, `awww`, and Hellwal for wallpaper colors
-- `qalc` for launcher calculations
-- `pactl` and PipeWire's PulseAudio compatibility service for audio card profiles
-- `DEEPL_API` in your environment for DeepL translation
-
-Review the configuration before using it: menus include personal commands and paths. To launch this checkout from its root directory:
+Follow the [installation guide](assets/INSTALL.md) for dependencies, Niri startup,
+keybindings, and optional feature setup. Install into `~/.config/quickshell`, then run:
 
 ```bash
-qs -p .
+qs -p "$HOME/.config/quickshell" --no-detailed-logs
 ```
 
 ## Settings
 
-Lives inside `Config.qml` holds settings such as font scale, bar geometry, popup spacing, and idle defaults.
+`Config.qml` holds appearance and behavior defaults. Idle, wallpaper and workspace
+preferences changed through the UI are saved separately.
+
+## Tests
+
+Run the offline tests with `python -B tests/run.py`, or select a feature, for example
+`python -B tests/run.py launcher network`. Use `--list` to see the available features.
+These tests do not start or reload the desktop shell.
 
 ## Structure
 
@@ -160,12 +148,12 @@ osd/            Volume overlay
   </tr>
 </table>
 
-
 ## Transparency
 
 This shell was developed with LLM assistance under my supervision. I direct the design, review the changes, and test them on my own desktop. These are personal dotfiles, so review and adapt them before using them on yours.
 
 This repository is mainly for hobby and learning, so don't expect everything to work out of the box.
+
 ## ISSUES 🔨
 
 - ~~dmenu-runner can't display special symbols (Nerd fonts etc.)~~

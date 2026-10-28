@@ -7,6 +7,7 @@ PopoutPanel {
     id: root
 
     required property var audioItem
+    required property var audioService
     required property Component profileBackend
     property bool profilesLoaded: false
     config: audioItem.config
@@ -27,7 +28,7 @@ PopoutPanel {
     AudioPopupState {
         id: popupState
         objectName: "audioPopupState"
-        audioItem: root.audioItem
+        audioService: root.audioService
         profiles: profileLoader.item
         onTabIndexChanged: if (tabIndex === 3) root.profilesLoaded = true
         onCloseRequested: root.audioItem.closePopup()
@@ -109,7 +110,7 @@ PopoutPanel {
                         AudioVolumeRow {
                             config: root.config
                             row: entry.modelData
-                            node: root.audioItem.nodeForId(entry.modelData.id)
+                            node: root.audioService.nodeForId(entry.modelData.id)
                             selected: popupState.rows.length > 1 && entry.index === popupState.selectedIndex
                             onPicked: {
                                 popupState.selectRow(entry.index);
@@ -120,8 +121,8 @@ PopoutPanel {
                                 popupState.activateSelected();
                                 keyboardHandler.forceActiveFocus();
                             }
-                            onMuteRequested: root.audioItem.toggleMute(entry.modelData.id)
-                            onVolumeRequested: value => root.audioItem.setVolume(entry.modelData.id, value)
+                            onMuteRequested: root.audioService.toggleMute(entry.modelData.id)
+                            onVolumeRequested: value => root.audioService.setVolume(entry.modelData.id, value)
                         }
                     }
                     Component {

@@ -2,28 +2,22 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
-import "idle/Duration.js" as Duration
 
 Item {
     id: root
     visible: false
 
-    required property var config
+    required property var settingsService
     required property var lockService
     property var targetScreen: null
     property bool disabled: false
-    property bool settingsLoaded: false
     property bool screensOff: false
-    property bool applying: false
     property string errorText: ""
-    property int lockTimeout: config.idleLockTimeout
-    property int offTimeout: config.idleOffTimeout
-    property int suspendTimeout: config.idleSuspendTimeout
-    property string hellwalMode: "dark"
-    property real hellwalDarkOffset: 0
-    property real hellwalBrightOffset: 0
-    property string workspaceLayout: "dots"
-    readonly property bool automaticEnabled: settingsLoaded && !disabled && !applying
+    readonly property int lockTimeout: settingsService.lockTimeout
+    readonly property int offTimeout: settingsService.offTimeout
+    readonly property int suspendTimeout: settingsService.suspendTimeout
+    readonly property bool automaticEnabled: settingsService.settingsLoaded
+        && !disabled && !settingsService.applying
 
     signal notificationRequested(string message, var screen)
     signal settingsRequested(var screen)
@@ -38,58 +32,12 @@ Item {
     }
 
     function toggle(screen) {
-        if (!settingsLoaded) {
+        if (!settingsService.settingsLoaded) {
             notificationRequested("Still starting up", screen || targetScreen)
             return
         }
         disabled = !disabled
         notificationRequested(disabled ? "Disabled" : "Enabled", screen || targetScreen)
-    }
-
-    function saveTimeouts(lockSeconds, offSeconds, suspendSeconds) {
-        const error = Duration.validate(lockSeconds, offSeconds, suspendSeconds)
-        if (error !== "")
-            return error
-        if (!settingsLoaded)
-            return "Settings are still loading"
-        applying = true
-        lockTimeout = lockSeconds
-        offTimeout = offSeconds
-        suspendTimeout = suspendSeconds
-        persistSettings()
-        applying = false
-        return ""
-    }
-
-    function saveHellwalSettings(mode, darkOffset, brightOffset) {
-        if (mode !== "dark" && mode !== "light")
-            return "Choose dark or light mode"
-        if (!Number.isFinite(darkOffset) || darkOffset < 0 || darkOffset > 1
-            || !Number.isFinite(brightOffset) || brightOffset < 0 || brightOffset > 1)
-            return "Offsets must be between 0 and 1"
-        if (!settingsLoaded)
-            return "Settings are still loading"
-        hellwalMode = mode
-        hellwalDarkOffset = darkOffset
-        hellwalBrightOffset = brightOffset
-        persistSettings()
-        return ""
-    }
-
-    function saveWorkspaceLayout(layout) {
-        if (layout !== "dots" && layout !== "minimal")
-            return "Choose dots or minimal layout"
-        if (!settingsLoaded)
-            return "Settings are still loading"
-        workspaceLayout = layout
-        persistSettings()
-        return ""
-    }
-
-    function persistSettings() {
-        settingsFile.setText(JSON.stringify({lock: lockTimeout, off: offTimeout,
-            suspend: suspendTimeout, hellwalMode, hellwalDarkOffset, hellwalBrightOffset,
-            workspaceLayout}))
     }
 
     function wakeScreens() {
@@ -184,40 +132,6 @@ Item {
             if (exitCode !== 0)
                 root.errorText = "Suspend failed"
         }
-    }
-
-    FileView {
-        id: settingsFile
-        path: (Quickshell.env("XDG_DATA_HOME") || Quickshell.env("HOME") + "/.local/share")
-            + "/quickshell-settings.json"
-        atomicWrites: true
-        printErrors: false
-        onLoaded: {
-            try {
-                const saved = JSON.parse(text())
-                if (Duration.validate(saved.lock, saved.off, saved.suspend) === "") {
-                    root.applying = true
-                    root.lockTimeout = saved.lock
-                    root.offTimeout = saved.off
-                    root.suspendTimeout = saved.suspend
-                    root.applying = false
-                }
-                if (saved.hellwalMode === "dark" || saved.hellwalMode === "dark-comfort")
-                    root.hellwalMode = "dark"
-                else if (saved.hellwalMode === "light" || saved.hellwalMode === "light-comfort")
-                    root.hellwalMode = "light"
-                if (Number.isFinite(saved.hellwalDarkOffset)
-                    && saved.hellwalDarkOffset >= 0 && saved.hellwalDarkOffset <= 1)
-                    root.hellwalDarkOffset = saved.hellwalDarkOffset
-                if (Number.isFinite(saved.hellwalBrightOffset)
-                    && saved.hellwalBrightOffset >= 0 && saved.hellwalBrightOffset <= 1)
-                    root.hellwalBrightOffset = saved.hellwalBrightOffset
-                if (saved.workspaceLayout === "dots" || saved.workspaceLayout === "minimal")
-                    root.workspaceLayout = saved.workspaceLayout
-            } catch (error) {}
-            root.settingsLoaded = true
-        }
-        onLoadFailed: root.settingsLoaded = true
     }
 
     IpcHandler {

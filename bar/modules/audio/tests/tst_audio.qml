@@ -12,7 +12,7 @@ Item {
 
     Component { id: fixtureComponent; AudioFixture {} }
     Component { id: stateComponent; AudioPopupState {} }
-    Component { id: popupComponent; AudioPopup {} }
+    Component { id: popupComponent; AudioPopup { audioService: test.fixture } }
     Component { id: profileComponent; ProfileFixture {} }
 
     TestCase {
@@ -28,7 +28,7 @@ Item {
             failOnWarning(/TypeError|Binding loop/);
             fixture = createTemporaryObject(fixtureComponent, host);
             profiles = createTemporaryObject(profileComponent, host);
-            controls = createTemporaryObject(stateComponent, host, {audioItem: fixture, profiles: profiles});
+            controls = createTemporaryObject(stateComponent, host, {audioService: fixture, profiles: profiles});
             verify(fixture !== null && controls !== null);
             controls.closeRequested.connect(() => fixture.closePopup());
         }

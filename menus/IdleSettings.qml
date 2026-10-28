@@ -10,6 +10,7 @@ Item {
 
     required property var config
     required property var idleService
+    required property var settingsService
     required property var targetScreen
     property var menuScreen: null
     property bool opened: false
@@ -18,30 +19,34 @@ Item {
     readonly property string toggleLabel: idleService.disabled ? "Enable" : "Pause"
 
     // Load saved values before showing the editor; invalid values stay in-place for correction.
-    function openMenu(screen) {
+    function open(screen) {
         menuScreen = screen || targetScreen;
         validationError = "";
-        lockRow.text = Duration.format(idleService.lockTimeout);
-        offRow.text = Duration.format(idleService.offTimeout);
-        suspendRow.text = Duration.format(idleService.suspendTimeout);
+        lockRow.text = Duration.format(settingsService.lockTimeout);
+        offRow.text = Duration.format(settingsService.offTimeout);
+        suspendRow.text = Duration.format(settingsService.suspendTimeout);
         opened = true;
         Qt.callLater(() => {
             return lockRow.focusInput();
         });
     }
 
-    function closeMenu() {
+    function close() {
         opened = false;
     }
 
+    function toggle(screen) {
+        opened ? close() : open(screen);
+    }
+
     function saveSettings() {
-        validationError = idleService.saveTimeouts(Duration.parse(lockRow.text), Duration.parse(offRow.text), Duration.parse(suspendRow.text));
+        validationError = settingsService.saveTimeouts(Duration.parse(lockRow.text), Duration.parse(offRow.text), Duration.parse(suspendRow.text));
         return validationError === "";
     }
 
     function applySettings() {
         if (saveSettings())
-            closeMenu();
+            close();
 
     }
 
@@ -94,7 +99,7 @@ Item {
 
             Shortcut {
                 sequence: "Escape"
-                onActivated: root.closeMenu()
+                onActivated: root.close()
             }
 
             Text {
@@ -221,7 +226,7 @@ Item {
     PopupCatcher {
         targetScreen: menuWindow.screen
         visible: menuWindow.visible
-        onDismissed: root.closeMenu()
+        onDismissed: root.close()
     }
 
     // Label on the left, editable duration on the right, shared baseline.

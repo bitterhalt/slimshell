@@ -45,17 +45,17 @@ Item {
         onTriggered: root.noticeText = ""
     }
 
-    function openMenu(screen) {
+    function open(screen) {
         menuScreen = screen || targetScreen
         opened = true
     }
 
     function close() { opened = false }
-    function toggle() {
+    function toggle(screen) {
         if (opened)
             close()
         else
-            openMenu(targetScreen)
+            open(screen)
     }
 
     function apply(path, hellwal, staticBackground) {
@@ -115,7 +115,7 @@ Item {
 
     IpcHandler {
         target: "wallpaper"
-        function open() { root.openMenu(root.targetScreen) }
+        function open() { root.open(root.targetScreen) }
         function close() { root.close() }
         function toggle() { root.toggle() }
     }

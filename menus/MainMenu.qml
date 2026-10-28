@@ -15,7 +15,7 @@ Item {
     required property var wallpaperPicker
 
     property string page: ""
-    property bool menuOpened: false
+    property bool opened: false
     property int selectedIndex: 0
     property var menuScreen: null
     property var confirmItem: null
@@ -102,26 +102,27 @@ Item {
         }
     }
 
-    function openPage(name, screen): void {
+    function open(name, screen): void {
         cancelConfirmation()
-        page = name
+        page = name || "power"
         menuScreen = screen || targetScreen
         selectedIndex = 0
         menuCard.prepareLayout()
-        menuOpened = true
+        opened = true
         Qt.callLater(() => keyboardHandler.forceActiveFocus())
     }
 
-    function closeMenu(): void {
+    function close(): void {
         cancelConfirmation()
-        menuOpened = false
+        opened = false
     }
 
-    function togglePower(screen): void {
-        if (menuOpened && page === "power")
-            closeMenu()
+    function toggle(name, screen): void {
+        const requestedPage = name || "power"
+        if (opened && page === requestedPage)
+            close()
         else
-            openPage("power", screen)
+            open(requestedPage, screen)
     }
 
     function cancelConfirmation(): void {
@@ -147,7 +148,7 @@ Item {
             return
         }
 
-        closeMenu()
+        close()
     }
 
     function selectNext(): void {
@@ -170,7 +171,7 @@ Item {
         if (confirmItem) {
             const pending = confirmItem
             if (index === 0) {
-                closeMenu()
+                close()
                 if (pending.command)
                     config.run(pending.command)
             } else {
@@ -194,26 +195,26 @@ Item {
 
         if (item.action === "wallpaper") {
             const screen = menuWindow.screen
-            closeMenu()
-            wallpaperPicker.openMenu(screen)
+            close()
+            wallpaperPicker.open(screen)
             return
         }
 
         if (item.action === "idleSettings") {
             const screen = menuWindow.screen
-            closeMenu()
+            close()
             idleService.openSettings(screen)
             return
         }
 
         if (item.action === "suspend") {
-            closeMenu()
+            close()
             idleService.suspend()
             return
         }
 
         if (item.action === "lock") {
-            closeMenu()
+            close()
             lockService.lock()
             return
         }
@@ -226,7 +227,7 @@ Item {
         }
 
         if (item.command) {
-            closeMenu()
+            close()
             config.run(item.command)
         }
     }
@@ -255,11 +256,11 @@ Item {
         visible: popupMotion.surfaceVisible
         color: "transparent"
         exclusiveZone: 0
-        focusable: root.menuOpened
+        focusable: root.opened
 
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.namespace: "slim-submenu"
-        WlrLayershell.keyboardFocus: root.menuOpened
+        WlrLayershell.keyboardFocus: root.opened
             ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
         PopupMotion {
@@ -267,7 +268,7 @@ Item {
             openDuration: root.config.popupOpenDuration
             slideDistance: root.config.popupSlideDistance
             closeDuration: root.config.popupCloseDuration
-            shown: root.menuOpened
+            shown: root.opened
             animationsEnabled: root.config.popupAnimations
             animationType: root.config.popupAnimationStyle
             onClosed: root.menuScreen = null
@@ -278,7 +279,7 @@ Item {
 
             anchors.fill: parent
             focus: true
-            enabled: root.menuOpened
+            enabled: root.opened
 
             Keys.onPressed: event => {
                 switch (event.key) {
@@ -334,7 +335,7 @@ Item {
         PopoutPanel {
             id: menuCard
 
-            enabled: root.menuOpened
+            enabled: root.opened
             opacity: popupMotion.contentOpacity
             transform: Translate {
                 y: popupMotion.contentOffset
@@ -458,23 +459,23 @@ Item {
     PopupCatcher {
         targetScreen: menuWindow.screen
         visible: menuWindow.visible
-        onDismissed: root.closeMenu()
+        onDismissed: root.close()
     }
 
     IpcHandler {
         target: "power"
 
         function toggle(): void {
-            root.togglePower(root.targetScreen)
+            root.toggle("power", root.targetScreen)
         }
 
         function open(): void {
-            root.openPage("power")
+            root.open("power")
         }
 
         function close(): void {
             if (root.page === "power")
-                root.closeMenu()
+                root.close()
         }
     }
 
@@ -483,19 +484,19 @@ Item {
 
 
         function packages(): void {
-            root.openPage("packages")
+            root.open("packages")
         }
 
         function settings(): void {
-            root.openPage("settings")
+            root.open("settings")
         }
 
         function system(): void {
-            root.openPage("system")
+            root.open("system")
         }
 
         function close(): void {
-            root.closeMenu()
+            root.close()
         }
     }
 }

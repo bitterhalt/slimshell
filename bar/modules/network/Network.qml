@@ -1,7 +1,5 @@
-import "Model.js" as Model
 import QtQuick
 import Quickshell
-import Quickshell.Networking
 
 Item {
     id: root
@@ -10,43 +8,7 @@ Item {
     required property var barWindow
     required property var popupManager
     required property var uiService
-    // Current adapters, selected network, and the icon shown in the bar.
-    readonly property var networkDevices: Networking.devices ? Networking.devices.values : []
-    readonly property var wifiDevice: findDevice(DeviceType.Wifi)
-    readonly property var wiredDevice: findDevice(DeviceType.Wired)
-    readonly property var wifiNetworkObjects: wifiDevice && wifiDevice.networks ? wifiDevice.networks.values : []
-    readonly property var networkRows: Model.rows(wifiNetworkObjects)
-    readonly property bool wiredConnected: wiredDevice !== null && wiredDevice.connected
-    readonly property bool wifiBrowsingAvailable: Model.shouldScanWifi(Networking.wifiEnabled, wiredConnected)
-    readonly property var connectedWifi: {
-        for (var i = 0; i < wifiNetworkObjects.length; ++i) {
-            if (wifiNetworkObjects[i] && wifiNetworkObjects[i].connected)
-                return wifiNetworkObjects[i];
-
-        }
-        return null;
-    }
-    readonly property string connectionKind: {
-        if (wiredDevice && wiredDevice.connected)
-            return "ethernet";
-
-        if (connectedWifi)
-            return "wifi";
-
-        return "disconnected";
-    }
-    readonly property string icon: {
-        if (connectionKind === "ethernet")
-            return "󰈀";
-
-        if (!Networking.wifiHardwareEnabled || !Networking.wifiEnabled)
-            return "󰤭";
-
-        if (connectedWifi)
-            return Model.strengthIcon(connectedWifi.signalStrength);
-
-        return "󰤯";
-    }
+    required property var networkService
 
     // IPC actions open/close the popup on the screen that owns the bar.
     Connections {
@@ -65,37 +27,16 @@ Item {
         }
     }
 
-    function findDevice(type) {
-        var fallback = null;
-        for (var i = 0; i < networkDevices.length; ++i) {
-            var device = networkDevices[i];
-            if (!device || device.type !== type)
-                continue;
-
-            if (device.connected)
-                return device;
-
-            if (!fallback)
-                fallback = device;
-
-        }
-        return fallback;
-    }
-
-    function networkForSsid(ssid) {
-        return Model.networkForSsid(wifiNetworkObjects, ssid);
-    }
-
     width: 24
     height: barWindow.height
 
     Text {
         anchors.centerIn: parent
         color: config.fg
-        opacity: connectionKind === "disconnected" ? 0.55 : 1
+        opacity: root.networkService.connectionKind === "disconnected" ? 0.55 : 1
         font.family: config.iconFontFamily
         font.pointSize: config.iconSize
-        text: root.icon
+        text: root.networkService.icon
     }
 
     // Click the bar icon to open the network popup.
@@ -110,7 +51,9 @@ Item {
         id: networkPopupComponent
 
         NetworkPopup {
-            network: root
+            network: root.networkService
+            config: root.config
+            popupManager: root.popupManager
         }
 
     }

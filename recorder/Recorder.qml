@@ -16,25 +16,26 @@ Item {
         barWindow.screen === recorderService.targetScreen
 
     property int selectedIndex: 0
+    property bool opened: false
     readonly property int actionCount: runningNow ? 3 : 2
 
     width: runningNow ? 24 : 0
     height: barWindow.height
     visible: runningNow
 
-    function openMenu(): void {
+    function open(): void {
         selectedIndex = 0
         menuCard.prepareLayout()
-        recorderMenu.visible = true
+        opened = true
         Qt.callLater(() => keyboardHandler.forceActiveFocus())
     }
 
-    function closeMenu(): void {
-        recorderMenu.visible = false
+    function close(): void {
+        opened = false
     }
 
-    function toggleMenu(): void {
-        recorderMenu.visible ? closeMenu() : openMenu()
+    function toggle(): void {
+        opened ? close() : open()
     }
 
     function selectNext(): void {
@@ -61,19 +62,19 @@ Item {
     }
 
     function fullscreen(): void {
-        closeMenu()
+        close()
         recorderService.fullscreen()
     }
 
     function region(): void {
-        closeMenu()
+        close()
 
         if (recorderService.canStart())
             regionSelector.open()
     }
 
     function stop(): void {
-        closeMenu()
+        close()
         recorderService.stop()
     }
 
@@ -102,7 +103,7 @@ Item {
     MouseArea {
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
-        onClicked: root.toggleMenu()
+        onClicked: root.toggle()
     }
 
     // Full-screen drag selector used by the Region menu action.
@@ -134,14 +135,14 @@ Item {
         margins.left: root.barWindow.screen
             ? Math.max(0, Math.round((root.barWindow.screen.width - menuCard.implicitWidth) / 2)) : 0
 
-        visible: false
+        visible: popupMotion.surfaceVisible
         color: "transparent"
         exclusiveZone: 0
-        focusable: true
+        focusable: root.opened
 
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.namespace: "slim-submenu"
-        WlrLayershell.keyboardFocus: visible
+        WlrLayershell.keyboardFocus: root.opened
             ? WlrKeyboardFocus.Exclusive
             : WlrKeyboardFocus.None
 
@@ -150,6 +151,7 @@ Item {
 
             anchors.fill: parent
             focus: true
+            enabled: root.opened
 
             Keys.onPressed: event => {
                 switch (event.key) {
@@ -172,7 +174,7 @@ Item {
                     return
 
                 case Qt.Key_Escape:
-                    root.closeMenu()
+                    root.close()
                     event.accepted = true
                     return
                 }
@@ -200,6 +202,9 @@ Item {
         PopoutPanel {
             id: menuCard
 
+            enabled: root.opened
+            opacity: popupMotion.contentOpacity
+            transform: Translate { y: popupMotion.contentOffset }
             z: 1
             config: root.config
             contentWidth: 190
@@ -234,20 +239,22 @@ Item {
             }
         }
 
-        onVisibleChanged: {
-            if (visible) {
-                root.selectedIndex = 0
-                Qt.callLater(
-                    () => keyboardHandler.forceActiveFocus()
-                )
-            }
-        }
+    }
+
+    PopupMotion {
+        id: popupMotion
+        shown: root.opened
+        animationsEnabled: root.config.popupAnimations
+        animationType: root.config.popupAnimationStyle
+        openDuration: root.config.popupOpenDuration
+        closeDuration: root.config.popupCloseDuration
+        slideDistance: root.config.popupSlideDistance
     }
 
     PopupCatcher {
         targetScreen: root.barWindow.screen
-        visible: recorderMenu.visible
-        onDismissed: root.closeMenu()
+        visible: popupMotion.surfaceVisible
+        onDismissed: root.close()
     }
 
     component RecorderMenuItem: Item {
@@ -321,19 +328,19 @@ Item {
 
         function onMenuActionRequested(action): void {
             if (action === "close") {
-                root.closeMenu()
+                root.close()
                 return
             }
 
             if (!root.ipcOwner) {
-                root.closeMenu()
+                root.close()
                 return
             }
 
             if (action === "toggle")
-                root.toggleMenu()
+                root.toggle()
             else if (action === "open")
-                root.openMenu()
+                root.open()
         }
 
         function onRegionSelectionRequested(): void {

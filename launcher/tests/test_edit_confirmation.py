@@ -11,7 +11,7 @@ import tempfile
 import unittest
 
 
-SOURCE = Path(__file__).resolve().parents[1] / "Launcher.qml"
+SOURCE = Path(__file__).resolve().parents[1] / "FileSearchState.qml"
 
 
 class EditConfirmationTests(unittest.TestCase):

@@ -6,7 +6,6 @@ import Quickshell.Widgets
 
 import "Scorer.js" as Scorer
 import "Dmenu.js" as Dmenu
-import "Emoji.js" as Emoji
 
 Item {
     id: root
@@ -36,23 +35,7 @@ Item {
     // Result file awaited by the caller; empty when no request is pending.
     property string dmenuOutPath: ""
     readonly property string dmenuSessionId: Date.now().toString() + "-" + Math.random().toString()
-    property var emojiEntries: []
-    property bool emojiDataRequested: false
-    property var emojiHistory: []
-    property bool emojiHistoryReady: false
-    readonly property string emojiHistoryPath:
-        (Quickshell.env("XDG_CACHE_HOME") || Quickshell.env("HOME") + "/.cache")
-        + "/quickshell-emoji-history.json"
-    readonly property var emojiBrowseEntries: Emoji.browse(emojiEntries, emojiHistory, 100)
     property double timerClock: Date.now()
-
-    // Run-mode data
-    property var binaries: []
-    property var history: []
-    readonly property string historyPath:
-        (Quickshell.env("HOME") || "") + "/.cache/drun-history"
-    readonly property int historyShown: 5
-    readonly property int historyKept: 50
 
     // App IDs only, newest first; separate from binary run history.
     property var appHistory: []
@@ -80,10 +63,7 @@ Item {
         : fileMode ? "Search files" : "Search applications"
 
     property string query: ""
-    property string calculatorResult: ""
-    property var fileResults: []
-    property int fileSearchGeneration: 0
-    property bool fileSearchPending: false
+    readonly property string calculatorResult: calculator.result
     property int selectedIndex: 0
 
     readonly property int maxVisibleRows: 7
@@ -133,92 +113,6 @@ Item {
                 seen.add(entry.id)
                 return true
             })
-    }
-
-    readonly property var binarySet: new Set(binaries)
-
-    // Most recent unique, still-existing binaries (newest first).
-    readonly property var recentBinaries: {
-        const seen = new Set()
-        const out = []
-
-        for (let i = history.length - 1;
-                i >= 0 && out.length < historyShown; --i) {
-            const name = history[i]
-
-            if (!name || seen.has(name))
-                continue
-
-            seen.add(name)
-
-            if (binarySet.size > 0 && !binarySet.has(name))
-                continue
-
-            out.push(name)
-        }
-
-        return out
-    }
-
-    // Run mode: the first word picks the binary, the rest are its arguments
-    // ("firefox --private-window"; quotes and backslashes are honored).
-    readonly property var runTokens: opened && runMode ? splitCommand(query) : []
-    readonly property string runName: runTokens.length > 0 ? runTokens[0] : ""
-    readonly property var runArgs: runTokens.slice(1)
-
-    readonly property var binaryResults: {
-        if (!opened || !runMode)
-            return []
-
-        const value = runName.toLowerCase()
-        const recent = new Set(recentBinaries)
-
-        const toItem = (name, score) => ({
-            type: "binary",
-            text: name,
-            subtitle: "",
-            icon: "",
-            recent: recent.has(name),
-            score: score
-        })
-
-        if (value === "") {
-            const rest = binaries
-                .filter(name => !recent.has(name))
-                .slice(0, 100)
-                .map(name => toItem(name, 0))
-
-            return recentBinaries.map(name => toItem(name, 0)).concat(rest)
-        }
-
-        // Filter on the match score first; the recent bonus only reorders.
-        return binaries
-            .map(name => ({ name: name, base: Scorer.scoreText(name, value) }))
-            .filter(entry => entry.base > 0)
-            .map(entry => toItem(
-                entry.name,
-                entry.base + (recent.has(entry.name) ? 200 : 0)
-            ))
-            .sort((a, b) => b.score - a.score
-                || (a.text < b.text ? -1 : 1))
-    }
-
-    readonly property var emojiResults: {
-        if (!opened || !emojiMode)
-            return []
-
-        const value = query.trim().toLowerCase()
-
-        const entries = value === "" ? emojiBrowseEntries : Emoji.search(emojiEntries, value, 100)
-        return entries
-            .map(entry => ({
-                type: "emoji",
-                text: entry.name,
-                emoji: entry.emoji,
-                subtitle: "",
-                icon: "",
-                score: 0
-            }))
     }
 
     readonly property var dmenuResults: {
@@ -288,15 +182,15 @@ Item {
         if (dmenuMode) {
             entries = dmenuResults
         } else if (runMode) {
-            entries = binaryResults
+            entries = runState.results
         } else if (emojiMode) {
-            entries = emojiResults
+            entries = emojiState.results
         } else if (timerMode) {
             entries = timerResults
         } else if (calcPrefix) {
             entries = []
         } else if (fileMode) {
-            entries = fileResults
+            entries = files.results
         } else if (value === "") {
             entries = applications
                 .map(entry => ({
@@ -344,8 +238,7 @@ Item {
         Math.min(selectedIndex, results.length - 1))
 
     // Normal modes stay fixed; dmenu can choose a row count per request.
-    readonly property bool fileSearching:
-        fileProcess.running || fileSearchDebounce.running
+    readonly property bool fileSearching: files.busy
     readonly property int availableDmenuRows: targetScreen
         ? Math.max(0, Math.floor((targetScreen.height - config.popupGap * 2
             - inputHeight - contentSpacing * 2 - 2) / rowHeight))
@@ -378,8 +271,6 @@ Item {
     function reset(): void {
         mode = "apps"
         query = ""
-        calculatorResult = ""
-        fileResults = []
         selectedIndex = 0
         searchInput.text = ""
     }
@@ -454,21 +345,6 @@ Item {
 
         mode = id
         selectedIndex = 0
-        calculatorResult = ""
-        updateCalculator()
-        updateFileSearch()
-
-        if (runMode) {
-            loadBinaries()
-            historyFile.reload()
-        }
-
-        if (emojiMode) {
-            if (!emojiDataRequested)
-                emojiDataRequested = true
-            else if (emojiEntries.length === 0)
-                emojiFile.reload()
-        }
 
         if (timerMode) {
             timerClock = Date.now()
@@ -555,58 +431,16 @@ Item {
             Quickshell.execDetached(["wl-copy", item.text])
             finalizeClose()
         } else if (item.type === "file") {
-            openFile(item.path)
+            files.open(item.path)
         } else if (item.type === "binary") {
-            recordRun(item.text)
-            Quickshell.execDetached([item.text, ...runArgs])
+            runState.record(item.text)
+            Quickshell.execDetached([item.text, ...runState.args])
             finalizeClose()
         } else if (item.type === "emoji") {
             Quickshell.execDetached(["wl-copy", item.emoji])
-            recordEmoji(item.emoji)
+            emojiState.record(item.emoji)
             finalizeClose()
         }
-    }
-
-    // Shell-like word splitting: whitespace separates words, '...' and "..."
-    // group them, and a backslash escapes the next character.
-    function splitCommand(text): var {
-        const tokens = []
-        let current = ""
-        let quote = ""
-        let started = false
-        let escaped = false
-
-        for (const ch of String(text || "")) {
-            if (escaped) {
-                current += ch
-                escaped = false
-            } else if (ch === "\\" && quote !== "'") {
-                escaped = true
-                started = true
-            } else if (quote !== "") {
-                if (ch === quote)
-                    quote = ""
-                else
-                    current += ch
-            } else if (ch === "\"" || ch === "'") {
-                quote = ch
-                started = true
-            } else if (/\s/.test(ch)) {
-                if (started) {
-                    tokens.push(current)
-                    current = ""
-                    started = false
-                }
-            } else {
-                current += ch
-                started = true
-            }
-        }
-
-        if (started)
-            tokens.push(current)
-
-        return tokens
     }
 
     function parseTimer(text): var {
@@ -674,28 +508,6 @@ Item {
         return formatDuration(seconds) + " remaining · select to cancel"
     }
 
-    // Collect every executable on $PATH (replaces `find` in menu_run).
-    function loadBinaries(): void {
-        if (binaries.length > 0 || binaryProcess.running)
-            return
-
-        const dirs = [...new Set(
-            (Quickshell.env("PATH") || "")
-                .split(":")
-                .filter(dir => dir.length > 0)
-        )]
-
-        binaryProcess.command = [
-            "fd", "-L", "-H", "--no-ignore",
-            "--max-depth", "1",
-            "-t", "x",
-            "-a",
-            ".",
-            ...dirs
-        ]
-        binaryProcess.running = true
-    }
-
     function applicationRank(id): int {
         const rank = appHistoryRanks.get(id)
         return rank === undefined ? appHistoryKept : rank
@@ -741,115 +553,34 @@ Item {
             appHistoryFile.setText(JSON.stringify(appHistory))
     }
 
-    function restoreEmojiHistory(value): void {
-        const stored = Emoji.parseHistory(value)
-        // Preserve selections made before the initial asynchronous load finishes.
-        const pending = !emojiHistoryReady && emojiHistory.length > 0
-        emojiHistory = Emoji.normalizeHistory(emojiHistoryReady ? stored : emojiHistory.concat(stored))
-        emojiHistoryReady = true
-        if (pending)
-            emojiHistoryFile.setText(JSON.stringify(emojiHistory))
+    CalculatorState {
+        id: calculator
+        active: root.opened && root.calculatorQuery
+        query: root.query.trim()
+        expression: root.calcExpression
+        onResultReady: root.selectedIndex = 0
     }
 
-    function recordEmoji(character): void {
-        emojiHistory = Emoji.normalizeHistory([character].concat(emojiHistory))
-        if (emojiHistoryReady)
-            emojiHistoryFile.setText(JSON.stringify(emojiHistory))
+    RunState {
+        id: runState
+        active: root.opened && root.runMode
+        query: root.query
+        onBinariesLoaded: root.selectedIndex = 0
     }
 
-    // Same history file/format as menu_run: one name per line, newest last.
-    function recordRun(name): void {
-        const next = history.filter(entry =>
-            entry !== name && (binarySet.size === 0 || binarySet.has(entry)))
-
-        next.push(name)
-        history = next.slice(-historyKept)
-        historyFile.setText(history.join("\n") + "\n")
+    EmojiState {
+        id: emojiState
+        active: root.opened && root.emojiMode
+        query: root.query
+        onEntriesLoaded: root.selectedIndex = 0
     }
 
-    // Replaces open-file.sh: detect the mime type, then either edit the file
-    // in a terminal (text/config/scripts) or hand it to xdg-open.
-    function openFile(path): void {
-        if (mimeProcess.running)
-            return
-
-        mimeProcess.path = path
-        mimeProcess.command = ["file", "--mime-type", "-b", "--", path]
-        mimeProcess.running = true
-    }
-
-    function launchFile(path, mime): void {
-        const home = Quickshell.env("HOME") || ""
-        const editor = Quickshell.env("EDITOR") || "nvim"
-        const terminal = Quickshell.env("TERMINAL") || "foot"
-
-        const isText = mime.startsWith("text/")
-            || /\.(sh|py|conf)$/.test(path)
-
-        if (!isText) {
-            Quickshell.execDetached(["xdg-open", path])
-        } else if (home === "" || !path.startsWith(home + "/")) {
-            // Default to ordinary editing. Elevation requires an explicit
-            // choice, and paths/editor names remain positional arguments.
-            Quickshell.execDetached([
-                terminal, "-e", "sh", "-c",
-                'printf "File: %s\\n\\nEnter: edit normally\\ns: sudoedit (administrator)\\nAnything else: cancel\\n> " "$1"; '
-                + 'IFS= read -r choice || exit 0; '
-                + 'case "$choice" in '
-                + '"") exec "$2" "$1" ;; '
-                + 's|S) exec sudoedit -- "$1" ;; '
-                + '*) exit 0 ;; esac',
-                "launcher-edit", path, editor
-            ])
-        } else {
-            Quickshell.execDetached([terminal, "-e", editor, path])
-        }
-    }
-
-    // qalc doesn't treat "x" as multiplication; map it (and ×/÷) to operators.
-    function normalizeExpression(expression): string {
-        let out = expression.replace(/×/g, "*").replace(/÷/g, "/")
-
-        // Leave hex literals such as 0x1F alone.
-        if (!/0[xX][0-9a-fA-F]/.test(out))
-            out = out.replace(/(\d|\))\s*[xX]\s*(?=[\d(.])/g, "$1*")
-
-        return out
-    }
-
-    function updateCalculator(): void {
-        calculatorResult = ""
-
-        if (calculatorQuery)
-            calculatorDebounce.restart()
-        else
-            calculatorDebounce.stop()
-    }
-
-    function updateFileSearch(): void {
-        fileSearchGeneration += 1
-        fileSearchPending = opened && fileMode && fileNeedle.length >= 2
-        fileResults = []
-        fileSearchDebounce.stop()
-
-        if (fileProcess.running) {
-            fileProcess.signal(15)
-            return
-        }
-
-        if (fileSearchPending)
-            fileSearchDebounce.restart()
-    }
-
-    function fileItem(path): var {
-        const parts = path.split("/")
-        return {
-            type: "file",
-            path: path,
-            text: parts[parts.length - 1] || path,
-            subtitle: path,
-            icon: ""
-        }
+    FileSearchState {
+        id: files
+        active: root.opened && root.fileMode
+        needle: root.fileNeedle
+        onResultsReady: root.selectedIndex = 0
+        onFileOpened: root.finalizeClose()
     }
 
     PanelWindow {
@@ -929,8 +660,6 @@ Item {
                 onTextChanged: {
                     root.query = text;
                     root.selectedIndex = 0;
-                    root.updateCalculator();
-                    root.updateFileSearch();
                 }
                 Keys.onPressed: (event) => {
                     const control = event.modifiers & Qt.ControlModifier;
@@ -1155,10 +884,10 @@ Item {
                     text: root.dmenuMode ? "No matches"
                         : root.calcPrefix
                         ? (root.calcExpression === "" ? "Type an expression"
-                            : calculatorProcess.running || calculatorDebounce.running
+                            : calculator.busy
                                 ? "Calculating…" : "Can't evaluate expression")
                         : root.runMode
-                        ? (binaryProcess.running ? "Loading binaries…" : "No binaries found")
+                        ? (runState.loading ? "Loading binaries…" : "No binaries found")
                         : root.timerMode
                         ? (root.query.trim() === ""
                             ? "No active timers"
@@ -1176,169 +905,12 @@ Item {
     }
 
     Timer {
-        id: calculatorDebounce
-        interval: 120
-        onTriggered: {
-            if (calculatorProcess.running)
-                return
-
-            calculatorProcess.expression = root.query.trim()
-            calculatorProcess.command = [
-                "qalc", "-t", root.normalizeExpression(root.calcExpression)
-            ]
-            calculatorProcess.running = true
-        }
-    }
-
-    Timer {
         interval: 1000
         repeat: true
         running: root.opened && root.timerMode
         onTriggered: {
             root.timerClock = Date.now()
             root.timerService.pruneExpired(root.timerClock)
-        }
-    }
-
-    Process {
-        id: calculatorProcess
-
-        property string expression: ""
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const value = text.trim().split("\n")[0] || ""
-
-                if (calculatorProcess.expression === root.query.trim()) {
-                    root.calculatorResult = value
-                    root.selectedIndex = 0
-                }
-            }
-        }
-
-        onExited: exitCode => {
-            if (exitCode !== 0)
-                root.calculatorResult = ""
-
-            if (root.calculatorQuery
-                    && calculatorProcess.expression !== root.query.trim()) {
-                calculatorDebounce.restart()
-            }
-        }
-    }
-
-    Timer {
-        id: fileSearchDebounce
-        interval: 180
-        onTriggered: {
-            if (fileProcess.running || !root.opened || !root.fileMode || root.fileNeedle.length < 2)
-                return
-
-            root.fileSearchPending = false
-            fileProcess.generation = root.fileSearchGeneration
-            fileProcess.needle = root.fileNeedle
-            fileProcess.command = [
-                "fd", "-H", "-t", "f",
-                "--max-results", "100",
-                "--exclude", "*.png",
-                "--exclude", "*.jpg",
-                "--exclude", "*.jpeg",
-                "--exclude", "*.webp",
-                "--exclude", "*.gif",
-                "--exclude", "*.bmp",
-                "--exclude", "*.svg",
-                "--exclude", "*.mp4",
-                "--exclude", "*.mkv",
-                "--exclude", "*.webm",
-                "--exclude", "*.mov",
-                "--exclude", "*.avi",
-                "--exclude", "*.ttf",
-                "--exclude", "*.otf",
-                "--exclude", "*.woff",
-                "--exclude", "*.woff2",
-                "--exclude", "*.so",
-                "--exclude", "*.so.*",
-                "--exclude", "*.exe",
-                "--exclude", "*.dll",
-                "--exclude", "*.zip",
-                "--exclude", "*.7z",
-                "--exclude", "*.tar",
-                "--exclude", "*.gz",
-                "--",
-                fileProcess.needle,
-                Quickshell.env("HOME") + "/.config",
-                Quickshell.env("HOME") + "/Documents",
-                Quickshell.env("HOME") + "/.local/bin",
-                "/etc"
-            ]
-            fileProcess.running = true
-        }
-    }
-
-    Process {
-        id: fileProcess
-
-        property string needle: ""
-        property int generation: -1
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (!root.opened || !root.fileMode
-                        || fileProcess.generation !== root.fileSearchGeneration)
-                    return
-
-                root.fileResults = text.trim()
-                    .split("\n")
-                    .filter(path => path.length > 0)
-                    .map(path => root.fileItem(path))
-                root.selectedIndex = 0
-            }
-        }
-
-        stderr: StdioCollector {}
-
-        onExited: {
-            if (root.fileSearchPending && root.opened && root.fileMode
-                    && root.fileNeedle.length >= 2) {
-                fileSearchDebounce.restart()
-            }
-        }
-    }
-
-    Process {
-        id: binaryProcess
-
-        // fd prints an error for PATH entries that don't exist; ignore it.
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const names = text.split("\n")
-                    .filter(path => path.length > 0)
-                    .map(path => path.slice(path.lastIndexOf("/") + 1))
-                    .filter(name => name.length > 0)
-
-                root.binaries = [...new Set(names)].sort()
-                root.selectedIndex = 0
-            }
-        }
-
-        stderr: StdioCollector {}
-    }
-
-    Process {
-        id: mimeProcess
-
-        property string path: ""
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const mime = text.trim()
-
-                // Empty output means `file` failed (e.g. path vanished).
-                if (mime !== "")
-                    root.launchFile(mimeProcess.path, mime)
-
-                root.finalizeClose()
-            }
         }
     }
 
@@ -1353,20 +925,6 @@ Item {
             root.appHistoryReady = true
             if (root.appHistory.length > 0)
                 setText(JSON.stringify(root.appHistory))
-        }
-    }
-
-    FileView {
-        id: historyFile
-
-        path: root.historyPath
-        atomicWrites: true
-        printErrors: false
-
-        onLoaded: {
-            root.history = text()
-                .split("\n")
-                .filter(line => line.length > 0)
         }
     }
 
@@ -1387,50 +945,6 @@ Item {
             root.beginDmenu(lines)
         }
         onLoadFailed: root.close()
-    }
-
-    FileView {
-        id: emojiFile
-
-        path: root.emojiDataRequested
-            ? (Quickshell.env("HOME") || "") + "/.local/share/emoji/emoji.txt" : ""
-        watchChanges: root.emojiDataRequested
-        printErrors: false
-
-        onLoaded: {
-            root.emojiEntries = text()
-                .split("\n")
-                .map(line => {
-                    const value = line.trim()
-                    const separator = value.search(/\s/)
-
-                    if (separator < 1)
-                        return null
-
-                    return {
-                        emoji: value.slice(0, separator),
-                        name: value.slice(separator).trim()
-                    }
-                })
-                .filter(entry => entry !== null)
-            if (root.emojiMode)
-                root.selectedIndex = 0
-        }
-
-        onLoadFailed: root.emojiEntries = []
-    }
-
-    FileView {
-        id: emojiHistoryFile
-        path: root.emojiHistoryPath
-        atomicWrites: true
-        printErrors: false
-        onLoaded: root.restoreEmojiHistory(text())
-        onLoadFailed: {
-            root.emojiHistoryReady = true
-            if (root.emojiHistory.length > 0)
-                setText(JSON.stringify(root.emojiHistory))
-        }
     }
 
     IpcHandler {
