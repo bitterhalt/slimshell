@@ -76,11 +76,11 @@ Rectangle {
         id: contentColumn
 
         anchors.left: parent.left
-        anchors.leftMargin: 22
+        anchors.leftMargin: 16
         anchors.right: imageBox.left
         anchors.rightMargin: 10
         anchors.top: parent.top
-        anchors.topMargin: 22
+        anchors.topMargin: 16
         spacing: 2
 
         Text {
