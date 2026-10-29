@@ -3,17 +3,17 @@ import Quickshell
 import Quickshell.Io
 import "idle/Duration.js" as Duration
 
-// Persisted user preferences. Config.qml supplies the initial idle defaults.
+// UI-managed preferences and their first-run defaults.
 Item {
     id: root
     visible: false
 
-    required property var config
     property bool settingsLoaded: false
-    property bool applying: false
-    property int lockTimeout: config.idleLockTimeout
-    property int offTimeout: config.idleOffTimeout
-    property int suspendTimeout: config.idleSuspendTimeout
+    property bool updating: false
+    readonly property bool applying: updating
+    property int lockTimeout: 1200
+    property int offTimeout: 1800
+    property int suspendTimeout: 7200
     property string hellwalMode: "dark"
     property real hellwalDarkOffset: 0
     property real hellwalBrightOffset: 0
@@ -25,12 +25,12 @@ Item {
             return error
         if (!settingsLoaded)
             return "Settings are still loading"
-        applying = true
+        updating = true
         lockTimeout = lockSeconds
         offTimeout = offSeconds
         suspendTimeout = suspendSeconds
         persistSettings()
-        applying = false
+        updating = false
         return ""
     }
 
@@ -73,7 +73,7 @@ Item {
         atomicWrites: true
         printErrors: false
         onLoaded: {
-            root.applying = true
+            root.updating = true
             try {
                 const saved = JSON.parse(text())
                 if (Duration.validate(saved.lock, saved.off, saved.suspend) === "") {
@@ -94,7 +94,7 @@ Item {
                 if (saved.workspaceLayout === "dots" || saved.workspaceLayout === "minimal")
                     root.workspaceLayout = saved.workspaceLayout
             } catch (error) {}
-            root.applying = false
+            root.updating = false
             root.settingsLoaded = true
         }
         onLoadFailed: root.settingsLoaded = true

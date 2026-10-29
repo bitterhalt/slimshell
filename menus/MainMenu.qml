@@ -40,7 +40,7 @@ Item {
     readonly property var settingsItems: [
         { label: "Niri", icon: "󰖲", shortcut: "n", command: "foot sh -c 'cd ~/.config/niri/ && nvim *'" },
         { label: "Nvim", icon: "", shortcut: "v", command: "foot sh -c 'cd ~/.config/nvim && vopen .'" },
-        { label: "Hellwal", icon: "󰏘", shortcut: "p", command: "foot -e nvim ~/.local/bin/setbg ~/.config/hellwal/templates/*" },
+        { label: "Hellwal", icon: "󰏘", shortcut: "p", command: "foot -e nvim  ~/.config/hellwal/templates/*" },
         { label: "Quickshell", icon: "󰆍", shortcut: "q", command: "foot sh -c 'cd ~/.config/quickshell && vopen .'" },
     ]
 

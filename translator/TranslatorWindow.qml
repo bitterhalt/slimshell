@@ -1,6 +1,7 @@
 import "../components"
 import "Languages.js" as Languages
 import QtQuick
+import QtQuick.Window
 import QtQuick.Controls.Basic
 import Quickshell
 import Quickshell.Io
@@ -38,6 +39,15 @@ PanelWindow {
     }
 
     signal closeRequested()
+
+    function focusInput(): void {
+        if (!root.visible || !root.popupMotion.shown)
+            return;
+        if (picker !== "")
+            languageSearch.forceActiveFocus();
+        else
+            sourceInput.forceActiveFocus();
+    }
 
     function clearResult() {
         translation = "";
@@ -145,9 +155,7 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: root.popupMotion.shown
         ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    Component.onCompleted: Qt.callLater(() => {
-        return sourceInput.forceActiveFocus();
-    })
+    Component.onCompleted: Qt.callLater(root.focusInput)
     Component.onDestruction: {
         if (translateProcess.running)
             translateProcess.signal(15);
@@ -225,6 +233,14 @@ PanelWindow {
         onDismissed: root.closeRequested()
     }
 
+    Connections {
+        target: root.popupMotion
+        function onShownChanged(): void {
+            if (root.popupMotion.shown)
+                Qt.callLater(root.focusInput);
+        }
+    }
+
     Rectangle {
         anchors.fill: parent
         enabled: root.popupMotion.shown
@@ -237,6 +253,12 @@ PanelWindow {
         border.width: 1
         radius: root.config.popupRadius
         clip: true
+
+        // Initial completion can precede compositor keyboard activation.
+        Window.onActiveChanged: {
+            if (Window.active)
+                Qt.callLater(root.focusInput);
+        }
 
         Shortcut {
             sequence: "Ctrl+Return"
@@ -338,6 +360,7 @@ PanelWindow {
 
                     TextArea {
                         id: sourceInput
+                        objectName: "translatorSourceInput"
 
                         renderType: Text.NativeRendering
                         placeholderText: "Type or paste text…"
@@ -424,6 +447,7 @@ PanelWindow {
 
                 TextField {
                     id: languageSearch
+                    objectName: "translatorLanguageSearch"
 
                     renderType: Text.NativeRendering
                     width: parent.width

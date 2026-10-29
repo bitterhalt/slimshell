@@ -95,8 +95,15 @@ qs -p "$HOME/.config/quickshell" --no-detailed-logs
 
 ## Settings
 
-`Config.qml` holds appearance and behavior defaults. Idle, wallpaper and workspace
-preferences changed through the UI are saved separately.
+Edit root-level `settings.json` for appearance and behavior defaults. Changes are
+loaded automatically; invalid values use safe defaults, and malformed JSON keeps
+the previous settings. Idle timeouts, wallpaper preferences and workspace layout
+are adjusted through the UI and saved separately.
+
+Audio styles are `classic` or `circle`; animation styles are `fade` or `slide`.
+`animations.style` controls menus, while `notificationStyle` controls toasts.
+Optional `animations.hostStyles` overrides individual menu styles (`audio`,
+`network`, `bluetooth`, or `notificationCenter`).
 
 ## Tests
 
@@ -108,7 +115,7 @@ These tests do not start or reload the desktop shell.
 
 ```text
 shell.qml       Shell entrypoint and service wiring
-Config.qml      Shared appearance and behavior settings
+settings.json   Editable appearance and behavior defaults
 bar/            Bar and its modules
 components/     Reusable UI and popup components
 services/       Shared desktop state and integrations

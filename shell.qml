@@ -46,7 +46,6 @@ ShellRoot {
 
   SettingsService {
     id: appSettingsService
-    config: appConfig
   }
 
   PolkitService {

@@ -55,7 +55,7 @@ Item {
         target: root.uiService
     }
 
-    // Circle style's level ring is loaded only when selected in Config.qml.
+    // Circle style's level ring is loaded only when selected in settings.json.
     Loader {
         anchors.centerIn: parent
         width: 24

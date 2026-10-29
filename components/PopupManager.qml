@@ -7,13 +7,8 @@ Item {
 
     required property var barWindow
     required property var config
-    // Set each bar popup to "slide" or "fade" here.
-    property var popupAnimationTypes: ({
-        "audio": "fade",
-        "network": "fade",
-        "bluetooth": "fade",
-        "notificationCenter": "fade"
-    })
+    // Optional per-host overrides; otherwise use the shared JSON style.
+    readonly property var popupAnimationTypes: config.popupAnimationTypes
     property bool hostRequested: false
     readonly property bool hostVisible: hostMotion.surfaceVisible
     readonly property bool hostClosing: hostMotion.closing
@@ -29,7 +24,7 @@ Item {
 
     function animationTypeFor(key) : string {
         const type = popupAnimationTypes[key];
-        return type === "slide" || type === "fade" ? type : "slide";
+        return type === "slide" || type === "fade" ? type : config.popupAnimationStyle;
     }
 
     function openHost(key, component, anchorItem, focusable, centered) {

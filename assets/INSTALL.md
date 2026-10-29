@@ -46,10 +46,12 @@ git clone https://github.com/bitterhalt/slimshell.git ~/.config/quickshell
 Several helpers currently expect `~/.config/quickshell`, so do not install into a
 named subconfiguration or another directory unless you also adjust those paths.
 
-Review `Config.qml` for appearance and defaults. Optional commands in
+Review `settings.json` for appearance and defaults. Optional commands in
 `menus/MainMenu.qml` still include local tools such as `sup`, `vopen` and
-`tmux-sysmon.sh`; replace or remove entries you do not use. Your own dmenu scripts
-are independent of these built-in menus.
+`tmux-sysmon.sh`. Menus and other integrations may rely on personal scripts or
+configuration from my [dotfiles](https://github.com/bitterhalt/dotfiles).
+Review those before borrowing them, or replace/remove entries you do not use.
+Your own dmenu scripts are independent of these built-in menus.
 
 ## 3. Try it in your Niri session
 
@@ -76,9 +78,9 @@ bundled `lock/pam/quickshell-lock` policy uses `pam_unix` and `pam_faillock`; it
 need adapting to your distribution's authentication policy. Keep another way to
 access your session while testing.
 
-Idle defaults include automatic locking, monitor power-off and suspension. If you
-want these disabled initially, set the three `idle*Timeout` defaults in `Config.qml`
-to `0` before first launch. Existing saved settings take precedence over defaults.
+Automatic locking, monitor power-off and suspension are configured through Idle
+Settings (`qs ipc call idle settings`). Set a timeout to `0` to disable that action.
+These preferences are saved separately, not in `settings.json`.
 
 ## 4. Add Niri startup and keybindings
 

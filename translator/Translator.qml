@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
 import Quickshell.Io
@@ -14,7 +16,7 @@ Item {
     property string targetLanguage: "EN-GB"
 
     PopupMotion {
-        id: popupMotion
+        id: translatorMotion
         openDuration: root.config.popupOpenDuration
         slideDistance: root.config.popupSlideDistance
         closeDuration: root.config.popupCloseDuration
@@ -28,12 +30,12 @@ Item {
     function toggle() { opened = !opened }
 
     LazyLoader {
-        active: popupMotion.surfaceVisible
+        active: translatorMotion.surfaceVisible
 
         TranslatorWindow {
             config: root.config
             targetScreen: root.targetScreen
-            popupMotion: popupMotion
+            popupMotion: translatorMotion
             sourceLanguage: root.sourceLanguage
             targetLanguage: root.targetLanguage
             onSourceLanguageChanged: root.sourceLanguage = sourceLanguage

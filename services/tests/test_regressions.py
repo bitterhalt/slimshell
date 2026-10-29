@@ -19,14 +19,11 @@ Item {
         id: settings
         property int notificationHistoryLimit: 100
         property var notificationHistoryExcludedApps: []
-        property int idleLockTimeout: 1200
-        property int idleOffTimeout: 1800
-        property int idleSuspendTimeout: 7200
     }
     Component { id: notifications; NotificationService { config: settings } }
     Component { id: niri; NiriService {} }
     Component { id: recorder; RecorderService {} }
-    Component { id: preferences; SettingsService { config: settings } }
+    Component { id: preferences; SettingsService {} }
     Component { id: idle; IdleService { lockService: lockStub } }
     Component { id: enabledSpy; SignalSpy { signalName: "automaticEnabledChanged" } }
     QtObject { id: lockStub; function lock() {} }
