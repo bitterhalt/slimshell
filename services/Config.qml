@@ -10,7 +10,6 @@ Item {
     property var values: Schema.defaults()
     property bool ready: false
     property bool applying: false
-
     readonly property real fontScale: values.fontScale
     readonly property real iconScale: values.iconScale
     readonly property string iconFontFamily: values.iconFontFamily
@@ -36,6 +35,7 @@ Item {
     readonly property int bluetoothBatteryCriticalPercent: values.bluetoothBatteryCriticalPercent
     readonly property int bluetoothBatteryRearmMargin: values.bluetoothBatteryRearmMargin
     // Semantic palette supplied by ThemeService, with its own fallback palette.
+    readonly property color border: theme.border
     readonly property color bg: theme.bg
     readonly property color fg: theme.fg
     readonly property color muted: theme.muted
@@ -54,30 +54,32 @@ Item {
         Quickshell.execDetached(["sh", "-lc", command]);
     }
 
-    visible: false
-
     function applySettings(text) {
         try {
-            const parsed = Schema.parse(text)
-            applying = true
-            values = parsed.values
+            const parsed = Schema.parse(text);
+            applying = true;
+            values = parsed.values;
             if (parsed.warnings.length > 0)
-                console.warn("settings.json: using defaults for " + parsed.warnings.join(", "))
+                console.warn("settings.json: using defaults for " + parsed.warnings.join(", "));
+
         } catch (error) {
-            console.warn("Invalid settings.json; keeping previous settings")
+            console.warn("Invalid settings.json; keeping previous settings");
         }
-        applying = false
-        ready = true
+        applying = false;
+        ready = true;
     }
 
+    visible: false
     Component.onCompleted: {
-        const initial = settingsFile.text()
+        const initial = settingsFile.text();
         if (!ready)
-            applySettings(initial)
+            applySettings(initial);
+
     }
 
     FileView {
         id: settingsFile
+
         path: Qt.resolvedUrl("../settings.json").toString()
         blockLoading: true
         watchChanges: true
@@ -85,8 +87,8 @@ Item {
         onFileChanged: reload()
         onLoaded: config.applySettings(text())
         onLoadFailed: {
-            config.ready = true
-            console.warn("Could not load settings.json; keeping current settings")
+            config.ready = true;
+            console.warn("Could not load settings.json; keeping current settings");
         }
     }
 

@@ -9,6 +9,7 @@ Item {
         property color fg: "#eeeeee"
         property color muted: "#888888"
         property color selectionBackground: "#6699cc"
+        readonly property color border: Qt.alpha(selectionBackground, 0.45)
         property color selectionForeground: "#ffffff"
         property real maxVolume: 1.1
         property color urgent: "#cc3333"

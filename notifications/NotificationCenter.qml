@@ -85,7 +85,7 @@ FocusScope {
     Rectangle {
         anchors.fill: parent
         color: root.config.bg
-        border.color: root.config.selectionBackground
+        border.color: root.config.border
         border.width: 1
         radius: root.config.popupRadius
     }

@@ -24,6 +24,7 @@ Item {
         property color muted: "#888888"
         property color urgent: "#ff5555"
         property color selectionBackground: "#6699cc"
+        readonly property color border: Qt.alpha(selectionBackground, 0.45)
         property color selectionForeground: "#ffffff"
     }
     Component { id: configComponent; Config { theme: fixtureTheme } }

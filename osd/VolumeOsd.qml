@@ -118,7 +118,7 @@ Item {
                 anchors.fill: parent
 
                 color: config.bg
-                border.color: config.selectionBackground
+                border.color: config.border
                 border.width: 1
                 radius: config.popupRadius
 

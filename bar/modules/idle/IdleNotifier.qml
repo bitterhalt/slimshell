@@ -59,7 +59,7 @@ Item {
 
             radius: root.config.popupRadius
             color: root.config.bg
-            border.color: root.config.selectionBackground
+            border.color: root.config.border
             border.width: 1
 
             Item {

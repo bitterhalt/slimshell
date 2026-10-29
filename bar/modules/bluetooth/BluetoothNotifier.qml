@@ -124,7 +124,7 @@ Item {
             transform: Translate { y: toastMotion.contentOffset }
             radius: root.config.popupRadius
             color: root.batteryAlert ? root.config.bg : root.config.bg
-            border.color: root.batteryAlert ? root.criticalBorderColor : root.config.selectionBackground
+            border.color: root.batteryAlert ? root.criticalBorderColor : root.config.border
             border.width: 1
 
             Item {

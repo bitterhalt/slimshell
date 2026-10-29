@@ -20,19 +20,20 @@ Rectangle {
     function iconSource(icon) {
         if (!icon)
             return "";
-        return icon.startsWith("/") || icon.startsWith("file:")
-            ? icon : Quickshell.iconPath(icon, true);
+
+        return icon.startsWith("/") || icon.startsWith("file:") ? icon : Quickshell.iconPath(icon, true);
     }
 
     implicitHeight: 100
     clip: true
     radius: config.popupRadius
     color: config.bg
-    border.color: critical ? criticalBorderColor : config.selectionBackground
+    border.color: critical ? criticalBorderColor : config.border
     border.width: 1
 
     Item {
         id: imageBox
+
         objectName: "notificationIconBox"
         anchors.right: parent.right
         anchors.rightMargin: 22
@@ -42,6 +43,7 @@ Rectangle {
 
         IconImage {
             id: appIcon
+
             anchors.fill: parent
             visible: !root.critical && !root.timerNotification && source.toString() !== ""
             source: root.iconSource(root.notification ? (root.notification.appIcon || root.imageIcon) : "")
@@ -55,6 +57,7 @@ Rectangle {
             font.pointSize: config.iconSize
             text: root.critical ? "󰀧" : root.timerNotification ? "⏰" : "󰂚"
         }
+
     }
 
     Column {
@@ -89,5 +92,7 @@ Rectangle {
             elide: Text.ElideRight
             text: root.notification ? (root.notification.body || "") : ""
         }
+
     }
+
 }

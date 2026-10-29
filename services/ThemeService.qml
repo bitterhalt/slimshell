@@ -19,6 +19,7 @@ Item {
     property color urgent: fallbackUrgent
     property color selectionBackground: fallbackSelectionBackground
     property color selectionForeground: fallbackSelectionForeground
+    readonly property color border: Qt.alpha(selectionBackground, 0.45)
 
     property bool hellwalActive: false
 

@@ -243,8 +243,6 @@ PanelWindow {
         transform: Translate {
             y: popupMotion.contentOffset
         }
-        border.color: root.config.selectionBackground
-        border.width: 1
         radius: root.config.popupRadius
         clip: true
 
@@ -541,7 +539,7 @@ PanelWindow {
         Rectangle {
             anchors.fill: parent
             color: "transparent"
-            border.color: root.config.selectionBackground
+            border.color: root.config.border
             border.width: 1
             radius: root.config.popupRadius
             z: 100

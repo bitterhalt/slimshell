@@ -26,6 +26,7 @@ Item {
         property color bg: "#111111"
         property color urgent: "red"
         property color selectionBackground: "#b8865e"
+        readonly property color border: Qt.alpha(selectionBackground, 0.45)
         property color selectionForeground: "#18120d"
         property string textFontFamily: "sans-serif"
         property string iconFontFamily: "sans-serif"

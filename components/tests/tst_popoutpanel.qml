@@ -11,6 +11,7 @@ Item {
         id: fixtureConfig
         property color bg: "#222222"
         property color selectionBackground: "#444444"
+        readonly property color border: Qt.alpha(selectionBackground, 0.45)
         property int popupRadius: 4
     }
 
@@ -46,6 +47,14 @@ Item {
 
     TestCase {
         name: "PopoutPanelLayout"
+
+        function test_outer_border_uses_muted_theme_color() {
+            const panel = createTemporaryObject(panelComponent, host);
+            const frame = panel.children.find(child => child.border !== undefined);
+            verify(frame !== undefined);
+            compare(frame.border.color, fixtureConfig.border);
+            verify(Math.abs(frame.border.color.a - 0.45) < 0.01);
+        }
 
         function test_first_open_sized_before_show() {
             const panel = createTemporaryObject(panelComponent, host);
