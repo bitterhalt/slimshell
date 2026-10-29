@@ -75,8 +75,8 @@ Item {
         fg = colors.foreground
         muted = Qt.alpha(fg, 0.65)
         urgent = colors.color3
-        selectionBackground = colors.selection_background || colors.color6
-        selectionForeground = colors.selection_foreground || fg
+        selectionBackground = colors.color6
+        selectionForeground =  bg
         hellwalActive = true
     }
 
