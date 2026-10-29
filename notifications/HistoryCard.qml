@@ -30,7 +30,7 @@ Rectangle {
     radius: config.popupRadius
     border.width: 1
     border.color: root.critical ? root.criticalBorderColor
-        : root.highlighted ? root.config.selectionBackground : root.config.muted
+        : root.highlighted ? root.config.selectionBackground : root.config.border
     color: root.config.bg
 
     HoverHandler {

@@ -98,6 +98,34 @@ Item {
             verify(service.saveWorkspaceLayout("invalid") !== "");
             compare(storage.written, previous);
         }
+        function test_fixed_background_is_validated_and_persisted() {
+            const service = createTemporaryObject(preferences, host);
+            const storage = file(service);
+            storage.loadFailed();
+            compare(service.hellwalBackgroundMode, "dynamic");
+            compare(service.hellwalBackgroundColor, "#111111");
+            compare(service.hellwalGrayScale, 0);
+            verify(service.saveHellwalSettings("light", 0.2, 0.3, "fixed", "invalid") !== "");
+            compare(service.hellwalMode, "dark");
+            compare(storage.written, "");
+            compare(service.saveHellwalSettings("light", 0.2, 0.3, "fixed", "#223344"), "");
+            const saved = JSON.parse(storage.written);
+            compare(saved.hellwalBackgroundMode, "fixed");
+            compare(saved.hellwalBackgroundColor, "#223344");
+            compare(saved.hellwalGrayScale, 0);
+            // Existing three-argument callers preserve the background preference.
+            compare(service.saveHellwalSettings("dark", 0, 0), "");
+            compare(service.hellwalBackgroundMode, "fixed");
+            storage.contents = storage.written;
+            storage.loaded();
+            compare(service.hellwalBackgroundColor, "#223344");
+            verify(service.saveHellwalSettings("dark", 0, 0, "fixed", "#223344", 1.1) !== "");
+            compare(service.hellwalGrayScale, 0);
+            compare(service.saveHellwalSettings("dark", 0, 0, "fixed", "#223344", 0.6), "");
+            compare(service.hellwalGrayScale, 0.6);
+            compare(service.saveHellwalSettings("dark", 0, 0, "dynamic", "#223344"), "");
+            compare(service.hellwalBackgroundMode, "dynamic");
+        }
         function test_idle_follows_preferences_without_owning_persistence() {
             const service = createTemporaryObject(preferences, host);
             const runtime = createTemporaryObject(idle, host, {settingsService: service});

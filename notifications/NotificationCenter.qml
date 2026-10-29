@@ -162,7 +162,7 @@ FocusScope {
             anchors.right: parent.right
             anchors.top: parent.top
             height: 1
-            color: root.config.selectionBackground
+            color: root.config.border
         }
 
         Text {
@@ -196,7 +196,7 @@ FocusScope {
             ToggleSwitch {
                 config: root.config
                 checked: root.notificationService.dnd
-                opacity: checked ? 1 : 0.8
+                opacity: checked ? 1 : 0.65
                 onToggled: {
                     root.notificationService.toggleDnd();
                     root.forceActiveFocus();

@@ -12,7 +12,6 @@ Item {
     height: barWindow.height
     implicitWidth: trayItems.implicitWidth
 
-    // System-tray icons, preceded by a separator only when items exist.
     Row {
         id: trayItems
 

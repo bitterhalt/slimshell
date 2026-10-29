@@ -17,6 +17,7 @@ Item {
     property string errorText: ""
     property string noticeText: ""
     property bool replyReceived: false
+    property int applyExitCode: 0
     readonly property bool busy: applyProcess.running
     readonly property string directory: Quickshell.env("HOME") + "/Pictures/wallpaper"
     readonly property string helperPath: Quickshell.env("HOME") + "/.config/quickshell/wallpaper/wallpaper-helper.py"
@@ -45,6 +46,32 @@ Item {
         onTriggered: root.noticeText = ""
     }
 
+    // Process can report exit before StdioCollector finishes draining stdout.
+    Timer {
+        id: responseTimer
+        interval: 1000
+        onTriggered: {
+            if (!root.replyReceived && applyStdout.text.trim() !== "")
+                root.handleReply(applyStdout.text)
+            if (!root.replyReceived)
+                root.errorText = root.applyExitCode === 0
+                    ? "No response from wallpaper helper" : "Could not run wallpaper helper"
+        }
+    }
+
+    function handleReply(text) {
+        root.replyReceived = true
+        try {
+            const reply = JSON.parse(text)
+            if (reply.ok)
+                root.noticeText = root.opened ? "Wallpaper applied" : ""
+            else
+                root.errorText = reply.error || "Could not apply wallpaper"
+        } catch (error) {
+            root.errorText = "Could not read the wallpaper helper response"
+        }
+    }
+
     function open(screen) {
         menuScreen = screen || targetScreen
         opened = true
@@ -58,7 +85,7 @@ Item {
             open(screen)
     }
 
-    function apply(path, hellwal, staticBackground) {
+    function apply(path, hellwal) {
         if (busy || !path)
             return
         errorText = ""
@@ -68,10 +95,27 @@ Item {
         if (hellwal) {
             command.push("--hellwal", "--mode", settingsService.hellwalMode,
                 "--dark-offset", String(settingsService.hellwalDarkOffset),
-                "--bright-offset", String(settingsService.hellwalBrightOffset))
-            if (staticBackground)
-                command.push("--static-background", staticBackground)
+                "--bright-offset", String(settingsService.hellwalBrightOffset),
+                "--gray-scale", String(settingsService.hellwalGrayScale))
+            if (settingsService.hellwalBackgroundMode === "fixed")
+                command.push("--static-background", settingsService.hellwalBackgroundColor)
         }
+        applyProcess.command = command
+        applyProcess.running = true
+    }
+
+    function refreshHellwal() {
+        if (busy)
+            return
+        errorText = ""
+        noticeText = ""
+        replyReceived = false
+        const command = ["python3", helperPath, "refresh", "--mode", settingsService.hellwalMode,
+            "--dark-offset", String(settingsService.hellwalDarkOffset),
+            "--bright-offset", String(settingsService.hellwalBrightOffset),
+            "--gray-scale", String(settingsService.hellwalGrayScale)]
+        if (settingsService.hellwalBackgroundMode === "fixed")
+            command.push("--static-background", settingsService.hellwalBackgroundColor)
         applyProcess.command = command
         applyProcess.running = true
     }
@@ -93,23 +137,13 @@ Item {
         id: applyProcess
 
         stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    const reply = JSON.parse(text)
-                    root.replyReceived = true
-                    if (reply.ok)
-                        root.noticeText = root.opened ? "Wallpaper applied" : ""
-                    else
-                        root.errorText = reply.error || "Could not apply wallpaper"
-                } catch (error) {
-                    root.errorText = "Could not read the wallpaper helper response"
-                }
-            }
+            id: applyStdout
+            onStreamFinished: root.handleReply(text)
         }
         stderr: StdioCollector {}
         onExited: exitCode => {
-            if (!root.replyReceived)
-                root.errorText = exitCode === 0 ? "No response from wallpaper helper" : "Could not run wallpaper helper"
+            root.applyExitCode = exitCode
+            responseTimer.restart()
         }
     }
 

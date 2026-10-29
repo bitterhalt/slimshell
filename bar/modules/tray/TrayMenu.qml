@@ -46,7 +46,7 @@ Item {
         anchors.fill: parent
 
         color: root.config.bg
-        border.color: root.config.selectionBackground
+        border.color: root.config.border
         border.width: 1
         radius: root.config.popupRadius
 
@@ -125,7 +125,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
 
                 height: 1
-                color: root.config.selectionBackground
+                color: root.config.border
             }
         }
     }
@@ -143,7 +143,7 @@ Item {
 
             Rectangle {
                 anchors.fill: parent
-                radius: 3
+                radius: 4
                 color: row.highlighted ? root.config.selectionBackground : "transparent"
             }
 

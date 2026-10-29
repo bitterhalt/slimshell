@@ -358,7 +358,7 @@ PanelWindow {
             anchors.rightMargin: 1
             height: 1
             z: 1
-            color: root.config.selectionBackground
+            color: root.config.border
         }
 
         // Left: compact history rows. Right: preview for the selected entry.
@@ -434,7 +434,7 @@ PanelWindow {
             Rectangle {
                 width: 1
                 height: parent.height
-                color: root.config.selectionBackground
+                color: root.config.border
             }
 
             Item {
@@ -497,7 +497,7 @@ PanelWindow {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 height: 1
-                color: root.config.selectionBackground
+                color: root.config.border
             }
 
             Row {

@@ -391,7 +391,7 @@ Item {
                 notification: note});
             compare(card.color, config.bg);
             compare(card.border.width, 1);
-            compare(card.border.color, config.muted);
+            compare(card.border.color, config.border);
             compare(card.opacity, 1);
             const hover = findChild(card, "historyHoverHandler");
             verify(hover !== null);
@@ -403,7 +403,7 @@ Item {
             mouseMove(host, host.width - 1, host.height - 1);
             tryVerify(() => !hover.hovered);
             compare(card.opacity, 1);
-            compare(card.border.color, config.muted);
+            compare(card.border.color, config.border);
             // Assert selected treatment directly; hover itself is driven by
             // HoverHandler in the actual UI.
             card.selected = true;

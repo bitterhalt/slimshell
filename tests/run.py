@@ -22,7 +22,7 @@ SUITES = {
     "idle": [("qml", "services/idle/tests")],
     "launcher": [("qml", "launcher/tests"), ("python", "launcher/tests")],
     "translator": [("qml", "translator/tests"), ("python", "translator")],
-    "wallpaper": [("python", "wallpaper")],
+    "wallpaper": [("qml", "wallpaper/tests"), ("python", "wallpaper")],
     "clipboard": [("python", "clipboard/tests")],
     "battery": [("python", "services/battery/tests")],
     "services": [("python", "services/tests")],

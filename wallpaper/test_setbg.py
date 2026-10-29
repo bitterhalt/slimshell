@@ -142,7 +142,8 @@ class WallpaperTests(unittest.TestCase):
             if cmd[0] == "hellwal":
                 self.assertIn("--comfort-mode", cmd)
                 self.assertIn("--dark", cmd)
-                self.assertEqual(cmd[-4:], ["--dark-offset", "0", "--bright-offset", "0"])
+                self.assertEqual(cmd[-6:], ["--dark-offset", "0", "--bright-offset", "0",
+                                            "--gray-scale", "0"])
                 raise RuntimeError("hellwal failed")
             return self.fake_run(cmd, **kwargs)
 
@@ -161,7 +162,7 @@ class WallpaperTests(unittest.TestCase):
         self.assertEqual(self.calls[-1], [
             "hellwal", "-i", str(self.folder / "wall/wallpaper.png"),
             "--comfort-mode", "--light", "--dark-offset", "0.45",
-            "--bright-offset", "0.2"
+            "--bright-offset", "0.2", "--gray-scale", "0"
         ])
 
     def test_hellwal_accepts_one_off_static_background(self):
@@ -173,7 +174,28 @@ class WallpaperTests(unittest.TestCase):
             setbg.apply_wallpaper(
                 image, True, static_background_value="#111111"
             )
-        self.assertEqual(self.calls[-1][-2:], ["--static-background", "#111111"])
+        self.assertEqual(self.calls[-1][-4:], ["--gray-scale", "0", "--static-background", "#111111"])
+
+    def test_refresh_hellwal_only_regenerates_theme_from_current_wallpaper(self):
+        self.calls = []
+        wall_dir = self.folder / "wall"
+        wall_dir.mkdir()
+        (wall_dir / "wallpaper.png").touch()
+        with patch.object(setbg, "WALL_DIR", wall_dir), \
+                patch.object(setbg, "run", side_effect=self.fake_run):
+            setbg.refresh_hellwal(mode="light", dark_offset_value=0.4,
+                                  bright_offset_value=0.2,
+                                  static_background_value="#223344", gray_scale_value=0.6)
+        self.assertEqual(self.calls, [[
+            "hellwal", "-i", str(wall_dir / "wallpaper.png"), "--comfort-mode",
+            "--light", "--dark-offset", "0.4", "--bright-offset", "0.2",
+            "--gray-scale", "0.6", "--static-background", "#223344"
+        ]])
+
+    def test_refresh_hellwal_requires_current_wallpaper(self):
+        with patch.object(setbg, "WALL_DIR", self.folder / "wall"):
+            with self.assertRaisesRegex(ValueError, "No current wallpaper"):
+                setbg.refresh_hellwal()
 
     def test_dark_offset_requires_hellwal_range_in_apply(self):
         image = self.folder / "image.png"
@@ -194,6 +216,15 @@ class WallpaperTests(unittest.TestCase):
         result = json.loads(output.getvalue())
         self.assertFalse(result["ok"])
         self.assertIn("still running", result["error"])
+
+    def test_apply_command_emits_success_response(self):
+        output = io.StringIO()
+        with patch.object(setbg, "CACHE_DIR", self.folder), \
+                patch("sys.argv", ["wallpaper-helper.py", "apply", "image.png", "--hellwal"]), \
+                patch.object(setbg, "apply_wallpaper"), \
+                contextlib.redirect_stdout(output):
+            self.assertEqual(setbg.main(), 0)
+        self.assertEqual(json.loads(output.getvalue()), {"ok": True})
 
     def test_failed_blur_preserves_both_images_without_presenting_wallpaper(self):
         self.calls = []

@@ -10,13 +10,15 @@ Item {
     required property var uiService
     required property var networkService
 
+    width: 24
+    height: barWindow.height
+
     // IPC actions open/close the popup on the screen that owns the bar.
     Connections {
-        target: root.uiService
         function onNetworkActionRequested(action) {
             if (root.barWindow.screen !== root.uiService.targetScreen) {
                 root.popupManager.closeHost("network");
-                return;
+                return ;
             }
             if (action === "open")
                 root.popupManager.openHost("network", networkPopupComponent, root, true);
@@ -25,10 +27,9 @@ Item {
             else if (action === "close")
                 root.popupManager.closeHost("network");
         }
-    }
 
-    width: 24
-    height: barWindow.height
+        target: root.uiService
+    }
 
     Text {
         anchors.centerIn: parent

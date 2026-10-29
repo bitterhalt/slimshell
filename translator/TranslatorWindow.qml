@@ -400,7 +400,7 @@ PanelWindow {
                 Rectangle {
                     width: parent.width
                     height: 1
-                    color: root.config.selectionBackground
+                    color: root.config.border
                 }
 
                 ScrollView {
@@ -545,7 +545,7 @@ PanelWindow {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: root.config.selectionBackground
+                color: root.config.border
             }
 
             Text {

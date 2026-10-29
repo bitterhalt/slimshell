@@ -86,7 +86,7 @@ Scope {
             anchors.fill: parent
             color: root.config.bg
             border.color: root.config.selectionBackground
-            border.width: 1
+            border.width: 2
             radius: root.config.popupRadius
             implicitHeight: content.implicitHeight + 32
 

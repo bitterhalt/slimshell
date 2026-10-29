@@ -17,6 +17,9 @@ Item {
     property string hellwalMode: "dark"
     property real hellwalDarkOffset: 0
     property real hellwalBrightOffset: 0
+    property real hellwalGrayScale: 0
+    property string hellwalBackgroundMode: "dynamic"
+    property string hellwalBackgroundColor: "#111111"
     property string workspaceLayout: "dots"
 
     function saveTimeouts(lockSeconds, offSeconds, suspendSeconds) {
@@ -34,17 +37,31 @@ Item {
         return ""
     }
 
-    function saveHellwalSettings(mode, darkOffset, brightOffset) {
+    function saveHellwalSettings(mode, darkOffset, brightOffset, backgroundMode, backgroundColor, grayScale) {
         if (mode !== "dark" && mode !== "light")
             return "Choose dark or light mode"
         if (!Number.isFinite(darkOffset) || darkOffset < 0 || darkOffset > 1
             || !Number.isFinite(brightOffset) || brightOffset < 0 || brightOffset > 1)
             return "Offsets must be between 0 and 1"
+        const nextGrayScale = grayScale === undefined ? hellwalGrayScale : grayScale
+        if (!Number.isFinite(nextGrayScale) || nextGrayScale < 0 || nextGrayScale > 1)
+            return "Grayscale must be between 0 and 1"
         if (!settingsLoaded)
             return "Settings are still loading"
+        const nextBackgroundMode = backgroundMode === undefined ? hellwalBackgroundMode : backgroundMode
+        const nextBackgroundColor = backgroundColor === undefined ? hellwalBackgroundColor : String(backgroundColor).trim()
+        if (nextBackgroundMode !== "dynamic" && nextBackgroundMode !== "fixed")
+            return "Choose dynamic or fixed background"
+        const validColor = /^#[0-9a-fA-F]{6}$/.test(nextBackgroundColor)
+        if (nextBackgroundMode === "fixed" && !validColor)
+            return "Enter a hex color like #111111"
         hellwalMode = mode
         hellwalDarkOffset = darkOffset
         hellwalBrightOffset = brightOffset
+        hellwalGrayScale = nextGrayScale
+        hellwalBackgroundMode = nextBackgroundMode
+        if (validColor)
+            hellwalBackgroundColor = nextBackgroundColor
         persistSettings()
         return ""
     }
@@ -62,7 +79,7 @@ Item {
     function persistSettings() {
         settingsFile.setText(JSON.stringify({lock: lockTimeout, off: offTimeout,
             suspend: suspendTimeout, hellwalMode, hellwalDarkOffset, hellwalBrightOffset,
-            workspaceLayout}))
+            hellwalGrayScale, workspaceLayout, hellwalBackgroundMode, hellwalBackgroundColor}))
     }
 
     FileView {
@@ -91,8 +108,16 @@ Item {
                 if (Number.isFinite(saved.hellwalBrightOffset)
                     && saved.hellwalBrightOffset >= 0 && saved.hellwalBrightOffset <= 1)
                     root.hellwalBrightOffset = saved.hellwalBrightOffset
+                if (Number.isFinite(saved.hellwalGrayScale)
+                    && saved.hellwalGrayScale >= 0 && saved.hellwalGrayScale <= 1)
+                    root.hellwalGrayScale = saved.hellwalGrayScale
                 if (saved.workspaceLayout === "dots" || saved.workspaceLayout === "minimal")
                     root.workspaceLayout = saved.workspaceLayout
+                if (typeof saved.hellwalBackgroundColor === "string"
+                    && /^#[0-9a-fA-F]{6}$/.test(saved.hellwalBackgroundColor))
+                    root.hellwalBackgroundColor = saved.hellwalBackgroundColor
+                if (saved.hellwalBackgroundMode === "dynamic" || saved.hellwalBackgroundMode === "fixed")
+                    root.hellwalBackgroundMode = saved.hellwalBackgroundMode
             } catch (error) {}
             root.updating = false
             root.settingsLoaded = true

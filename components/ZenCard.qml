@@ -37,7 +37,7 @@ PanelWindow {
     Rectangle {
         anchors.fill: parent
         color: root.config.bg
-        opacity: 0.45
+        opacity: 0.9
         radius: root.config.popupRadius
     }
 

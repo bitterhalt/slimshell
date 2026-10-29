@@ -278,7 +278,7 @@ PopoutPanel {
                 anchors.top: parent.top
                 width: parent.width
                 height: 1
-                color: root.config.selectionBackground
+                color: root.config.border
             }
             Row {
                 anchors.left: parent.left

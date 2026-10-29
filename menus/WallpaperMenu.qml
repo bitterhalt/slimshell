@@ -7,6 +7,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import "../components"
+import "../wallpaper"
 
 PanelWindow {
     id: root
@@ -20,18 +21,11 @@ PanelWindow {
     property bool scanFinished: false
     property string selectedPath: ""
     property bool settingsOpen: false
-    property bool backgroundPrompt: false
-    property string promptError: ""
     // Footer actions and their single-key shortcuts.
     readonly property var actions: [
         { label: "Set Wallpaper", key: "b", action: "wallpaper", control: false },
         { label: "Hellwal", key: "h", action: "hellwal", control: false },
-        { label: "Hellwal fixed bg", key: "g", action: "background", control: false },
         { label: "Settings", key: "s", action: "settings", control: false }
-    ]
-    readonly property var hellwalModes: [
-        {value: "dark", label: "Dark"},
-        {value: "light", label: "Light"}
     ]
     readonly property int selectedIndex: {
         if (visibleEntries.count === 0)
@@ -88,81 +82,30 @@ PanelWindow {
     }
 
     function openSettings() {
-        promptError = ""
-        const savedMode = hellwalModes.findIndex(
-            option => option.value === controller.settingsService.hellwalMode)
-        modeInput.currentIndex = savedMode >= 0 ? savedMode : 0
-        darkOffsetInput.text = String(controller.settingsService.hellwalDarkOffset)
-        brightOffsetInput.text = String(controller.settingsService.hellwalBrightOffset)
         settingsOpen = true
-        Qt.callLater(() => {
-            modeInput.forceActiveFocus()
-        })
+        settingsPanel.begin()
     }
 
-    function openBackgroundPrompt() {
-        if (!selected || controller.busy)
-            return
-        promptError = ""
-        backgroundInput.text = "#111111"
-        backgroundPrompt = true
-        Qt.callLater(() => {
-            backgroundInput.forceActiveFocus()
-            backgroundInput.selectAll()
-        })
-    }
-
-    function applyStaticBackground() {
-        if (!selected || controller.busy)
-            return
-        const color = backgroundInput.text.trim()
-        if (!/^#[0-9a-fA-F]{6}$/.test(color)) {
-            promptError = "Enter a hex color like #111111"
-            return
-        }
-        backgroundPrompt = false
-        controller.apply(selected.path, true, color)
-        grid.forceActiveFocus()
-    }
-
-    function saveSettings() {
-        if (controller.busy)
-            return
-        const mode = hellwalModes[modeInput.currentIndex].value
-        const dark = Number(darkOffsetInput.text.trim())
-        const bright = Number(brightOffsetInput.text.trim())
-        if (darkOffsetInput.text.trim() === "" || brightOffsetInput.text.trim() === ""
-            || !Number.isFinite(dark) || !Number.isFinite(bright)
-            || dark < 0 || dark > 1 || bright < 0 || bright > 1) {
-            promptError = "Offsets must be between 0 and 1"
-            return
-        }
-        promptError = controller.settingsService.saveHellwalSettings(
-            mode, dark, bright)
-        if (promptError !== "")
-            return
+    function closeSettings() {
         settingsOpen = false
         grid.forceActiveFocus()
+    }
+
+    function saveSettingsAndRefresh() {
+        closeSettings()
+        controller.refreshHellwal()
     }
 
     function activateAction(action) {
         if (action === "settings")
             openSettings()
-        else if (action === "background")
-            openBackgroundPrompt()
         else
             applySelection(action === "hellwal")
     }
 
     function handleEscape() {
         if (settingsOpen) {
-            settingsOpen = false
-            promptError = ""
-            grid.forceActiveFocus()
-        } else if (backgroundPrompt) {
-            backgroundPrompt = false
-            promptError = ""
-            grid.forceActiveFocus()
+            closeSettings()
         } else if (search.activeFocus) {
             grid.forceActiveFocus()
         } else {
@@ -207,23 +150,17 @@ PanelWindow {
     Shortcut { sequence: "Escape"; onActivated: root.handleEscape() }
     Shortcut {
         sequence: "B"
-        enabled: !search.activeFocus && !root.settingsOpen && !root.backgroundPrompt && !!root.selected && !root.controller.busy
+        enabled: !search.activeFocus && !root.settingsOpen && !!root.selected && !root.controller.busy
         onActivated: root.applySelection(false)
     }
     Shortcut {
         sequence: "H"
-        enabled: !search.activeFocus && !root.settingsOpen && !root.backgroundPrompt && !!root.selected && !root.controller.busy
+        enabled: !search.activeFocus && !root.settingsOpen && !!root.selected && !root.controller.busy
         onActivated: root.applySelection(true)
     }
     Shortcut {
-        sequence: "G"
-        enabled: !search.activeFocus && !root.settingsOpen && !root.backgroundPrompt
-            && !!root.selected && !root.controller.busy
-        onActivated: root.openBackgroundPrompt()
-    }
-    Shortcut {
         sequence: "S"
-        enabled: !search.activeFocus && !root.settingsOpen && !root.backgroundPrompt
+        enabled: !search.activeFocus && !root.settingsOpen
         onActivated: root.openSettings()
     }
 
@@ -285,6 +222,7 @@ PanelWindow {
                 id: search
                 Layout.fillWidth: true
                 Layout.preferredHeight: 34
+                visible: !root.settingsOpen
                 placeholderText: "Search wallpapers…"
                 color: root.config.fg
                 placeholderTextColor: root.config.muted
@@ -292,7 +230,7 @@ PanelWindow {
                 selectedTextColor: root.config.selectionForeground
                 font.pointSize: root.config.fontSize(0.92)
                 selectByMouse: true
-                enabled: !root.settingsOpen && !root.backgroundPrompt
+                enabled: !root.settingsOpen
                 KeyNavigation.priority: KeyNavigation.BeforeItem
                 KeyNavigation.tab: grid
                 KeyNavigation.backtab: grid
@@ -327,7 +265,8 @@ PanelWindow {
                 keyNavigationEnabled: false
                 reuseItems: true
                 cacheBuffer: 145
-                enabled: !root.settingsOpen && !root.backgroundPrompt
+                visible: !root.settingsOpen
+                enabled: !root.settingsOpen
                 activeFocusOnTab: true
                 KeyNavigation.priority: KeyNavigation.BeforeItem
                 KeyNavigation.tab: search
@@ -349,8 +288,8 @@ PanelWindow {
                         radius: 4
                         color: root.config.bg
                         border.width: root.selectedIndex === tile.index ? 2 : 1
-                        border.color: Qt.alpha(root.config.selectionBackground,
-                            root.selectedIndex === tile.index ? 1 : 0.5)
+                        border.color: root.selectedIndex === tile.index
+                            ? root.config.selectionBackground : root.config.border
 
                         Image {
                             anchors.left: parent.left
@@ -409,180 +348,41 @@ PanelWindow {
                 }
             }
 
-            // One-off static Hellwal background prompt; not persisted.
-            RowLayout {
+            WallpaperSettings {
+                id: settingsPanel
                 Layout.fillWidth: true
-                visible: root.backgroundPrompt
-                spacing: 8
-
-                Text {
-                    renderType: Text.NativeRendering
-                    text: "Static background"
-                    color: root.config.fg
-                    font.pointSize: root.config.fontSize(0.85)
-                }
-                TextField {
-                    id: backgroundInput
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 30
-                    color: root.config.fg
-                    placeholderText: "#111111"
-                    placeholderTextColor: root.config.muted
-                    selectionColor: root.config.selectionBackground
-                    selectedTextColor: root.config.selectionForeground
-                    enabled: !root.controller.busy
-                    onAccepted: root.applyStaticBackground()
-                    onTextChanged: root.promptError = ""
-                    background: Rectangle {
-                        radius: 4
-                        color: "transparent"
-                        border.color: root.config.selectionBackground
-                    }
-                }
-                Text {
-                    renderType: Text.NativeRendering
-                    text: "Apply"
-                    color: root.config.selectionBackground
-                    font.pointSize: root.config.fontSize(0.85)
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.applyStaticBackground()
-                    }
-                }
-            }
-
-            // Persistent Hellwal mode and offset settings.
-            RowLayout {
-                Layout.fillWidth: true
+                Layout.fillHeight: true
                 visible: root.settingsOpen
-                spacing: 6
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    Text {
-                        renderType: Text.NativeRendering
-                        text: "Settings"
-                        color: root.config.fg
-                        font.pointSize: root.config.fontSize(0.9)
-                    }
-                    Item { Layout.fillWidth: true }
-                    Text {
-                        renderType: Text.NativeRendering
-                        text: "Mode"
-                        color: root.config.muted
-                        font.pointSize: root.config.fontSize(0.8)
-                    }
-                    ComboBox {
-                        id: modeInput
-                        Layout.preferredWidth: 100
-                        Layout.preferredHeight: 30
-                        model: root.hellwalModes
-                        textRole: "label"
-                        currentIndex: 0
-                        enabled: !root.controller.busy
-                        contentItem: Text {
-                            renderType: Text.NativeRendering
-                            leftPadding: 8
-                            rightPadding: 8
-                            verticalAlignment: Text.AlignVCenter
-                            text: modeInput.currentText
-                            color: root.config.fg
-                            font.pointSize: root.config.fontSize(0.85)
-                            elide: Text.ElideRight
-                        }
-                        background: Rectangle {
-                            radius: 4
-                            color: "transparent"
-                            border.color: root.config.selectionBackground
-                        }
-                    }
-                }
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: 8
-                    Text {
-                        renderType: Text.NativeRendering
-                        text: "Dark offset"
-                        color: root.config.muted
-                        font.pointSize: root.config.fontSize(0.8)
-                    }
-                    TextField {
-                        id: darkOffsetInput
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
-                        color: root.config.fg
-                        placeholderText: "0"
-                        placeholderTextColor: root.config.muted
-                        selectionColor: root.config.selectionBackground
-                        selectedTextColor: root.config.selectionForeground
-                        enabled: !root.controller.busy
-                        onTextChanged: root.promptError = ""
-                        background: Rectangle {
-                            radius: 4
-                            color: "transparent"
-                            border.color: root.config.selectionBackground
-                        }
-                    }
-                    Text {
-                        renderType: Text.NativeRendering
-                        text: "Bright offset"
-                        color: root.config.muted
-                        font.pointSize: root.config.fontSize(0.8)
-                    }
-                    TextField {
-                        id: brightOffsetInput
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 30
-                        color: root.config.fg
-                        placeholderText: "0"
-                        placeholderTextColor: root.config.muted
-                        selectionColor: root.config.selectionBackground
-                        selectedTextColor: root.config.selectionForeground
-                        enabled: !root.controller.busy
-                        onTextChanged: root.promptError = ""
-                        background: Rectangle {
-                            radius: 4
-                            color: "transparent"
-                            border.color: root.config.selectionBackground
-                        }
-                    }
-                    Text {
-                        renderType: Text.NativeRendering
-                        text: "Save"
-                        color: root.config.selectionBackground
-                        font.pointSize: root.config.fontSize(0.85)
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.saveSettings()
-                        }
-                    }
-                }
+                config: root.config
+                settingsService: root.controller.settingsService
+                busy: root.controller.busy
+                onSaved: root.saveSettingsAndRefresh()
+                onCancelled: root.closeSettings()
             }
 
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 1
-                color: root.config.selectionBackground
+                color: root.config.border
+                visible: !root.settingsOpen
             }
 
             // Status, errors, and action/shortcut hints.
             Item {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 30
+                visible: !root.settingsOpen
 
                 Text {
                     renderType: Text.NativeRendering
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     width: Math.max(0, parent.width - actionTips.width - 12)
-                    text: root.promptError || root.controller.errorText || root.scanError
+                    text: root.controller.errorText || root.scanError
                         || (root.controller.busy ? "Applying wallpaper…" : root.controller.noticeText)
                         || (scanProcess.running ? "Building thumbnails… " + allEntries.count : root.scanNotice)
                         || visibleEntries.count + " wallpapers"
-                    color: root.promptError || root.controller.errorText || root.scanError ? root.config.urgent : root.config.muted
+                    color: root.controller.errorText || root.scanError ? root.config.urgent : root.config.muted
                     font.pointSize: root.config.fontSize(0.78)
                     elide: Text.ElideRight
                     ToolTip.visible: statusHover.hovered && truncated
@@ -608,7 +408,7 @@ PanelWindow {
                             height: 20
                             opacity: enabled ? 1 : 0.5
                             enabled: (hint.modelData.action === "settings" || !!root.selected)
-                                && !root.controller.busy && !root.settingsOpen && !root.backgroundPrompt
+                                && !root.controller.busy && !root.settingsOpen
 
                             Rectangle {
                                 anchors.fill: parent
