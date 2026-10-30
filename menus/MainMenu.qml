@@ -45,9 +45,6 @@ Item {
     ]
 
     readonly property var systemItems: [
-        { label: "Wiremix", icon: "󰓃", shortcut: "a", command: "foot -a wiremix -e wiremix" },
-        { label: "Bluetooth", icon: "󰂯", shortcut: "b", command: "foot -a bluetui -e bluetui" },
-        { label: "Wi-Fi", icon: "󰖩", shortcut: "w", command: "foot -a impala -e impala" },
         { label: "Network Manager", icon: "󰲝", shortcut: "n", command: "foot -e nmtui" },
         { label: "Update System", icon: "󰑐", shortcut: "u", command: "foot -a pop-upgrade -e sup" },
         { label: "Idle Settings", icon: "󰤄", shortcut: "i", action: "idleSettings" },
