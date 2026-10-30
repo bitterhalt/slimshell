@@ -6,22 +6,37 @@ Item {
     id: root
     visible: false
 
+    // Fallback palette (used when hellwal output is missing or invalid)
     readonly property color fallbackBg: "#100f0f"
     readonly property color fallbackFg: "#cecdc3"
-    readonly property color fallbackMuted: Qt.alpha(fallbackFg, 0.85)
     readonly property color fallbackSelectionBackground: "#205ea6"
-    readonly property color fallbackUrgent: "#bc5215"
     readonly property color fallbackSelectionForeground: "#ffffff"
+    readonly property color fallbackUrgent: "#bc5215"
 
+    // Shared derivation values so fallback and palette paths stay consistent
+    readonly property real mutedAlpha: 0.65
+    readonly property real borderAlpha: 0.45
+
+    readonly property color fallbackMuted: Qt.alpha(fallbackFg, mutedAlpha)
+
+    // Active theme colors
     property color bg: fallbackBg
     property color fg: fallbackFg
     property color muted: fallbackMuted
     property color urgent: fallbackUrgent
     property color selectionBackground: fallbackSelectionBackground
     property color selectionForeground: fallbackSelectionForeground
-    readonly property color border: Qt.alpha(selectionBackground, 0.45)
+
+    // Binding: updates automatically whenever selectionBackground changes
+    readonly property color border: Qt.alpha(selectionBackground, borderAlpha)
 
     property bool hellwalActive: false
+
+    // Regex building blocks, defined once to avoid copy/paste typos
+    readonly property string colorNames:
+        "(background|foreground|selection_background|selection_foreground|color(?:1[0-5]|[0-9]))"
+    readonly property string hexValue:
+        "(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)"
 
     function applyFallback(): void {
         bg = fallbackBg
@@ -35,19 +50,21 @@ Item {
 
     function parsePalette(text): var {
         const colors = {}
-        let match
 
-        let re = /@define-color\s+(background|foreground|selection_background|selection_foreground|color(?:1[0-5]|[0-9]))\s+(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)/g
-        while ((match = re.exec(text)) !== null)
-            colors[match[1]] = match[2]
+        const patterns = [
+            // GTK:   @define-color name #hex
+            new RegExp("@define-color\\s+" + colorNames + "\\s+" + hexValue, "g"),
+            // CSS:   --name: #hex
+            new RegExp("--" + colorNames + "\\s*:\\s*" + hexValue, "g"),
+            // SCSS:  $name: #hex
+            new RegExp("\\$" + colorNames + "\\s*:\\s*" + hexValue, "g"),
+        ]
 
-        re = /--(background|foreground|selection_background|selection_foreground|color(?:1[0-5]|[0-9]))\s*:\s*(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)/g
-        while ((match = re.exec(text)) !== null)
-            colors[match[1]] = match[2]
-
-        re = /\$(background|foreground|selection_background|selection_foreground|color(?:1[0-5]|[0-9]))\s*:\s*(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)/g
-        while ((match = re.exec(text)) !== null)
-            colors[match[1]] = match[2]
+        for (const re of patterns) {
+            let match
+            while ((match = re.exec(text)) !== null)
+                colors[match[1]] = match[2]
+        }
 
         const required = [
             "background",
@@ -74,10 +91,10 @@ Item {
 
         bg = colors.background
         fg = colors.foreground
-        muted = Qt.alpha(fg, 0.65)
+        muted = Qt.alpha(colors.foreground, mutedAlpha)
         urgent = colors.color3
         selectionBackground = colors.color6
-        selectionForeground =  bg
+        selectionForeground = colors.background
         hellwalActive = true
     }
 
