@@ -18,6 +18,11 @@ class TranslatorControllerTests(unittest.TestCase):
             source = "\n".join(line for line in source.splitlines()
                                if not line.startswith("import Quickshell"))
             (base / "Translator.qml").write_text(source.replace('"../components"', '"."'))
+            (base / "Languages.js").write_text((ROOT / "Languages.js").read_text())
+            (base / "qmldir").write_text("singleton Quickshell 1.0 Quickshell.qml\n")
+            (base / "Quickshell.qml").write_text(
+                'pragma Singleton\nimport QtQuick\nQtObject { function env(name) { return "/synthetic-home"; } }\n'
+            )
             (base / "PopupMotion.qml").write_text(
                 (ROOT.parent / "components/PopupMotion.qml").read_text()
             )
@@ -33,6 +38,19 @@ Item {
             (base / "IpcHandler.qml").write_text(
                 'import QtQuick\nQtObject { property string target }\n'
             )
+            (base / "FileView.qml").write_text('''import QtQuick
+QtObject {
+    property string path: ""
+    property bool atomicWrites: false
+    property bool printErrors: false
+    property string contents: ""
+    property string written: ""
+    signal loaded()
+    signal loadFailed()
+    function text() { return contents; }
+    function setText(value) { written = value; }
+}
+''')
             (base / "TranslatorWindow.qml").write_text('''import QtQuick
 Item {
     required property var config
@@ -80,6 +98,19 @@ Item {
             verify(window.keyboardRequested);
             controller.close();
             tryCompare(loader, "item", null);
+        }
+        function test_language_preferences_restore_and_persist_only_codes() {
+            const controller = createTemporaryObject(controllerComponent, host);
+            const file = findChild(controller, "translatorLanguagePreferences");
+            verify(file !== undefined);
+            file.contents = JSON.stringify({source: "SV", target: "EN-US"});
+            file.loaded();
+            compare(controller.sourceLanguage, "SV");
+            compare(controller.targetLanguage, "EN-US");
+            compare(file.written, "");
+            controller.sourceLanguage = "DE";
+            controller.targetLanguage = "FR";
+            compare(JSON.parse(file.written), {source: "DE", target: "FR"});
         }
     }
 }
