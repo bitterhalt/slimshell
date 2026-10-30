@@ -141,9 +141,8 @@ Scope {
 
             PopupMotion {
                 id: toastMotion
-                openDuration: root.config.popupOpenDuration
-                slideDistance: root.config.popupSlideDistance
-                closeDuration: root.config.popupCloseDuration
+                duration: root.config.popupDuration
+                surfaceHeight: toastWindow.height
                 shown: toastWindow.toastActive
                 animationsEnabled: root.config.popupAnimations
                 animationType: root.config.notificationAnimationStyle
@@ -268,9 +267,8 @@ Scope {
 
         PopupMotion {
             id: chipMotion
-            openDuration: root.config.popupOpenDuration
-            slideDistance: root.config.popupSlideDistance
-            closeDuration: root.config.popupCloseDuration
+            duration: root.config.popupDuration
+            surfaceHeight: root.chipHeight
             shown: root.toasts.length > 0 && root.overflowCount > 0
             animationsEnabled: root.config.popupAnimations
             animationType: root.config.notificationAnimationStyle

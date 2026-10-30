@@ -246,9 +246,8 @@ Item {
         shown: root.opened
         animationsEnabled: root.config.popupAnimations
         animationType: root.config.popupAnimationStyle
-        openDuration: root.config.popupOpenDuration
-        closeDuration: root.config.popupCloseDuration
-        slideDistance: root.config.popupSlideDistance
+        duration: root.config.popupDuration
+        surfaceHeight: recorderMenu.height
     }
 
     PopupCatcher {

@@ -79,15 +79,28 @@ TestCase {
         tryCompare(popup, "surfaceVisible", false);
     }
 
+    function test_distanceScalesWithHeight() {
+        const popup = createTemporaryObject(initiallyOpen, this);
+        popup.surfaceHeight = 62;
+        compare(popup.slideDistance, 62);
+        popup.surfaceHeight = 300;
+        compare(popup.slideDistance, 300);
+        popup.surfaceHeight = 900;
+        compare(popup.slideDistance, 900);
+        popup.surfaceHeight = 10;
+        compare(popup.slideDistance, 10);
+        popup.animationType = "fade";
+        compare(popup.contentOffset, 0);
+    }
+
     name: "PopupMotionLifecycle"
     when: windowShown
 
     PopupMotion {
         id: motion
 
-        openDuration: 30
-        slideDistance: 8
-        closeDuration: 30
+        duration: 30
+        surfaceHeight: 80
     }
 
     SignalSpy {
@@ -102,9 +115,8 @@ TestCase {
 
         PopupMotion {
             shown: true
-            openDuration: 30
-            slideDistance: 8
-            closeDuration: 30
+            duration: 30
+            surfaceHeight: 80
         }
 
     }

@@ -23,6 +23,7 @@ TranslatorWindow {
         property bool surfaceVisible: true
         property real contentOpacity: 1
         property real contentOffset: 0
+        property real surfaceHeight: 0
     }
     config: QtObject {
         property color bg: "#101010"

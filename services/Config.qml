@@ -23,9 +23,7 @@ Item {
     readonly property int popupGap: values.popupGap
     readonly property int popupRadius: values.popupRadius
     readonly property bool popupAnimations: values.popupAnimations
-    readonly property int popupOpenDuration: values.popupOpenDuration
-    readonly property real popupSlideDistance: values.popupSlideDistance
-    readonly property int popupCloseDuration: values.popupCloseDuration
+    readonly property int popupDuration: values.popupDuration
     readonly property string popupAnimationStyle: values.popupAnimationStyle
     readonly property var popupAnimationTypes: values.popupAnimationTypes
     readonly property string notificationAnimationStyle: values.notificationAnimationStyle

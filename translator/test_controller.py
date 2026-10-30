@@ -69,9 +69,7 @@ Item {
     id: host
     QtObject {
         id: settings
-        property int popupOpenDuration: 5
-        property int popupCloseDuration: 5
-        property real popupSlideDistance: 8
+        property int popupDuration: 5
         property bool popupAnimations: true
         property string popupAnimationStyle: "fade"
     }

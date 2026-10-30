@@ -19,9 +19,8 @@ Item {
         shown: root.toastShown
         animationsEnabled: root.config.popupAnimations
         animationType: root.config.notificationAnimationStyle
-        openDuration: root.config.popupOpenDuration
-        slideDistance: root.config.popupSlideDistance
-        closeDuration: root.config.popupCloseDuration
+        duration: root.config.popupDuration
+        surfaceHeight: toast.height
     }
 
     function show(newState): void {

@@ -32,9 +32,7 @@ Item {
 
     PopupMotion {
         id: translatorMotion
-        openDuration: root.config.popupOpenDuration
-        slideDistance: root.config.popupSlideDistance
-        closeDuration: root.config.popupCloseDuration
+        duration: root.config.popupDuration
         shown: root.opened
         animationsEnabled: root.config.popupAnimations
         animationType: root.config.popupAnimationStyle

@@ -44,7 +44,7 @@ Item {
         }
         function test_missing_keys_and_empty_array() {
             const parsed = Schema.parse('{"notifications":{"historyExcludedApps":[]}}');
-            compare(parsed.values.popupOpenDuration, 100);
+            compare(parsed.values.popupDuration, 150);
             compare(parsed.values.fontScale, 1);
             compare(parsed.values.notificationHistoryExcludedApps.length, 0);
             compare(parsed.warnings.length, 0);
@@ -52,14 +52,14 @@ Item {
         function test_invalid_values_use_defaults() {
             const parsed = Schema.parse(JSON.stringify({
                 appearance: {fontScale: "large"}, bar: {height: 32.5},
-                audio: {maxVolume: -1}, animations: {style: "spin", openDuration: -10},
+                audio: {maxVolume: -1}, animations: {style: "spin", duration: -10},
                 notifications: {historyExcludedApps: [null]}, clock: []
             }));
             compare(parsed.values.fontScale, 1);
             compare(parsed.values.barHeight, 32);
             compare(parsed.values.maxVolume, 1.1);
             compare(parsed.values.popupAnimationStyle, "fade");
-            compare(parsed.values.popupOpenDuration, 100);
+            compare(parsed.values.popupDuration, 150);
             verify(parsed.warnings.length >= 6);
         }
         function test_cross_field_validation() {
@@ -74,32 +74,32 @@ Item {
             compare(parsed.warnings.length, 2);
         }
         function test_adapter_initial_load_and_reload() {
-            TestFiles.configuration = '{"appearance":{"fontScale":1.25},"animations":{"openDuration":210}}';
+            TestFiles.configuration = '{"appearance":{"fontScale":1.25},"animations":{"duration":210}}';
             const config = createTemporaryObject(configComponent, host);
             verify(config.ready);
             compare(config.fontScale, 1.25);
-            compare(config.popupOpenDuration, 210);
+            compare(config.popupDuration, 210);
             const file = storage(config);
             verify(file.path.endsWith("/settings.json"));
             verify(file.watchChanges);
             verify(file.blockLoading);
-            file.contents = '{"animations":{"enabled":false,"openDuration":80}}';
+            file.contents = '{"animations":{"enabled":false,"duration":80}}';
             file.loaded();
             verify(!config.popupAnimations);
-            compare(config.popupOpenDuration, 80);
+            compare(config.popupDuration, 80);
             file.contents = "malformed JSON";
             file.loaded();
-            compare(config.popupOpenDuration, 80);
+            compare(config.popupDuration, 80);
             verify(!config.applying);
             file.loadFailed();
-            compare(config.popupOpenDuration, 80);
+            compare(config.popupDuration, 80);
         }
         function test_audio_and_animation_values_update_through_file_reload() {
             const config = createTemporaryObject(configComponent, host);
             const file = storage(config);
             file.contents = JSON.stringify({audio: {style: "circle"}, animations: {
                 enabled: false, style: "slide", notificationStyle: "fade",
-                openDuration: 250, closeDuration: 200,
+                duration: 250,
                 hostStyles: {network: "fade"}
             }});
             file.loaded();
@@ -107,8 +107,7 @@ Item {
             verify(!config.popupAnimations);
             compare(config.popupAnimationStyle, "slide");
             compare(config.notificationAnimationStyle, "fade");
-            compare(config.popupOpenDuration, 250);
-            compare(config.popupCloseDuration, 200);
+            compare(config.popupDuration, 250);
             compare(config.popupAnimationTypes.network, "fade");
             file.contents = '{"audio":{"style":"classic"},"animations":{"enabled":true}}';
             file.loaded();
@@ -121,7 +120,7 @@ Item {
             const service = createTemporaryObject(settingsComponent, host);
             storage(service).contents = '{"lock":60,"off":120,"suspend":300}';
             storage(service).loaded();
-            config.applySettings('{"animations":{"openDuration":250}}');
+            config.applySettings('{"animations":{"duration":250}}');
             compare(service.lockTimeout, 60);
             compare(service.offTimeout, 120);
             verify(!service.applying);

@@ -76,9 +76,8 @@ Item {
 
         PopupMotion {
             id: popupMotion
-            openDuration: root.config.popupOpenDuration
-            slideDistance: root.config.popupSlideDistance
-            closeDuration: root.config.popupCloseDuration
+            duration: root.config.popupDuration
+            surfaceHeight: menuWindow.height
             shown: root.opened
             animationsEnabled: root.config.popupAnimations
             animationType: root.config.popupAnimationStyle

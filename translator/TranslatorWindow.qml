@@ -40,6 +40,12 @@ PanelWindow {
 
     signal closeRequested()
 
+    Binding {
+        target: root.popupMotion
+        property: "surfaceHeight"
+        value: root.height
+    }
+
     function focusInput(): void {
         if (!root.visible || !root.popupMotion.shown)
             return;

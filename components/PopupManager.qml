@@ -104,9 +104,9 @@ Item {
 
     PopupMotion {
         id: hostMotion
-        openDuration: manager.config.popupOpenDuration
-        slideDistance: manager.config.popupSlideDistance
-        closeDuration: manager.config.popupCloseDuration
+        duration: manager.config.popupDuration
+        surfaceHeight: manager.activeKey === "notificationCenter" ? notificationSurface.height
+            : manager.barPopupActive ? barSurface.height : submenuSurface.height
 
         shown: manager.hostRequested
         animationsEnabled: manager.hostMotionActive
@@ -115,6 +115,7 @@ Item {
     }
 
     PopupSurface {
+        id: notificationSurface
         managerRef: manager
         motion: hostMotion
         hostKey: "notificationCenter"
@@ -122,6 +123,7 @@ Item {
     }
 
     PopupSurface {
+        id: barSurface
         managerRef: manager
         motion: hostMotion
         hostKey: "barPopup"
@@ -129,6 +131,7 @@ Item {
     }
 
     PopupSurface {
+        id: submenuSurface
         managerRef: manager
         motion: hostMotion
         hostKey: ""

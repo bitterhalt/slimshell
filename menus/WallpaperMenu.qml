@@ -21,6 +21,11 @@ PanelWindow {
     property bool scanFinished: false
     property string selectedPath: ""
     property bool settingsOpen: false
+    Binding {
+        target: root.popupMotion
+        property: "surfaceHeight"
+        value: root.height
+    }
     // Footer actions and their single-key shortcuts.
     readonly property var actions: [
         { label: "Set Wallpaper", key: "b", action: "wallpaper", control: false },

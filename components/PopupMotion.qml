@@ -11,9 +11,9 @@ Item {
     property bool shown: false
     property bool animationsEnabled: true
     property string animationType: "fade"
-    required property int openDuration
-    required property int closeDuration
-    required property real slideDistance
+    required property int duration
+    property real surfaceHeight: 0
+    readonly property real slideDistance: surfaceHeight
     property bool closing: false
     property bool initialized: false
     property real progress: 0
@@ -34,7 +34,7 @@ Item {
         progressAnimation.stop()
         finishCloseTimer.stop()
         progress = 0
-        animateTo(1, openDuration)
+        animateTo(1, duration)
     }
 
     onAnimationsEnabledChanged: {
@@ -59,10 +59,10 @@ Item {
         if (shown) {
             surfaceVisible = true
             closing = false
-            animateTo(1, openDuration)
+            animateTo(1, duration)
         } else if (animationsEnabled) {
             closing = true
-            animateTo(0, closeDuration)
+            animateTo(0, duration)
         } else {
             closing = false
             progress = 0
@@ -96,7 +96,7 @@ Item {
             progress = 0
             Qt.callLater(() => {
                 if (motion.shown)
-                    motion.animateTo(1, motion.openDuration)
+                    motion.animateTo(1, motion.duration)
             })
         } else {
             progress = shown ? 1 : 0
