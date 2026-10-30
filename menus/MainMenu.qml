@@ -48,15 +48,7 @@ Item {
         { label: "Network Manager", icon: "󰲝", shortcut: "n", command: "foot -e nmtui" },
         { label: "Update System", icon: "󰑐", shortcut: "u", command: "foot -a pop-upgrade -e sup" },
         { label: "Idle Settings", icon: "󰤄", shortcut: "i", action: "idleSettings" },
-        { label: "Monitor", icon: "󰨇", shortcut: "m", page: "monitor" },
-    ]
-
-    readonly property var monitorItems: [
-        { label: "Atop [AMD GPU Monitor]", icon: "󰾲", shortcut: "a", command: "foot -T atop -e amdgpu_top --smi" },
-        { label: "Btop [System Monitor]", icon: "󰨇", shortcut: "b", command: "foot -a btop -e btop" },
-        { label: "Nethogs [Network Monitor]", icon: "󰛳", shortcut: "n", command: "foot -a nethogs -e nethogs" },
-        { label: "Logs", icon: "󰌱", shortcut: "l", command: "foot -a foot -T journalctl -e journalctl -f" },
-        { label: "Combined", icon: "󰕮", shortcut: "c", command: "foot -a Sysmon -T Sysmon -e ~/.local/bin/tmux-sysmon.sh" }
+        { label: "System Monitor", icon: "󰕮", shortcut: "m", command: "foot -a Sysmon -T Sysmon -e ~/.local/bin/tmux-sysmon.sh" }
     ]
 
     readonly property var currentItems: {
@@ -75,8 +67,6 @@ Item {
             return settingsItems
         case "system":
             return systemItems
-        case "monitor":
-            return monitorItems
         default:
             return []
         }
@@ -92,8 +82,6 @@ Item {
             return "Edit configs"
         case "system":
             return "Settings"
-        case "monitor":
-            return "Monitor"
         default:
             return ""
         }
@@ -135,13 +123,6 @@ Item {
     function back(): void {
         if (confirmItem) {
             cancelConfirmation()
-            return
-        }
-
-        if (page === "monitor") {
-            page = "system"
-            selectedIndex = 0
-            menuCard.prepareLayout()
             return
         }
 
