@@ -82,6 +82,7 @@ FocusScope {
             GridLayout {
                 width: settingsScroll.availableWidth
                 columns: width < 400 ? 1 : 2
+                uniformCellWidths: true
                 columnSpacing: 20
                 rowSpacing: 16
                 enabled: !root.busy
@@ -133,34 +134,14 @@ FocusScope {
                 }
                 ColumnLayout {
                     Layout.fillWidth: true
-                    Layout.columnSpan: parent.columns
+                    enabled: backgroundModeInput.currentIndex === 1
+                    opacity: enabled ? 1 : 0.5
                     SettingLabel { text: "Fixed background color" }
-                    RowLayout {
-                        Layout.fillWidth: true
-                        enabled: backgroundModeInput.currentIndex === 1
-                        opacity: enabled ? 1 : 0.5
-                        SettingField {
-                            id: backgroundInput
-                            objectName: "wallpaperBackgroundColor"
-                            placeholderText: "#111111"
-                            onAccepted: root.save()
-                        }
-                        Rectangle {
-                            Layout.preferredWidth: 32
-                            Layout.preferredHeight: 32
-                            radius: 4
-                            color: /^#[0-9a-fA-F]{6}$/.test(backgroundInput.text.trim())
-                                ? backgroundInput.text.trim() : root.config.bg
-                            border.color: root.config.border
-                        }
-                    }
-                    Text {
-                        renderType: Text.NativeRendering
-                        Layout.fillWidth: true
-                        text: "Used by Hellwal. Dynamic derives the background from the wallpaper."
-                        color: root.config.muted
-                        font.pointSize: root.config.fontSize(0.8)
-                        wrapMode: Text.WordWrap
+                    SettingField {
+                        id: backgroundInput
+                        objectName: "wallpaperBackgroundColor"
+                        placeholderText: "#111111"
+                        onAccepted: root.save()
                     }
                 }
             }
@@ -196,6 +177,7 @@ FocusScope {
     component SettingField: TextField {
         Layout.fillWidth: true
         Layout.minimumWidth: 0
+        Layout.preferredWidth: 1
         Layout.preferredHeight: 32
         color: root.config.fg
         placeholderTextColor: root.config.muted
@@ -215,6 +197,7 @@ FocusScope {
         id: combo
         Layout.fillWidth: true
         Layout.minimumWidth: 0
+        Layout.preferredWidth: 1
         Layout.preferredHeight: 32
         font.pointSize: root.config.fontSize(0.9)
         onActivated: root.errorText = ""

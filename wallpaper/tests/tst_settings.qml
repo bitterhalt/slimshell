@@ -63,8 +63,10 @@ Item {
             const color = findChild(panel, "wallpaperBackgroundColor");
             compare(background.currentIndex, 0);
             verify(!color.enabled);
+            verify(color.visible);
             background.currentIndex = 1;
             verify(color.enabled);
+            verify(color.visible);
             color.text = "#223344";
             panel.save();
             compare(preferences.calls.length, 1);
@@ -104,16 +106,39 @@ Item {
             compare(preferences.calls[0].mode, "light");
             compare(preferences.calls[0].background, "fixed");
         }
+        function test_control_widths_stay_constant_when_text_changes() {
+            const background = findChild(panel, "wallpaperBackgroundMode");
+            const mode = findChild(panel, "wallpaperColorMode");
+            const color = findChild(panel, "wallpaperBackgroundColor");
+            wait(50);
+            const backgroundWidth = background.width;
+            const modeWidth = mode.width;
+            const colorWidth = color.width;
+            background.currentIndex = 1;
+            mode.currentIndex = 1;
+            color.text = "";
+            findChild(panel, "wallpaperDarkOffset").text = "";
+            wait(50);
+            compare(background.width, backgroundWidth);
+            compare(mode.width, modeWidth);
+            compare(color.width, colorWidth);
+            background.currentIndex = -1;
+            wait(50);
+            compare(background.width, backgroundWidth);
+        }
+
         function test_narrow_layout_keeps_fields_inside_panel() {
+            findChild(panel, "wallpaperBackgroundMode").currentIndex = 1;
             panel.width = 300;
-            wait(0);
+            waitForPolish(panel);
             for (const name of ["wallpaperColorMode", "wallpaperBackgroundMode",
                     "wallpaperDarkOffset", "wallpaperBrightOffset", "wallpaperGrayScale",
                     "wallpaperBackgroundColor"]) {
                 const control = findChild(panel, name);
-                const position = control.mapToItem(panel, 0, 0);
-                verify(position.x >= 0);
-                verify(position.x + control.width <= panel.width + 1);
+                tryVerify(() => {
+                    const position = control.mapToItem(panel, 0, 0);
+                    return position.x >= 0 && position.x + control.width <= panel.width + 1;
+                }, 1000, name + " must fit within the panel");
             }
         }
     }
