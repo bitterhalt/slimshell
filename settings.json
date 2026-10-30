@@ -27,9 +27,9 @@
     "enabled": true,
     "style": "fade",
     "notificationStyle": "slide",
-    "openDuration": 100,
-    "closeDuration": 70,
-    "slideDistance": 8
+    "openDuration": 150,
+    "closeDuration": 150,
+    "slideDistance": 24
   },
   "notifications": {
     "historyLimit": 20,

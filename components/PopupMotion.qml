@@ -107,7 +107,7 @@ Item {
         id: progressAnimation
         target: motion
         property: "progress"
-        easing.type: motion.shown ? Easing.OutExpo : Easing.OutQuad
+        easing.type: Easing.OutCubic
         onFinished: {
             if (!motion.shown && motion.progress <= 0)
                 finishCloseTimer.start()
