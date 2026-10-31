@@ -243,11 +243,11 @@ Item {
 
         PopupMotion {
             id: popupMotion
-            duration: root.config.popupDuration
+            duration: 150
             surfaceHeight: menuWindow.height
             shown: root.opened
             animationsEnabled: root.config.popupAnimations
-            animationType: root.config.popupAnimationStyle
+            animationType: "fade"
             onClosed: root.menuScreen = null
         }
 

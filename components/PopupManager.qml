@@ -7,8 +7,6 @@ Item {
 
     required property var barWindow
     required property var config
-    // Optional per-host overrides; otherwise use the shared JSON style.
-    readonly property var popupAnimationTypes: config.popupAnimationTypes
     property bool hostRequested: false
     readonly property bool hostVisible: hostMotion.surfaceVisible
     readonly property bool hostClosing: hostMotion.closing
@@ -19,13 +17,7 @@ Item {
     property var anchorRightOffsets: new Map()
     property bool hostFocusable: false
     property bool hostCentered: false
-    property string hostAnimationType: "slide"
     readonly property bool hostMotionActive: config.popupAnimations && (barPopupActive || activeKey === "notificationCenter")
-
-    function animationTypeFor(key) : string {
-        const type = popupAnimationTypes[key];
-        return type === "slide" || type === "fade" ? type : config.popupAnimationStyle;
-    }
 
     function openHost(key, component, anchorItem, focusable, centered) {
         const wasRequested = hostRequested;
@@ -54,7 +46,6 @@ Item {
         }
         hostFocusable = focusable === true;
         hostCentered = centered === true;
-        hostAnimationType = animationTypeFor(key);
         // Reopening reverses an exit from its current progress. Switching an
         // already-open host starts a fresh entrance without unmapping it.
         if (wasRequested || (hostRequested && switching))
@@ -104,13 +95,13 @@ Item {
 
     PopupMotion {
         id: hostMotion
-        duration: manager.config.popupDuration
+        duration: 150
         surfaceHeight: manager.activeKey === "notificationCenter" ? notificationSurface.height
             : manager.barPopupActive ? barSurface.height : submenuSurface.height
 
         shown: manager.hostRequested
         animationsEnabled: manager.hostMotionActive
-        animationType: manager.hostAnimationType
+        animationType: "fade"
         onClosed: manager.finishClose()
     }
 

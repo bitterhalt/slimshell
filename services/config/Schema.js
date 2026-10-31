@@ -15,10 +15,6 @@ const fields = {
     popupGap: ["popups", "gap", 16, "integer", 0, 256],
     popupRadius: ["popups", "radius", 4, "integer", 0, 64],
     popupAnimations: ["animations", "enabled", true, "boolean"],
-    popupAnimationStyle: ["animations", "style", "fade", ["slide", "fade"]],
-    popupAnimationTypes: ["animations", "hostStyles", {}, "hostStyles"],
-    notificationAnimationStyle: ["animations", "notificationStyle", "slide", ["slide", "fade"]],
-    popupDuration: ["animations", "duration", 150, "integer", 0, 5000],
     notificationHistoryLimit: ["notifications", "historyLimit", 100, "integer", 1, 10000],
     notificationHistoryExcludedApps: ["notifications", "historyExcludedApps",
         ["time-noti", "niri", "thunar", "Media-notify", "wl-color-picker"], "strings"],
@@ -46,10 +42,6 @@ function valid(value, field) {
         return kind.includes(value)
     if (kind === "strings")
         return Array.isArray(value) && value.every(item => typeof item === "string")
-    if (kind === "hostStyles")
-        return object(value) && Object.keys(value).every(key =>
-            ["audio", "network", "bluetooth", "notificationCenter"].includes(key)
-            && ["slide", "fade"].includes(value[key]))
     if (kind === "number" || kind === "integer")
         return typeof value === "number" && Number.isFinite(value)
             && (kind !== "integer" || Number.isInteger(value))

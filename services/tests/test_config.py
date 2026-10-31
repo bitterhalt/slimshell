@@ -44,7 +44,7 @@ Item {
         }
         function test_missing_keys_and_empty_array() {
             const parsed = Schema.parse('{"notifications":{"historyExcludedApps":[]}}');
-            compare(parsed.values.popupDuration, 150);
+            compare(parsed.values.popupAnimations, true);
             compare(parsed.values.fontScale, 1);
             compare(parsed.values.notificationHistoryExcludedApps.length, 0);
             compare(parsed.warnings.length, 0);
@@ -52,14 +52,13 @@ Item {
         function test_invalid_values_use_defaults() {
             const parsed = Schema.parse(JSON.stringify({
                 appearance: {fontScale: "large"}, bar: {height: 32.5},
-                audio: {maxVolume: -1}, animations: {style: "spin", duration: -10},
+                audio: {maxVolume: -1}, animations: {enabled: "yes"},
                 notifications: {historyExcludedApps: [null]}, clock: []
             }));
             compare(parsed.values.fontScale, 1);
             compare(parsed.values.barHeight, 32);
             compare(parsed.values.maxVolume, 1.1);
-            compare(parsed.values.popupAnimationStyle, "fade");
-            compare(parsed.values.popupDuration, 150);
+            compare(parsed.values.popupAnimations, true);
             verify(parsed.warnings.length >= 6);
         }
         function test_cross_field_validation() {
@@ -74,53 +73,45 @@ Item {
             compare(parsed.warnings.length, 2);
         }
         function test_adapter_initial_load_and_reload() {
-            TestFiles.configuration = '{"appearance":{"fontScale":1.25},"animations":{"duration":210}}';
+            TestFiles.configuration = '{"appearance":{"fontScale":1.25},"animations":{"enabled":true}}';
             const config = createTemporaryObject(configComponent, host);
             verify(config.ready);
             compare(config.fontScale, 1.25);
-            compare(config.popupDuration, 210);
+            compare(config.popupAnimations, true);
             const file = storage(config);
             verify(file.path.endsWith("/settings.json"));
             verify(file.watchChanges);
             verify(file.blockLoading);
-            file.contents = '{"animations":{"enabled":false,"duration":80}}';
+            file.contents = '{"animations":{"enabled":false}}';
             file.loaded();
             verify(!config.popupAnimations);
-            compare(config.popupDuration, 80);
             file.contents = "malformed JSON";
             file.loaded();
-            compare(config.popupDuration, 80);
+            compare(config.popupAnimations, false);
             verify(!config.applying);
             file.loadFailed();
-            compare(config.popupDuration, 80);
+            compare(config.popupAnimations, false);
         }
         function test_audio_and_animation_values_update_through_file_reload() {
             const config = createTemporaryObject(configComponent, host);
             const file = storage(config);
             file.contents = JSON.stringify({audio: {style: "circle"}, animations: {
-                enabled: false, style: "slide", notificationStyle: "fade",
-                duration: 250,
-                hostStyles: {network: "fade"}
+                enabled: false
             }});
             file.loaded();
             compare(config.audioStyle, "circle");
             verify(!config.popupAnimations);
-            compare(config.popupAnimationStyle, "slide");
-            compare(config.notificationAnimationStyle, "fade");
-            compare(config.popupDuration, 250);
-            compare(config.popupAnimationTypes.network, "fade");
             file.contents = '{"audio":{"style":"classic"},"animations":{"enabled":true}}';
             file.loaded();
             compare(config.audioStyle, "classic");
             verify(config.popupAnimations);
-            compare(Object.keys(config.popupAnimationTypes).length, 0);
         }
         function test_json_reload_does_not_change_saved_idle_preferences() {
             const config = createTemporaryObject(configComponent, host);
             const service = createTemporaryObject(settingsComponent, host);
             storage(service).contents = '{"lock":60,"off":120,"suspend":300}';
             storage(service).loaded();
-            config.applySettings('{"animations":{"duration":250}}');
+            config.applySettings('{"animations":{"enabled":false}}');
             compare(service.lockTimeout, 60);
             compare(service.offTimeout, 120);
             verify(!service.applying);

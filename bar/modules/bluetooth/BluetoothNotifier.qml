@@ -27,8 +27,8 @@ Item {
         id: toastMotion
         shown: root.toastShown
         animationsEnabled: root.config.popupAnimations
-        animationType: root.config.notificationAnimationStyle
-        duration: root.config.popupDuration
+        animationType: "slide"
+        duration: 150
         surfaceHeight: toast.height
         onClosed: root.batteryAlert = false
     }

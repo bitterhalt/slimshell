@@ -69,9 +69,7 @@ Item {
     id: host
     QtObject {
         id: settings
-        property int popupDuration: 5
         property bool popupAnimations: true
-        property string popupAnimationStyle: "fade"
     }
     Component { id: controllerComponent; Translator { config: settings; targetScreen: null } }
     TestCase {

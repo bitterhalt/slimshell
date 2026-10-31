@@ -16,9 +16,7 @@ Item {
     id: host
     QtObject {
         id: fixtureConfig
-        property int popupDuration: 100
         property bool popupAnimations: false
-        property string popupAnimationStyle: "fade"
     }
     QtObject {
         id: preferences

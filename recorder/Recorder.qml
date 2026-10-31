@@ -245,8 +245,8 @@ Item {
         id: popupMotion
         shown: root.opened
         animationsEnabled: root.config.popupAnimations
-        animationType: root.config.popupAnimationStyle
-        duration: root.config.popupDuration
+        animationType: "fade"
+        duration: 150
         surfaceHeight: recorderMenu.height
     }
 

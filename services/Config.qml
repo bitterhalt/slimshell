@@ -23,10 +23,6 @@ Item {
     readonly property int popupGap: values.popupGap
     readonly property int popupRadius: values.popupRadius
     readonly property bool popupAnimations: values.popupAnimations
-    readonly property int popupDuration: values.popupDuration
-    readonly property string popupAnimationStyle: values.popupAnimationStyle
-    readonly property var popupAnimationTypes: values.popupAnimationTypes
-    readonly property string notificationAnimationStyle: values.notificationAnimationStyle
     readonly property int notificationHistoryLimit: values.notificationHistoryLimit
     readonly property var notificationHistoryExcludedApps: values.notificationHistoryExcludedApps
     readonly property int bluetoothBatteryWarningPercent: values.bluetoothBatteryWarningPercent

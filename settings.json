@@ -24,10 +24,7 @@
     "radius": 4
   },
   "animations": {
-    "enabled": true,
-    "style": "fade",
-    "notificationStyle": "slide",
-    "duration": 150
+    "enabled": true
   },
   "notifications": {
     "historyLimit": 20,

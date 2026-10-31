@@ -32,10 +32,10 @@ Item {
 
     PopupMotion {
         id: translatorMotion
-        duration: root.config.popupDuration
+        duration: 150
         shown: root.opened
         animationsEnabled: root.config.popupAnimations
-        animationType: root.config.popupAnimationStyle
+        animationType: "fade"
     }
 
     function open() { opened = true }

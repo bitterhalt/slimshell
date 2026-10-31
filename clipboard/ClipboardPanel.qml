@@ -49,11 +49,11 @@ PanelWindow {
 
     PopupMotion {
         id: popupMotion
-        duration: root.config.popupDuration
+        duration: 150
         surfaceHeight: root.height
         shown: root.opened
         animationsEnabled: root.config.popupAnimations
-        animationType: root.config.popupAnimationStyle
+        animationType: "fade"
         onClosed: root.finishClose()
     }
 

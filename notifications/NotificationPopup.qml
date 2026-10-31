@@ -141,11 +141,11 @@ Scope {
 
             PopupMotion {
                 id: toastMotion
-                duration: root.config.popupDuration
+                duration: 150
                 surfaceHeight: toastWindow.height
                 shown: toastWindow.toastActive
                 animationsEnabled: root.config.popupAnimations
-                animationType: root.config.notificationAnimationStyle
+                animationType: "slide"
                 onClosed: root.finishExit(toastWindow.modelData)
             }
 
@@ -267,11 +267,11 @@ Scope {
 
         PopupMotion {
             id: chipMotion
-            duration: root.config.popupDuration
+            duration: 150
             surfaceHeight: root.chipHeight
             shown: root.toasts.length > 0 && root.overflowCount > 0
             animationsEnabled: root.config.popupAnimations
-            animationType: root.config.notificationAnimationStyle
+            animationType: "slide"
         }
 
         // Stop tracking bumped notifications once they are closed elsewhere.
