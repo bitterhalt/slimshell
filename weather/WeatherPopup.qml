@@ -3,8 +3,10 @@ import QtQuick.Layouts
 
 FocusScope {
     id: root
+
     required property var config
     required property var weatherData
+
     signal closeRequested()
 
     implicitWidth: 360
@@ -12,17 +14,21 @@ FocusScope {
     width: implicitWidth
     height: implicitHeight
     focus: true
-    Component.onCompleted: Qt.callLater(() => forceActiveFocus())
-    Keys.onPressed: event => {
+    Component.onCompleted: Qt.callLater(() => {
+        return forceActiveFocus();
+    })
+    Keys.onPressed: (event) => {
         if (event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier))
-            return
+            return ;
+
         if (event.key === Qt.Key_F5) {
             if (!weatherData.refreshing && !event.isAutoRepeat)
-                weatherData.refresh(true)
-            event.accepted = true
+                weatherData.refresh(true);
+
+            event.accepted = true;
         } else if (event.key === Qt.Key_Escape) {
-            root.closeRequested()
-            event.accepted = true
+            root.closeRequested();
+            event.accepted = true;
         }
     }
 
@@ -35,6 +41,7 @@ FocusScope {
 
     ColumnLayout {
         id: content
+
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -44,10 +51,12 @@ FocusScope {
         RowLayout {
             Layout.fillWidth: true
             spacing: 6
+
             Icon {
                 text: "󰍎"
                 color: root.config.selectionBackground
             }
+
             Label {
                 Layout.fillWidth: true
                 Layout.minimumWidth: 0
@@ -56,67 +65,112 @@ FocusScope {
                 font.pointSize: root.config.fontSize(1)
                 elide: Text.ElideRight
             }
+
             Label {
                 objectName: "weatherRefreshHint"
                 text: root.weatherData.refreshing ? "Refreshing…" : "F5 Refresh"
                 color: root.config.muted
                 font.pointSize: root.config.fontSize(0.72)
             }
+
         }
+
         RowLayout {
             Layout.fillWidth: true
             spacing: 14
+
             Rectangle {
                 Layout.preferredWidth: 78
                 Layout.preferredHeight: 78
                 radius: root.config.popupRadius
                 color: Qt.alpha(root.config.selectionBackground, 0.1)
+
                 Text {
                     anchors.centerIn: parent
                     text: root.weatherData.data.icon || "✨"
                     font.pointSize: root.config.fontSize(3)
                 }
+
             }
+
             ColumnLayout {
                 Layout.fillWidth: true
                 Layout.minimumWidth: 0
                 spacing: 0
+
                 Label {
                     Layout.fillWidth: true
                     text: root.weatherData.data.available ? root.weatherData.data.temperature + "°C" : "N/A"
                     font.pointSize: root.config.fontSize(2.8)
                     font.bold: true
                 }
+
                 Label {
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
                     color: root.config.muted
                     font.pointSize: root.config.fontSize(0.8)
-                    text: root.weatherData.data.available
-                        ? root.weatherData.data.condition + " · Feels like " + root.weatherData.data.feels + "°"
-                        : root.weatherData.refreshing ? "Loading weather…" : "Weather unavailable"
+                    text: root.weatherData.data.available ? root.weatherData.data.condition + " · Feels like " + root.weatherData.data.feels + "°" : root.weatherData.refreshing ? "Loading weather…" : "Weather unavailable"
                 }
+
             }
+
         }
-        Separator {}
+
+        Separator {
+        }
+
         GridLayout {
             Layout.fillWidth: true
             columns: 2
             uniformCellWidths: true
             columnSpacing: 14
             rowSpacing: 6
-            Detail { icon: "󰖌"; label: "Humidity"; value: root.weatherData.data.humidity + "%" }
-            Detail { icon: "󰖝"; label: "Wind"; value: root.weatherData.data.wind + " km/h " + root.weatherData.data.windDirection }
-            Detail { icon: "󰈈"; label: "Visibility"; value: root.weatherData.data.visibility + " km" }
-            Detail { icon: "󰖙"; label: "UV index"; value: String(root.weatherData.data.uv) }
-            Detail { icon: "󰖜"; label: "Sunrise"; value: root.weatherData.data.sunrise || "" }
-            Detail { icon: "󰖛"; label: "Sunset"; value: root.weatherData.data.sunset || "" }
+
+            Detail {
+                icon: "󰖌"
+                label: "Humidity"
+                value: root.weatherData.data.humidity + "%"
+            }
+
+            Detail {
+                icon: "󰖝"
+                label: "Wind"
+                value: root.weatherData.data.wind + " km/h " + root.weatherData.data.windDirection
+            }
+
+            Detail {
+                icon: "󰈈"
+                label: "Visibility"
+                value: root.weatherData.data.visibility + " km"
+            }
+
+            Detail {
+                icon: "󰖙"
+                label: "UV index"
+                value: String(root.weatherData.data.uv)
+            }
+
+            Detail {
+                icon: "󰖜"
+                label: "Sunrise"
+                value: root.weatherData.data.sunrise || ""
+            }
+
+            Detail {
+                icon: "󰖛"
+                label: "Sunset"
+                value: root.weatherData.data.sunset || ""
+            }
+
         }
+
         Rectangle {
             Layout.fillWidth: true
             implicitHeight: 30
             radius: root.config.popupRadius
             color: Qt.alpha(root.config.selectionBackground, 0.12)
+
             Label {
                 anchors.fill: parent
                 anchors.leftMargin: 10
@@ -124,46 +178,85 @@ FocusScope {
                 verticalAlignment: Text.AlignVCenter
                 elide: Text.ElideRight
                 font.pointSize: root.config.fontSize(0.8)
-                text: root.weatherData.data.moon
-                    ? root.weatherData.data.moon.icon + "  " + root.weatherData.data.moon.name
-                        + " · " + root.weatherData.data.moon.illumination + "%" : "Moon information unavailable"
+                text: root.weatherData.data.moon ? root.weatherData.data.moon.icon + "  " + root.weatherData.data.moon.name + " · " + root.weatherData.data.moon.illumination + "%" : "Moon information unavailable"
             }
+
         }
+
         RowLayout {
             Layout.fillWidth: true
             spacing: 10
+
             Label {
                 text: "7-DAY FORECAST"
                 color: root.config.muted
                 font.bold: true
                 font.pointSize: root.config.fontSize(0.72)
             }
-            Separator {}
+
+            Separator {
+            }
+
         }
+
         Repeater {
             model: root.weatherData.data.forecast || []
+
             delegate: Rectangle {
                 id: forecastRow
+
                 required property var modelData
                 required property int index
+
                 objectName: "weatherForecast-" + index
                 Layout.fillWidth: true
                 implicitHeight: 25
                 radius: root.config.popupRadius
                 color: Qt.alpha(root.config.selectionBackground, index % 2 === 0 ? 0.1 : 0.05)
+
                 RowLayout {
                     anchors.fill: parent
                     anchors.leftMargin: 8
                     anchors.rightMargin: 8
                     spacing: 10
-                    Label { Layout.preferredWidth: 34; text: forecastRow.modelData.day; font.bold: true }
-                    Label { Layout.preferredWidth: 28; text: forecastRow.modelData.icon }
-                    Label { Layout.fillWidth: true; text: forecastRow.modelData.high + "° / " + forecastRow.modelData.low + "°" }
-                    Icon { text: "󰖗"; color: root.config.muted }
-                    Label { Layout.preferredWidth: 34; horizontalAlignment: Text.AlignRight; text: forecastRow.modelData.rain + "%"; color: root.config.muted }
+
+                    Label {
+                        Layout.preferredWidth: 34
+                        text: forecastRow.modelData.day
+                        font.bold: true
+                    }
+
+                    Label {
+                        Layout.preferredWidth: 28
+                        text: forecastRow.modelData.icon
+                        font.pointSize: root.config.fontSize(1.5)
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+
+                    Label {
+                        Layout.fillWidth: true
+                        text: forecastRow.modelData.high + "° / " + forecastRow.modelData.low + "°"
+                    }
+
+                    Icon {
+                        text: "󰖗"
+                        color: root.config.muted
+                        font.pointSize: root.config.fontSize(1.2)
+                    }
+
+                    Label {
+                        Layout.preferredWidth: 34
+                        horizontalAlignment: Text.AlignRight
+                        text: forecastRow.modelData.rain + "%"
+                        color: root.config.muted
+                    }
+
                 }
+
             }
+
         }
+
     }
 
     component Label: Text {
@@ -172,19 +265,28 @@ FocusScope {
         color: root.config.fg
         font.pointSize: root.config.fontSize(0.9)
     }
+
     component Icon: Label {
         font.family: root.config.iconFontFamily
         font.pointSize: root.config.fontSize(1)
     }
+
     component Detail: RowLayout {
         id: detail
+
         required property string icon
         required property string label
         required property string value
+
         Layout.fillWidth: true
         Layout.minimumWidth: 0
         spacing: 5
-        Icon { text: detail.icon; color: root.config.selectionBackground }
+
+        Icon {
+            text: detail.icon
+            color: root.config.selectionBackground
+        }
+
         Label {
             Layout.fillWidth: true
             Layout.minimumWidth: 0
@@ -193,14 +295,17 @@ FocusScope {
             elide: Text.ElideRight
             font.pointSize: root.config.fontSize(0.72)
         }
+
         Rectangle {
             Layout.maximumWidth: detail.width * 0.62
             implicitWidth: valueLabel.implicitWidth + 12
             implicitHeight: 20
             radius: root.config.popupRadius
             color: Qt.alpha(root.config.selectionBackground, 0.12)
+
             Label {
                 id: valueLabel
+
                 anchors.fill: parent
                 anchors.leftMargin: 6
                 anchors.rightMargin: 6
@@ -210,11 +315,15 @@ FocusScope {
                 elide: Text.ElideRight
                 font.pointSize: root.config.fontSize(0.72)
             }
+
         }
+
     }
+
     component Separator: Rectangle {
         Layout.fillWidth: true
         implicitHeight: 1
         color: root.config.border
     }
+
 }
