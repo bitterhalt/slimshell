@@ -26,6 +26,7 @@ PanelWindow {
     required property var audioService
     required property var networkService
     required property var batteryService
+    required property var weatherService
     required property var idleService
     required property var settingsService
     required property var recorderService
@@ -86,6 +87,9 @@ PanelWindow {
         Clock {
             config: barWindow.config
             barWindow: barWindow
+            popupManager: popupManager
+            weatherData: barWindow.weatherService
+            uiService: barWindow.uiService
         }
 
         NotificationIndicator {

@@ -17,7 +17,7 @@ Item {
     property var anchorRightOffsets: new Map()
     property bool hostFocusable: false
     property bool hostCentered: false
-    readonly property bool hostMotionActive: config.popupAnimations && (barPopupActive || activeKey === "notificationCenter")
+    readonly property bool hostMotionActive: config.popupAnimations && (barPopupActive || activeKey === "notificationCenter" || activeKey === "weather")
 
     function openHost(key, component, anchorItem, focusable, centered) {
         const wasRequested = hostRequested;
@@ -101,7 +101,7 @@ Item {
 
         shown: manager.hostRequested
         animationsEnabled: manager.hostMotionActive
-        animationType: "fade"
+        animationType: manager.activeKey === "weather" ? "slide" : "fade"
         onClosed: manager.finishClose()
     }
 

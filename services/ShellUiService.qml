@@ -13,6 +13,14 @@ Item {
     signal audioActionRequested(string action)
     signal bluetoothActionRequested(string action)
     signal networkActionRequested(string action)
+    signal weatherActionRequested(string action)
+
+    IpcHandler {
+        target: "weather"
+        function toggle(): void { root.weatherActionRequested("toggle") }
+        function open(): void { root.weatherActionRequested("open") }
+        function close(): void { root.weatherActionRequested("close") }
+    }
 
     IpcHandler {
         target: "bluetooth"

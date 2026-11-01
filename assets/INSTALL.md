@@ -150,6 +150,14 @@ its search description on each line:
 Set `DEEPL_API` in the environment inherited by Slimshell before launching it.
 Do not put the key in this repository or commit it to your configuration.
 
+### Weather
+
+Hover the clock and click the weather to open the forecast. Press F5 to refresh.
+Set `WEATHER_LOCATION` to a city, or `WEATHER_LAT` and `WEATHER_LON` (optionally
+`WEATHER_NAME`) in the shell's environment. Without a configured location, the
+helper uses approximate IP geolocation. Conditions come from Open-Meteo and
+are cached for one hour.
+
 ### Your own menus
 
 Scripts can call `~/.config/quickshell/launcher/dmenu-runner` while Slimshell is

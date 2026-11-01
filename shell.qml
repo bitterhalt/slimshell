@@ -170,6 +170,10 @@ ShellRoot {
     id: appBatteryService
   }
 
+  WeatherService {
+    id: appWeatherService
+  }
+
   IdleService {
     id: appIdleService
     settingsService: appSettingsService
@@ -258,6 +262,7 @@ ShellRoot {
       audioService: appAudioService
       networkService: appNetworkService
       batteryService: appBatteryService
+      weatherService: appWeatherService
       idleService: appIdleService
       settingsService: appSettingsService
       recorderService: appRecorderService

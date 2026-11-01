@@ -24,7 +24,7 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 
 |              | What's included                                                                                 |
 | ------------ | ----------------------------------------------------------------------------------------------- |
-| **Bar**      | Workspaces, Window title, Clock, Battery, Connections, Tray etc.                                |
+| **Bar**      | Workspaces, Window title, Clock and Weather, Battery, Connections, Tray etc.                    |
 | **Menus**    | Keyboard-driven menus for Bluetooth, Wi-Fi, Audio, Power, and Notifications                     |
 | **launcher** | Application launcher with: File Search, Calculator, Binary Runner, Emoji, Timers and Dmenu-mode |
 | **Tools**    | Clipboard, DeepL translation, and Screen recording                                              |
@@ -53,6 +53,7 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 | `translator`         | `toggle`, `open`, `close`                                              | Control the translator                                   |
 | `volume`             | `up`, `down`, `mute`                                                   | Adjust or mute the default audio output; shows the OSD   |
 | `wallpaper`          | `toggle`, `open`, `close`                                              | Control the wallpaper picker                             |
+| `weather`            | `toggle`, `open`, `close`                                              | Show or hide the weather forecast                        |
 
 For example, `qs ipc call volume up` raises the volume by one step. `launcher/dmenu-runner` uses the launcher's IPC internally; call the script to open a picker.
 
@@ -127,6 +128,7 @@ lock/           Lock screen components and PAM setup
 recorder/       Screen recording and region selection
 translator/     DeepL translator
 wallpaper/      Wallpaper helpers
+weather/        Weather forecast popup and helper
 osd/            Volume overlay
 ```
 
@@ -151,7 +153,7 @@ osd/            Volume overlay
   </tr>
   <tr>
     <td width="50%"><img src="assets/history.png" alt="Notification history" width="100%"><br><sub>Notification history</sub></td>
-    <td width="50%"></td>
+    <td width="50%"><img src="assets/weather.png" alt="Weather forecast" width="100%"><br><sub>Weather forecast</sub></td>
   </tr>
 </table>
 
