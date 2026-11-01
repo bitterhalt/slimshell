@@ -95,18 +95,18 @@ Item {
 
     PopupMotion {
         id: hostMotion
-        duration: 150
-        surfaceHeight: manager.activeKey === "notificationCenter" ? notificationSurface.height
-            : manager.barPopupActive ? barSurface.height : submenuSurface.height
 
+        duration: 150
+        surfaceHeight: manager.activeKey === "notificationCenter" ? notificationSurface.height : manager.barPopupActive ? barSurface.height : submenuSurface.height
         shown: manager.hostRequested
         animationsEnabled: manager.hostMotionActive
-        animationType: manager.activeKey === "weather" ? "slide" : "fade"
+        animationType: "fade"
         onClosed: manager.finishClose()
     }
 
     PopupSurface {
         id: notificationSurface
+
         managerRef: manager
         motion: hostMotion
         hostKey: "notificationCenter"
@@ -115,6 +115,7 @@ Item {
 
     PopupSurface {
         id: barSurface
+
         managerRef: manager
         motion: hostMotion
         hostKey: "barPopup"
@@ -123,6 +124,7 @@ Item {
 
     PopupSurface {
         id: submenuSurface
+
         managerRef: manager
         motion: hostMotion
         hostKey: ""
