@@ -189,8 +189,9 @@ FocusScope {
 
             Label {
                 text: "7-DAY FORECAST"
+                renderType: Text.NativeRendering
                 color: root.config.muted
-                font.bold: true
+                font.weight: Font.DemiBold
                 font.pointSize: root.config.fontSize(0.72)
             }
 
@@ -223,13 +224,13 @@ FocusScope {
                     Label {
                         Layout.preferredWidth: 34
                         text: forecastRow.modelData.day
-                        font.bold: true
+                        font.weight: Font.DemiBold
                     }
 
                     Label {
                         Layout.preferredWidth: 28
                         text: forecastRow.modelData.icon
-                        font.pointSize: root.config.fontSize(1.5)
+                        font.pointSize: root.config.fontSize(1.3)
                         horizontalAlignment: Text.AlignHCenter
                     }
 
@@ -241,7 +242,7 @@ FocusScope {
                     Icon {
                         text: "󰖗"
                         color: root.config.muted
-                        font.pointSize: root.config.fontSize(1.2)
+                        font.pointSize: root.config.fontSize(1)
                     }
 
                     Label {

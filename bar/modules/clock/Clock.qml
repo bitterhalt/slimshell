@@ -78,7 +78,8 @@ ItemRevealer {
       color: root.config.fg
       font.pointSize: root.config.fontSize(1)
       font.weight: Font.DemiBold
-      text: root.weatherData.text
+      text: root.weatherData.data.available
+        ? root.weatherData.data.temperature + "°C" : "N/A"
       MouseArea {
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
