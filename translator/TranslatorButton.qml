@@ -11,6 +11,7 @@ Button {
     implicitHeight: 30
     implicitWidth: label.implicitWidth + 20
     focusPolicy: Qt.StrongFocus
+    hoverEnabled: true
     padding: 8
 
     contentItem: Text {
@@ -29,7 +30,7 @@ Button {
 
     background: Rectangle {
         radius: 4
-        color: root.down || root.hovered || root.activeFocus ? root.config.selectionBackground
+        color: root.enabled && (root.down || root.hovered || root.activeFocus) ? root.config.selectionBackground
             : root.tinted ? Qt.alpha(root.config.selectionBackground, 0.12) : "transparent"
         border.width: root.activeFocus ? 1 : 0
         border.color: root.config.selectionBackground

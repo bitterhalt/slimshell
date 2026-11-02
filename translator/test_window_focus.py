@@ -42,6 +42,21 @@ TranslatorWindow {
     TestCase {
         name: "TranslatorKeyboardFocus"
         when: windowShown
+        Component {
+            id: hoverButtonComponent
+            TranslatorButton { config: dialog.config; text: "Translate"; x: 10; y: 100 }
+        }
+        function test_button_hover_uses_selection_foreground() {
+            const button = createTemporaryObject(hoverButtonComponent, dialog.contentItem);
+            verify(button !== null);
+            mouseMove(button, button.width / 2, button.height / 2);
+            tryCompare(button, "hovered", true);
+            compare(button.contentItem.color, dialog.config.selectionForeground);
+            compare(button.background.color, dialog.config.selectionBackground);
+            button.enabled = false;
+            compare(button.contentItem.color, dialog.config.muted);
+            verify(button.background.color !== dialog.config.selectionBackground);
+        }
         function init() {
             failOnWarning(/TypeError|ReferenceError|Binding loop/);
             dialog.popupMotion.shown = true;
