@@ -172,7 +172,7 @@ This repository is mainly for hobby and learning, so don't expect everything to 
 
 - ~~dmenu-runner can't display special symbols (Nerd fonts etc.)~~
 - File structure is messy and files needs to be commented better
-- There are probably plenty of other things as well. Maybe yoy can show me how to fix them or do better :)
+- There are probably plenty of other things as well. Maybe you can show me how to fix them or do better :)
 
 ## TODO
 
