@@ -51,7 +51,7 @@ Item {
     FileView {
         id: emojiFile
         path: root.dataRequested
-            ? (Quickshell.env("HOME") || "") + "/.local/share/emoji/emoji.txt" : ""
+            ? (Quickshell.env("HOME") || "") + "/.config/quickshell/components/emoji/emoji.txt" : ""
         watchChanges: root.dataRequested
         printErrors: false
         onLoaded: {

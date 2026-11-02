@@ -13,34 +13,12 @@ Rectangle {
     required property var config
     readonly property color bg: config.bg
     readonly property color fg: config.fg
-    readonly property color error: config.urgent
+    readonly property color error: "#cc241d"
     property int previousPasswordLength: 0
-    property real pulseScale: 1.0
-    property real pulseOpacity: 0.0
+    property real pulseScale: 1
+    property real pulseOpacity: 0
     property real feedbackOffset: 0
     property string weatherText: ""
-
-    // Read-only decoration: never fetch weather or delay the lock for it.
-    FileView {
-        objectName: "lockWeatherCache"
-        path: (Quickshell.env("XDG_CACHE_HOME") || Quickshell.env("HOME") + "/.cache")
-            + "/quickshell/weather.json"
-        watchChanges: true
-        printErrors: false
-        onLoaded: {
-            root.weatherText = "";
-            try {
-                const cached = JSON.parse(text());
-                const city = cached && cached._place;
-                const temperature = cached && cached.current && cached.current.temperature_2m;
-                if (typeof city === "string" && city.trim() !== ""
-                        && typeof temperature === "number" && Number.isFinite(temperature))
-                    root.weatherText = city.trim() + " " + Math.round(temperature) + "°C";
-            } catch (_) {}
-        }
-        onFileChanged: reload()
-        onLoadFailed: root.weatherText = ""
-    }
 
     function focusPassword() {
         if (root.context.acceptingPassword && root.context.pamResponseRequired && passwordBox.enabled && passwordBox.visible) {
@@ -82,7 +60,29 @@ Rectangle {
         event.accepted = true;
     }
 
-    // One quick pulse per typed character; nothing animates while idle.
+    // Read-only decoration: never fetch weather or delay the lock for it.
+    FileView {
+        objectName: "lockWeatherCache"
+        path: (Quickshell.env("XDG_CACHE_HOME") || Quickshell.env("HOME") + "/.cache") + "/quickshell/weather.json"
+        watchChanges: true
+        printErrors: false
+        onLoaded: {
+            root.weatherText = "";
+            try {
+                const cached = JSON.parse(text());
+                const city = cached && cached._place;
+                const temperature = cached && cached.current && cached.current.temperature_2m;
+                if (typeof city === "string" && city.trim() !== "" && typeof temperature === "number" && Number.isFinite(temperature))
+                    root.weatherText = city.trim() + " " + Math.round(temperature) + "°C";
+
+            } catch (_) {
+            }
+        }
+        onFileChanged: reload()
+        onLoadFailed: root.weatherText = ""
+    }
+
+    // Typing feedback (pulse effect)
     SequentialAnimation {
         id: typingPulse
 
@@ -90,11 +90,12 @@ Rectangle {
             NumberAnimation {
                 target: root
                 property: "pulseScale"
-                from: 1.0
+                from: 1
                 to: 1.4
                 duration: 100
                 easing.type: Easing.OutQuad
             }
+
             NumberAnimation {
                 target: root
                 property: "pulseOpacity"
@@ -102,31 +103,61 @@ Rectangle {
                 to: 0.18
                 duration: 100
             }
+
         }
+
         ParallelAnimation {
             NumberAnimation {
                 target: root
                 property: "pulseScale"
-                to: 1.0
+                to: 1
                 duration: 180
                 easing.type: Easing.OutQuad
             }
+
             NumberAnimation {
                 target: root
                 property: "pulseOpacity"
-                to: 0.0
+                to: 0
                 duration: 180
                 easing.type: Easing.OutQuad
             }
+
         }
+
     }
 
     SequentialAnimation {
         id: failureShake
-        NumberAnimation { target: root; property: "feedbackOffset"; to: -7; duration: 45 }
-        NumberAnimation { target: root; property: "feedbackOffset"; to: 6; duration: 55 }
-        NumberAnimation { target: root; property: "feedbackOffset"; to: -4; duration: 50 }
-        NumberAnimation { target: root; property: "feedbackOffset"; to: 0; duration: 65 }
+
+        NumberAnimation {
+            target: root
+            property: "feedbackOffset"
+            to: -7
+            duration: 45
+        }
+
+        NumberAnimation {
+            target: root
+            property: "feedbackOffset"
+            to: 6
+            duration: 55
+        }
+
+        NumberAnimation {
+            target: root
+            property: "feedbackOffset"
+            to: -4
+            duration: 50
+        }
+
+        NumberAnimation {
+            target: root
+            property: "feedbackOffset"
+            to: 0
+            duration: 65
+        }
+
     }
 
     SystemClock {
@@ -186,8 +217,8 @@ Rectangle {
                 typingPulse.restart();
             } else {
                 typingPulse.stop();
-                root.pulseScale = 1.0;
-                root.pulseOpacity = 0.0;
+                root.pulseScale = 1;
+                root.pulseOpacity = 0;
             }
             root.previousPasswordLength = length;
         }
@@ -242,8 +273,8 @@ Rectangle {
     // Password feedback and authentication status.
     ColumnLayout {
         id: feedbackColumn
+
         spacing: 16
-        transform: Translate { x: root.feedbackOffset }
 
         anchors {
             horizontalCenter: parent.horizontalCenter
@@ -252,18 +283,16 @@ Rectangle {
 
         // Keep the real text input invisible, but focusable for IME/key input.
         RowLayout {
-            visible: root.context.pamActivated
-                     && (root.context.pamResponseRequired || root.context.currentText.length > 0)
+            visible: root.context.pamActivated && (root.context.pamResponseRequired || root.context.currentText.length > 0)
             Layout.alignment: Qt.AlignHCenter
 
             TextField {
                 id: passwordBox
-                objectName: "lockPasswordInput"
 
+                objectName: "lockPasswordInput"
                 renderType: Text.NativeRendering
                 horizontalAlignment: TextInput.AlignHCenter
                 cursorVisible: false
-                cursorDelegate: Item { visible: false }
                 implicitWidth: 240
                 implicitHeight: 52
                 padding: 12
@@ -273,16 +302,21 @@ Rectangle {
                 color: "transparent"
                 selectionColor: "transparent"
                 selectedTextColor: "transparent"
-
                 onTextChanged: root.context.currentText = text
                 onAccepted: root.context.submitPassword()
 
                 Connections {
-                    target: root.context
                     function onCurrentTextChanged() {
                         if (passwordBox.text !== root.context.currentText)
                             passwordBox.text = root.context.currentText;
+
                     }
+
+                    target: root.context
+                }
+
+                cursorDelegate: Item {
+                    visible: false
                 }
 
                 background: Item {
@@ -292,6 +326,7 @@ Rectangle {
 
                         Repeater {
                             id: passwordDots
+
                             objectName: "lockPasswordDots"
                             // Cap only the visible dots, not the actual password.
                             model: Math.min(12, Array.from(root.context.currentText).length)
@@ -299,6 +334,7 @@ Rectangle {
                             delegate: Item {
                                 required property int index
                                 readonly property bool newest: index === passwordDots.count - 1
+
                                 width: 12
                                 height: 24
 
@@ -321,18 +357,24 @@ Rectangle {
                                     color: newest ? root.config.selectionBackground : root.config.border
                                     scale: newest ? root.pulseScale : 1
                                 }
+
                             }
+
                         }
+
                     }
+
                 }
+
             }
+
         }
 
         // Status message
         Label {
             id: statusLabel
-            objectName: "lockStatus"
 
+            objectName: "lockStatus"
             renderType: Text.NativeRendering
             textFormat: Text.PlainText
             visible: text !== ""
@@ -351,6 +393,10 @@ Rectangle {
             color: root.context.errorText !== "" || root.context.pamMessageIsError || root.context.showFailure ? root.error : root.config.muted
             font.pointSize: 13
             Layout.alignment: Qt.AlignHCenter
+        }
+
+        transform: Translate {
+            x: root.feedbackOffset
         }
 
     }

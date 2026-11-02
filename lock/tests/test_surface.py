@@ -136,11 +136,11 @@ Item {
             const status = findChild(surface, "lockStatus");
             auth.showFailure = true;
             compare(status.text, "Incorrect password");
-            compare(status.color, fixtureConfig.urgent);
+            compare(status.color, "#cc241d");
             auth.showFailure = false;
             auth.errorText = "Authentication error";
             compare(status.text, "Authentication error");
-            compare(status.color, fixtureConfig.urgent);
+            compare(status.color, "#cc241d");
             auth.errorText = "";
             compare(status.text, "");
         }

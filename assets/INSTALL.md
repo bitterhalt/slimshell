@@ -137,7 +137,7 @@ Hellwal supplies `~/.cache/hellwal/colors.css`.
 
 ### Emoji
 
-Place a UTF-8 list at `~/.local/share/emoji/emoji.txt`, with an emoji followed by
+The bundled UTF-8 list is at `components/emoji/emoji.txt`, with an emoji followed by
 its search description on each line:
 
 ```text
