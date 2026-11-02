@@ -301,6 +301,7 @@ PanelWindow {
                 id: sourceButton
 
                 config: root.config
+                tinted: true
                 width: (parent.width - swapButton.width - parent.spacing * 2) / 2
                 text: "From: " + Languages.label(root.sourceLanguage) + " ▾"
                 enabled: !root.busy
@@ -328,6 +329,7 @@ PanelWindow {
                 id: targetButton
 
                 config: root.config
+                tinted: true
                 width: sourceButton.width
                 text: "To: " + Languages.label(root.targetLanguage) + " ▾"
                 enabled: !root.busy
