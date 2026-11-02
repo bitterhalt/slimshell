@@ -25,6 +25,7 @@ SUITES = {
     "translator": [("qml", "translator/tests"), ("python", "translator")],
     "wallpaper": [("qml", "wallpaper/tests"), ("python", "wallpaper")],
     "weather": [("qml", "weather/tests"), ("python", "weather")],
+    "lock": [("python", "lock/tests")],
     "clipboard": [("python", "clipboard/tests")],
     "battery": [("python", "services/battery/tests")],
     "services": [("python", "services/tests")],

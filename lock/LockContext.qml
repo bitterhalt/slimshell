@@ -151,7 +151,7 @@ Scope {
             timeoutTimer.stop();
             root.currentText = "";
             root.unlockInProgress = false;
-            root.errorText = "Authentication error; press Enter to retry or Esc to cancel";
+            root.errorText = "Authentication error";
             root.showFailure = true;
         }
     }

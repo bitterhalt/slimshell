@@ -3,6 +3,7 @@ import QtQuick.Controls.Fusion
 import QtQuick.Layouts
 import QtQuick.Window
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 
 Rectangle {
@@ -13,6 +14,33 @@ Rectangle {
     readonly property color bg: config.bg
     readonly property color fg: config.fg
     readonly property color error: config.urgent
+    property int previousPasswordLength: 0
+    property real pulseScale: 1.0
+    property real pulseOpacity: 0.0
+    property real feedbackOffset: 0
+    property string weatherText: ""
+
+    // Read-only decoration: never fetch weather or delay the lock for it.
+    FileView {
+        objectName: "lockWeatherCache"
+        path: (Quickshell.env("XDG_CACHE_HOME") || Quickshell.env("HOME") + "/.cache")
+            + "/quickshell/weather.json"
+        watchChanges: true
+        printErrors: false
+        onLoaded: {
+            root.weatherText = "";
+            try {
+                const cached = JSON.parse(text());
+                const city = cached && cached._place;
+                const temperature = cached && cached.current && cached.current.temperature_2m;
+                if (typeof city === "string" && city.trim() !== ""
+                        && typeof temperature === "number" && Number.isFinite(temperature))
+                    root.weatherText = city.trim() + " " + Math.round(temperature) + "°C";
+            } catch (_) {}
+        }
+        onFileChanged: reload()
+        onLoadFailed: root.weatherText = ""
+    }
 
     function focusPassword() {
         if (root.context.acceptingPassword && root.context.pamResponseRequired && passwordBox.enabled && passwordBox.visible) {
@@ -54,6 +82,53 @@ Rectangle {
         event.accepted = true;
     }
 
+    // One quick pulse per typed character; nothing animates while idle.
+    SequentialAnimation {
+        id: typingPulse
+
+        ParallelAnimation {
+            NumberAnimation {
+                target: root
+                property: "pulseScale"
+                from: 1.0
+                to: 1.4
+                duration: 100
+                easing.type: Easing.OutQuad
+            }
+            NumberAnimation {
+                target: root
+                property: "pulseOpacity"
+                from: 0.28
+                to: 0.18
+                duration: 100
+            }
+        }
+        ParallelAnimation {
+            NumberAnimation {
+                target: root
+                property: "pulseScale"
+                to: 1.0
+                duration: 180
+                easing.type: Easing.OutQuad
+            }
+            NumberAnimation {
+                target: root
+                property: "pulseOpacity"
+                to: 0.0
+                duration: 180
+                easing.type: Easing.OutQuad
+            }
+        }
+    }
+
+    SequentialAnimation {
+        id: failureShake
+        NumberAnimation { target: root; property: "feedbackOffset"; to: -7; duration: 45 }
+        NumberAnimation { target: root; property: "feedbackOffset"; to: 6; duration: 55 }
+        NumberAnimation { target: root; property: "feedbackOffset"; to: -4; duration: 50 }
+        NumberAnimation { target: root; property: "feedbackOffset"; to: 0; duration: 65 }
+    }
+
     SystemClock {
         id: systemClock
 
@@ -88,9 +163,13 @@ Rectangle {
         }
 
         function onShowFailureChanged() {
-            if (root.context.showFailure)
+            if (root.context.showFailure) {
                 root.forceActiveFocus();
-
+                failureShake.restart();
+            } else {
+                failureShake.stop();
+                root.feedbackOffset = 0;
+            }
         }
 
         function onAcceptingPasswordChanged() {
@@ -99,6 +178,18 @@ Rectangle {
 
         function onPamResponseRequiredChanged() {
             Qt.callLater(root.focusPassword);
+        }
+
+        function onCurrentTextChanged() {
+            const length = Array.from(root.context.currentText).length;
+            if (length > root.previousPasswordLength && root.context.acceptingPassword) {
+                typingPulse.restart();
+            } else {
+                typingPulse.stop();
+                root.pulseScale = 1.0;
+                root.pulseOpacity = 0.0;
+            }
+            root.previousPasswordLength = length;
         }
 
         target: root.context
@@ -134,142 +225,116 @@ Rectangle {
             text: Qt.formatTime(systemClock.date, "HH:mm")
         }
 
+        Label {
+            objectName: "lockWeatherLabel"
+            anchors.horizontalCenter: parent.horizontalCenter
+            visible: root.weatherText !== ""
+            renderType: Text.NativeRendering
+            textFormat: Text.PlainText
+            font.pointSize: 20
+            color: root.config.fg
+            opacity: 0.7
+            text: root.weatherText
+        }
+
     }
 
-    // PAM input, verification spinner, failure/status text, and actions.
+    // Password feedback and authentication status.
     ColumnLayout {
+        id: feedbackColumn
         spacing: 16
+        transform: Translate { x: root.feedbackOffset }
 
         anchors {
             horizontalCenter: parent.horizontalCenter
             top: parent.verticalCenter
         }
 
-        // Password field - shown when PAM requests a response.
+        // Keep the real text input invisible, but focusable for IME/key input.
         RowLayout {
-            visible: root.context.pamActivated && root.context.pamResponseRequired
+            visible: root.context.pamActivated
+                     && (root.context.pamResponseRequired || root.context.currentText.length > 0)
             Layout.alignment: Qt.AlignHCenter
 
             TextField {
                 id: passwordBox
+                objectName: "lockPasswordInput"
 
                 renderType: Text.NativeRendering
                 horizontalAlignment: TextInput.AlignHCenter
-                cursorVisible: activeFocus && (length > 0 || preeditText.length > 0)
-                implicitWidth: 180
+                cursorVisible: false
+                cursorDelegate: Item { visible: false }
+                implicitWidth: 240
+                implicitHeight: 52
                 padding: 12
                 enabled: !root.context.unlockInProgress
                 echoMode: TextInput.Password
                 inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
-                color: enabled ? root.fg : root.config.muted
-                selectionColor: root.config.selectionBackground
-                selectedTextColor: root.config.selectionForeground
-                placeholderTextColor: root.config.muted
-                onTextChanged: root.context.currentText = this.text
-                onAccepted: {
-                    root.context.submitPassword();
-                }
+                color: "transparent"
+                selectionColor: "transparent"
+                selectedTextColor: "transparent"
 
-                // Fusion hides its centered placeholder while focused.
-                Text {
-                    renderType: Text.NativeRendering
-                    anchors.fill: parent
-                    anchors.leftMargin: passwordBox.leftPadding
-                    anchors.rightMargin: passwordBox.rightPadding
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    visible: passwordBox.length === 0 && passwordBox.preeditText.length === 0
-                    font: passwordBox.font
-                    color: passwordBox.placeholderTextColor
-                    text: "Enter password"
-                }
+                onTextChanged: root.context.currentText = text
+                onAccepted: root.context.submitPassword()
 
                 Connections {
+                    target: root.context
                     function onCurrentTextChanged() {
-                        passwordBox.text = root.context.currentText;
+                        if (passwordBox.text !== root.context.currentText)
+                            passwordBox.text = root.context.currentText;
                     }
-
-                    target: root.context
-                }
-
-                Connections {
-                    function onPamActivatedChanged() {
-                        if (!root.context.pamActivated)
-                            passwordBox.text = "";
-
-                    }
-
-                    target: root.context
                 }
 
                 background: Item {
-                    Rectangle {
-                        anchors.fill: parent
-                        color: root.config.bg
-                        opacity: 0.6
-                        radius: 4
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: 6
+
+                        Repeater {
+                            id: passwordDots
+                            objectName: "lockPasswordDots"
+                            // Cap only the visible dots, not the actual password.
+                            model: Math.min(12, Array.from(root.context.currentText).length)
+
+                            delegate: Item {
+                                required property int index
+                                readonly property bool newest: index === passwordDots.count - 1
+                                width: 12
+                                height: 24
+
+                                Rectangle {
+                                    anchors.centerIn: parent
+                                    width: 20
+                                    height: 20
+                                    radius: 10
+                                    color: root.config.selectionBackground
+                                    opacity: newest ? root.pulseOpacity : 0
+                                    scale: newest ? root.pulseScale : 1
+                                }
+
+                                Rectangle {
+                                    objectName: "lockPasswordDot-" + index
+                                    anchors.centerIn: parent
+                                    width: newest ? 10 : 8
+                                    height: width
+                                    radius: width / 2
+                                    color: newest ? root.config.selectionBackground : root.config.border
+                                    scale: newest ? root.pulseScale : 1
+                                }
+                            }
+                        }
                     }
-
                 }
-
             }
-
-        }
-
-        // Spinner loader - shown while verifying
-        Item {
-            id: verificationSpinner
-
-            visible: root.context.pamActivated && root.context.unlockInProgress
-            implicitWidth: 24
-            implicitHeight: 24
-            Layout.alignment: Qt.AlignHCenter
-
-            Rectangle {
-                anchors.centerIn: parent
-                width: 20
-                height: 20
-                color: "transparent"
-
-                Canvas {
-                    anchors.fill: parent
-                    anchors.margins: 2
-                    onPaint: {
-                        var ctx = getContext("2d");
-                        ctx.reset();
-                        ctx.lineWidth = 2;
-                        ctx.strokeStyle = root.config.selectionBackground;
-                        ctx.lineCap = "round";
-                        ctx.beginPath();
-                        ctx.arc(width / 2, height / 2, width / 2 - 1, 0, Math.PI * 1.5);
-                        ctx.stroke();
-                    }
-                }
-
-                transform: Rotation {
-                    origin.x: 10
-                    origin.y: 10
-                    angle: 0
-
-                    NumberAnimation on angle {
-                        running: verificationSpinner.visible
-                        from: 0
-                        to: 360
-                        duration: 800
-                        loops: Animation.Infinite
-                    }
-
-                }
-
-            }
-
         }
 
         // Status message
         Label {
             id: statusLabel
+            objectName: "lockStatus"
 
             renderType: Text.NativeRendering
+            textFormat: Text.PlainText
             visible: text !== ""
             text: {
                 if (root.context.errorText !== "")
@@ -279,31 +344,13 @@ Rectangle {
                     return root.context.pamMessage;
 
                 if (root.context.showFailure)
-                    return "Authentication failed · Enter to retry";
+                    return "Incorrect password";
 
                 return "";
             }
-            color: root.context.pamMessageIsError || root.context.showFailure ? root.error : root.config.muted
+            color: root.context.errorText !== "" || root.context.pamMessageIsError || root.context.showFailure ? root.error : root.config.muted
             font.pointSize: 13
             Layout.alignment: Qt.AlignHCenter
-        }
-
-    }
-
-    // Hint label - shown before any auth attempt
-    Label {
-        id: hintLabel
-
-        renderType: Text.NativeRendering
-        visible: !root.context.pamActivated
-        text: "Click or press any key to unlock"
-        color: root.config.muted
-        font.pointSize: 14
-
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-            bottom: parent.bottom
-            bottomMargin: 60
         }
 
     }
