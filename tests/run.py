@@ -16,6 +16,7 @@ SUITES = {
     "notifications": [("qml", "notifications/tests")],
     "audio": [("qml", "bar/modules/audio/tests")],
     "bluetooth": [("qml", "bar/modules/bluetooth/tests"),
+                  ("python", "bar/modules/bluetooth/tests"),
                   ("qml", "services/bluetooth/tests")],
     "network": [("qml", "bar/modules/network/tests")],
     "workspaces": [("qml", "bar/modules/workspaces/tests")],
