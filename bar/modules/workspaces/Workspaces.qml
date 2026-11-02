@@ -149,9 +149,11 @@ Item {
                     width: workspaceName.implicitWidth + 16
                     height: 26
                     radius: 4
-                    color: workspaceItem.modelData.is_urgent
-                        ? root.config.urgent : root.config.selectionBackground
-                    opacity: 0.8
+                    color: Qt.alpha(
+                        workspaceItem.modelData.is_urgent
+                            ? root.config.urgent : root.config.selectionBackground,
+                        0.5
+                    )
 
                     Text {
                         id: workspaceName
@@ -165,12 +167,6 @@ Item {
                         font.weight: Font.DemiBold
                         text: workspaceItem.modelData.name
                             || String(workspaceItem.modelData.idx)
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.focusWorkspace(workspaceItem.modelData)
                     }
                 }
             }
