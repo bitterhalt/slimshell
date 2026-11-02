@@ -31,7 +31,7 @@ Rectangle {
     border.width: 1
     border.color: root.critical ? root.criticalBorderColor
         : root.highlighted ? root.config.selectionBackground : root.config.border
-    color: root.config.bg
+    color: root.critical ? root.config.bg : Qt.alpha(root.config.selectionBackground, 0.05)
 
     HoverHandler {
         id: hover
@@ -169,11 +169,10 @@ Rectangle {
                     objectName: "historyAction-" + modelData.key
                     width: Math.min(actions.width, caption.implicitWidth + 16)
                     height: 26
-                    radius: 3
+                    radius: 4
                     color: actionMouse.containsMouse
-                        ? root.config.selectionBackground : root.config.bg
-                    border.width: 1
-                    border.color: root.config.selectionBackground
+                        ? root.config.selectionBackground
+                        : root.critical ? root.config.bg : Qt.alpha(root.config.selectionBackground, 0.12)
                     Text {
                         id: caption
                         anchors.centerIn: parent

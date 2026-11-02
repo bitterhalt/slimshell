@@ -378,18 +378,21 @@ Item {
             compare(icon.color, card.criticalBorderColor);
             verify(!findChild(card, "historyAppIcon").visible);
             compare(card.border.color, card.criticalBorderColor);
+            compare(card.color, config.bg);
             for (const label of ["12:34", note.summary, note.body]) compare(findText(card, label).color, card.criticalTextColor)
             card.selected = true;
             waitForPolish(host.Window.window);
             compare(card.border.color, card.criticalBorderColor);
             compare(findText(card, "[o] Open").color, card.criticalTextColor);
+            compare(card.color, config.bg);
+            compare(findChild(card, "historyAction-o").color, config.bg);
         }
 
         function test_history_rows_have_subtle_card_surfaces() {
             const note = notification(1);
             card = createTemporaryObject(cardComponent, host, {width: 340, config: config,
                 notification: note});
-            compare(card.color, config.bg);
+            compare(card.color, Qt.alpha(config.selectionBackground, 0.05));
             compare(card.border.width, 1);
             compare(card.border.color, config.border);
             compare(card.opacity, 1);
@@ -397,7 +400,7 @@ Item {
             verify(hover !== null);
             mouseMove(card, card.width / 2, card.height / 2);
             tryVerify(() => hover.hovered);
-            compare(card.color, config.bg);
+            compare(card.color, Qt.alpha(config.selectionBackground, 0.05));
             compare(card.opacity, 1);
             compare(card.border.color, config.selectionBackground);
             mouseMove(host, host.width - 1, host.height - 1);
@@ -407,7 +410,7 @@ Item {
             // Assert selected treatment directly; hover itself is driven by
             // HoverHandler in the actual UI.
             card.selected = true;
-            compare(card.color, config.bg);
+            compare(card.color, Qt.alpha(config.selectionBackground, 0.05));
             compare(card.border.color, config.selectionBackground);
             compare(findText(card, note.summary).color, config.fg);
         }
