@@ -15,6 +15,14 @@ spec.loader.exec_module(runner)
 
 
 class RunnerTests(unittest.TestCase):
+    def test_suite_paths_are_centralized_and_exist(self):
+        test_root = runner.ROOT / "tests"
+        for suites in runner.SUITES.values():
+            for _, path in suites:
+                directory = (runner.ROOT / path).resolve()
+                self.assertTrue(directory.is_relative_to(test_root))
+                self.assertTrue(directory.is_dir())
+
     def test_qt6_is_preferred_over_generic_path_tool(self):
         with patch.dict(runner.os.environ, {"QMLTESTRUNNER": ""}), \
                 patch.object(runner.shutil, "which", side_effect=lambda name:
@@ -32,7 +40,7 @@ class RunnerTests(unittest.TestCase):
                 contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(runner.main(["network", "network"]), 0)
         self.assertEqual(run.call_count, 1)
-        self.assertEqual(run.call_args.args[:2], ("qml", "bar/modules/network/tests"))
+        self.assertEqual(run.call_args.args[:2], ("qml", "tests/network"))
 
     def test_failure_does_not_skip_remaining_suites(self):
         with patch.object(runner, "run_suite", side_effect=[(False, "failed"), (True, "passed")]) as run, \
@@ -50,7 +58,7 @@ class RunnerTests(unittest.TestCase):
     def test_python_uses_offscreen_no_bytecode_and_checkout_root(self):
         result = Mock(returncode=0, stdout="", stderr="Ran 3 tests in 0.1s\n\nOK\n")
         with patch.object(runner.subprocess, "run", return_value=result) as run:
-            passed, summary = runner.run_suite("python", "launcher/tests", None)
+            passed, summary = runner.run_suite("python", "tests/launcher", None)
         self.assertTrue(passed)
         self.assertIn("Ran 3 tests", summary)
         self.assertIn("-B", run.call_args.args[0])
@@ -60,7 +68,7 @@ class RunnerTests(unittest.TestCase):
 
     def test_missing_qt_runner_fails_without_launching_anything(self):
         with patch.object(runner.subprocess, "run") as run:
-            passed, detail = runner.run_suite("qml", "components/tests", None)
+            passed, detail = runner.run_suite("qml", "tests/components", None)
         self.assertFalse(passed)
         self.assertIn("not found", detail)
         run.assert_not_called()

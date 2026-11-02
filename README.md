@@ -43,7 +43,7 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 | `launcher`           | `toggle`, `open`, `close`                                              | Control the application launcher                         |
 | `lock`               | `lock`                                                                 | Lock the session                                         |
 | `locker`             | `isSecure`                                                             | Query whether the separate lock-screen process is secure |
-| `menu`               | `packages`, `settings`, `system`, `close`                              | Open a main-menu page or close it                        |
+| `menu`               | `open <name>`, `toggle <name>`, `close`, `packages`, `settings`, `system` | Open a user menu or close it                             |
 | `network`            | `toggle`, `open`, `close`                                              | Show or hide the network popup                           |
 | `notificationCenter` | `toggle`, `open`, `close`                                              | Show or hide notification history                        |
 | `notifications`      | `toggleDnd`, `enableDnd`, `disableDnd`, `isDnd`, `clear`, `count`      | Control DND or notification history                      |
@@ -106,20 +106,28 @@ Audio styles are `classic` or `circle`; animation styles are `fade` or `slide`.
 Optional `animations.hostStyles` overrides individual menu styles (`audio`,
 `network`, `bluetooth`, or `notificationCenter`).
 
+Edit `menus.json` to customize `user-menu1` through `user-menu4`; the fourth is an empty placeholder.
+Open one with `qs ipc call menu open user-menu1`.
+Changes reload automatically; invalid edits keep the last working menus. Power
+actions remain built in.
+
 ## Tests
 
 Run the offline tests with `python -B tests/run.py`, or select a feature, for example
 `python -B tests/run.py launcher network`. Use `--list` to see the available features.
 These tests do not start or reload the desktop shell.
+All test cases and fixtures live under `tests/`, grouped by feature.
 
 ## Structure
 
 ```text
 shell.qml       Shell entrypoint and service wiring
 settings.json   Editable appearance and behavior defaults
+menus.json      Personal menu items and commands
 bar/            Bar and its modules
 components/     Reusable UI and popup components
 services/       Shared desktop state and integrations
+tests/          Offline tests and fixtures, grouped by feature
 launcher/       Launcher, dmenu runner, and search helpers
 menus/          System and wallpaper menus
 notifications/  Notification popups and history

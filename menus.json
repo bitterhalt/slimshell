@@ -1,0 +1,19 @@
+{
+  "user-menu1": [
+    { "label": "Install Packages", "icon": "󰏗", "shortcut": "i", "command": "foot -a pacseek -T pacseek -e pacseek -m" },
+    { "label": "Update", "icon": "󰑐", "shortcut": "u", "command": "foot -a pop-upgrade -e sup" }
+  ],
+  "user-menu2": [
+    { "label": "Niri", "icon": "󰖲", "shortcut": "n", "command": "foot sh -c 'cd ~/.config/niri/ && nvim *'" },
+    { "label": "Nvim", "icon": "", "shortcut": "v", "command": "foot sh -c 'cd ~/.config/nvim && vopen .'" },
+    { "label": "Hellwal", "icon": "󰏘", "shortcut": "p", "command": "foot -e nvim  ~/.config/hellwal/templates/*" },
+    { "label": "Quickshell", "icon": "󰆍", "shortcut": "q", "command": "foot sh -c 'cd ~/.config/quickshell && vopen .'" }
+  ],
+  "user-menu3": [
+    { "label": "Network Manager", "icon": "󰲝", "shortcut": "n", "command": "foot -e nmtui" },
+    { "label": "Update System", "icon": "󰑐", "shortcut": "u", "command": "foot -a pop-upgrade -e sup" },
+    { "label": "Idle Settings", "icon": "󰤄", "shortcut": "i", "action": "idleSettings" },
+    { "label": "System Monitor", "icon": "󰕮", "shortcut": "m", "command": "foot -a Sysmon -T Sysmon -e ~/.local/bin/tmux-sysmon.sh" }
+  ],
+  "user-menu4": []
+}

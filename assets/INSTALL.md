@@ -160,6 +160,30 @@ are cached for one hour.
 
 ### Your own menus
 
+Edit `menus.json` to replace or extend the `user-menu1` through `user-menu4`
+lists. Each item needs a label and one of `command`, `action`, or `page`:
+
+```json
+{
+  "user-menu1": [
+    { "label": "Terminal", "icon": "󰆍", "shortcut": "t", "command": "foot" },
+    { "label": "Idle Settings", "shortcut": "i", "action": "idleSettings" }
+  ]
+}
+```
+
+Icons and shortcuts are optional. Shortcuts are single letters or digits and
+must be unique within a list. Commands run through the shell when activated;
+only add commands you trust. Set `"confirm": true` on a command to ask before
+running it. Built-in actions are `idleSettings`, `wallpaper`, `lock`, and
+`suspend`; page links accept `user-menu1` through `user-menu4`, or `power`.
+Open a list with `qs ipc call menu open user-menu1`, or use `menu toggle user-menu1`.
+The old `menu packages`, `menu settings`, and `menu system` calls remain aliases
+for the first three menus, so existing keybindings still work. The fourth list
+ships empty as a placeholder.
+Omitted lists are empty. Invalid edits or a missing file keep the last loaded
+menus; if none have loaded yet, the custom lists are empty and Power still works.
+
 Scripts can call `~/.config/quickshell/launcher/dmenu-runner` while Slimshell is
 running. See the [dmenu examples](../README.md#dmenu-mode).
 

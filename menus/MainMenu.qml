@@ -21,7 +21,7 @@ Item {
     property var confirmItem: null
     property int confirmIndex: -1
 
-    // Page contents and keyboard shortcuts. Edit labels/actions here.
+    // Session actions remain built in; personal menus live in menus.json.
     readonly property var powerItems: [
         { label: "Lock", icon: "󰌾", shortcut: "l", action: "lock" },
         { label: "Log out", icon: "󰍃", shortcut: "e", command: "niri msg action quit", confirm: true },
@@ -31,25 +31,17 @@ Item {
     ]
 
 
-    readonly property var packagesItems: [
-        { label: "Install Packages", icon: "󰏗", shortcut: "i", command: "foot -a pacseek -T pacseek -e pacseek -m" },
-        { label: "Update", icon: "󰑐", shortcut: "u", command: "foot -a pop-upgrade -e sup" }
-    ]
-
-
-    readonly property var settingsItems: [
-        { label: "Niri", icon: "󰖲", shortcut: "n", command: "foot sh -c 'cd ~/.config/niri/ && nvim *'" },
-        { label: "Nvim", icon: "", shortcut: "v", command: "foot sh -c 'cd ~/.config/nvim && vopen .'" },
-        { label: "Hellwal", icon: "󰏘", shortcut: "p", command: "foot -e nvim  ~/.config/hellwal/templates/*" },
-        { label: "Quickshell", icon: "󰆍", shortcut: "q", command: "foot sh -c 'cd ~/.config/quickshell && vopen .'" },
-    ]
-
-    readonly property var systemItems: [
-        { label: "Network Manager", icon: "󰲝", shortcut: "n", command: "foot -e nmtui" },
-        { label: "Update System", icon: "󰑐", shortcut: "u", command: "foot -a pop-upgrade -e sup" },
-        { label: "Idle Settings", icon: "󰤄", shortcut: "i", action: "idleSettings" },
-        { label: "System Monitor", icon: "󰕮", shortcut: "m", command: "foot -a Sysmon -T Sysmon -e ~/.local/bin/tmux-sysmon.sh" }
-    ]
+    MenuConfig {
+        id: menuConfig
+        onMenusChanged: {
+            if (root.page !== "power") {
+                root.confirmItem = null
+                root.confirmIndex = -1
+                root.selectedIndex = 0
+                Qt.callLater(() => menuCard.prepareLayout())
+            }
+        }
+    }
 
     readonly property var currentItems: {
         if (confirmItem)
@@ -61,14 +53,8 @@ Item {
         switch (page) {
         case "power":
             return powerItems
-        case "packages":
-            return packagesItems
-        case "settings":
-            return settingsItems
-        case "system":
-            return systemItems
         default:
-            return []
+            return menuConfig.menus[page] || []
         }
     }
 
@@ -76,20 +62,16 @@ Item {
         switch (page) {
         case "power":
             return "Power"
-        case "packages":
-            return "Packages"
-        case "settings":
-            return "Edit configs"
-        case "system":
-            return "Settings"
         default:
-            return ""
+            return page
         }
     }
 
     function open(name, screen): void {
         cancelConfirmation()
         page = name || "power"
+        if (!["power", "user-menu1", "user-menu2", "user-menu3", "user-menu4"].includes(page))
+            page = "power"
         menuScreen = screen || targetScreen
         selectedIndex = 0
         menuCard.prepareLayout()
@@ -340,6 +322,16 @@ Item {
             }
 
             // Highlighted row, icon, label, and shortcut hint.
+            Text {
+                width: parent.width
+                visible: root.currentItems.length === 0
+                text: "No menu items configured"
+                textFormat: Text.PlainText
+                renderType: Text.NativeRendering
+                color: root.config.muted
+                font.pointSize: root.config.fontSize(0.9)
+            }
+
             Repeater {
                 model: root.currentItems
 
@@ -392,6 +384,7 @@ Item {
                         font.weight: Font.Medium
                         elide: Text.ElideRight
                         text: modelData.label
+                        textFormat: Text.PlainText
                     }
 
                     Text {
@@ -459,17 +452,19 @@ Item {
     IpcHandler {
         target: "menu"
 
+        function open(name: string): void { root.open(name) }
+        function toggle(name: string): void { root.toggle(name, root.targetScreen) }
 
         function packages(): void {
-            root.open("packages")
+            root.open("user-menu1")
         }
 
         function settings(): void {
-            root.open("settings")
+            root.open("user-menu2")
         }
 
         function system(): void {
-            root.open("system")
+            root.open("user-menu3")
         }
 
         function close(): void {
