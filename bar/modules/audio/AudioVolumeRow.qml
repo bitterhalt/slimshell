@@ -146,7 +146,7 @@ Item {
             width: slider.availableWidth
             height: 4
             radius: 2
-            color: root.config.muted
+            color: root.config.border
 
             Rectangle {
                 width: slider.visualPosition * parent.width
