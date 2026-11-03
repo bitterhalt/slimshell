@@ -1,7 +1,4 @@
-import "../../../components"
 import QtQuick
-import QtQuick.Controls
-import Quickshell
 
 Item {
     id: root
@@ -15,14 +12,9 @@ Item {
     readonly property var sinkAudio: audioService.sinkAudio
     readonly property int volume: audioService.volume
     readonly property bool muted: audioService.muted
-    readonly property bool circleStyle: config.audioStyle === "circle"
-    readonly property real volumeLevel: sinkAudio && config.maxVolume > 0 ? Math.max(0, Math.min(sinkAudio.volume / config.maxVolume, 1)) : 0
     readonly property string icon: {
         if (muted)
             return "󰝟";
-
-        if (circleStyle)
-            return "󰕾";
 
         if (volume < 25)
             return "󰕿";
@@ -55,59 +47,12 @@ Item {
         target: root.uiService
     }
 
-    // Circle style's level ring is loaded only when selected in settings.json.
-    Loader {
-        anchors.centerIn: parent
-        width: 24
-        height: 24
-        active: root.circleStyle
-
-        sourceComponent: Component {
-            Canvas {
-                id: volumeRing
-                anchors.fill: parent
-
-                onPaint: {
-                    const context = getContext("2d");
-                    const center = width / 2;
-                    const radius = center - 1.5;
-                    const start = -Math.PI / 2;
-                    context.clearRect(0, 0, width, height);
-                    context.beginPath();
-                    context.arc(center, center, radius, 0, Math.PI * 2, false);
-                    context.lineWidth = 2;
-                    context.lineCap = "round";
-                    context.globalAlpha = 0.35;
-                    context.strokeStyle = root.config.muted.toString();
-                    context.stroke();
-                    if (root.volumeLevel > 0) {
-                        context.beginPath();
-                        context.arc(center, center, radius, start,
-                            start + Math.PI * 2 * root.volumeLevel, false);
-                        context.globalAlpha = 1;
-                        context.strokeStyle = root.config.selectionBackground.toString();
-                        context.stroke();
-                    }
-                    context.globalAlpha = 1;
-                }
-
-                Connections {
-                    function onVolumeLevelChanged() {
-                        volumeRing.requestPaint();
-                    }
-
-                    target: root
-                }
-            }
-        }
-    }
-
     Text {
         anchors.centerIn: parent
-        color: root.circleStyle && root.muted ? config.muted : config.fg
-        opacity: root.circleStyle || !root.muted ? 1 : 0.5
+        color: config.fg
+        opacity: root.muted ? 0.5 : 1
         font.family: config.iconFontFamily
-        font.pointSize: root.circleStyle ? config.iconSize * 0.82 : config.iconSize
+        font.pointSize: config.iconSize
         text: root.icon
     }
 

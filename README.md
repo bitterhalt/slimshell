@@ -24,7 +24,7 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 
 |              | What's included                                                                                 |
 | ------------ | ----------------------------------------------------------------------------------------------- |
-| **Bar**      | Workspaces, Window title, Clock and Weather, Battery, Connections, Tray etc.                    |
+| **Bar**      | Workspaces, Window title, Clock and Weather, Battery, Connections, Privacy indicators, Tray etc. |
 | **Menus**    | Keyboard-driven menus for Bluetooth, Wi-Fi, Audio, Power, and Notifications                     |
 | **launcher** | Application launcher with: File Search, Calculator, Binary Runner, Emoji, Timers and Dmenu-mode |
 | **Tools**    | Clipboard, DeepL translation, and Screen recording                                              |
@@ -101,10 +101,7 @@ loaded automatically; invalid values use safe defaults, and malformed JSON keeps
 the previous settings. Idle timeouts, wallpaper preferences and workspace layout
 are adjusted through the UI and saved separately.
 
-Audio styles are `classic` or `circle`; animation styles are `fade` or `slide`.
-`animations.style` controls menus, while `notificationStyle` controls toasts.
-Optional `animations.hostStyles` overrides individual menu styles (`audio`,
-`network`, `bluetooth`, or `notificationCenter`).
+Animations can be enabled or disabled in settings; each widget owns its style and timing.
 
 Edit `menus.json` to customize `user-menu1` through `user-menu4`; the fourth is an empty placeholder.
 Open one with `qs ipc call menu open user-menu1`.

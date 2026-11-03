@@ -113,14 +113,16 @@ Item {
             const codeName = findChild(workspaces, "workspace-name-2");
             verify(codeName !== null);
             compare(codeName.text, "Code");
-            compare(codeName.parent.color, fixtureConfig.urgent);
-            compare(codeName.parent.opacity, 0.8);
+            compare(codeName.parent.color, Qt.alpha(fixtureConfig.urgent, 0.5));
+            compare(codeName.parent.opacity, 1);
+            compare(codeName.color, fixtureConfig.fg);
             const notesName = findChild(workspaces, "workspace-name-3");
             verify(notesName !== null);
-            compare(notesName.parent.color, fixtureConfig.selectionBackground);
-            compare(notesName.parent.opacity, 0.8);
+            compare(notesName.parent.color, Qt.alpha(fixtureConfig.selectionBackground, 0.5));
+            compare(notesName.parent.opacity, 1);
+            compare(notesName.color, fixtureConfig.selectionForeground);
             mouseClick(codeName, codeName.width / 2, codeName.height / 2);
-            compare(fixtureConfig.commands, ["niri msg action focus-workspace 2"]);
+            compare(fixtureConfig.commands, []);
         }
     }
 }

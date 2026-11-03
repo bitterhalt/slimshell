@@ -10,6 +10,7 @@ import "modules/bluetooth"
 import "modules/clock"
 import "modules/idle"
 import "modules/network"
+import "modules/privacy"
 import "modules/tray"
 import "modules/window"
 import "modules/workspaces"
@@ -25,6 +26,7 @@ PanelWindow {
     required property var bluetoothService
     required property var audioService
     required property var networkService
+    required property var privacyService
     required property var batteryService
     required property var weatherService
     required property var idleService
@@ -48,6 +50,13 @@ PanelWindow {
 
         barWindow: barWindow
         config: barWindow.config
+    }
+
+    // Recorder UI is controlled through its existing IPC; Privacy shows activity.
+    Recorder {
+        config: barWindow.config
+        barWindow: barWindow
+        recorderService: barWindow.recorderService
     }
 
     // ---------------------------------------------------------
@@ -101,12 +110,6 @@ PanelWindow {
             uiService: barWindow.uiService
         }
 
-        Recorder {
-            config: barWindow.config
-            barWindow: barWindow
-            recorderService: barWindow.recorderService
-        }
-
     }
 
     // ---------------------------------------------------------
@@ -118,6 +121,13 @@ PanelWindow {
         anchors.rightMargin: 14
         anchors.verticalCenter: parent.verticalCenter
         spacing: 8
+
+        Privacy {
+            config: barWindow.config
+            barWindow: barWindow
+            privacyService: barWindow.privacyService
+            recorderService: barWindow.recorderService
+        }
 
         Network {
             config: barWindow.config

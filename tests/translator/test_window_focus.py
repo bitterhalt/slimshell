@@ -106,6 +106,7 @@ class TranslatorFocusTests(unittest.TestCase):
             (base / "TranslatorWindow.qml").write_text('import "."\n' + source)
             for name in ("TranslatorButton.qml", "Languages.js"):
                 (base / name).write_text((ROOT / name).read_text())
+            (base / "ShellToolTip.qml").write_text((ROOT.parent / "tests/fixtures/ShellToolTip.qml").read_text())
             (base / "qmldir").write_text("singleton Quickshell 1.0 Quickshell.qml\n")
             (base / "Quickshell.qml").write_text(
                 'pragma Singleton\nimport QtQuick\nQtObject { function env(name) { return "/synthetic-home"; } }\n'

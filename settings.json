@@ -13,7 +13,6 @@
     "alternativeFormat": "dddd, d MMMM"
   },
   "audio": {
-    "style": "classic",
     "maxVolume": 1.1
   },
   "launcher": {

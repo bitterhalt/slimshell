@@ -47,7 +47,7 @@ Several helpers currently expect `~/.config/quickshell`, so do not install into 
 named subconfiguration or another directory unless you also adjust those paths.
 
 Review `settings.json` for appearance and defaults. Optional commands in
-`menus/MainMenu.qml` still include local tools such as `sup`, `vopen` and
+`menus.json` still include local tools such as `sup`, `vopen` and
 `tmux-sysmon.sh`. Menus and other integrations may rely on personal scripts or
 configuration from my [dotfiles](https://github.com/bitterhalt/dotfiles).
 Review those before borrowing them, or replace/remove entries you do not use.

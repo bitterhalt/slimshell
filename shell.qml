@@ -67,6 +67,10 @@ ShellRoot {
     id: appNetworkService
   }
 
+  PrivacyService {
+    id: appPrivacyService
+  }
+
   MainMenu {
     id: mainMenu
     config: appConfig
@@ -261,6 +265,7 @@ ShellRoot {
       bluetoothService: appBluetoothService
       audioService: appAudioService
       networkService: appNetworkService
+      privacyService: appPrivacyService
       batteryService: appBatteryService
       weatherService: appWeatherService
       idleService: appIdleService

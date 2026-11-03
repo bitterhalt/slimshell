@@ -14,7 +14,6 @@ Item {
     readonly property real iconScale: values.iconScale
     readonly property string iconFontFamily: values.iconFontFamily
     readonly property real maxVolume: values.maxVolume
-    readonly property string audioStyle: values.audioStyle
     readonly property int barHeight: values.barHeight
     readonly property bool showTray: values.showTray
     readonly property bool launcherEnabled: values.launcherEnabled

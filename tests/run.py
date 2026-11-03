@@ -12,7 +12,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 # Explicit paths keep future live/integration tests out of the default run.
 SUITES = {
-    "components": [("qml", "tests/components")],
+    "components": [("qml", "tests/components"), ("python", "tests/components")],
     "notifications": [("qml", "tests/notifications")],
     "audio": [("qml", "tests/audio")],
     "bluetooth": [("qml", "tests/bluetooth"), ("python", "tests/bluetooth")],
@@ -25,6 +25,7 @@ SUITES = {
     "weather": [("qml", "tests/weather"), ("python", "tests/weather")],
     "lock": [("python", "tests/lock")],
     "menus": [("qml", "tests/menus"), ("python", "tests/menus")],
+    "privacy": [("python", "tests/privacy")],
     "clipboard": [("python", "tests/clipboard")],
     "battery": [("python", "tests/battery")],
     "services": [("python", "tests/services")],

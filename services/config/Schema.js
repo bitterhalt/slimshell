@@ -9,7 +9,6 @@ const fields = {
     showTray: ["bar", "showTray", true, "boolean"],
     clockFormat: ["clock", "format", "HH:mm", "string"],
     clockAlternativeFormat: ["clock", "alternativeFormat", "dddd, d MMMM", "string"],
-    audioStyle: ["audio", "style", "classic", ["classic", "circle"]],
     maxVolume: ["audio", "maxVolume", 1.1, "number", 0, 2],
     launcherEnabled: ["launcher", "enabled", true, "boolean"],
     popupGap: ["popups", "gap", 16, "integer", 0, 256],

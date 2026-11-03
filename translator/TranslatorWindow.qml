@@ -316,9 +316,12 @@ PanelWindow {
                 config: root.config
                 iconOnly: true
                 text: "⇄"
-                ToolTip.visible: hovered
-                ToolTip.text: "Swap languages and input/output"
-                ToolTip.delay: 400
+                ShellToolTip {
+                    config: root.config
+                    anchorItem: swapButton
+                    shown: swapButton.hovered && swapButton.enabled
+                    text: "Swap languages and input/output"
+                }
                 enabled: !root.busy && root.picker === "" && (root.sourceLanguage !== "" || root.detectedLanguage !== "")
                 onClicked: root.swapLanguages()
                 KeyNavigation.tab: targetButton

@@ -19,9 +19,8 @@ Item {
     property bool opened: false
     readonly property int actionCount: runningNow ? 3 : 2
 
-    width: runningNow ? 24 : 0
-    height: barWindow.height
-    visible: runningNow
+    width: 0
+    height: 0
 
     function open(): void {
         selectedIndex = 0
@@ -76,34 +75,6 @@ Item {
     function stop(): void {
         close()
         recorderService.stop()
-    }
-
-    Text {
-        renderType: Text.NativeRendering
-        id: recordingLabel
-
-        anchors.centerIn: parent
-        color: config.selectionBackground
-        font.pointSize: config.fontSize(1)
-        font.weight: Font.DemiBold
-        text: "REC"
-
-        SequentialAnimation on opacity {
-            running: root.runningNow && root.visible
-            loops: Animation.Infinite
-            onRunningChanged: if (!running) recordingLabel.opacity = 1
-
-            PauseAnimation { duration: 500 }
-            NumberAnimation { from: 1; to: 0; duration: 100 }
-            PauseAnimation { duration: 400 }
-            PropertyAction { value: 1 }
-        }
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        cursorShape: Qt.PointingHandCursor
-        onClicked: root.toggle()
     }
 
     // Full-screen drag selector used by the Region menu action.

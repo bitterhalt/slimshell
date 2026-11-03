@@ -95,15 +95,15 @@ Item {
         function test_audio_and_animation_values_update_through_file_reload() {
             const config = createTemporaryObject(configComponent, host);
             const file = storage(config);
-            file.contents = JSON.stringify({audio: {style: "circle"}, animations: {
+            file.contents = JSON.stringify({audio: {maxVolume: 1.5}, animations: {
                 enabled: false
             }});
             file.loaded();
-            compare(config.audioStyle, "circle");
+            compare(config.maxVolume, 1.5);
             verify(!config.popupAnimations);
-            file.contents = '{"audio":{"style":"classic"},"animations":{"enabled":true}}';
+            file.contents = '{"audio":{"maxVolume":1.1},"animations":{"enabled":true}}';
             file.loaded();
-            compare(config.audioStyle, "classic");
+            compare(config.maxVolume, 1.1);
             verify(config.popupAnimations);
         }
         function test_json_reload_does_not_change_saved_idle_preferences() {

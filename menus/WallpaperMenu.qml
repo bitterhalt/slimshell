@@ -379,6 +379,7 @@ PanelWindow {
                 visible: !root.settingsOpen
 
                 Text {
+                    id: wallpaperStatus
                     renderType: Text.NativeRendering
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
@@ -390,9 +391,13 @@ PanelWindow {
                     color: root.controller.errorText || root.scanError ? root.config.urgent : root.config.muted
                     font.pointSize: root.config.fontSize(0.78)
                     elide: Text.ElideRight
-                    ToolTip.visible: statusHover.hovered && truncated
-                    ToolTip.text: text
-                    ToolTip.delay: 500
+                    ShellToolTip {
+                        config: root.config
+                        anchorItem: wallpaperStatus
+                        shown: statusHover.hovered && wallpaperStatus.truncated
+                        text: wallpaperStatus.text
+                        delay: 500
+                    }
 
                     HoverHandler { id: statusHover }
                 }
