@@ -7,6 +7,7 @@ PanelWindow {
 
     required property var config
     required property var targetScreen
+    required property var resumeService
     readonly property int horizontalPadding: 28
     readonly property int verticalPadding: 14
 
@@ -32,6 +33,15 @@ PanelWindow {
 
         enabled: root.visible
         precision: SystemClock.Minutes
+    }
+
+    Connections {
+        target: root.resumeService
+        function onResumed(): void {
+            clock.enabled = false
+            // Restore the visibility binding, rather than leaving a hidden clock enabled.
+            clock.enabled = Qt.binding(() => root.visible)
+        }
     }
 
     Rectangle {

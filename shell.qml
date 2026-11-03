@@ -48,6 +48,10 @@ ShellRoot {
     id: appSettingsService
   }
 
+  ResumeService {
+    id: appResumeService
+  }
+
   PolkitService {
     config: appConfig
     targetScreen: root.activeScreen
@@ -247,6 +251,7 @@ ShellRoot {
 
       targetScreen: modelData
       config: appConfig
+      resumeService: appResumeService
       visible: !root.barVisible
     }
   }
@@ -260,6 +265,7 @@ ShellRoot {
       targetScreen: modelData
       config: appConfig
       niri: niriService
+      resumeService: appResumeService
       notificationService: appNotificationService
       notificationPopup: appNotificationPopup
       bluetoothService: appBluetoothService

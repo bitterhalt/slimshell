@@ -10,6 +10,15 @@ ItemRevealer {
   required property var popupManager
   required property var weatherData
   required property var uiService
+  required property var resumeService
+
+  Connections {
+    target: root.resumeService
+    function onResumed(): void {
+      clock.enabled = false
+      clock.enabled = true
+    }
+  }
 
   function weatherAction(action): void {
     if (action === "close" || root.barWindow.screen !== root.uiService.targetScreen) {
@@ -46,6 +55,7 @@ ItemRevealer {
 
     SystemClock {
       id: clock
+      objectName: "barClock"
       precision: SystemClock.Minutes
     }
   }

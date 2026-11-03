@@ -21,6 +21,7 @@ PanelWindow {
     required property var targetScreen
     required property var config
     required property var niri
+    required property var resumeService
     required property var notificationService
     required property var notificationPopup
     required property var bluetoothService
@@ -96,6 +97,7 @@ PanelWindow {
         Clock {
             config: barWindow.config
             barWindow: barWindow
+            resumeService: barWindow.resumeService
             popupManager: popupManager
             weatherData: barWindow.weatherService
             uiService: barWindow.uiService

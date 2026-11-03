@@ -12,6 +12,7 @@ Install these using your distribution's package manager:
 - PipeWire, NetworkManager, BlueZ, UPower and polkit, with the relevant services running.
 - Symbols Nerd Font Mono for icons, plus your preferred text font.
 - Git to clone the repository.
+- `dbus-monitor` for refreshing clocks immediately after resume (usually included with D-Bus).
 
 Additional tools are needed only for the features you use:
 

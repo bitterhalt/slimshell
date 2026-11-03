@@ -7,6 +7,7 @@ import "services"
 ShellRoot {
 	ThemeService { id: lockTheme }
 	Config { id: lockConfig; theme: lockTheme }
+	ResumeService { id: lockResumeService }
 	// This stores all the information shared between the lock surfaces on each screen.
 	LockContext {
 		id: lockContext
@@ -31,6 +32,7 @@ ShellRoot {
 				anchors.fill: parent
 				context: lockContext
 				config: lockConfig
+				resumeService: lockResumeService
 			}
 		}
 	}

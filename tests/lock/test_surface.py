@@ -49,8 +49,9 @@ Item {
     }
     Component {
         id: surfaceComponent
-        LockSurface { context: auth; config: fixtureConfig; width: host.width; height: host.height }
+        LockSurface { context: auth; config: fixtureConfig; resumeService: fixtureResume; width: host.width; height: host.height }
     }
+    QtObject { id: fixtureResume; signal resumed() }
     TestCase {
         name: "LockFeedback"
         when: windowShown
@@ -108,6 +109,14 @@ Item {
                 compare(label.text, "");
                 verify(!label.visible);
             }
+        }
+        function test_clock_refreshes_on_resume_without_changing_precision() {
+            const clock = findChild(surface, "lockClock");
+            const previous = clock.refreshes;
+            fixtureResume.resumed();
+            compare(clock.refreshes, previous + 1);
+            verify(clock.enabled);
+            compare(clock.precision, 0);
         }
         function test_pulse_settles_and_deletion_cancels_it() {
             auth.currentText = "a";
@@ -188,6 +197,9 @@ QtObject {
 QtObject {
     enum Precision { Minutes }
     property int precision
+    property bool enabled: true
+    property int refreshes: 0
+    onEnabledChanged: if (enabled) refreshes++
     property date date: new Date(2026, 10, 2)
 }
 ''')

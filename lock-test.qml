@@ -6,6 +6,7 @@ import "services"
 ShellRoot {
 	ThemeService { id: lockTheme }
 	Config { id: lockConfig; theme: lockTheme }
+	ResumeService { id: lockResumeService }
 	LockContext {
 		id: lockContext
 		onUnlocked: Qt.quit();
@@ -16,6 +17,7 @@ ShellRoot {
 			anchors.fill: parent
 			context: lockContext
 			config: lockConfig
+			resumeService: lockResumeService
 		}
 	}
 

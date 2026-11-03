@@ -11,6 +11,7 @@ Rectangle {
 
     required property LockContext context
     required property var config
+    property var resumeService: null
     readonly property color bg: config.bg
     readonly property color fg: config.fg
     readonly property color error: "#cc241d"
@@ -162,8 +163,17 @@ Rectangle {
 
     SystemClock {
         id: systemClock
+        objectName: "lockClock"
 
         precision: SystemClock.Minutes
+    }
+
+    Connections {
+        target: root.resumeService
+        function onResumed(): void {
+            systemClock.enabled = false;
+            systemClock.enabled = true;
+        }
     }
 
     Image {
