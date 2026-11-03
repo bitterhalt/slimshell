@@ -94,7 +94,7 @@ Item {
 
         config: root.config
         barWindow: root.barWindow
-        hoverRevealDelay: 350
+        hoverRevealDelay: 300
         visible: opacity > 0
         enabled: root.minimalLayout
         opacity: root.minimalLayout ? 1 : 0
