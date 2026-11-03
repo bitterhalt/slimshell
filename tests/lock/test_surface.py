@@ -91,6 +91,25 @@ Item {
             auth.currentText = "";
             compare(dots.count, 0);
         }
+        function test_mouse_does_not_start_authentication() {
+            auth.pamActivated = false;
+            mouseClick(surface, 20, 20);
+            verify(!auth.pamActivated);
+        }
+        function test_password_mouse_input_is_ignored() {
+            const input = findChild(surface, "lockPasswordInput");
+            auth.currentText = "ab";
+            surface.focusPassword();
+            tryCompare(input, "activeFocus", true);
+            compare(input.cursorPosition, 2);
+            for (const button of [Qt.LeftButton, Qt.RightButton, Qt.MiddleButton]) {
+                mouseClick(input, 1, input.height / 2, button);
+                compare(auth.currentText, "ab");
+                compare(input.cursorPosition, 2);
+            }
+            keyClick(Qt.Key_C);
+            compare(auth.currentText, "abc");
+        }
         function test_weather_cache_is_optional_and_invalid_data_is_hidden() {
             const file = findChild(surface, "lockWeatherCache");
             const label = findChild(surface, "lockWeatherLabel");

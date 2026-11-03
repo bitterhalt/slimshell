@@ -190,12 +190,6 @@ Rectangle {
         opacity: 0.3
     }
 
-    MouseArea {
-        anchors.fill: parent
-        visible: !root.context.pamActivated
-        onClicked: root.context.requestUnlock()
-    }
-
     Connections {
         function onPamActivatedChanged() {
             if (!root.context.pamActivated)
@@ -309,11 +303,22 @@ Rectangle {
                 enabled: !root.context.unlockInProgress
                 echoMode: TextInput.Password
                 inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
+                activeFocusOnPress: false
+                selectByMouse: false
                 color: "transparent"
                 selectionColor: "transparent"
                 selectedTextColor: "transparent"
                 onTextChanged: root.context.currentText = text
                 onAccepted: root.context.submitPassword()
+
+                // Block cursor movement, selection, context menus and middle-click paste.
+                // Programmatic keyboard focus and text input remain unchanged.
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.AllButtons
+                    cursorShape: Qt.ArrowCursor
+                    onWheel: event => { event.accepted = true; }
+                }
 
                 Connections {
                     function onCurrentTextChanged() {
