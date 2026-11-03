@@ -1,4 +1,5 @@
 import "../../../components"
+import "Model.js" as Model
 import QtQuick
 import QtQuick.Controls.Basic
 
@@ -112,7 +113,7 @@ Item {
         height: 18
         padding: 4
         from: 0
-        to: Math.max(0, root.config.maxVolume)
+        to: Math.max(0, Model.volumeLimit(root.node, root.config.maxVolume))
         stepSize: 0.01
         focusPolicy: Qt.NoFocus
         enabled: root.nodeAudio !== null

@@ -61,6 +61,23 @@ Item {
             service.setOutput(3);
             compare(Pipewire.preferredDefaultAudioSink, fixture.headset);
         }
+        function test_input_and_playback_are_limited_to_unity() {
+            const service = createTemporaryObject(audio, host, {config: fixture.config});
+            service.setVolume(3, 2);
+            service.setVolume(4, 2);
+            compare(fixture.micAudio.volume, 1);
+            compare(fixture.streamAudio.volume, 1);
+            service.adjustVolume(3, 0.05);
+            service.adjustVolume(4, 0.05);
+            compare(fixture.micAudio.volume, 1);
+            compare(fixture.streamAudio.volume, 1);
+            fixture.config.maxVolume = 0.8;
+            service.setVolume(3, 1);
+            service.setVolume(4, 1);
+            compare(fixture.micAudio.volume, 0.8);
+            compare(fixture.streamAudio.volume, 0.8);
+        }
+
         function test_network_selects_connected_adapter_and_strongest_ssid() {
             const weak = {name: "home", connected: false, signalStrength: 0.2};
             const strong = {name: "home", connected: true, signalStrength: 0.8};

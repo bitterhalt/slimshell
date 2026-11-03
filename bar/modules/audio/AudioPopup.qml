@@ -238,7 +238,7 @@ PopoutPanel {
             anchors.bottomMargin: root.spacing
             height: 18
             text: popupState.helpOpen
-                ? "Volume range: 0–" + Math.round(root.config.maxVolume * 100) + "% · keyboard step: 5% · ? Close help"
+                ? "Volume range: 0–" + Math.round((popupState.tabIndex === 0 ? root.config.maxVolume : Math.min(1, root.config.maxVolume)) * 100) + "% · keyboard step: 5% · ? Close help"
                 : popupState.tabIndex === 3
                     ? (popupState.profiles && (popupState.profiles.errorText
                         || (popupState.profiles.changing ? "Applying profile…" : "")

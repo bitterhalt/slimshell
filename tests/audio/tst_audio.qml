@@ -119,7 +119,7 @@ Item {
             press(Qt.Key_Left); compare(fixture.streamAudio.volume, 0.55);
             press(Qt.Key_M); compare(fixture.streamAudio.muted, true);
             fixture.streamAudio.volume = 1.09;
-            press(Qt.Key_Right); compare(fixture.streamAudio.volume, 1.1);
+            press(Qt.Key_Right); compare(fixture.streamAudio.volume, 1);
             fixture.streamAudio.volume = 0.01;
             press(Qt.Key_Left); compare(fixture.streamAudio.volume, 0);
         }
@@ -152,6 +152,21 @@ Item {
             const popupControls = findChild(popup, "audioPopupState");
             popupControls.helpOpen = true;
             verify(findText(popup, "Volume range: 0–125% · keyboard step: 5% · ? Close help") !== null);
+        }
+
+        function test_input_and_playback_slider_ceiling() {
+            popup = createTemporaryObject(popupComponent, host, {audioItem: fixture, profileBackend: profileComponent});
+            const state = findChild(popup, "audioPopupState");
+            for (const tab of [1, 2]) {
+                state.tabIndex = tab;
+                waitForPolish(host.Window.window);
+                const slider = findChild(popup, "audioVolumeSlider");
+                verify(slider !== null);
+                compare(slider.to, 1);
+                state.setVolumePercent(2);
+                state.adjustVolume(0.05);
+                compare(tab === 1 ? fixture.micAudio.volume : fixture.streamAudio.volume, 1);
+            }
         }
 
         function test_default_selection_survives_reordering() {

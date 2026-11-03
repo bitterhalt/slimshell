@@ -78,3 +78,7 @@ function selectionIndex(rows, key) {
 function clampVolume(value, maximum) {
   return Math.max(0, Math.min(maximum, value));
 }
+
+function volumeLimit(node, maximum) {
+  return node && (node.isStream || !node.isSink) ? Math.min(1, maximum) : maximum;
+}

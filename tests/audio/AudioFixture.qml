@@ -47,7 +47,7 @@ Item {
         const node = nodeForId(id);
         if (!node || !node.audio)
             return;
-        node.audio.volume = Model.clampVolume(value, config.maxVolume);
+        node.audio.volume = Model.clampVolume(value, Model.volumeLimit(node, config.maxVolume));
         calls = calls.concat([{action: "volume", id: id, value: node.audio.volume}]);
     }
     function adjustVolume(id, delta) {
