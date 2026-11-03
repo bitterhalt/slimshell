@@ -29,7 +29,7 @@ PopupWindow {
     color: "transparent"
     grabFocus: false
     mask: Region {}
-    implicitWidth: Math.min(360, caption.implicitWidth + 20)
+    implicitWidth: Math.min(360, Math.ceil(naturalCaption.implicitWidth) + 20)
     implicitHeight: caption.implicitHeight + 16
 
     anchor.item: anchorItem
@@ -47,6 +47,17 @@ PopupWindow {
         onTriggered: root.delayElapsed = true
     }
 
+    // Do not size the window from the wrapped caption: its width depends on ours.
+    Text {
+        id: naturalCaption
+        visible: false
+        text: root.text
+        font: caption.font
+        textFormat: Text.PlainText
+        renderType: Text.NativeRendering
+        wrapMode: Text.NoWrap
+    }
+
     Rectangle {
         anchors.fill: parent
         color: root.config.bg
@@ -61,7 +72,7 @@ PopupWindow {
             anchors.top: parent.top
             anchors.leftMargin: 10
             anchors.topMargin: 8
-            width: root.implicitWidth - 20
+            width: Math.max(0, root.width - 20)
             text: root.text
             textFormat: Text.PlainText
             renderType: Text.NativeRendering

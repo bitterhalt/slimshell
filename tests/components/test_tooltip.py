@@ -91,6 +91,24 @@ Item {
             wait(60);
             verify(!tooltip.visible);
         }
+        function test_short_hints_fit_one_line_and_width_resets_after_long_text() {
+            const tooltip = createTemporaryObject(tooltipComponent, host);
+            const caption = findChild(tooltip.contentItem, "tooltipCaption");
+            tooltip.shown = true;
+            tryCompare(tooltip, "visible", true);
+            for (const text of ["Recording screen · Click to stop", "Swap languages and input/output"]) {
+                tooltip.text = text;
+                tryCompare(caption, "lineCount", 1);
+                const shortWidth = tooltip.width;
+                tooltip.text = "long application name ".repeat(40);
+                tryVerify(() => caption.lineCount > 1);
+                tooltip.text = text;
+                tryCompare(tooltip, "width", shortWidth);
+                tryCompare(caption, "lineCount", 1);
+            }
+            tooltip.text = "Microphone in use\\nBrowser\\nChat";
+            tryCompare(caption, "lineCount", 3);
+        }
         function test_wrapping_and_hidden_anchor() {
             const tooltip = createTemporaryObject(tooltipComponent, host);
             tooltip.text = "<b>literal application name</b> " + "long name ".repeat(40);
