@@ -246,7 +246,7 @@ Rectangle {
             font.pointSize: 24
             color: root.config.fg
             opacity: 0.7
-            text: Qt.formatDateTime(systemClock.date, "dddd, d MMMM yyyy")
+            text: Qt.formatDateTime(systemClock.date, "dddd, d MMMM")
         }
 
         Label {
