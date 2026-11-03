@@ -1,5 +1,5 @@
 import QtQuick
-import QtQuick.Layouts
+import "../components"
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
@@ -107,13 +107,13 @@ Item {
 
             exclusiveZone: 0
             implicitWidth: 220
-            implicitHeight: 42
+            implicitHeight: 48
             color: "transparent"
 
             // Do not steal mouse input from whatever is underneath the OSD.
             mask: Region {}
 
-            // Speaker state, volume level, and numeric percentage.
+            // Segmented level; dim the whole meter when muted, like the audio popup.
             Rectangle {
                 anchors.fill: parent
 
@@ -122,87 +122,18 @@ Item {
                 border.width: 1
                 radius: config.popupRadius
 
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.leftMargin: 12
-                    anchors.rightMargin: 12
-                    spacing: 10
-
-                    Text {
-                        Layout.preferredWidth: 22
-
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-
-                        color: config.fg
-                        opacity: Pipewire.defaultAudioSink?.audio.muted ? 0.55 : 1.0
-
-                        font.family: config.iconFontFamily
-                        font.pointSize: config.iconSize
-
-                        text: {
-                            const audio = Pipewire.defaultAudioSink?.audio
-
-                            if (!audio || audio.muted)
-                                return "󰝟"
-
-                            const volume = Math.round(audio.volume * 100)
-
-                            if (volume < 25)
-                                return "󰕿"
-                            if (volume < 60)
-                                return "󰖀"
-
-                            return "󰕾"
-                        }
-                    }
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        implicitHeight: 6
-
-                        radius: 2.5
-                        color: config.border
-
-                        Rectangle {
-                            anchors {
-                                left: parent.left
-                                top: parent.top
-                                bottom: parent.bottom
-                            }
-
-                            // Fill at the configured ceiling, including a zero limit.
-                            width: {
-                                const volume =
-                                    Pipewire.defaultAudioSink?.audio.volume ?? 0
-                                return osd.config.maxVolume > 0
-                                    ? parent.width * Math.max(0, Math.min(volume / osd.config.maxVolume, 1.0)) : 0
-                            }
-
-                            radius: parent.radius
-                            color: config.selectionBackground
-                        }
-                    }
-
-                    Text {
-                        renderType: Text.NativeRendering
-                        Layout.preferredWidth: 38
-
-                        horizontalAlignment: Text.AlignRight
-                        verticalAlignment: Text.AlignVCenter
-
-                        color: config.fg
-                        font.pointSize: config.fontSize(0.92)
-
-                        text: {
-                            const audio = Pipewire.defaultAudioSink?.audio
-
-                            if (!audio)
-                                return "0%"
-
-                            return `${Math.round(audio.volume * 100)}%`
-                        }
-                    }
+                VolumeMeter {
+                    objectName: "osdVolumeMeter"
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.leftMargin: 22
+                    anchors.rightMargin: 22
+                    height: 14
+                    config: osd.config
+                    value: osd.sinkAudio ? osd.sinkAudio.volume : 0
+                    maximum: osd.config.maxVolume
+                    opacity: osd.sinkAudio && osd.sinkAudio.muted ? 0.4 : 1
                 }
             }
         }

@@ -11,11 +11,11 @@ PopoutPanel {
     required property Component profileBackend
     property bool profilesLoaded: false
     config: audioItem.config
-    contentWidth: Math.min(440, audioItem.barWindow.screen
-        ? audioItem.barWindow.screen.width - config.popupGap * 2 : 440)
+    contentWidth: Math.min(420, audioItem.barWindow.screen
+        ? audioItem.barWindow.screen.width - config.popupGap * 2 : 420)
     padding: 10
-    readonly property int rowHeight: popupState.tabIndex === 3 ? 48 : 60
-    readonly property int rowSpacing: 4
+    readonly property int rowHeight: popupState.tabIndex === 3 ? 40 : popupState.tabIndex === 2 ? 56 : 44
+    readonly property int rowSpacing: 2
     readonly property int chromeHeight: 12 + status.height + root.spacing + footer.height
     readonly property real desiredBodyHeight: popupState.helpOpen ? helpRows.implicitHeight
         : popupState.contextOpen ? optionRows.implicitHeight
@@ -161,7 +161,7 @@ PopoutPanel {
                 id: optionRows
                 anchors.left: parent.left
                 anchors.right: parent.right
-                spacing: 4
+                spacing: 2
                 visible: popupState.contextOpen && !popupState.helpOpen
                 Repeater {
                     model: popupState.contextActions
@@ -169,7 +169,7 @@ PopoutPanel {
                         required property var modelData
                         required property int index
                         width: parent.width
-                        height: 40
+                        height: 32
                         config: root.config
                         title: modelData.name
                         selected: popupState.contextActions.length > 1 && index === popupState.contextIndex
@@ -335,7 +335,7 @@ PopoutPanel {
         property string subtitle: ""
         property bool selected: false
         signal activated()
-        height: 50
+        height: 40
         opacity: enabled ? 1 : 0.45
 
         Rectangle {
@@ -352,7 +352,7 @@ PopoutPanel {
         Column {
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.leftMargin: 12
+            anchors.leftMargin: 8
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             spacing: 2

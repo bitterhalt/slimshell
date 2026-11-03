@@ -233,12 +233,11 @@ Item {
             const slider = findChild(popup, "audioVolumeSlider");
             verify(slider !== null);
             compare(slider.value, 0.55);
-            compare(slider.background.color, fixture.config.border);
-            const percent = findChild(popup, "audioVolumePercent");
-            compare(percent.text, "55%");
+            compare(findChild(slider.background, "volumeSegment-0").color, fixture.config.selectionBackground);
+            compare(findChild(slider.background, "volumeSegment-" + (slider.background.segmentCount - 1)).color, fixture.config.border);
+            compare(findChild(popup, "audioVolumePercent"), null);
             fixture.speakerAudio.volume = 1.5;
-            compare(percent.text, "150%");
-            verify(slider.x + slider.width < percent.x);
+            compare(slider.background.activeSegments, slider.background.segmentCount);
             keyClick(Qt.Key_Tab);
             compare(popupControls.tabIndex, 1);
             keyClick(Qt.Key_Tab, Qt.ShiftModifier);
@@ -248,7 +247,7 @@ Item {
             keyClick(Qt.Key_Left, Qt.ControlModifier);
             compare(popupControls.tabIndex, 0);
             const currentSlider = findChild(popup, "audioVolumeSlider");
-            compare(currentSlider.background.color, fixture.config.border);
+            compare(findChild(currentSlider.background, "volumeSegment-0").color, fixture.config.selectionBackground);
             keyClick(Qt.Key_Escape);
             verify(fixture.closed);
         }
@@ -262,6 +261,26 @@ Item {
                     return match;
             }
             return null;
+        }
+
+        function test_compact_rows_and_right_click_mute_feedback() {
+            popup = createTemporaryObject(popupComponent, host, {audioItem: fixture, profileBackend: profileComponent});
+            waitForPolish(host.Window.window);
+            const row = volumeRows(popup, [])[0];
+            compare(row.height, 44);
+            const slider = findChild(row, "audioVolumeSlider");
+            const name = findChild(row, "audioVolumeName");
+            compare(name.x, slider.x + slider.leftPadding);
+            compare(slider.leftPadding, 4);
+            verify(name.y + name.height <= slider.y + slider.background.y);
+            compare(slider.opacity, 1);
+            mouseClick(row, row.width / 2, 10, Qt.RightButton);
+            verify(fixture.speakerAudio.muted);
+            compare(slider.opacity, 0.4);
+            verify(findText(row, "Muted · Default") !== null);
+            mouseClick(row, row.width / 2, 10, Qt.RightButton);
+            verify(!fixture.speakerAudio.muted);
+            compare(slider.opacity, 1);
         }
 
         function test_popup_mouse_controls() {
