@@ -149,7 +149,7 @@ Item {
                     width: workspaceName.implicitWidth + 16
                     height: 24
                     radius: 4
-                    color: Qt.alpha(
+                    color: workspaceMouse.containsMouse ? root.config.selectionBackground : Qt.alpha(
                         workspaceItem.modelData.is_urgent
                             ? root.config.urgent : root.config.selectionBackground,
                         0.5
@@ -161,12 +161,21 @@ Item {
                         renderType: Text.NativeRendering
 
                         anchors.centerIn: parent
-                        color: workspaceItem.modelData.is_urgent
+                        color: workspaceMouse.containsMouse ? root.config.selectionForeground : workspaceItem.modelData.is_urgent
                             ? root.config.fg : root.config.selectionForeground
                         font.pointSize: root.config.fontSize(1)
                         font.weight: Font.DemiBold
                         text: workspaceItem.modelData.name
                             || String(workspaceItem.modelData.idx)
+                    }
+
+                    MouseArea {
+                        id: workspaceMouse
+                        anchors.fill: parent
+                        acceptedButtons: Qt.LeftButton
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.focusWorkspace(workspaceItem.modelData)
                     }
                 }
             }

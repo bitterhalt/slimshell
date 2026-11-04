@@ -121,8 +121,11 @@ Item {
             compare(notesName.parent.color, Qt.alpha(fixtureConfig.selectionBackground, 0.5));
             compare(notesName.parent.opacity, 1);
             compare(notesName.color, fixtureConfig.selectionForeground);
+            mouseMove(codeName, codeName.width / 2, codeName.height / 2);
+            tryCompare(codeName.parent, "color", fixtureConfig.selectionBackground);
+            compare(codeName.color, fixtureConfig.selectionForeground);
             mouseClick(codeName, codeName.width / 2, codeName.height / 2);
-            compare(fixtureConfig.commands, []);
+            compare(fixtureConfig.commands, ["niri msg action focus-workspace 2"]);
         }
     }
 }
