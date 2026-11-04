@@ -147,7 +147,7 @@ Item {
                     required property var modelData
 
                     width: workspaceName.implicitWidth + 16
-                    height: 26
+                    height: 24
                     radius: 4
                     color: Qt.alpha(
                         workspaceItem.modelData.is_urgent
