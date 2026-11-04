@@ -287,6 +287,27 @@ Item {
         opened ? close() : openApplications()
     }
 
+    function toggleMode(name): void {
+        if (!modes.concat(["files", "calculator"]).includes(name))
+            return
+        const currentMode = fileMode ? "files"
+            : calcPrefix || calculatorQuery ? "calculator" : mode
+        if (opened && currentMode === name) {
+            close()
+            return
+        }
+        // Cancel any pending dmenu request before replacing its UI.
+        cancelDmenu()
+        reset()
+        opened = true
+        setMode(name === "files" || name === "calculator" ? "apps" : name)
+        if (name === "files" || name === "calculator") {
+            searchInput.text = name === "files" ? "/" : "="
+            searchInput.cursorPosition = searchInput.text.length
+        }
+        Qt.callLater(() => searchInput.forceActiveFocus())
+    }
+
     // Called from IPC: the items are read from itemsPath, and the result is
     // written atomically to outPath, awaited by launcher/dmenu-runner.
     function requestDmenu(itemsPath, outPath, prompt, lines, minimalLines, indexMode): void {
@@ -949,6 +970,13 @@ Item {
 
     IpcHandler {
         target: "launcher"
+
+        function apps(): void { root.toggleMode("apps") }
+        function run(): void { root.toggleMode("run") }
+        function emoji(): void { root.toggleMode("emoji") }
+        function timer(): void { root.toggleMode("timer") }
+        function files(): void { root.toggleMode("files") }
+        function calculator(): void { root.toggleMode("calculator") }
 
         function toggle(): void {
             root.toggleApplications()

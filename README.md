@@ -40,7 +40,7 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 | `bluetooth`          | `toggle`, `open`, `close`                                                 | Show or hide the Bluetooth menu                          |
 | `clipboard`          | `toggle`, `open`, `close`, `refresh`, `copySelected`, `deleteSelected`    | Control the clipboard picker                             |
 | `idle`               | `toggle`, `isDisabled`, `settings`                                        | Control idle handling or open its settings               |
-| `launcher`           | `toggle`, `open`, `close`                                                 | Control the application launcher                         |
+| `launcher`           | `toggle`, `open`, `close`, `apps`, `run`, `emoji`, `timer`, `files`, `calculator` | Open, switch, or toggle launcher modes                 |
 | `lock`               | `lock`                                                                    | Lock the session                                         |
 | `locker`             | `isSecure`                                                                | Query whether the separate lock-screen process is secure |
 | `menu`               | `open <name>`, `toggle <name>`, `close`, `packages`, `settings`, `system` | Open a user menu or close it                             |
