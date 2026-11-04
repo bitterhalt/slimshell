@@ -18,7 +18,7 @@ It is built for my own desktop: compact, opinionated, and comfortable to use fro
 
 ## Why?
 
-Why does this exist? Because all the well-known Quickshell setups focus too much on large Material Design Menus and features that, at the end of the day, no productive user actually needs. If a widget has functions, it must also work 100% with the keyboard. Bluetooth or the Wi-Fi menus do not need to take half of your 1440p screen space. So the goal was simple = Make the most of the best features of the Quickshell in terms of usability and lightness.
+Why does this exist? Because all the well-known Quickshell setups focus too much on large Material Design Menus and features that, at the end of the day, no productive user actually needs. If a widget has functions, it must also work 100% with the keyboard. Bluetooth or the Wi-Fi menus do not need to take half of your 1440p screen space. So the goal was simple = Make the most of the best features of the Quickshell in terms of usability.
 
 ## Features
 
@@ -33,27 +33,27 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 <details>
 <summary>IPC reference</summary>
 
-| Target               | Calls                                                                     | Effect                                                   |
-| -------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `audio`              | `toggle`, `open`, `close`                                                 | Show or hide the audio menu                              |
-| `bar`                | `toggle`, `hide`, `show`, `isVisible`                                     | Control or query bar visibility                          |
-| `bluetooth`          | `toggle`, `open`, `close`                                                 | Show or hide the Bluetooth menu                          |
-| `clipboard`          | `toggle`, `open`, `close`, `refresh`, `copySelected`, `deleteSelected`    | Control the clipboard picker                             |
-| `idle`               | `toggle`, `isDisabled`, `settings`                                        | Control idle handling or open its settings               |
-| `launcher`           | `toggle`, `open`, `close`, `apps`, `run`, `emoji`, `timer`, `files`, `calculator` | Open, switch, or toggle launcher modes                 |
-| `lock`               | `lock`                                                                    | Lock the session                                         |
-| `locker`             | `isSecure`                                                                | Query whether the separate lock-screen process is secure |
-| `menu`               | `open <name>`, `toggle <name>`, `close`, `packages`, `settings`, `system` | Open a user menu or close it                             |
-| `network`            | `toggle`, `open`, `close`                                                 | Show or hide the network menu                            |
-| `notificationCenter` | `toggle`, `open`, `close`                                                 | Show or hide notification history                        |
-| `notifications`      | `toggleDnd`, `enableDnd`, `disableDnd`, `isDnd`, `clear`, `count`         | Control DND or notification history                      |
-| `power`              | `toggle`, `open`, `close`                                                 | Control the power menu                                   |
-| `recorder`           | `toggle`, `open`, `close`, `fullscreen`, `region`, `stop`                 | Control screen recording                                 |
-| `theme`              | `refresh`, `usingHellwal`                                                 | Reload or query the active theme                         |
-| `translator`         | `toggle`, `open`, `close`                                                 | Control the translator                                   |
-| `volume`             | `up`, `down`, `mute`                                                      | Adjust or mute the default audio output; shows the OSD   |
-| `wallpaper`          | `toggle`, `open`, `close`                                                 | Control the wallpaper picker                             |
-| `weather`            | `toggle`, `open`, `close`                                                 | Show or hide the weather forecast                        |
+| Target               | Calls                                                                             | Effect                                                   |
+| -------------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `audio`              | `toggle`, `open`, `close`                                                         | Show or hide the audio menu                              |
+| `bar`                | `toggle`, `hide`, `show`, `isVisible`                                             | Control or query bar visibility                          |
+| `bluetooth`          | `toggle`, `open`, `close`                                                         | Show or hide the Bluetooth menu                          |
+| `clipboard`          | `toggle`, `open`, `close`, `refresh`, `copySelected`, `deleteSelected`            | Control the clipboard picker                             |
+| `idle`               | `toggle`, `isDisabled`, `settings`                                                | Control idle handling or open its settings               |
+| `launcher`           | `toggle`, `open`, `close`, `apps`, `run`, `emoji`, `timer`, `files`, `calculator` | Open, switch, or toggle launcher modes                   |
+| `lock`               | `lock`                                                                            | Lock the session                                         |
+| `locker`             | `isSecure`                                                                        | Query whether the separate lock-screen process is secure |
+| `menu`               | `open <name>`, `toggle <name>`, `close`, `packages`, `settings`, `system`         | Open a user menu or close it                             |
+| `network`            | `toggle`, `open`, `close`                                                         | Show or hide the network menu                            |
+| `notificationCenter` | `toggle`, `open`, `close`                                                         | Show or hide notification history                        |
+| `notifications`      | `toggleDnd`, `enableDnd`, `disableDnd`, `isDnd`, `clear`, `count`                 | Control DND or notification history                      |
+| `power`              | `toggle`, `open`, `close`                                                         | Control the power menu                                   |
+| `recorder`           | `toggle`, `open`, `close`, `fullscreen`, `region`, `stop`                         | Control screen recording                                 |
+| `theme`              | `refresh`, `usingHellwal`                                                         | Reload or query the active theme                         |
+| `translator`         | `toggle`, `open`, `close`                                                         | Control the translator                                   |
+| `volume`             | `up`, `down`, `mute`                                                              | Adjust or mute the default audio output; shows the OSD   |
+| `wallpaper`          | `toggle`, `open`, `close`                                                         | Control the wallpaper picker                             |
+| `weather`            | `toggle`, `open`, `close`                                                         | Show or hide the weather forecast                        |
 
 For example, `qs ipc call volume up` raises the volume by one step. `launcher/dmenu-runner` uses the launcher's IPC internally; call the script to open a picker.
 
@@ -107,13 +107,6 @@ Edit `menus.json` to customize `user-menu1` through `user-menu4`; the fourth is 
 Open one with `qs ipc call menu open user-menu1`.
 Changes reload automatically; invalid edits keep the last working menus. Power
 actions remain built in.
-
-## Tests
-
-Run the offline tests with `python -B tests/run.py`, or select a feature, for example
-`python -B tests/run.py launcher network`. Use `--list` to see the available features.
-These tests do not start or reload the desktop shell.
-All test cases and fixtures live under `tests/`, grouped by feature.
 
 ## Structure
 

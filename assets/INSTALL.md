@@ -199,3 +199,10 @@ or lacks a required integration. Missing icons usually mean the Nerd Font is abs
 
 Offline tests are available with `python -B tests/run.py` from the checkout.
 They require Qt 6's `qmltestrunner` and do not start or reload the live shell.
+
+## Development and testing
+
+Run the offline tests with `python -B tests/run.py`, or select a feature, for example
+`python -B tests/run.py launcher network`. Use `--list` to see the available features.
+These tests do not start or reload the desktop shell.
+All test cases and fixtures live under `tests/`, grouped by feature.
