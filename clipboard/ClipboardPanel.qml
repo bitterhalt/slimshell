@@ -194,6 +194,7 @@ PanelWindow {
 
     Rectangle {
         id: panel
+        objectName: "clipboardSurface"
 
         width: root.panelWidth
         height: root.panelHeight
@@ -218,21 +219,20 @@ PanelWindow {
         // Full-width search header above both the history list and preview.
         Item {
             id: header
+            objectName: "clipboardHeader"
 
             anchors.top: parent.top
             anchors.left: parent.left
-            anchors.topMargin: 2
-            anchors.leftMargin: 2
-            width: parent.width - 2
-            height: 42
+            anchors.right: parent.right
+            anchors.margins: 1 // Keep content inside the surface outline.
+            height: Math.max(32, searchInput.implicitHeight) + root.config.panelPadding * 2
             z: 1
 
             Rectangle {
+                id: searchFrame
+                objectName: "clipboardSearchFrame"
                 anchors.fill: parent
-                anchors.leftMargin: 8
-                anchors.rightMargin: 8
-                anchors.topMargin: 5
-                anchors.bottomMargin: 5
+                anchors.margins: root.config.panelPadding
                 color: root.config.bg
                 radius: 4
                 border.width: 1
@@ -243,17 +243,17 @@ PanelWindow {
                 id: searchInput
 
                 renderType: Text.NativeRendering
-                anchors.left: parent.left
-                anchors.leftMargin: 18
-                anchors.right: parent.right
-                anchors.rightMargin: 18
-                anchors.verticalCenter: parent.verticalCenter
-                height: 40
+                anchors.left: searchFrame.left
+                anchors.leftMargin: root.config.spacingControl
+                anchors.right: searchFrame.right
+                anchors.rightMargin: root.config.spacingControl
+                anchors.verticalCenter: searchFrame.verticalCenter
+                height: searchFrame.height
                 verticalAlignment: TextInput.AlignVCenter
                 color: root.config.fg
                 selectionColor: root.config.selectionBackground
                 selectedTextColor: root.config.selectionForeground
-                font.pointSize: root.config.fontSize * 1
+                font.pointSize: root.config.textSizeNormal
                 focus: true
                 clip: true
 
@@ -308,7 +308,7 @@ PanelWindow {
                 anchors.verticalCenter: searchInput.verticalCenter
                 visible: searchInput.text.length === 0
                 color: root.config.muted
-                font.pointSize: root.config.fontSize * 1
+                font.pointSize: root.config.textSizeNormal
                 text: "Search clipboard"
             }
         }
@@ -341,11 +341,12 @@ PanelWindow {
 
                 ListView {
                     id: entriesList
+                    objectName: "clipboardEntries"
 
                     anchors.fill: parent
-                    anchors.margins: 8
+                    anchors.margins: root.config.spacingControl
                     clip: true
-                    spacing: 2
+                    spacing: root.config.spacingTight
                     model: root.filteredEntries
                     currentIndex: root.selectedIndex
 
@@ -383,10 +384,12 @@ PanelWindow {
         // Footer with item count and keyboard actions.
         Item {
             id: footer
+            objectName: "clipboardFooter"
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            height: 32
+            anchors.margins: 1
+            height: Math.max(footerLabels.implicitHeight, footerHint.implicitHeight) + root.config.panelPadding * 2
 
             Rectangle {
                 anchors.top: parent.top
@@ -397,16 +400,17 @@ PanelWindow {
             }
 
             Row {
+                id: footerLabels
                 anchors.left: parent.left
-                anchors.leftMargin: 14
+                anchors.leftMargin: root.config.panelPadding
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: 8
+                spacing: root.config.spacingControl
 
                 Text {
                     renderType: Text.NativeRendering
                     anchors.verticalCenter: parent.verticalCenter
                     color: root.config.muted
-                    font.pointSize: root.config.fontSize * 0.78
+                    font.pointSize: root.config.textSizeSmall
                     text: "Clipboard History"
                 }
 
@@ -414,18 +418,19 @@ PanelWindow {
                     renderType: Text.NativeRendering
                     anchors.verticalCenter: parent.verticalCenter
                     color: root.config.muted
-                    font.pointSize: root.config.fontSize * 0.72
+                    font.pointSize: root.config.textSizeSmall
                     text: `${root.filteredEntries.length} items`
                 }
             }
 
             Text {
+                id: footerHint
                 renderType: Text.NativeRendering
                 anchors.right: parent.right
-                anchors.rightMargin: 14
+                anchors.rightMargin: root.config.panelPadding
                 anchors.verticalCenter: parent.verticalCenter
                 color: root.config.muted
-                font.pointSize: root.config.fontSize * 0.78
+                font.pointSize: root.config.textSizeSmall
                 text: "Enter:  Copy   Del:  Delete"
             }
         }

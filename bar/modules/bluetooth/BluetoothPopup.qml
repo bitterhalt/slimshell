@@ -156,7 +156,7 @@ PopoutPanel {
         visible: !root.adapter || !root.adapter.enabled
         horizontalAlignment: Text.AlignHCenter
         color: config.muted
-        font.pointSize: config.fontSize * 0.85
+        font.pointSize: config.textSizeMedium
         text: root.adapter ? "Bluetooth is turned off" : "No Bluetooth adapter found"
         topPadding: 10
         bottomPadding: 10
@@ -225,7 +225,7 @@ PopoutPanel {
             visible: root.deviceRows.length === 0
             horizontalAlignment: Text.AlignHCenter
             color: config.muted
-            font.pointSize: config.fontSize * 0.85
+            font.pointSize: config.textSizeMedium
             text: root.adapter && root.adapter.discovering ? "Scanning for devices…" : "No devices found"
             topPadding: 10
             bottomPadding: 10
@@ -238,7 +238,7 @@ PopoutPanel {
         width: parent.width
         visible: root.confirmForget
         color: root.config.urgent
-        font.pointSize: root.config.fontSize * 0.8
+        font.pointSize: root.config.textSizeSmall
         text: "Forget " + (root.forgetTarget ? root.forgetTarget.name : "device") + "? Enter Confirm · Esc Cancel"
         wrapMode: Text.WordWrap
     }
@@ -248,7 +248,7 @@ PopoutPanel {
         width: parent.width
         visible: root.helpOpen
         color: root.config.muted
-        font.pointSize: root.config.fontSize * 0.78
+        font.pointSize: root.config.textSizeSmall
         text: "↑/↓ or j/k Select · Enter Connect/Pair · t Trust/Untrust · f Forget · Ctrl+S Scan/Stop · ?/Esc Back"
         wrapMode: Text.WordWrap
     }
@@ -274,7 +274,7 @@ PopoutPanel {
             anchors.verticalCenter: scanButton.verticalCenter
             renderType: Text.NativeRendering
             color: root.config.muted
-            font.pointSize: root.config.fontSize * 0.78
+            font.pointSize: root.config.textSizeSmall
             text: root.adapter && root.adapter.discovering ? "Scanning…" : "? Help"
         }
 

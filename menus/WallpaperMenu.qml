@@ -251,8 +251,8 @@ PanelWindow {
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: 12
-            spacing: 8
+            anchors.margins: root.config.panelPadding + parent.border.width
+            spacing: root.config.spacingControl
 
             // Search field spans the picker above the thumbnail list and preview.
             TextField {
@@ -266,7 +266,7 @@ PanelWindow {
                 placeholderTextColor: root.config.muted
                 selectionColor: root.config.selectionBackground
                 selectedTextColor: root.config.selectionForeground
-                font.pointSize: root.config.fontSize * 0.92
+                font.pointSize: root.config.textSizeNormal
                 selectByMouse: true
                 enabled: !root.settingsOpen
                 KeyNavigation.priority: KeyNavigation.BeforeItem
@@ -323,7 +323,7 @@ PanelWindow {
 
                     Rectangle {
                         anchors.fill: parent
-                        anchors.margins: 3
+                        anchors.margins: root.config.spacingControl / 2
                         radius: 4
                         color: root.config.bg
                         border.width: root.selectedIndex === tile.index ? 2 : 1
@@ -348,7 +348,7 @@ PanelWindow {
                             visible: tile.thumbnail === ""
                             text: "No preview"
                             color: root.config.muted
-                            font.pointSize: root.config.fontSize * 0.8
+                            font.pointSize: root.config.textSizeSmall
                         }
 
                         Text {
@@ -356,11 +356,11 @@ PanelWindow {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.bottom: parent.bottom
-                            anchors.margins: 7
+                            anchors.margins: root.config.spacingControl
                             text: tile.name
                             elide: Text.ElideMiddle
                             color: root.config.fg
-                            font.pointSize: root.config.fontSize * 0.8
+                            font.pointSize: root.config.textSizeMedium
                         }
                     }
 
@@ -381,7 +381,7 @@ PanelWindow {
                     visible: visibleEntries.count === 0
                     text: scanProcess.running ? "Loading wallpapers…" : allEntries.count ? "No matching wallpapers" : "No wallpapers found"
                     color: root.config.muted
-                    font.pointSize: root.config.fontSize * 0.9
+                    font.pointSize: root.config.textSizeMedium
                 }
             }
 
@@ -407,7 +407,7 @@ PanelWindow {
             // Status, errors, and action/shortcut hints.
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 30
+                Layout.preferredHeight: Math.max(30, actionTips.implicitHeight)
                 visible: !root.settingsOpen
 
                 Text {
@@ -415,10 +415,10 @@ PanelWindow {
                     renderType: Text.NativeRendering
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
-                    width: Math.max(0, parent.width - actionTips.width - 12)
+                    width: Math.max(0, parent.width - actionTips.width - root.config.panelPadding)
                     text: root.controller.errorText || root.scanError || (root.controller.busy ? "Applying wallpaper…" : root.controller.noticeText) || (scanProcess.running ? "Building thumbnails… " + allEntries.count : root.scanNotice) || visibleEntries.count + " wallpapers"
                     color: root.controller.errorText || root.scanError ? root.config.urgent : root.config.muted
-                    font.pointSize: root.config.fontSize * 0.78
+                    font.pointSize: root.config.textSizeSmall
                     elide: Text.ElideRight
                     ShellToolTip {
                         config: root.config
@@ -437,7 +437,7 @@ PanelWindow {
                     id: actionTips
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: 10
+                    spacing: root.config.spacingControl
 
                     Repeater {
                         model: root.actions
@@ -445,41 +445,41 @@ PanelWindow {
                             id: hint
                             required property var modelData
                             readonly property bool hovered: enabled && hintMouse.containsMouse
-                            width: hintRow.width
-                            height: 20
+                            width: hintRow.width + root.config.spacingTight * 2
+                            height: hintRow.height + root.config.spacingTight * 2
                             opacity: enabled ? 1 : 0.5
                             enabled: (hint.modelData.action === "settings" || !!root.selected) && !root.controller.busy && !root.settingsOpen
 
                             Rectangle {
                                 anchors.fill: parent
-                                anchors.margins: -4
                                 radius: 4
                                 color: hint.hovered ? root.config.selectionBackground : "transparent"
                             }
 
                             Row {
                                 id: hintRow
-                                spacing: 5
+                                anchors.centerIn: parent
+                                spacing: root.config.spacingTight
                                 Text {
                                     renderType: Text.NativeRendering
                                     height: 20
                                     verticalAlignment: Text.AlignVCenter
                                     text: hint.modelData.label
                                     color: hint.hovered ? root.config.selectionForeground : root.config.muted
-                                    font.pointSize: root.config.fontSize * 0.8
+                                    font.pointSize: root.config.textSizeSmall
                                 }
                                 KeyCap {
                                     visible: hint.modelData.control
                                     label: "Ctrl"
                                     edgeColor: hint.hovered ? root.config.selectionForeground : root.config.selectionBackground
                                     textColor: hint.hovered ? root.config.selectionForeground : root.config.muted
-                                    fontPointSize: root.config.fontSize * 0.74
+                                    fontPointSize: root.config.textSizeSmall
                                 }
                                 KeyCap {
                                     label: hint.modelData.key
                                     edgeColor: hint.hovered ? root.config.selectionForeground : root.config.selectionBackground
                                     textColor: hint.hovered ? root.config.selectionForeground : root.config.muted
-                                    fontPointSize: root.config.fontSize * 0.74
+                                    fontPointSize: root.config.textSizeSmall
                                 }
                             }
                             MouseArea {

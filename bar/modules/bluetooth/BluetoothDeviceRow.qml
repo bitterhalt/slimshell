@@ -71,7 +71,7 @@ Item {
                 renderType: Text.NativeRendering
                 width: Math.min(Math.max(0, parent.width - trustedStar.width - (deviceRow.trusted ? parent.spacing : 0)), implicitWidth)
                 color: deviceMouse.containsMouse ? Qt.lighter(deviceRow.config.fg, 1.15) : deviceRow.config.fg
-                font.pointSize: deviceRow.config.fontSize * 0.92
+                font.pointSize: deviceRow.config.textSizeMedium
                 font.weight: deviceRow.selected || deviceRow.highlighted ? Font.DemiBold : Font.Normal
                 elide: Text.ElideRight
                 text: deviceRow.row.name
@@ -81,7 +81,7 @@ Item {
                 id: trustedStar
                 width: deviceRow.trusted ? implicitWidth : 0
                 color: deviceRow.config.selectionBackground
-                font.pointSize: deviceRow.config.fontSize * 0.78
+                font.pointSize: deviceRow.config.textSizeSmall
                 font.weight: Font.DemiBold
                 text: "★"
                 visible: deviceRow.trusted
@@ -93,7 +93,7 @@ Item {
             width: parent.width
             visible: deviceRow.detailText !== ""
             color: deviceRow.config.muted
-            font.pointSize: deviceRow.config.fontSize * 0.77
+            font.pointSize: deviceRow.config.textSizeSmall
             elide: Text.ElideRight
             text: deviceRow.detailText
         }
@@ -114,7 +114,7 @@ Item {
             width: parent.width
             horizontalAlignment: Text.AlignRight
             color: deviceRow.config.muted
-            font.pointSize: deviceRow.config.fontSize * 0.77
+            font.pointSize: deviceRow.config.textSizeSmall
             elide: Text.ElideRight
             text: deviceRow.actionText || deviceRow.batteryText
         }

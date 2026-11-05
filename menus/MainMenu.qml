@@ -326,8 +326,8 @@ Item {
             z: 1
             config: root.config
             contentWidth: 260
-            padding: 12
-            spacing: 4
+            padding: root.config.panelPadding + 1 // Inside the one-pixel surface border.
+            spacing: root.config.spacingTight
 
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
@@ -337,7 +337,7 @@ Item {
                 width: parent.width
                 visible: root.confirmItem !== null
                 color: root.config.urgent
-                font.pointSize: root.config.fontSize * 0.9
+                font.pointSize: root.config.textSizeNormal
                 font.weight: Font.Medium
                 wrapMode: Text.WordWrap
                 text: root.confirmItem ? root.confirmItem.label + "?" : ""
@@ -351,7 +351,7 @@ Item {
                 textFormat: Text.PlainText
                 renderType: Text.NativeRendering
                 color: root.config.muted
-                font.pointSize: root.config.fontSize * 0.9
+                font.pointSize: root.config.textSizeSmall
             }
 
             Repeater {
@@ -375,8 +375,9 @@ Item {
                     }
 
                     Text {
+                        id: rowIcon
                         anchors.left: parent.left
-                        anchors.leftMargin: 7
+                        anchors.leftMargin: root.config.spacingControl
                         anchors.verticalCenter: parent.verticalCenter
 
                         width: 22
@@ -390,14 +391,14 @@ Item {
 
                     Text {
                         renderType: Text.NativeRendering
-                        anchors.left: parent.left
-                        anchors.leftMargin: 38
+                        anchors.left: rowIcon.right
+                        anchors.leftMargin: root.config.spacingControl
                         anchors.right: keyHint.left
-                        anchors.rightMargin: 8
+                        anchors.rightMargin: root.config.spacingControl
                         anchors.verticalCenter: parent.verticalCenter
 
                         color: menuItem.selected ? root.config.selectionForeground : root.config.fg
-                        font.pointSize: root.config.fontSize * 1
+                        font.pointSize: root.config.textSizeMedium
                         font.weight: Font.Medium
                         elide: Text.ElideRight
                         text: modelData.label
@@ -407,7 +408,7 @@ Item {
                     Text {
                         visible: modelData.page !== undefined
                         anchors.right: keyHint.left
-                        anchors.rightMargin: 8
+                        anchors.rightMargin: root.config.spacingControl
                         anchors.verticalCenter: parent.verticalCenter
 
                         color: menuItem.selected ? root.config.selectionForeground : root.config.muted
@@ -421,13 +422,13 @@ Item {
                         renderType: Text.NativeRendering
 
                         anchors.right: parent.right
-                        anchors.rightMargin: 6
+                        anchors.rightMargin: root.config.spacingControl
                         anchors.verticalCenter: parent.verticalCenter
 
                         width: 21
                         horizontalAlignment: Text.AlignHCenter
                         color: menuItem.selected ? root.config.selectionForeground : root.config.fg
-                        font.pointSize: root.config.fontSize * 0.846
+                        font.pointSize: root.config.textSizeSmall
                         text: modelData.shortcut ?? ""
                     }
                 }

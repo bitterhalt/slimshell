@@ -35,9 +35,16 @@ TranslatorWindow {
         property color selectionForeground: "#ffffff"
         property int popupGap: 16
         property int popupRadius: 4
+        property int spacingTight: 4
+        property int spacingControl: 8
+        property int panelPadding: 12
+        property int previewPadding: 16
         property string iconFontFamily: "sans-serif"
         property real iconSize: 10
         readonly property real fontSize: 10
+        readonly property real textSizeNormal: fontSize
+        readonly property real textSizeMedium: fontSize * 0.88
+        readonly property real textSizeSmall: fontSize * 0.76
     }
     TestCase {
         name: "TranslatorKeyboardFocus"
@@ -69,6 +76,19 @@ TranslatorWindow {
             tryCompare(source, "activeFocus", true);
             keyClick(Qt.Key_A);
             compare(source.text, "a");
+        }
+        function test_consistent_panel_insets_and_text_padding() {
+            const header = findChild(dialog.contentItem, "translatorHeader");
+            const footer = findChild(dialog.contentItem, "translatorFooter");
+            const body = findChild(dialog.contentItem, "translatorBody");
+            const source = findChild(dialog.contentItem, "translatorSourceInput");
+            compare(header.x, dialog.config.panelPadding + 1);
+            compare(header.y, dialog.config.panelPadding + 1);
+            compare(header.spacing, dialog.config.spacingControl);
+            compare(body.y - header.y - header.height, dialog.config.panelPadding);
+            compare(source.leftPadding, dialog.config.panelPadding);
+            compare(source.topPadding, dialog.config.panelPadding);
+            compare(footer.height, 28 + dialog.config.panelPadding * 2);
         }
         function test_reopening_during_exit_restores_input_focus() {
             const source = findChild(dialog.contentItem, "translatorSourceInput");

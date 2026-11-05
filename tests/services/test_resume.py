@@ -57,6 +57,9 @@ Item {
         property string clockFormat: "HH:mm"
         property string clockAlternativeFormat: "dddd, d MMMM"
         readonly property real fontSize: 10
+        readonly property real textSizeNormal: fontSize
+        readonly property real textSizeMedium: fontSize * 0.88
+        readonly property real textSizeSmall: fontSize * 0.76
     }
     QtObject { id: fixtureBar; property int height: 30; property var screen: null }
     QtObject {

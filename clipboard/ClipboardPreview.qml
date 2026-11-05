@@ -13,7 +13,7 @@ Item {
 
     Image {
         anchors.fill: parent
-        anchors.margins: 16
+        anchors.margins: root.config.previewPadding
         visible: root.ready && root.entry && root.entry.isImage
         source: root.ready ? "file://" + root.imagePath : ""
         fillMode: Image.PreserveAspectFit
@@ -27,11 +27,11 @@ Item {
         objectName: "clipboardPreviewText"
         renderType: Text.NativeRendering
         anchors.fill: parent
-        anchors.margins: 18
+        anchors.margins: root.config.previewPadding
         visible: root.entry && !root.entry.isImage
         color: root.config.fg
         font.family: "monospace"
-        font.pointSize: root.config.fontSize * 0.82
+        font.pointSize: root.config.textSizeMedium
         wrapMode: Text.WrapAnywhere
         text: root.previewText
         clip: true
@@ -43,7 +43,7 @@ Item {
         anchors.centerIn: parent
         visible: !root.entry
         color: root.config.muted
-        font.pointSize: root.config.fontSize * 0.9
+        font.pointSize: root.config.textSizeMedium
         text: root.historyEmpty ? "Clipboard history is empty" : "Select an item to preview"
     }
 }

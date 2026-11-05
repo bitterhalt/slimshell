@@ -128,7 +128,7 @@ Item {
 
                 anchors.centerIn: parent
                 color: root.config.selectionForeground
-                font.pointSize: root.config.fontSize * 1
+                font.pointSize: root.config.textSizeNormal
                 font.weight: Font.DemiBold
                 text: root.activeWorkspace ? (root.activeWorkspace.name || String(root.activeWorkspace.idx)) : "—"
             }
@@ -161,7 +161,7 @@ Item {
 
                         anchors.centerIn: parent
                         color: workspaceMouse.containsMouse ? root.config.selectionForeground : workspaceItem.modelData.is_urgent ? root.config.fg : root.config.selectionForeground
-                        font.pointSize: root.config.fontSize * 1
+                        font.pointSize: root.config.textSizeNormal
                         font.weight: Font.DemiBold
                         text: workspaceItem.modelData.name || String(workspaceItem.modelData.idx)
                     }

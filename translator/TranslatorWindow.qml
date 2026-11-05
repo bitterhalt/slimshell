@@ -282,12 +282,13 @@ PanelWindow {
         // Source/target language controls and swap action.
         Row {
             id: header
+            objectName: "translatorHeader"
 
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.margins: 8
-            spacing: 8
+            anchors.margins: root.config.panelPadding + parent.border.width
+            spacing: root.config.spacingControl
 
             ShellButton {
                 id: sourceButton
@@ -336,9 +337,10 @@ PanelWindow {
 
         Item {
             id: body
+            objectName: "translatorBody"
 
             anchors.top: header.bottom
-            anchors.topMargin: 8
+            anchors.topMargin: root.config.panelPadding
             anchors.bottom: footer.top
             anchors.left: parent.left
             anchors.right: parent.right
@@ -350,7 +352,7 @@ PanelWindow {
             Column {
                 anchors.fill: parent
                 visible: root.picker === ""
-                spacing: 8
+                spacing: root.config.spacingControl
 
                 ScrollView {
                     id: sourceScroll
@@ -370,15 +372,15 @@ PanelWindow {
                         color: root.config.fg
                         selectionColor: root.config.selectionBackground
                         selectedTextColor: root.config.selectionForeground
-                        font.pointSize: root.config.fontSize * 1
+                        font.pointSize: root.config.textSizeNormal
                         wrapMode: TextEdit.Wrap
                         textFormat: TextEdit.PlainText
                         selectByMouse: true
                         readOnly: root.busy
-                        leftPadding: 16
-                        rightPadding: 16
-                        topPadding: 10
-                        bottomPadding: 10
+                        leftPadding: root.config.panelPadding
+                        rightPadding: root.config.panelPadding
+                        topPadding: root.config.panelPadding
+                        bottomPadding: root.config.panelPadding
                         background: null
                         KeyNavigation.priority: KeyNavigation.BeforeItem
                         KeyNavigation.tab: outputArea
@@ -420,16 +422,16 @@ PanelWindow {
                         color: root.config.fg
                         selectionColor: root.config.selectionBackground
                         selectedTextColor: root.config.selectionForeground
-                        font.pointSize: root.config.fontSize * 1
+                        font.pointSize: root.config.textSizeNormal
                         wrapMode: TextEdit.Wrap
                         textFormat: TextEdit.PlainText
                         selectByMouse: true
                         readOnly: true
                         activeFocusOnTab: true
-                        leftPadding: 16
-                        rightPadding: 16
-                        topPadding: 10
-                        bottomPadding: 10
+                        leftPadding: root.config.panelPadding
+                        rightPadding: root.config.panelPadding
+                        topPadding: root.config.panelPadding
+                        bottomPadding: root.config.panelPadding
                         background: null
                         KeyNavigation.priority: KeyNavigation.BeforeItem
                         KeyNavigation.tab: translateButton.enabled ? translateButton : copyButton
@@ -440,9 +442,11 @@ PanelWindow {
 
             Column {
                 anchors.fill: parent
-                anchors.margins: 8
+                anchors.leftMargin: root.config.panelPadding
+                anchors.rightMargin: root.config.panelPadding
+                anchors.bottomMargin: root.config.panelPadding
                 visible: root.picker !== ""
-                spacing: 8
+                spacing: root.config.spacingControl
 
                 TextField {
                     id: languageSearch
@@ -456,7 +460,7 @@ PanelWindow {
                     placeholderTextColor: root.config.muted
                     selectionColor: root.config.selectionBackground
                     selectedTextColor: root.config.selectionForeground
-                    font.pointSize: root.config.fontSize * 0.92
+                    font.pointSize: root.config.textSizeNormal
                     onTextChanged: root.pickerIndex = 0
                     Keys.onPressed: event => {
                         switch (event.key) {
@@ -507,10 +511,10 @@ PanelWindow {
                         Text {
                             renderType: Text.NativeRendering
                             anchors.fill: parent
-                            anchors.leftMargin: 10
-                            anchors.rightMargin: 10
+                            anchors.leftMargin: root.config.spacingControl
+                            anchors.rightMargin: root.config.spacingControl
                             verticalAlignment: Text.AlignVCenter
-                            font.pointSize: root.config.fontSize * 0.92
+                            font.pointSize: root.config.textSizeMedium
                             color: index === root.pickerIndex ? root.config.selectionForeground : root.config.fg
                             text: modelData.label
                         }
@@ -530,11 +534,15 @@ PanelWindow {
         // Translate/copy buttons and current status.
         Item {
             id: footer
+            objectName: "translatorFooter"
 
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            height: Math.max(42, footerActions.implicitHeight + 12)
+            anchors.leftMargin: 1
+            anchors.rightMargin: 1
+            anchors.bottomMargin: 1
+            height: Math.max(footerActions.implicitHeight, footerStatus.implicitHeight) + root.config.panelPadding * 2
 
             Rectangle {
                 width: parent.width
@@ -543,14 +551,15 @@ PanelWindow {
             }
 
             Text {
+                id: footerStatus
                 renderType: Text.NativeRendering
                 anchors.left: parent.left
-                anchors.leftMargin: 14
+                anchors.leftMargin: root.config.panelPadding
                 anchors.right: footerActions.left
-                anchors.rightMargin: 8
+                anchors.rightMargin: root.config.spacingControl
                 anchors.verticalCenter: parent.verticalCenter
                 color: root.errorText ? root.config.urgent : root.config.muted
-                font.pointSize: root.config.fontSize * 0.76
+                font.pointSize: root.config.textSizeSmall
                 elide: Text.ElideRight
                 text: root.errorText || root.noticeText || (root.picker !== "" ? "Tab Select · Enter Apply" : root.detectedLanguage !== "" && root.sourceLanguage === "" ? "Detected: " + Languages.label(root.detectedLanguage) : "DeepL · Ctrl+Enter Translate")
             }
@@ -559,9 +568,9 @@ PanelWindow {
                 id: footerActions
 
                 anchors.right: parent.right
-                anchors.rightMargin: 8
+                anchors.rightMargin: root.config.panelPadding
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: 8
+                spacing: root.config.spacingControl
 
                 ShellButton {
                     id: translateButton

@@ -42,7 +42,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         width: parent.width - 10 - root.titleLeft
         color: root.config.fg
-        font.pointSize: root.config.fontSize * 1
+        font.pointSize: root.config.textSizeNormal
         elide: Text.ElideRight
         text: {
             const win = root.focusedWindow;

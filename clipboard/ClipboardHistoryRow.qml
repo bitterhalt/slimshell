@@ -32,7 +32,7 @@ Item {
         anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         color: root.selected ? root.config.selectionForeground : root.config.fg
-        font.pointSize: root.config.fontSize * 0.88
+        font.pointSize: root.config.textSizeMedium
         text: root.entry.isImage ? "Image" : "Text"
     }
 }

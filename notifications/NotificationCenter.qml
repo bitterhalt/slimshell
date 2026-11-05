@@ -147,7 +147,7 @@ FocusScope {
         renderType: Text.NativeRendering
         text: "No notifications"
         color: root.config.muted
-        font.pointSize: root.config.fontSize * 0.9
+        font.pointSize: root.config.textSizeMedium
     }
 
     // Persistent keyboard hints and the DND toggle.
@@ -174,7 +174,7 @@ FocusScope {
             anchors.topMargin: 10
             renderType: Text.NativeRendering
             color: root.config.muted
-            font.pointSize: root.config.fontSize * 0.76
+            font.pointSize: root.config.textSizeSmall
             text: "x Dismiss · Ctrl+x Clear all"
         }
 
@@ -191,7 +191,7 @@ FocusScope {
                 renderType: Text.NativeRendering
                 text: "DND"
                 color: root.notificationService.dnd ? root.config.selectionBackground : root.config.muted
-                font.pointSize: root.config.fontSize * 0.8
+                font.pointSize: root.config.textSizeSmall
             }
 
             ToggleSwitch {

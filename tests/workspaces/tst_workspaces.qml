@@ -18,6 +18,9 @@ Item {
         property var commands: []
 
         readonly property real fontSize: 12
+        readonly property real textSizeNormal: fontSize
+        readonly property real textSizeMedium: fontSize * 0.88
+        readonly property real textSizeSmall: fontSize * 0.76
         function run(command) {
             commands = commands.concat([command]);
         }

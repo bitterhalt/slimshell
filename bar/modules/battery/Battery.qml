@@ -21,7 +21,7 @@ Item {
             renderType: Text.NativeRendering
             anchors.verticalCenter: parent.verticalCenter
             color: config.fg
-            font.pointSize: config.fontSize * 1
+            font.pointSize: config.textSizeNormal
             text: `${battery.capacity}% `
         }
 

@@ -257,7 +257,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
 
             color: menuItem.selected ? root.config.selectionForeground : root.config.fg
-            font.pointSize: root.config.fontSize * 1
+            font.pointSize: root.config.textSizeMedium
             font.weight: Font.Medium
             text: menuItem.label
         }
@@ -271,7 +271,7 @@ Item {
             width: 21
             horizontalAlignment: Text.AlignHCenter
             color: menuItem.selected ? root.config.selectionForeground : root.config.fg
-            font.pointSize: root.config.fontSize * 0.846
+            font.pointSize: root.config.textSizeSmall
             font.weight: Font.Normal
             text: menuItem.keyHint
         }

@@ -94,7 +94,7 @@ Item {
                     renderType: Text.NativeRendering
                     width: parent.width
                     color: root.config.fg
-                    font.pointSize: root.config.fontSize * 0.92
+                    font.pointSize: root.config.textSizeNormal
                     font.weight: Font.DemiBold
                     elide: Text.ElideRight
                     text: "Idle timer"
@@ -103,7 +103,7 @@ Item {
                 Text {
                     renderType: Text.NativeRendering
                     color: root.config.muted
-                    font.pointSize: root.config.fontSize * 0.80
+                    font.pointSize: root.config.textSizeSmall
                     text: root.state
                 }
             }

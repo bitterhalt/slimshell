@@ -122,7 +122,7 @@ Item {
             compare(button.height, 28);
             compare(button.topPadding, 4);
             compare(button.leftPadding, 8);
-            fuzzyCompare(button.font.pointSize, config.fontSize * 0.88, 0.01);
+            fuzzyCompare(button.font.pointSize, config.textSizeMedium, 0.01);
             button.font.pointSize = 28;
             verify(button.height > 28);
             verify(button.availableHeight >= button.contentItem.implicitHeight);

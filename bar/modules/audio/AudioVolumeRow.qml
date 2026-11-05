@@ -58,7 +58,7 @@ Item {
         anchors.rightMargin: defaultLabel.visible ? 8 : slider.rightPadding
         y: 2
         color: rowHover.hovered ? Qt.lighter(root.config.fg, 1.15) : root.config.fg
-        font.pointSize: root.config.fontSize * 0.9
+        font.pointSize: root.config.textSizeMedium
         font.weight: root.selected ? Font.DemiBold : Font.Normal
         elide: Text.ElideRight
         text: root.row.name
@@ -74,7 +74,7 @@ Item {
         visible: !!root.row.active || !!(root.nodeAudio && root.nodeAudio.muted)
         text: root.nodeAudio && root.nodeAudio.muted ? (root.row.active ? "Muted · Default" : "Muted") : "Default"
         color: root.nodeAudio && root.nodeAudio.muted ? root.config.muted : root.config.selectionBackground
-        font.pointSize: root.config.fontSize * 0.72
+        font.pointSize: root.config.textSizeSmall
     }
 
     Text {
@@ -85,7 +85,7 @@ Item {
         anchors.rightMargin: slider.rightPadding
         y: 20
         color: root.config.muted
-        font.pointSize: root.config.fontSize * 0.75
+        font.pointSize: root.config.textSizeSmall
         elide: Text.ElideRight
         text: root.row.media || ""
         visible: root.row.kind === "playback" && text !== ""

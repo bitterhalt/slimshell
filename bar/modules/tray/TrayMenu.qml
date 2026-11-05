@@ -77,7 +77,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
 
                     color: backMouse.containsMouse ? root.config.selectionForeground : root.config.muted
-                    font.pointSize: root.config.fontSize * 0.9
+                    font.pointSize: root.config.textSizeMedium
                     text: "‹  Back"
                 }
 
@@ -165,7 +165,7 @@ Item {
                     anchors.centerIn: parent
                     visible: entry.icon === "" && entry.buttonType !== QsMenuButtonType.None
                     color: row.highlighted ? root.config.selectionForeground : root.config.selectionBackground
-                    font.pointSize: root.config.fontSize * 0.9
+                    font.pointSize: root.config.textSizeMedium
                     text: entry.checkState === Qt.Checked ? "✓" : ""
                 }
             }
@@ -179,7 +179,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
 
                 color: row.highlighted ? root.config.selectionForeground : root.config.fg
-                font.pointSize: root.config.fontSize * 0.92
+                font.pointSize: root.config.textSizeMedium
                 elide: Text.ElideRight
                 text: entry.text
             }

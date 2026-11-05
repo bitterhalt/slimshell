@@ -21,6 +21,11 @@ Item {
     readonly property string clockAlternativeFormat: values.clockAlternativeFormat
     readonly property int popupGap: values.popupGap
     readonly property int popupRadius: values.popupRadius
+    // Internal layout rhythm; popupGap remains the window-to-screen gap.
+    readonly property int spacingTight: 4
+    readonly property int spacingControl: 8
+    readonly property int panelPadding: 12
+    readonly property int previewPadding: 16
     readonly property bool popupAnimations: values.popupAnimations
     readonly property int notificationHistoryLimit: values.notificationHistoryLimit
     readonly property var notificationHistoryExcludedApps: values.notificationHistoryExcludedApps
@@ -38,6 +43,9 @@ Item {
     readonly property string textFontFamily: systemFontMetrics.font.family
     readonly property real systemFontPointSize: systemFontMetrics.font.pointSize > 0 ? systemFontMetrics.font.pointSize : 10
     readonly property real fontSize: systemFontPointSize * fontScale
+    readonly property real textSizeNormal: fontSize
+    readonly property real textSizeMedium: fontSize * 0.88
+    readonly property real textSizeSmall: fontSize * 0.76
     readonly property real iconSize: fontSize * iconScale
 
     function run(command) {

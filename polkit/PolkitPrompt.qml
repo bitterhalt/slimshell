@@ -44,7 +44,7 @@ PanelSurface {
             renderType: Text.NativeRendering
             width: parent.width
             color: root.config.fg
-            font.pointSize: root.config.fontSize * 1.05
+            font.pointSize: root.config.textSizeNormal
             font.weight: Font.DemiBold
             wrapMode: Text.WordWrap
             text: root.flow ? root.flow.message : "Authentication required"
@@ -55,7 +55,7 @@ PanelSurface {
             width: parent.width
             visible: !!root.flow && root.flow.actionId !== ""
             color: root.config.muted
-            font.pointSize: root.config.fontSize * 0.78
+            font.pointSize: root.config.textSizeSmall
             wrapMode: Text.WordWrap
             text: root.flow ? root.flow.actionId : ""
         }
@@ -65,7 +65,7 @@ PanelSurface {
             width: parent.width
             visible: !!root.flow && root.flow.identities.length > 1
             color: root.config.fg
-            font.pointSize: root.config.fontSize * 0.86
+            font.pointSize: root.config.textSizeMedium
             text: "Authenticate as"
         }
 
@@ -84,7 +84,7 @@ PanelSurface {
             width: parent.width
             visible: !!root.flow && root.flow.identities.length === 1
             color: root.config.muted
-            font.pointSize: root.config.fontSize * 0.86
+            font.pointSize: root.config.textSizeMedium
             text: root.flow && root.flow.selectedIdentity ? root.flow.selectedIdentity.displayName : ""
         }
 
@@ -93,7 +93,7 @@ PanelSurface {
             width: parent.width
             visible: !!root.flow && root.flow.supplementaryMessage !== ""
             color: root.flow && root.flow.supplementaryIsError ? root.config.urgent : root.config.muted
-            font.pointSize: root.config.fontSize * 0.82
+            font.pointSize: root.config.textSizeSmall
             wrapMode: Text.WordWrap
             text: root.flow ? root.flow.supplementaryMessage : ""
         }

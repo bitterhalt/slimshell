@@ -55,7 +55,7 @@ FocusScope {
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: 12
+        spacing: root.config.panelPadding
 
         RowLayout {
             Layout.fillWidth: true
@@ -64,7 +64,7 @@ FocusScope {
                 Layout.fillWidth: true
                 text: "Wallpaper settings"
                 color: root.config.fg
-                font.pointSize: root.config.fontSize * 1
+                font.pointSize: root.config.textSizeNormal
                 font.weight: Font.Medium
                 elide: Text.ElideRight
             }
@@ -81,8 +81,8 @@ FocusScope {
                 width: settingsScroll.availableWidth
                 columns: width < 400 ? 1 : 2
                 uniformCellWidths: true
-                columnSpacing: 20
-                rowSpacing: 16
+                columnSpacing: root.config.panelPadding
+                rowSpacing: root.config.spacingControl
                 enabled: !root.busy
 
                 ColumnLayout {
@@ -163,13 +163,13 @@ FocusScope {
             visible: root.errorText !== ""
             text: root.errorText
             color: root.config.urgent
-            font.pointSize: root.config.fontSize * 0.85
+            font.pointSize: root.config.textSizeSmall
             wrapMode: Text.WordWrap
         }
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: 8
+            spacing: root.config.spacingControl
             Item {
                 Layout.fillWidth: true
             }
@@ -189,7 +189,7 @@ FocusScope {
         renderType: Text.NativeRendering
         Layout.fillWidth: true
         color: root.config.muted
-        font.pointSize: root.config.fontSize * 0.85
+        font.pointSize: root.config.textSizeMedium
         wrapMode: Text.WordWrap
     }
 
@@ -208,7 +208,7 @@ FocusScope {
         Layout.minimumWidth: 0
         Layout.preferredWidth: 1
         Layout.preferredHeight: 32
-        font.pointSize: root.config.fontSize * 0.9
+        font.pointSize: root.config.textSizeNormal
         onActivated: root.errorText = ""
         contentItem: Text {
             renderType: Text.NativeRendering

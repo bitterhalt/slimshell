@@ -22,7 +22,7 @@ Column {
         renderType: Text.NativeRendering
         width: parent.width
         color: root.config.fg
-        font.pointSize: root.config.fontSize * 0.92
+        font.pointSize: root.config.textSizeNormal
         font.weight: Font.DemiBold
         elide: Text.ElideRight
         text: root.ssid
@@ -31,7 +31,7 @@ Column {
     Text {
         renderType: Text.NativeRendering
         color: root.config.muted
-        font.pointSize: root.config.fontSize * 0.77
+        font.pointSize: root.config.textSizeSmall
         text: "Enter network password"
     }
 
@@ -54,7 +54,7 @@ Column {
         echoMode: TextInput.Password
         passwordCharacter: "•"
         placeholderText: "Password"
-        font.pointSize: root.config.fontSize * 0.92
+        font.pointSize: root.config.textSizeNormal
         Keys.onReturnPressed: if (connectButton.enabled)
             root.submitted(text)
         Keys.onEnterPressed: if (connectButton.enabled)
@@ -66,7 +66,7 @@ Column {
         width: parent.width
         visible: root.errorText !== ""
         color: root.config.urgent
-        font.pointSize: root.config.fontSize * 0.77
+        font.pointSize: root.config.textSizeSmall
         text: root.errorText
     }
 

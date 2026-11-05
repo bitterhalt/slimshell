@@ -47,13 +47,25 @@ Item {
             compare(typeof config.fontSize, "number");
             compare(typeof config.iconSize, "number");
             const base = config.systemFontPointSize;
+            compare(config.spacingTight, 4);
+            compare(config.spacingControl, 8);
+            compare(config.panelPadding, 12);
+            compare(config.previewPadding, 16);
             compare(config.fontSize, base);
+            compare(config.textSizeNormal, base);
+            fuzzyCompare(config.textSizeMedium, base * 0.88, 0.001);
+            fuzzyCompare(config.textSizeSmall, base * 0.76, 0.001);
             compare(config.iconSize, base);
             config.applySettings('{"appearance":{"fontScale":1.5,"iconScale":1.2}}');
             fuzzyCompare(config.fontSize, base * 1.5, 0.001);
+            fuzzyCompare(config.textSizeNormal, base * 1.5, 0.001);
+            fuzzyCompare(config.textSizeMedium, base * 1.5 * 0.88, 0.001);
+            fuzzyCompare(config.textSizeSmall, base * 1.5 * 0.76, 0.001);
             fuzzyCompare(config.iconSize, base * 1.5 * 1.2, 0.001);
             fuzzyCompare(config.fontSize * 0.88, base * 1.5 * 0.88, 0.001);
             config.applySettings('{"appearance":{"fontScale":1.5,"iconScale":0.8}}');
+            fuzzyCompare(config.textSizeMedium, base * 1.5 * 0.88, 0.001);
+            fuzzyCompare(config.textSizeSmall, base * 1.5 * 0.76, 0.001);
             fuzzyCompare(config.fontSize, base * 1.5, 0.001);
             fuzzyCompare(config.iconSize, base * 1.5 * 0.8, 0.001);
         }

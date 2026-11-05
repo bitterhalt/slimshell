@@ -24,7 +24,7 @@ Button {
     padding: compact ? 2 : 4
     leftPadding: compact ? 6 : 8
     rightPadding: compact ? 6 : 8
-    font.pointSize: config.fontSize * (compact ? 0.78 : 0.88)
+    font.pointSize: compact ? config.textSizeSmall : config.textSizeMedium
 
     contentItem: Text {
         id: label

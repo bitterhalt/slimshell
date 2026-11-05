@@ -208,7 +208,7 @@ PopoutPanel {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             color: root.config.fg
-            font.pointSize: root.config.fontSize * 1
+            font.pointSize: root.config.textSizeNormal
             font.weight: Font.DemiBold
             text: "Connect to Wi-Fi"
         }
@@ -248,7 +248,7 @@ PopoutPanel {
                 Text {
                     renderType: Text.NativeRendering
                     color: root.config.fg
-                    font.pointSize: root.config.fontSize * 0.92
+                    font.pointSize: root.config.textSizeMedium
                     font.weight: Font.DemiBold
                     text: "Ethernet"
                 }
@@ -256,7 +256,7 @@ PopoutPanel {
                 Text {
                     renderType: Text.NativeRendering
                     color: root.config.muted
-                    font.pointSize: root.config.fontSize * 0.77
+                    font.pointSize: root.config.textSizeSmall
                     text: root.network.wiredDevice ? root.network.wiredDevice.name : ""
                 }
             }
@@ -320,7 +320,7 @@ PopoutPanel {
             visible: !root.network.wifiDevice
             horizontalAlignment: Text.AlignHCenter
             color: root.config.muted
-            font.pointSize: root.config.fontSize * 0.85
+            font.pointSize: root.config.textSizeMedium
             text: "No Wi-Fi device found"
             topPadding: 10
             bottomPadding: 10
@@ -332,7 +332,7 @@ PopoutPanel {
             visible: !root.network.wiredConnected && root.network.wifiDevice && !Networking.wifiEnabled
             horizontalAlignment: Text.AlignHCenter
             color: root.config.muted
-            font.pointSize: root.config.fontSize * 0.85
+            font.pointSize: root.config.textSizeMedium
             text: "Wi-Fi is turned off"
             topPadding: 10
             bottomPadding: 10
@@ -344,7 +344,7 @@ PopoutPanel {
             visible: root.showNearby && root.network.wifiDevice && root.network.networkRows.length === 0
             horizontalAlignment: Text.AlignHCenter
             color: root.config.muted
-            font.pointSize: root.config.fontSize * 0.85
+            font.pointSize: root.config.textSizeMedium
             text: root.network.wifiDevice && root.network.wifiDevice.scannerEnabled ? "Scanning…" : "No networks found"
             topPadding: 10
             bottomPadding: 10
@@ -356,7 +356,7 @@ PopoutPanel {
             visible: !root.showNearby && root.network.connectionKind === "disconnected" && scanState.canScan
             horizontalAlignment: Text.AlignHCenter
             color: root.config.muted
-            font.pointSize: root.config.fontSize * 0.85
+            font.pointSize: root.config.textSizeMedium
             text: "Not connected"
             topPadding: 10
             bottomPadding: 10
@@ -387,7 +387,7 @@ PopoutPanel {
         visible: root.actionMode && root.confirmForget
         renderType: Text.NativeRendering
         color: root.config.urgent
-        font.pointSize: root.config.fontSize * 0.74
+        font.pointSize: root.config.textSizeSmall
         wrapMode: Text.WordWrap
         text: "Forget saved network? Enter Confirm · Esc Cancel"
     }
@@ -419,7 +419,7 @@ PopoutPanel {
         width: parent.width
         visible: root.helpOpen && !root.passwordMode
         color: root.config.muted
-        font.pointSize: root.config.fontSize * 0.74
+        font.pointSize: root.config.textSizeSmall
         wrapMode: Text.WordWrap
         text: root.actionMode ? "←/→ Select · Enter Activate · " + (actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "d Disconnect" : "c Connect") + " · f Forget · Esc Back" : "↑/↓ or j/k Select · Enter Connect · Ctrl+S Scan/Stop · ?/Esc Help/Close"
     }
@@ -444,7 +444,7 @@ PopoutPanel {
             anchors.verticalCenter: scanButton.verticalCenter
             renderType: Text.NativeRendering
             color: root.config.muted
-            font.pointSize: root.config.fontSize * 0.78
+            font.pointSize: root.config.textSizeSmall
             text: !root.network.wifiDevice ? "No Wi-Fi adapter" : !Networking.wifiEnabled ? "Wi-Fi off" : root.network.wiredConnected ? "Ethernet connected" : scanState.requested ? "Scanning…" : "? Help"
         }
 

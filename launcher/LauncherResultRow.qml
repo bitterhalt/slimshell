@@ -53,7 +53,7 @@ Item {
             renderType: Text.NativeRendering
             width: parent.width
             color: root.selected ? root.config.selectionForeground : root.config.fg
-            font.pointSize: root.config.fontSize * 0.96
+            font.pointSize: root.config.textSizeMedium
             font.family: root.config.textFontFamily
             font.weight: Font.Medium
             elide: Text.ElideRight
@@ -67,7 +67,7 @@ Item {
             width: parent.width
             visible: root.entry.type === "timer-active" || (root.entry.subtitle || "") !== ""
             color: root.selected ? root.config.selectionForeground : root.config.muted
-            font.pointSize: root.config.fontSize * 0.74
+            font.pointSize: root.config.textSizeSmall
             elide: Text.ElideRight
             text: root.entry.type === "timer-active" ? root.remainingText : root.entry.subtitle || ""
         }

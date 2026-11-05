@@ -18,6 +18,9 @@ Item {
         property int popupGap: 16
         property int popupRadius: 4
         readonly property real fontSize: 10
+        readonly property real textSizeNormal: fontSize
+        readonly property real textSizeMedium: fontSize * 0.88
+        readonly property real textSizeSmall: fontSize * 0.76
     }
     property var barWindow: ({
             screen: {
