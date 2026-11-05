@@ -17,9 +17,7 @@ Item {
         property real iconSize: 10
         property int popupGap: 16
         property int popupRadius: 4
-        function fontSize(scale) {
-            return 10 * scale;
-        }
+        readonly property real fontSize: 10
     }
     property var barWindow: ({
             screen: {

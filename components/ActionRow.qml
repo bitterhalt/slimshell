@@ -35,7 +35,7 @@ ShellButton {
             renderType: Text.NativeRendering
             textFormat: Text.PlainText
             color: root.visuallyHighlighted ? root.config.selectionForeground : root.config.muted
-            font.pointSize: root.config.fontSize(0.76)
+            font.pointSize: root.config.fontSize * 0.76
             text: root.shortcutText
         }
     }

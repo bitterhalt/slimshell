@@ -12,6 +12,7 @@
 - `components/PopupManager.qml` owns bar popup windows and their motion. `PopupMotion.qml` also serves standalone popups; keep surfaces mapped until close animations finish and preserve reopen-during-close behavior.
 - Popups may be destroyed on close. Keep persistent selections/preferences in their controller/service, reset transient help/confirmation state, and release discovery/process resources on destruction. Preserve both keyboard and mouse controls.
 - Use direct object calls internally; IPC is the external control boundary, with unique target names. Do not add dynamic QML module loading unless requested.
+- Keep icon and text sizing independent inside widgets: both `config.iconSize` and `config.fontSize` are numeric base sizes. Scale them with multiplication (`config.iconSize * 0.88`, `config.fontSize * 0.88`), not function calls. Apply any widget-specific scaling separately to each; never bind icon size to the text font size. Reusable controls should expose an independent icon-size override while following `config.iconSize` by default.
 
 ## Background work
 

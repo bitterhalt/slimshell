@@ -156,7 +156,7 @@ PopoutPanel {
         visible: !root.adapter || !root.adapter.enabled
         horizontalAlignment: Text.AlignHCenter
         color: config.muted
-        font.pointSize: config.fontSize(0.85)
+        font.pointSize: config.fontSize * 0.85
         text: root.adapter ? "Bluetooth is turned off" : "No Bluetooth adapter found"
         topPadding: 10
         bottomPadding: 10
@@ -225,7 +225,7 @@ PopoutPanel {
             visible: root.deviceRows.length === 0
             horizontalAlignment: Text.AlignHCenter
             color: config.muted
-            font.pointSize: config.fontSize(0.85)
+            font.pointSize: config.fontSize * 0.85
             text: root.adapter && root.adapter.discovering ? "Scanning for devices…" : "No devices found"
             topPadding: 10
             bottomPadding: 10
@@ -238,7 +238,7 @@ PopoutPanel {
         width: parent.width
         visible: root.confirmForget
         color: root.config.urgent
-        font.pointSize: root.config.fontSize(0.8)
+        font.pointSize: root.config.fontSize * 0.8
         text: "Forget " + (root.forgetTarget ? root.forgetTarget.name : "device") + "? Enter Confirm · Esc Cancel"
         wrapMode: Text.WordWrap
     }
@@ -248,7 +248,7 @@ PopoutPanel {
         width: parent.width
         visible: root.helpOpen
         color: root.config.muted
-        font.pointSize: root.config.fontSize(0.78)
+        font.pointSize: root.config.fontSize * 0.78
         text: "↑/↓ or j/k Select · Enter Connect/Pair · t Trust/Untrust · f Forget · Ctrl+S Scan/Stop · ?/Esc Back"
         wrapMode: Text.WordWrap
     }
@@ -256,7 +256,7 @@ PopoutPanel {
     // Device count/status and discovery controls.
     Item {
         width: parent.width
-        height: Math.max(footerStatus.implicitHeight, footerHint.implicitHeight) + root.spacing
+        height: Math.max(footerStatus.implicitHeight, scanButton.height) + root.spacing
         visible: !!root.adapter && root.adapter.enabled && !root.confirmForget
 
         Rectangle {
@@ -271,24 +271,32 @@ PopoutPanel {
             id: footerStatus
 
             anchors.left: parent.left
-            anchors.top: parent.top
-            anchors.topMargin: root.spacing
+            anchors.verticalCenter: scanButton.verticalCenter
             renderType: Text.NativeRendering
             color: root.config.muted
-            font.pointSize: root.config.fontSize(0.78)
+            font.pointSize: root.config.fontSize * 0.78
             text: root.adapter && root.adapter.discovering ? "Scanning…" : "? Help"
         }
 
-        Text {
-            id: footerHint
+        ShellIconButton {
+            id: scanButton
+            iconText: "󰑐"
+            objectName: "bluetoothScanButton"
+            filled: true
+            opacity: hovered ? 0.8 : 1
+            config: root.config
 
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.topMargin: root.spacing
-            renderType: Text.NativeRendering
-            color: root.config.muted
-            font.pointSize: root.config.fontSize(0.78)
-            text: discoveryState.requested ? "Ctrl+S: Stop scan" : "Ctrl+S: Scan"
+            implicitHeight: 20
+            padding: 2
+            leftPadding: 6
+            rightPadding: 6
+            font.pointSize: root.config.fontSize * 0.78
+            iconSize: root.config.iconSize * 0.78
+            text: discoveryState.requested ? "Stop" : "Scan"
+            onClicked: discoveryState.toggleDiscovery()
         }
     }
 }

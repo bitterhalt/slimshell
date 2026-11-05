@@ -337,7 +337,7 @@ Item {
                 width: parent.width
                 visible: root.confirmItem !== null
                 color: root.config.urgent
-                font.pointSize: root.config.fontSize(0.9)
+                font.pointSize: root.config.fontSize * 0.9
                 font.weight: Font.Medium
                 wrapMode: Text.WordWrap
                 text: root.confirmItem ? root.confirmItem.label + "?" : ""
@@ -351,7 +351,7 @@ Item {
                 textFormat: Text.PlainText
                 renderType: Text.NativeRendering
                 color: root.config.muted
-                font.pointSize: root.config.fontSize(0.9)
+                font.pointSize: root.config.fontSize * 0.9
             }
 
             Repeater {
@@ -397,7 +397,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
 
                         color: menuItem.selected ? root.config.selectionForeground : root.config.fg
-                        font.pointSize: root.config.fontSize(1)
+                        font.pointSize: root.config.fontSize * 1
                         font.weight: Font.Medium
                         elide: Text.ElideRight
                         text: modelData.label
@@ -427,7 +427,7 @@ Item {
                         width: 21
                         horizontalAlignment: Text.AlignHCenter
                         color: menuItem.selected ? root.config.selectionForeground : root.config.fg
-                        font.pointSize: root.config.fontSize(0.846)
+                        font.pointSize: root.config.fontSize * 0.846
                         text: modelData.shortcut ?? ""
                     }
                 }

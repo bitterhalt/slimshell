@@ -37,11 +37,8 @@ Item {
     readonly property color selectionForeground: theme.selectionForeground
     readonly property string textFontFamily: systemFontMetrics.font.family
     readonly property real systemFontPointSize: systemFontMetrics.font.pointSize > 0 ? systemFontMetrics.font.pointSize : 10
-    readonly property real iconSize: systemFontPointSize * fontScale * iconScale
-
-    function fontSize(scale) {
-        return systemFontPointSize * fontScale * scale;
-    }
+    readonly property real fontSize: systemFontPointSize * fontScale
+    readonly property real iconSize: fontSize * iconScale
 
     function run(command) {
         Quickshell.execDetached(["sh", "-lc", command]);

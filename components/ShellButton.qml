@@ -12,6 +12,7 @@ Button {
     property bool destructive: false
     property bool selected: false
     readonly property bool visuallyHighlighted: enabled && (down || hovered || activeFocus || selected || filled)
+    readonly property color foregroundColor: !enabled ? config.muted : visuallyHighlighted ? config.selectionForeground : destructive ? config.urgent : config.fg
     property color outlineColor: config.selectionBackground
     property real cornerRadius: 4
 
@@ -22,7 +23,7 @@ Button {
     padding: 8
     leftPadding: 10
     rightPadding: 10
-    font.pointSize: config.fontSize(0.88)
+    font.pointSize: config.fontSize * 0.88
 
     contentItem: Text {
         id: label
@@ -31,7 +32,7 @@ Button {
         textFormat: Text.PlainText
         text: root.text
         font: root.font
-        color: !root.enabled ? root.config.muted : root.visuallyHighlighted ? root.config.selectionForeground : root.destructive ? root.config.urgent : root.config.fg
+        color: root.foregroundColor
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         elide: Text.ElideRight

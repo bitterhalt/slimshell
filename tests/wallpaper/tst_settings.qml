@@ -17,9 +17,7 @@ Item {
         property color selectionBackground: "#6699cc"
         property color selectionForeground: "#ffffff"
         property color border: "#444444"
-        function fontSize(scale) {
-            return 10 * scale;
-        }
+        readonly property real fontSize: 10
     }
     QtObject {
         id: preferences

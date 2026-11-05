@@ -37,7 +37,7 @@ TranslatorWindow {
         property int popupRadius: 4
         property string iconFontFamily: "sans-serif"
         property real iconSize: 10
-        function fontSize(scale) { return 10 * scale; }
+        readonly property real fontSize: 10
     }
     TestCase {
         name: "TranslatorKeyboardFocus"

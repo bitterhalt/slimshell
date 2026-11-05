@@ -31,7 +31,7 @@ Item {
         visible: root.entry && !root.entry.isImage
         color: root.config.fg
         font.family: "monospace"
-        font.pointSize: root.config.fontSize(0.82)
+        font.pointSize: root.config.fontSize * 0.82
         wrapMode: Text.WrapAnywhere
         text: root.previewText
         clip: true
@@ -43,7 +43,7 @@ Item {
         anchors.centerIn: parent
         visible: !root.entry
         color: root.config.muted
-        font.pointSize: root.config.fontSize(0.9)
+        font.pointSize: root.config.fontSize * 0.9
         text: root.historyEmpty ? "Clipboard history is empty" : "Select an item to preview"
     }
 }

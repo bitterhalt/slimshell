@@ -266,7 +266,7 @@ PanelWindow {
                 placeholderTextColor: root.config.muted
                 selectionColor: root.config.selectionBackground
                 selectedTextColor: root.config.selectionForeground
-                font.pointSize: root.config.fontSize(0.92)
+                font.pointSize: root.config.fontSize * 0.92
                 selectByMouse: true
                 enabled: !root.settingsOpen
                 KeyNavigation.priority: KeyNavigation.BeforeItem
@@ -348,7 +348,7 @@ PanelWindow {
                             visible: tile.thumbnail === ""
                             text: "No preview"
                             color: root.config.muted
-                            font.pointSize: root.config.fontSize(0.8)
+                            font.pointSize: root.config.fontSize * 0.8
                         }
 
                         Text {
@@ -360,7 +360,7 @@ PanelWindow {
                             text: tile.name
                             elide: Text.ElideMiddle
                             color: root.config.fg
-                            font.pointSize: root.config.fontSize(0.8)
+                            font.pointSize: root.config.fontSize * 0.8
                         }
                     }
 
@@ -381,7 +381,7 @@ PanelWindow {
                     visible: visibleEntries.count === 0
                     text: scanProcess.running ? "Loading wallpapers…" : allEntries.count ? "No matching wallpapers" : "No wallpapers found"
                     color: root.config.muted
-                    font.pointSize: root.config.fontSize(0.9)
+                    font.pointSize: root.config.fontSize * 0.9
                 }
             }
 
@@ -418,7 +418,7 @@ PanelWindow {
                     width: Math.max(0, parent.width - actionTips.width - 12)
                     text: root.controller.errorText || root.scanError || (root.controller.busy ? "Applying wallpaper…" : root.controller.noticeText) || (scanProcess.running ? "Building thumbnails… " + allEntries.count : root.scanNotice) || visibleEntries.count + " wallpapers"
                     color: root.controller.errorText || root.scanError ? root.config.urgent : root.config.muted
-                    font.pointSize: root.config.fontSize(0.78)
+                    font.pointSize: root.config.fontSize * 0.78
                     elide: Text.ElideRight
                     ShellToolTip {
                         config: root.config
@@ -466,20 +466,20 @@ PanelWindow {
                                     verticalAlignment: Text.AlignVCenter
                                     text: hint.modelData.label
                                     color: hint.hovered ? root.config.selectionForeground : root.config.muted
-                                    font.pointSize: root.config.fontSize(0.8)
+                                    font.pointSize: root.config.fontSize * 0.8
                                 }
                                 KeyCap {
                                     visible: hint.modelData.control
                                     label: "Ctrl"
                                     edgeColor: hint.hovered ? root.config.selectionForeground : root.config.selectionBackground
                                     textColor: hint.hovered ? root.config.selectionForeground : root.config.muted
-                                    fontPointSize: root.config.fontSize(0.74)
+                                    fontPointSize: root.config.fontSize * 0.74
                                 }
                                 KeyCap {
                                     label: hint.modelData.key
                                     edgeColor: hint.hovered ? root.config.selectionForeground : root.config.selectionBackground
                                     textColor: hint.hovered ? root.config.selectionForeground : root.config.muted
-                                    fontPointSize: root.config.fontSize(0.74)
+                                    fontPointSize: root.config.fontSize * 0.74
                                 }
                             }
                             MouseArea {

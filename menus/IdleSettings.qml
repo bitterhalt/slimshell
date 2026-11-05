@@ -106,7 +106,7 @@ Item {
                 anchors.leftMargin: 8
                 anchors.rightMargin: 8
                 color: root.config.muted
-                font.pointSize: root.config.fontSize(0.8)
+                font.pointSize: root.config.fontSize * 0.8
                 wrapMode: Text.WordWrap
                 text: root.statusText
             }
@@ -143,7 +143,7 @@ Item {
                 anchors.leftMargin: 8
                 anchors.rightMargin: 8
                 color: root.config.muted
-                font.pointSize: root.config.fontSize(0.78)
+                font.pointSize: root.config.fontSize * 0.78
                 text: "30s, 30m, 2h · 0 disables an idle action"
             }
 
@@ -155,7 +155,7 @@ Item {
                 anchors.rightMargin: 8
                 visible: text !== ""
                 color: root.config.urgent
-                font.pointSize: root.config.fontSize(0.78)
+                font.pointSize: root.config.fontSize * 0.78
                 wrapMode: Text.WordWrap
                 text: root.validationError || root.idleService.errorText
             }
@@ -225,7 +225,7 @@ Item {
             anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             color: row.config.fg
-            font.pointSize: row.config.fontSize(0.94)
+            font.pointSize: row.config.fontSize * 0.94
             text: row.label
         }
 
@@ -251,7 +251,7 @@ Item {
                 color: row.config.fg
                 selectionColor: row.config.selectionBackground
                 selectedTextColor: row.config.selectionForeground
-                font.pointSize: row.config.fontSize(0.92)
+                font.pointSize: row.config.fontSize * 0.92
                 selectByMouse: true
                 activeFocusOnTab: true
                 onAccepted: row.accepted()

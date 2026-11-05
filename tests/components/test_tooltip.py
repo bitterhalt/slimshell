@@ -58,7 +58,7 @@ Item {
         property color border: "#665544"
         property int popupRadius: 4
         property string textFontFamily: "sans-serif"
-        function fontSize(scale) { return 10 * scale; }
+        readonly property real fontSize: 10
     }
     Component {
         id: tooltipComponent

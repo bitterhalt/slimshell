@@ -15,9 +15,7 @@ Item {
         property color selectionBackground: "#bb9955"
         property string iconFontFamily: "sans-serif"
         property int popupRadius: 4
-        function fontSize(scale) {
-            return 10 * scale;
-        }
+        readonly property real fontSize: 10
     }
     QtObject {
         id: weather

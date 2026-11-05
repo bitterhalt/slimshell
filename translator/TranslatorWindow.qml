@@ -371,7 +371,7 @@ PanelWindow {
                         color: root.config.fg
                         selectionColor: root.config.selectionBackground
                         selectedTextColor: root.config.selectionForeground
-                        font.pointSize: root.config.fontSize(1)
+                        font.pointSize: root.config.fontSize * 1
                         wrapMode: TextEdit.Wrap
                         textFormat: TextEdit.PlainText
                         selectByMouse: true
@@ -421,7 +421,7 @@ PanelWindow {
                         color: root.config.fg
                         selectionColor: root.config.selectionBackground
                         selectedTextColor: root.config.selectionForeground
-                        font.pointSize: root.config.fontSize(1)
+                        font.pointSize: root.config.fontSize * 1
                         wrapMode: TextEdit.Wrap
                         textFormat: TextEdit.PlainText
                         selectByMouse: true
@@ -457,7 +457,7 @@ PanelWindow {
                     placeholderTextColor: root.config.muted
                     selectionColor: root.config.selectionBackground
                     selectedTextColor: root.config.selectionForeground
-                    font.pointSize: root.config.fontSize(0.92)
+                    font.pointSize: root.config.fontSize * 0.92
                     onTextChanged: root.pickerIndex = 0
                     Keys.onPressed: event => {
                         switch (event.key) {
@@ -511,7 +511,7 @@ PanelWindow {
                             anchors.leftMargin: 10
                             anchors.rightMargin: 10
                             verticalAlignment: Text.AlignVCenter
-                            font.pointSize: root.config.fontSize(0.92)
+                            font.pointSize: root.config.fontSize * 0.92
                             color: index === root.pickerIndex ? root.config.selectionForeground : root.config.fg
                             text: modelData.label
                         }
@@ -551,7 +551,7 @@ PanelWindow {
                 anchors.rightMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
                 color: root.errorText ? root.config.urgent : root.config.muted
-                font.pointSize: root.config.fontSize(0.76)
+                font.pointSize: root.config.fontSize * 0.76
                 elide: Text.ElideRight
                 text: root.errorText || root.noticeText || (root.picker !== "" ? "Tab Select · Enter Apply" : root.detectedLanguage !== "" && root.sourceLanguage === "" ? "Detected: " + Languages.label(root.detectedLanguage) : "DeepL · Ctrl+Enter Translate")
             }

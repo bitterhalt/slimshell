@@ -56,7 +56,7 @@ Item {
         property color selectionBackground: "orange"
         property string clockFormat: "HH:mm"
         property string clockAlternativeFormat: "dddd, d MMMM"
-        function fontSize(scale) { return 10 * scale; }
+        readonly property real fontSize: 10
     }
     QtObject { id: fixtureBar; property int height: 30; property var screen: null }
     QtObject {

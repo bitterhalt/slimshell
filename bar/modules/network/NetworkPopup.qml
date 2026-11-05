@@ -185,7 +185,7 @@ PopoutPanel {
     // Page title shown for connect/password/action subpages.
     Item {
         width: parent.width
-        height: root.passwordMode || root.actionMode ? 28 : 0
+        height: root.passwordMode ? 28 : 0
         visible: height > 0
 
         Text {
@@ -193,9 +193,9 @@ PopoutPanel {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             color: root.config.fg
-            font.pointSize: root.config.fontSize(1)
+            font.pointSize: root.config.fontSize * 1
             font.weight: Font.DemiBold
-            text: root.passwordMode ? "Connect to Wi-Fi" : (root.actionMode ? "Wi-Fi network" : "Network")
+            text: "Connect to Wi-Fi"
         }
     }
 
@@ -233,7 +233,7 @@ PopoutPanel {
                 Text {
                     renderType: Text.NativeRendering
                     color: root.config.fg
-                    font.pointSize: root.config.fontSize(0.92)
+                    font.pointSize: root.config.fontSize * 0.92
                     font.weight: Font.DemiBold
                     text: "Ethernet"
                 }
@@ -241,7 +241,7 @@ PopoutPanel {
                 Text {
                     renderType: Text.NativeRendering
                     color: root.config.muted
-                    font.pointSize: root.config.fontSize(0.77)
+                    font.pointSize: root.config.fontSize * 0.77
                     text: root.network.wiredDevice ? root.network.wiredDevice.name : ""
                 }
             }
@@ -305,7 +305,7 @@ PopoutPanel {
             visible: !root.network.wifiDevice
             horizontalAlignment: Text.AlignHCenter
             color: root.config.muted
-            font.pointSize: root.config.fontSize(0.85)
+            font.pointSize: root.config.fontSize * 0.85
             text: "No Wi-Fi device found"
             topPadding: 10
             bottomPadding: 10
@@ -317,7 +317,7 @@ PopoutPanel {
             visible: !root.network.wiredConnected && root.network.wifiDevice && !Networking.wifiEnabled
             horizontalAlignment: Text.AlignHCenter
             color: root.config.muted
-            font.pointSize: root.config.fontSize(0.85)
+            font.pointSize: root.config.fontSize * 0.85
             text: "Wi-Fi is turned off"
             topPadding: 10
             bottomPadding: 10
@@ -329,7 +329,7 @@ PopoutPanel {
             visible: root.showNearby && root.network.wifiDevice && root.network.networkRows.length === 0
             horizontalAlignment: Text.AlignHCenter
             color: root.config.muted
-            font.pointSize: root.config.fontSize(0.85)
+            font.pointSize: root.config.fontSize * 0.85
             text: root.network.wifiDevice && root.network.wifiDevice.scannerEnabled ? "Scanning…" : "No networks found"
             topPadding: 10
             bottomPadding: 10
@@ -341,7 +341,7 @@ PopoutPanel {
             visible: !root.showNearby && root.network.connectionKind === "disconnected" && scanState.canScan
             horizontalAlignment: Text.AlignHCenter
             color: root.config.muted
-            font.pointSize: root.config.fontSize(0.85)
+            font.pointSize: root.config.fontSize * 0.85
             text: "Not connected"
             topPadding: 10
             bottomPadding: 10
@@ -389,7 +389,7 @@ PopoutPanel {
         width: parent.width
         visible: root.helpOpen && !root.passwordMode
         color: root.config.muted
-        font.pointSize: root.config.fontSize(0.74)
+        font.pointSize: root.config.fontSize * 0.74
         wrapMode: Text.WordWrap
         text: root.actionMode ? (actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "d Disconnect" : "c Connect") + " · f Forget · Esc Back" : "↑/↓ or j/k Select · Enter Connect · Ctrl+S Scan/Stop · ?/Esc Help/Close"
     }
@@ -397,7 +397,7 @@ PopoutPanel {
     // Bottom connection status and scan controls.
     Item {
         width: parent.width
-        height: Math.max(footerStatus.implicitHeight, footerHint.implicitHeight) + root.spacing
+        height: Math.max(footerStatus.implicitHeight, scanButton.height) + root.spacing
         visible: !root.passwordMode && !root.actionMode
 
         Rectangle {
@@ -411,23 +411,32 @@ PopoutPanel {
         Text {
             id: footerStatus
             anchors.left: parent.left
-            anchors.top: parent.top
-            anchors.topMargin: root.spacing
+            anchors.verticalCenter: scanButton.verticalCenter
             renderType: Text.NativeRendering
             color: root.config.muted
-            font.pointSize: root.config.fontSize(0.78)
-            text: scanState.requested ? "Scanning…" : "? Help"
+            font.pointSize: root.config.fontSize * 0.78
+            text: !root.network.wifiDevice ? "No Wi-Fi adapter" : !Networking.wifiEnabled ? "Wi-Fi off" : root.network.wiredConnected ? "Ethernet connected" : scanState.requested ? "Scanning…" : "? Help"
         }
 
-        Text {
-            id: footerHint
+        ShellIconButton {
+            id: scanButton
+            iconText: "󰑐"
+            objectName: "networkScanButton"
+            filled: true
+            opacity: hovered ? 0.8 : 1
+            config: root.config
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.topMargin: root.spacing
-            renderType: Text.NativeRendering
-            color: root.config.muted
-            font.pointSize: root.config.fontSize(0.78)
-            text: root.network.wiredConnected ? "Ethernet connected" : !root.network.wifiDevice ? "No Wi-Fi adapter" : !Networking.wifiEnabled ? "Wi-Fi off" : scanState.requested ? "Ctrl+S: Stop scan" : "Ctrl+S: Scan"
+            implicitHeight: 20
+            padding: 2
+            leftPadding: 6
+            rightPadding: 6
+            font.pointSize: root.config.fontSize * 0.78
+            iconSize: root.config.iconSize * 0.78
+            enabled: scanState.canScan
+            text: scanState.requested ? "Stop" : "Scan"
+            onClicked: scanState.toggle()
         }
     }
 }

@@ -63,7 +63,7 @@ Item {
             renderType: Text.NativeRendering
             width: parent.width
             color: rowMouse.containsMouse ? Qt.lighter(root.config.fg, 1.15) : root.config.fg
-            font.pointSize: root.config.fontSize(0.92)
+            font.pointSize: root.config.fontSize * 0.92
             font.weight: root.selected ? Font.DemiBold : Font.Normal
             elide: Text.ElideRight
             text: root.row.ssid
@@ -73,7 +73,7 @@ Item {
             renderType: Text.NativeRendering
             width: parent.width
             color: root.config.muted
-            font.pointSize: root.config.fontSize(0.77)
+            font.pointSize: root.config.fontSize * 0.77
             elide: Text.ElideRight
             text: root.statusText
         }
@@ -88,7 +88,7 @@ Item {
         width: 44
         horizontalAlignment: Text.AlignRight
         color: root.config.muted
-        font.pointSize: root.config.fontSize(0.77)
+        font.pointSize: root.config.fontSize * 0.77
         text: `${Math.round(Math.max(0, Math.min(1, Number(root.row.strength) || 0)) * 100)}%`
     }
 

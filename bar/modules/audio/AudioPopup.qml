@@ -142,7 +142,7 @@ PopoutPanel {
                     visible: popupState.rows.length === 0
                     text: popupState.tabIndex === 3 ? (popupState.profiles && popupState.profiles.loading ? "Loading audio cards…" : "No audio cards") : popupState.tabIndex === 2 ? "No playback streams" : popupState.tabIndex === 1 ? "No input devices" : "No output devices"
                     color: root.config.muted
-                    font.pointSize: root.config.fontSize(0.86)
+                    font.pointSize: root.config.fontSize * 0.86
                 }
             }
 
@@ -233,7 +233,7 @@ PopoutPanel {
                             anchors.leftMargin: 6
                             text: helpRow.modelData.name
                             color: root.config.fg
-                            font.pointSize: root.config.fontSize(0.8)
+                            font.pointSize: root.config.fontSize * 0.8
                         }
                         Text {
                             renderType: Text.NativeRendering
@@ -241,7 +241,7 @@ PopoutPanel {
                             anchors.rightMargin: 6
                             text: helpRow.modelData.key
                             color: root.config.muted
-                            font.pointSize: root.config.fontSize(0.78)
+                            font.pointSize: root.config.fontSize * 0.78
                         }
                     }
                 }
@@ -259,7 +259,7 @@ PopoutPanel {
             height: 18
             text: popupState.helpOpen ? "Volume range: 0–" + Math.round((popupState.tabIndex === 0 ? root.config.maxVolume : Math.min(1, root.config.maxVolume)) * 100) + "% · keyboard step: 5% · ? Close help" : popupState.tabIndex === 3 ? (popupState.profiles && (popupState.profiles.errorText || (popupState.profiles.changing ? "Applying profile…" : "") || (popupState.profiles.loading ? "Loading cards…" : ""))) || (popupState.profileCard ? popupState.profileCard.name + " · Enter Apply · Esc Back" : "Enter Profiles · ? Help") : popupState.contextOpen ? "Options · " + (popupState.selectedRow ? popupState.selectedRow.name : "") + " · Esc Back · ? Help" : "? Help"
             color: popupState.tabIndex === 3 && popupState.profiles && popupState.profiles.errorText ? root.config.urgent : root.config.muted
-            font.pointSize: root.config.fontSize(0.72)
+            font.pointSize: root.config.fontSize * 0.72
             elide: Text.ElideRight
             verticalAlignment: Text.AlignVCenter
 
@@ -315,7 +315,7 @@ PopoutPanel {
                             objectName: "audioTabLabel-" + tab.modelData
                             text: tab.modelData
                             color: tab.highlighted ? root.config.selectionForeground : root.config.muted
-                            font.pointSize: root.config.fontSize(0.82)
+                            font.pointSize: root.config.fontSize * 0.82
                             font.weight: tab.highlighted ? Font.DemiBold : Font.Normal
                         }
                         MouseArea {
@@ -367,7 +367,7 @@ PopoutPanel {
                 width: parent.width
                 text: choice.title
                 color: choiceMouse.containsMouse ? choice.config.selectionBackground : choice.config.fg
-                font.pointSize: choice.config.fontSize(0.88)
+                font.pointSize: choice.config.fontSize * 0.88
                 font.weight: choice.selected ? Font.DemiBold : Font.Normal
                 elide: Text.ElideRight
             }
@@ -377,7 +377,7 @@ PopoutPanel {
                 visible: choice.subtitle !== ""
                 text: choice.subtitle
                 color: choice.config.muted
-                font.pointSize: choice.config.fontSize(0.74)
+                font.pointSize: choice.config.fontSize * 0.74
                 elide: Text.ElideRight
             }
         }

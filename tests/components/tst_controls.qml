@@ -12,6 +12,16 @@ Item {
     }
     readonly property var controlConfig: config
     Component {
+        id: iconButtonComponent
+        ShellIconButton {
+            config: host.controlConfig
+            iconText: "󰑐"
+            text: "Scan"
+            implicitHeight: 20
+            padding: 2
+        }
+    }
+    Component {
         id: buttonComponent
         ShellButton {
             config: host.controlConfig
@@ -89,6 +99,21 @@ Item {
             compare(clickSpy.count, 2);
             compare(button.contentItem.color, config.muted);
             verify(button.background.color !== config.selectionBackground);
+        }
+        function test_icon_uses_explicit_font_and_button_colors() {
+            const button = createTemporaryObject(iconButtonComponent, host);
+            const icon = findChild(button, "buttonIcon");
+            compare(icon.font.family, config.iconFontFamily);
+            compare(icon.font.pointSize, config.iconSize);
+            button.iconSize = 18;
+            compare(icon.font.pointSize, 18);
+            compare(icon.renderType, Text.QtRendering);
+            compare(icon.text, "󰑐");
+            compare(button.height, 20);
+            button.forceActiveFocus();
+            compare(icon.color, config.selectionForeground);
+            button.enabled = false;
+            compare(icon.color, config.muted);
         }
 
         function test_action_row_selection_and_destructive_state() {

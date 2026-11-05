@@ -72,7 +72,7 @@ Rectangle {
             width: parent.width
             textFormat: Text.PlainText
             color: root.critical ? root.criticalTextColor : config.fg
-            font.pointSize: config.fontSize(0.96)
+            font.pointSize: config.fontSize * 0.96
             font.weight: Font.DemiBold
             maximumLineCount: 1
             elide: Text.ElideRight
@@ -84,7 +84,7 @@ Rectangle {
             width: parent.width
             visible: text.length > 0
             color: root.critical ? root.criticalTextColor : config.muted
-            font.pointSize: config.fontSize(0.86)
+            font.pointSize: config.fontSize * 0.86
             textFormat: Text.PlainText
             wrapMode: Text.Wrap
             maximumLineCount: 2

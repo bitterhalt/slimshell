@@ -17,9 +17,7 @@ Item {
         property color fg: "white"
         property var commands: []
 
-        function fontSize(scale) {
-            return 12 * scale;
-        }
+        readonly property real fontSize: 12
         function run(command) {
             commands = commands.concat([command]);
         }

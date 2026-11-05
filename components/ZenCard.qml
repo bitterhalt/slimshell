@@ -69,7 +69,7 @@ PanelWindow {
             text: "Zen Mode"
             color: root.config.muted
             font.family: root.config.textFontFamily
-            font.pointSize: root.config.fontSize(0.96)
+            font.pointSize: root.config.fontSize * 0.96
             horizontalAlignment: Text.AlignHCenter
         }
 
@@ -82,7 +82,7 @@ PanelWindow {
             text: Qt.formatDateTime(clock.date, root.config.clockFormat)
             color: root.config.muted
             font.family: root.config.textFontFamily
-            font.pointSize: root.config.fontSize(2.8)
+            font.pointSize: root.config.fontSize * 2.8
             font.weight: Font.DemiBold
             horizontalAlignment: Text.AlignRight
         }

@@ -64,7 +64,7 @@ FocusScope {
                 Layout.fillWidth: true
                 text: "Wallpaper settings"
                 color: root.config.fg
-                font.pointSize: root.config.fontSize(1)
+                font.pointSize: root.config.fontSize * 1
                 font.weight: Font.Medium
                 elide: Text.ElideRight
             }
@@ -163,7 +163,7 @@ FocusScope {
             visible: root.errorText !== ""
             text: root.errorText
             color: root.config.urgent
-            font.pointSize: root.config.fontSize(0.85)
+            font.pointSize: root.config.fontSize * 0.85
             wrapMode: Text.WordWrap
         }
 
@@ -189,7 +189,7 @@ FocusScope {
         renderType: Text.NativeRendering
         Layout.fillWidth: true
         color: root.config.muted
-        font.pointSize: root.config.fontSize(0.85)
+        font.pointSize: root.config.fontSize * 0.85
         wrapMode: Text.WordWrap
     }
 
@@ -208,7 +208,7 @@ FocusScope {
         Layout.minimumWidth: 0
         Layout.preferredWidth: 1
         Layout.preferredHeight: 32
-        font.pointSize: root.config.fontSize(0.9)
+        font.pointSize: root.config.fontSize * 0.9
         onActivated: root.errorText = ""
         contentItem: Text {
             renderType: Text.NativeRendering
@@ -229,7 +229,7 @@ FocusScope {
 
     component ActionButton: ShellButton {
         config: root.config
-        font.pointSize: root.config.fontSize(0.85)
+        font.pointSize: root.config.fontSize * 0.85
         outlined: true
         outlineColor: root.config.border
         opacity: enabled ? 1 : 0.5

@@ -22,7 +22,7 @@ class NetworkPopupTests(unittest.TestCase):
                     source = 'import "."\n' + source
                 (base / name).write_text(source)
             for name in ("PopoutPanel.qml", "PanelSurface.qml", "ShellButton.qml", "ShellTextField.qml",
-                         "ActionRow.qml", "SelectionIndicator.qml"):
+                         "ActionRow.qml", "SelectionIndicator.qml", "ShellIconButton.qml"):
                 (base / name).write_text((ROOT / "components" / name).read_text())
             (base / "ControlConfig.qml").write_text((ROOT / "tests/components/ControlConfig.qml").read_text())
             (base / "qmldir").write_text("singleton Networking 1.0 Networking.qml\n")
@@ -104,6 +104,20 @@ Item {
             mouseClick(connect, 10, 10);
             compare(saved.connects, 1);
             verify(!popup.actionMode);
+        }
+        function test_scan_button_toggles_and_respects_availability() {
+            const popup = createTemporaryObject(popupComponent, host);
+            const button = findChild(popup, "networkScanButton");
+            verify(button !== null);
+            waitForPolish(host.Window.window);
+            mouseClick(button, button.width / 2, button.height / 2);
+            verify(device.scannerEnabled);
+            compare(button.text, "Stop");
+            mouseClick(button, button.width / 2, button.height / 2);
+            verify(!device.scannerEnabled);
+            service.wifiBrowsingAvailable = false;
+            verify(!button.enabled);
+            service.wifiBrowsingAvailable = true;
         }
         function test_password_submit_cancel_and_reopen_clear() {
             const popup = createTemporaryObject(popupComponent, host);

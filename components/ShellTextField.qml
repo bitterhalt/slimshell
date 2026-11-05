@@ -15,7 +15,7 @@ TextField {
     placeholderTextColor: config.muted
     selectionColor: config.selectionBackground
     selectedTextColor: config.selectionForeground
-    font.pointSize: config.fontSize(0.9)
+    font.pointSize: config.fontSize * 0.9
     selectByMouse: true
 
     background: Rectangle {

@@ -27,7 +27,7 @@ Column {
         renderType: Text.NativeRendering
         width: parent.width
         color: root.config.fg
-        font.pointSize: root.config.fontSize(0.92)
+        font.pointSize: root.config.fontSize * 0.92
         font.weight: Font.DemiBold
         elide: Text.ElideRight
         text: root.ssid
@@ -36,7 +36,7 @@ Column {
     Text {
         renderType: Text.NativeRendering
         color: root.config.muted
-        font.pointSize: root.config.fontSize(0.77)
+        font.pointSize: root.config.fontSize * 0.77
         text: root.selectedNetwork && root.selectedNetwork.connected ? "Connected" : "Saved network"
     }
 

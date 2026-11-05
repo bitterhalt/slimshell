@@ -253,7 +253,7 @@ PanelWindow {
                 color: root.config.fg
                 selectionColor: root.config.selectionBackground
                 selectedTextColor: root.config.selectionForeground
-                font.pointSize: root.config.fontSize(1.04)
+                font.pointSize: root.config.fontSize * 1.04
                 focus: true
                 clip: true
 
@@ -308,7 +308,7 @@ PanelWindow {
                 anchors.verticalCenter: searchInput.verticalCenter
                 visible: searchInput.text.length === 0
                 color: root.config.muted
-                font.pointSize: root.config.fontSize(1.0)
+                font.pointSize: root.config.fontSize * 1.0
                 text: "Search clipboard"
             }
         }
@@ -406,7 +406,7 @@ PanelWindow {
                     renderType: Text.NativeRendering
                     anchors.verticalCenter: parent.verticalCenter
                     color: root.config.muted
-                    font.pointSize: root.config.fontSize(0.78)
+                    font.pointSize: root.config.fontSize * 0.78
                     text: "Clipboard History"
                 }
 
@@ -414,7 +414,7 @@ PanelWindow {
                     renderType: Text.NativeRendering
                     anchors.verticalCenter: parent.verticalCenter
                     color: root.config.muted
-                    font.pointSize: root.config.fontSize(0.72)
+                    font.pointSize: root.config.fontSize * 0.72
                     text: `${root.filteredEntries.length} items`
                 }
             }
@@ -425,7 +425,7 @@ PanelWindow {
                 anchors.rightMargin: 14
                 anchors.verticalCenter: parent.verticalCenter
                 color: root.config.muted
-                font.pointSize: root.config.fontSize(0.78)
+                font.pointSize: root.config.fontSize * 0.78
                 text: "Enter:  Copy   Del:  Delete"
             }
         }

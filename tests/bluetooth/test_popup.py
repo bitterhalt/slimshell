@@ -22,10 +22,11 @@ Item {
         property color urgent: "red"
         property color border: "#444444"
         property color selectionBackground: "orange"
+        property color selectionForeground: "black"
         property int popupRadius: 4
         property string iconFontFamily: "sans-serif"
         property real iconSize: 12
-        function fontSize(scale) { return 10 * scale; }
+        readonly property real fontSize: 10
     }
     QtObject {
         id: fixtureAdapter
@@ -117,6 +118,17 @@ Item {
             keyClick(Qt.Key_Return);
             compare(service.forgets, 1);
         }
+        function test_scan_button_starts_and_stops_discovery() {
+            const button = findChild(manager.popup, "bluetoothScanButton");
+            verify(button !== null);
+            waitForPolish(host.Window.window);
+            mouseClick(button, button.width / 2, button.height / 2);
+            compare(service.scans, 1);
+            compare(button.text, "Stop");
+            mouseClick(button, button.width / 2, button.height / 2);
+            compare(service.scans, 0);
+            compare(button.text, "Scan");
+        }
         function test_reopen_preserves_selection_but_resets_popup_state() {
             manager.popup.selectDevice(1);
             manager.popup.helpOpen = true;
@@ -148,7 +160,7 @@ class BluetoothPopupTests(unittest.TestCase):
                                        and line != 'import "../../../components"')
                     source = 'import "."\n' + source
                 (base / name).write_text(source)
-            for name in ("PopoutPanel.qml", "PanelSurface.qml", "SelectionIndicator.qml"):
+            for name in ("PopoutPanel.qml", "PanelSurface.qml", "SelectionIndicator.qml", "ShellButton.qml", "ShellIconButton.qml"):
                 (base / name).write_text((ROOT.parents[2] / "components" / name).read_text())
             (base / "qmldir").write_text("singleton Quickshell 1.0 Quickshell.qml\n")
             (base / "Quickshell.qml").write_text(

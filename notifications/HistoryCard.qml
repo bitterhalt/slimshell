@@ -99,7 +99,7 @@ Rectangle {
                 textFormat: Text.PlainText
                 text: root.notification ? root.notification.summary || "Notification" : ""
                 color: root.critical ? root.criticalTextColor : root.config.fg
-                font.pointSize: root.config.fontSize(0.96)
+                font.pointSize: root.config.fontSize * 0.96
                 font.weight: Font.Medium
                 elide: Text.ElideRight
             }
@@ -112,7 +112,7 @@ Rectangle {
                 renderType: Text.NativeRendering
                 text: root.timeLabel
                 color: root.critical ? root.criticalTextColor : root.highlighted ? root.config.fg : root.config.muted
-                font.pointSize: root.config.fontSize(0.72)
+                font.pointSize: root.config.fontSize * 0.72
             }
 
             Text {
@@ -139,7 +139,7 @@ Rectangle {
             textFormat: Text.PlainText
             text: root.notification ? root.notification.body || "" : ""
             color: root.critical ? root.criticalTextColor : root.highlighted ? root.config.fg : root.config.muted
-            font.pointSize: root.config.fontSize(0.85)
+            font.pointSize: root.config.fontSize * 0.85
             wrapMode: Text.Wrap
             maximumLineCount: root.expanded ? root.expandedBodyLineLimit : 3
             elide: root.expanded ? Text.ElideNone : Text.ElideRight
@@ -169,7 +169,7 @@ Rectangle {
                         textFormat: Text.PlainText
                         text: (actionButton.modelData.key ? "[" + actionButton.modelData.key + "] " : "") + actionButton.modelData.label
                         color: root.critical ? root.criticalTextColor : actionMouse.containsMouse ? root.config.selectionForeground : root.config.fg
-                        font.pointSize: root.config.fontSize(0.78)
+                        font.pointSize: root.config.fontSize * 0.78
                         elide: Text.ElideRight
                     }
                     MouseArea {

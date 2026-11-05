@@ -21,14 +21,14 @@ Item {
             renderType: Text.NativeRendering
             anchors.verticalCenter: parent.verticalCenter
             color: config.fg
-            font.pointSize: config.fontSize(1)
+            font.pointSize: config.fontSize * 1
             text: `${battery.capacity}% `
         }
 
         Text {
             anchors.verticalCenter: parent.verticalCenter
             color: config.fg
-            font.pointSize: config.fontSize(1)
+            font.pointSize: config.fontSize * 1
             text: battery.icon
         }
     }

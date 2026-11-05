@@ -293,7 +293,7 @@ Scope {
                 renderType: Text.NativeRendering
                 anchors.centerIn: parent
                 color: root.config.muted
-                font.pointSize: root.config.fontSize(0.78)
+                font.pointSize: root.config.fontSize * 0.78
                 text: "+" + root.overflowCount + " more in notification center"
             }
 
