@@ -316,7 +316,6 @@ PopoutPanel {
                             text: tab.modelData
                             color: tab.highlighted ? root.config.selectionForeground : root.config.muted
                             font.pointSize: root.config.fontSize * 0.82
-                            font.weight: tab.highlighted ? Font.DemiBold : Font.Normal
                         }
                         MouseArea {
                             id: tabMouse

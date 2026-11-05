@@ -32,8 +32,7 @@ Row {
         KeyNavigation.backtab: forgetAction
         onActiveFocusChanged: if (activeFocus)
             root.focused(2)
-        width: 26
-        height: 32
+        width: Math.max(26, implicitWidth)
         padding: 0
         leftPadding: 0
         rightPadding: 0
@@ -55,7 +54,6 @@ Row {
         onActiveFocusChanged: if (activeFocus)
             root.focused(0)
         width: Math.max(0, (root.width - cancelAction.width - root.spacing * 2) / 2)
-        height: 32
         text: root.selectedNetwork && root.selectedNetwork.connected ? "Disconnect" : "Connect"
         onClicked: root.activated(0)
     }
@@ -73,7 +71,6 @@ Row {
         onActiveFocusChanged: if (activeFocus)
             root.focused(1)
         width: connectAction.width
-        height: 32
         text: root.confirmForget ? "Confirm" : "Forget"
         onClicked: root.activated(1)
     }

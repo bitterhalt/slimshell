@@ -229,7 +229,6 @@ FocusScope {
 
     component ActionButton: ShellButton {
         config: root.config
-        font.pointSize: root.config.fontSize * 0.85
         outlined: true
         outlineColor: root.config.border
         opacity: enabled ? 1 : 0.5

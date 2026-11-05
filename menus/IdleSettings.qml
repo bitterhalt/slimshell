@@ -174,7 +174,6 @@ Item {
                     config: root.config
                     outlined: true
                     width: (parent.width - card.spacing) / 2
-                    height: 32
                     text: root.toggleLabel
                     focusPolicy: Qt.StrongFocus
                     onClicked: root.toggleIdle()
@@ -186,7 +185,6 @@ Item {
                     config: root.config
                     outlined: true
                     width: (parent.width - card.spacing) / 2
-                    height: 32
                     text: "Apply"
                     focusPolicy: Qt.StrongFocus
                     onClicked: root.applySettings()

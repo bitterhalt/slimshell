@@ -289,11 +289,7 @@ PopoutPanel {
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.topMargin: root.spacing
-            implicitHeight: 20
-            padding: 2
-            leftPadding: 6
-            rightPadding: 6
-            font.pointSize: root.config.fontSize * 0.78
+            compact: true
             iconSize: root.config.iconSize * 0.78
             text: discoveryState.requested ? "Stop" : "Scan"
             onClicked: discoveryState.toggleDiscovery()

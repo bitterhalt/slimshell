@@ -6,11 +6,11 @@ ShellButton {
 
     property string shortcutText: ""
 
-    implicitHeight: 32
     implicitWidth: label.implicitWidth + hint.implicitWidth + 28
     outlined: true
 
     contentItem: Item {
+        implicitHeight: Math.max(label.implicitHeight, hint.implicitHeight)
         Text {
             id: label
 

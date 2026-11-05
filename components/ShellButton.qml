@@ -5,6 +5,7 @@ Button {
     id: root
 
     required property var config
+    property bool compact: false
     property bool iconOnly: false
     property bool tinted: false
     property bool filled: false
@@ -16,14 +17,14 @@ Button {
     property color outlineColor: config.selectionBackground
     property real cornerRadius: 4
 
-    implicitHeight: 30
+    implicitHeight: Math.max(compact ? 22 : 28, implicitContentHeight + topPadding + bottomPadding)
     implicitWidth: label.implicitWidth + leftPadding + rightPadding
     focusPolicy: Qt.StrongFocus
     hoverEnabled: true
-    padding: 8
-    leftPadding: 10
-    rightPadding: 10
-    font.pointSize: config.fontSize * 0.88
+    padding: compact ? 2 : 4
+    leftPadding: compact ? 6 : 8
+    rightPadding: compact ? 6 : 8
+    font.pointSize: config.fontSize * (compact ? 0.78 : 0.88)
 
     contentItem: Text {
         id: label

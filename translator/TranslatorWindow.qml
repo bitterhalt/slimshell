@@ -287,7 +287,6 @@ PanelWindow {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.margins: 8
-            height: 34
             spacing: 8
 
             ShellButton {
@@ -535,7 +534,7 @@ PanelWindow {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            height: 42
+            height: Math.max(42, footerActions.implicitHeight + 12)
 
             Rectangle {
                 width: parent.width

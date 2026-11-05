@@ -221,8 +221,8 @@ PanelWindow {
 
             anchors.top: parent.top
             anchors.left: parent.left
-            anchors.topMargin: 1
-            anchors.leftMargin: 1
+            anchors.topMargin: 2
+            anchors.leftMargin: 2
             width: parent.width - 2
             height: 42
             z: 1
@@ -253,7 +253,7 @@ PanelWindow {
                 color: root.config.fg
                 selectionColor: root.config.selectionBackground
                 selectedTextColor: root.config.selectionForeground
-                font.pointSize: root.config.fontSize * 1.04
+                font.pointSize: root.config.fontSize * 1
                 focus: true
                 clip: true
 
@@ -308,7 +308,7 @@ PanelWindow {
                 anchors.verticalCenter: searchInput.verticalCenter
                 visible: searchInput.text.length === 0
                 color: root.config.muted
-                font.pointSize: root.config.fontSize * 1.0
+                font.pointSize: root.config.fontSize * 1
                 text: "Search clipboard"
             }
         }

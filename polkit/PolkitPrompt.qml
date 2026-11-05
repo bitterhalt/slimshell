@@ -130,10 +130,7 @@ PanelSurface {
                 objectName: "polkitCancelButton"
                 config: root.config
                 text: "Cancel"
-                height: 28
                 outlined: true
-                topPadding: 4
-                bottomPadding: 4
                 onClicked: root.cancelled()
                 Keys.onEscapePressed: event => {
                     root.cancelled();
@@ -147,9 +144,6 @@ PanelSurface {
                 visible: !!root.flow && root.flow.isResponseRequired
                 text: "Authenticate"
                 filled: true
-                height: 28
-                topPadding: 4
-                bottomPadding: 4
                 onClicked: root.submitted()
             }
         }

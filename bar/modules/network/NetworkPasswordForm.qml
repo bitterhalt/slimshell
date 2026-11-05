@@ -72,7 +72,6 @@ Column {
 
     Row {
         width: parent.width
-        height: 30
         spacing: 6
 
         ShellButton {
@@ -81,11 +80,9 @@ Column {
             config: root.config
             outlined: true
             cornerRadius: 3
-            font.pointSize: root.config.fontSize * 0.85
             KeyNavigation.tab: connectButton
             KeyNavigation.backtab: passwordInput
             width: (parent.width - 6) / 2
-            height: parent.height
             text: "Cancel"
             onClicked: root.cancelled()
         }
@@ -95,12 +92,11 @@ Column {
             objectName: "networkSubmitPassword"
             config: root.config
             filled: true
+            outlined: true
             cornerRadius: 3
-            font.pointSize: root.config.fontSize * 0.85
             KeyNavigation.tab: passwordInput
             KeyNavigation.backtab: cancelPassword
             width: (parent.width - 6) / 2
-            height: parent.height
             text: "Connect"
             enabled: root.ssid !== "" && passwordInput.text.length > 0
             onClicked: root.submitted(passwordInput.text)

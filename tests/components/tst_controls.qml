@@ -17,8 +17,7 @@ Item {
             config: host.controlConfig
             iconText: "󰑐"
             text: "Scan"
-            implicitHeight: 20
-            padding: 2
+            compact: true
         }
     }
     Component {
@@ -27,7 +26,6 @@ Item {
             config: host.controlConfig
             text: "Apply"
             width: 120
-            height: 32
         }
     }
     Component {
@@ -105,15 +103,33 @@ Item {
             const icon = findChild(button, "buttonIcon");
             compare(icon.font.family, config.iconFontFamily);
             compare(icon.font.pointSize, config.iconSize);
+            const initialHeight = button.height;
+            verify(initialHeight >= 20);
             button.iconSize = 18;
             compare(icon.font.pointSize, 18);
             compare(icon.renderType, Text.QtRendering);
             compare(icon.text, "󰑐");
-            compare(button.height, 20);
+            verify(button.height > initialHeight);
+            verify(button.availableHeight >= button.contentItem.implicitHeight);
             button.forceActiveFocus();
             compare(icon.color, config.selectionForeground);
             button.enabled = false;
             compare(icon.color, config.muted);
+        }
+
+        function test_standard_button_metrics_and_large_font_growth() {
+            const button = createTemporaryObject(buttonComponent, host);
+            compare(button.height, 28);
+            compare(button.topPadding, 4);
+            compare(button.leftPadding, 8);
+            fuzzyCompare(button.font.pointSize, config.fontSize * 0.88, 0.01);
+            button.font.pointSize = 28;
+            verify(button.height > 28);
+            verify(button.availableHeight >= button.contentItem.implicitHeight);
+            const row = createTemporaryObject(rowComponent, host);
+            compare(row.height, 28);
+            row.font.pointSize = 28;
+            verify(row.height > 28);
         }
 
         function test_action_row_selection_and_destructive_state() {

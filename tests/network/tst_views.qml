@@ -62,7 +62,7 @@ Item {
             compare(connect.text, "Connect");
             const back = findChild(actions, "networkBackAction");
             compare(connect.width, forget.width);
-            compare(actions.implicitHeight, 32);
+            compare(actions.implicitHeight, 28);
             verify(back.x < connect.x && connect.x < forget.x);
             actions.focusAction(0);
             tryCompare(connect, "activeFocus", true);

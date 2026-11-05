@@ -9,6 +9,7 @@ ShellButton {
     implicitWidth: contentRow.implicitWidth + leftPadding + rightPadding
 
     contentItem: Item {
+        implicitHeight: contentRow.height
         Row {
             id: contentRow
             anchors.centerIn: parent
