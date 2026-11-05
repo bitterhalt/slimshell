@@ -385,7 +385,7 @@ Item {
 
                         color: menuItem.selected ? root.config.selectionForeground : root.config.selectionBackground
                         font.family: root.config.iconFontFamily
-                        font.pointSize: root.config.iconSize * 1.077
+                        font.pointSize: root.config.iconSize
                         text: modelData.icon ?? ""
                     }
 
