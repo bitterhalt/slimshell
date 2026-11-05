@@ -1,7 +1,6 @@
 import "../components"
 import "../services/idle/Duration.js" as Duration
 import QtQuick
-import QtQuick.Controls.Basic
 import Quickshell
 import Quickshell.Wayland
 
