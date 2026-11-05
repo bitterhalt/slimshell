@@ -156,6 +156,11 @@ osd/            Volume overlay
 </table>
 
 <p align="center">
+  <img src="assets/launcher.png" alt="Application launcher" width="50%"><br>
+  <sub>Application launcher</sub>
+</p>
+
+<p align="center">
   <img src="assets/lock.png" alt="Lock screen with password feedback and weather" width="100%"><br>
   <sub>Lock screen</sub>
 </p>
