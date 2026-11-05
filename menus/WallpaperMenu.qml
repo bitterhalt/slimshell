@@ -471,13 +471,13 @@ PanelWindow {
                                 KeyCap {
                                     visible: hint.modelData.control
                                     label: "Ctrl"
-                                    edgeColor: root.config.selectionBackground
+                                    edgeColor: hint.hovered ? root.config.selectionForeground : root.config.selectionBackground
                                     textColor: hint.hovered ? root.config.selectionForeground : root.config.muted
                                     fontPointSize: root.config.fontSize(0.74)
                                 }
                                 KeyCap {
                                     label: hint.modelData.key
-                                    edgeColor: root.config.selectionBackground
+                                    edgeColor: hint.hovered ? root.config.selectionForeground : root.config.selectionBackground
                                     textColor: hint.hovered ? root.config.selectionForeground : root.config.muted
                                     fontPointSize: root.config.fontSize(0.74)
                                 }
