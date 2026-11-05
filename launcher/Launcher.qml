@@ -49,17 +49,17 @@ Item {
         return ranks;
     }
 
-    readonly property string placeholder: dmenuMode ? (dmenuPrompt !== "" ? dmenuPrompt : "Select") : runMode ? "Search binaries" : timerMode ? "Set a timer (e.g. 25m Focus)" : emojiMode ? "Search emoji" : fileMode ? "Search files" : "Search applications"
+    readonly property string placeholder: dmenuMode ? (dmenuPrompt !== "" ? dmenuPrompt : "Select") : runMode ? "Search binaries" : timerMode ? "Set a timer (e.g. 25m Focus)" : emojiMode ? "Search emojis" : fileMode ? "Search files" : "Search applications"
 
     property string query: ""
     readonly property string calculatorResult: calculator.result
     property int selectedIndex: 0
 
     readonly property int maxVisibleRows: 7
-    readonly property int rowHeight: 46
+    readonly property int rowHeight: 36
     readonly property int panelInset: config.panelPadding + 1
     readonly property int inputHeight: panelInset + rowHeight
-    readonly property int contentWidth: 400
+    readonly property int contentWidth: 380
     readonly property int contentSpacing: config.panelPadding
     readonly property bool fileMode: !runMode && !emojiMode && !timerMode && !dmenuMode && query.trim().startsWith("/")
     readonly property string fileNeedle: fileMode ? query.trim().slice(1).trim() : ""

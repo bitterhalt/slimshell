@@ -46,7 +46,7 @@ Item {
         anchors.right: parent.right
         anchors.rightMargin: root.config.panelPadding
         anchors.verticalCenter: parent.verticalCenter
-        spacing: root.config.spacingTight
+        spacing: 0 // Keep the paired title/status lines compact, like device rows.
 
         Text {
             objectName: "launcherResultTitle"
