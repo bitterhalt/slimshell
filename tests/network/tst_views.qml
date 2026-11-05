@@ -15,7 +15,6 @@ Item {
         id: actionsComponent
         NetworkActions {
             config: host.controlConfig
-            ssid: "Synthetic"
             selectedNetwork: ({
                     connected: false
                 })
@@ -61,6 +60,10 @@ Item {
             const connect = findChild(actions, "networkConnectAction");
             const forget = findChild(actions, "networkForgetAction");
             compare(connect.text, "Connect");
+            const back = findChild(actions, "networkBackAction");
+            compare(connect.width, forget.width);
+            compare(actions.implicitHeight, 32);
+            verify(back.x < connect.x && connect.x < forget.x);
             actions.focusAction(0);
             tryCompare(connect, "activeFocus", true);
             keyClick(Qt.Key_Tab);
@@ -71,7 +74,8 @@ Item {
                 connected: true
             };
             compare(connect.text, "Disconnect");
-            compare(connect.shortcutText, "[d]");
+            actions.confirmForget = true;
+            compare(forget.text, "Confirm");
             mouseClick(connect, 10, 10);
             compare(actionSpy.signalArguments[1][0], 0);
         }

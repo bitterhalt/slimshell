@@ -95,6 +95,15 @@ Item {
             const connect = findChild(popup, "networkConnectAction");
             tryCompare(connect, "activeFocus", true);
             keyClick(Qt.Key_F);
+            verify(popup.confirmForget);
+            compare(saved.forgets, 0);
+            keyClick(Qt.Key_F);
+            compare(saved.forgets, 0);
+            keyClick(Qt.Key_Escape);
+            verify(!popup.confirmForget);
+            verify(popup.actionMode);
+            keyClick(Qt.Key_F);
+            keyClick(Qt.Key_Return);
             compare(saved.forgets, 1);
             verify(!popup.actionMode);
             wait(0);
@@ -104,6 +113,51 @@ Item {
             mouseClick(connect, 10, 10);
             compare(saved.connects, 1);
             verify(!popup.actionMode);
+        }
+        function test_forget_confirmation_resets_on_back_and_target_change() {
+            const popup = createTemporaryObject(popupComponent, host);
+            popup.openRow({ssid: "Saved"});
+            wait(0);
+            popup.activateAction(1);
+            verify(popup.confirmForget);
+            const back = findChild(popup, "networkBackAction");
+            waitForPolish(host.Window.window);
+            mouseClick(back, back.width / 2, back.height / 2);
+            verify(!popup.confirmForget);
+            verify(!popup.actionMode);
+            compare(saved.forgets, 0);
+            wait(0);
+            popup.openRow({ssid: "Saved"});
+            wait(0);
+            popup.activateAction(1);
+            verify(popup.confirmForget);
+            popup.selectedSsid = "Secured";
+            verify(!popup.confirmForget);
+            compare(saved.forgets, 0);
+        }
+        function test_actions_use_horizontal_navigation_and_only_highlight_selection() {
+            const popup = createTemporaryObject(popupComponent, host);
+            popup.openRow({ssid: "Saved"});
+            const connect = findChild(popup, "networkConnectAction");
+            const forget = findChild(popup, "networkForgetAction");
+            const back = findChild(popup, "networkBackAction");
+            tryCompare(connect, "activeFocus", true);
+            keyClick(Qt.Key_Right);
+            tryCompare(forget, "activeFocus", true);
+            compare(popup.selectedActionIndex, 1);
+            verify(!connect.visuallyHighlighted);
+            compare(connect.background.border.width, 1);
+            compare(connect.background.border.color, fixtureConfig.border);
+            compare(connect.contentItem.color, fixtureConfig.muted);
+            keyClick(Qt.Key_Up);
+            compare(popup.selectedActionIndex, 1);
+            keyClick(Qt.Key_Down);
+            compare(popup.selectedActionIndex, 1);
+            keyClick(Qt.Key_Left);
+            tryCompare(connect, "activeFocus", true);
+            keyClick(Qt.Key_Left);
+            tryCompare(back, "activeFocus", true);
+            compare(popup.selectedActionIndex, 2);
         }
         function test_scan_button_toggles_and_respects_availability() {
             const popup = createTemporaryObject(popupComponent, host);

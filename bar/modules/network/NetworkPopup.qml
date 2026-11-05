@@ -12,11 +12,14 @@ PopoutPanel {
     required property var popupManager
     property bool passwordMode: false
     property bool actionMode: false
+    property bool confirmForget: false
     property string selectedSsid: ""
     property string errorText: ""
     property int selectedNetworkIndex: 0
     property int selectedActionIndex: 0
     property bool helpOpen: false
+    onSelectedSsidChanged: confirmForget = false
+    onActionModeChanged: confirmForget = false
     readonly property bool showNearby: scanState.resultsVisible && network.wifiBrowsingAvailable
     readonly property var selectableRows: Model.selectableRows(network.networkRows, showNearby)
 
@@ -33,6 +36,7 @@ PopoutPanel {
         selectedSsid = "";
         errorText = "";
         helpOpen = false;
+        confirmForget = false;
         selectedActionIndex = 0;
         wifiPassword.text = "";
         Qt.callLater(() => {
@@ -75,6 +79,11 @@ PopoutPanel {
             else
                 item.connect();
         } else if (index === 1) {
+            if (!confirmForget) {
+                confirmForget = true;
+                actionPage.focusAction(1);
+                return;
+            }
             item.forget();
         }
         resetState();
@@ -99,7 +108,9 @@ PopoutPanel {
         if (actionMode && !helpOpen) {
             const index = Model.actionShortcut(event.text, !!actionPage.selectedNetwork && actionPage.selectedNetwork.connected);
             if (index >= 0) {
-                activateAction(index);
+                // Repeated shortcut presses must not confirm credential removal.
+                if (index !== 1 || !confirmForget)
+                    activateAction(index);
                 event.accepted = true;
                 return true;
             }
@@ -107,6 +118,8 @@ PopoutPanel {
         if (event.key === Qt.Key_Escape) {
             if (helpOpen)
                 helpOpen = false;
+            else if (confirmForget)
+                confirmForget = false;
             else if (actionMode) {
                 resetState();
             } else {
@@ -116,16 +129,15 @@ PopoutPanel {
             helpOpen = !helpOpen;
         } else if (helpOpen) {
             return false;
-        } else if (event.key === Qt.Key_Up || event.key === Qt.Key_K) {
-            if (actionMode)
-                focusAction(Math.max(0, selectedActionIndex - 1));
-            else
-                selectNetwork(selectedNetworkIndex - 1);
-        } else if (event.key === Qt.Key_Down || event.key === Qt.Key_J) {
-            if (actionMode)
-                focusAction(Math.min(2, selectedActionIndex + 1));
-            else
-                selectNetwork(selectedNetworkIndex + 1);
+        } else if (actionMode && (event.key === Qt.Key_Left || event.key === Qt.Key_Right)) {
+            const order = [2, 0, 1];
+            const position = order.indexOf(selectedActionIndex);
+            const direction = event.key === Qt.Key_Left ? -1 : 1;
+            focusAction(order[Math.max(0, Math.min(order.length - 1, position + direction))]);
+        } else if (!actionMode && (event.key === Qt.Key_Up || event.key === Qt.Key_K)) {
+            selectNetwork(selectedNetworkIndex - 1);
+        } else if (!actionMode && (event.key === Qt.Key_Down || event.key === Qt.Key_J)) {
+            selectNetwork(selectedNetworkIndex + 1);
         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
             if (actionMode)
                 activateAction(selectedActionIndex);
@@ -139,6 +151,8 @@ PopoutPanel {
     }
 
     function focusAction(index) {
+        if (index !== 1)
+            confirmForget = false;
         selectedActionIndex = index;
         actionPage.focusAction(index);
     }
@@ -149,6 +163,7 @@ PopoutPanel {
             return;
 
         errorText = "";
+        confirmForget = false;
         if (item.connected || item.known) {
             selectedSsid = row.ssid;
             selectedActionIndex = 0;
@@ -353,13 +368,28 @@ PopoutPanel {
         id: actionPage
 
         config: root.config
-        ssid: root.selectedSsid
         selectedNetwork: root.network.networkForSsid(root.selectedSsid)
+        onSelectedNetworkChanged: root.confirmForget = false
+        confirmForget: root.confirmForget
         selectedIndex: root.selectedActionIndex
-        onFocused: index => root.selectedActionIndex = index
+        onFocused: index => {
+            root.selectedActionIndex = index;
+            if (index !== 1)
+                root.confirmForget = false;
+        }
         onActivated: index => root.activateAction(index)
         width: parent.width
         visible: root.actionMode
+    }
+
+    Text {
+        width: parent.width
+        visible: root.actionMode && root.confirmForget
+        renderType: Text.NativeRendering
+        color: root.config.urgent
+        font.pointSize: root.config.fontSize * 0.74
+        wrapMode: Text.WordWrap
+        text: "Forget saved network? Enter Confirm · Esc Cancel"
     }
 
     // Password entry and connection feedback.
@@ -391,7 +421,7 @@ PopoutPanel {
         color: root.config.muted
         font.pointSize: root.config.fontSize * 0.74
         wrapMode: Text.WordWrap
-        text: root.actionMode ? (actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "d Disconnect" : "c Connect") + " · f Forget · Esc Back" : "↑/↓ or j/k Select · Enter Connect · Ctrl+S Scan/Stop · ?/Esc Help/Close"
+        text: root.actionMode ? "←/→ Select · Enter Activate · " + (actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "d Disconnect" : "c Connect") + " · f Forget · Esc Back" : "↑/↓ or j/k Select · Enter Connect · Ctrl+S Scan/Stop · ?/Esc Help/Close"
     }
 
     // Bottom connection status and scan controls.

@@ -12,7 +12,7 @@ Button {
     property bool destructive: false
     property bool selected: false
     readonly property bool visuallyHighlighted: enabled && (down || hovered || activeFocus || selected || filled)
-    readonly property color foregroundColor: !enabled ? config.muted : visuallyHighlighted ? config.selectionForeground : destructive ? config.urgent : config.fg
+    property color foregroundColor: !enabled ? config.muted : visuallyHighlighted ? config.selectionForeground : destructive ? config.urgent : config.fg
     property color outlineColor: config.selectionBackground
     property real cornerRadius: 4
 

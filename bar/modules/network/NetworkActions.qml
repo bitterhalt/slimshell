@@ -1,13 +1,13 @@
 import QtQuick
 import "../../../components"
 
-Column {
+Row {
     id: root
 
     required property var config
-    required property string ssid
     required property var selectedNetwork
     property int selectedIndex: 0
+    property bool confirmForget: false
 
     signal activated(int index)
     signal focused(int index)
@@ -21,72 +21,60 @@ Column {
             cancelAction.forceActiveFocus();
     }
 
-    spacing: 5
+    spacing: 6
 
-    Text {
-        renderType: Text.NativeRendering
-        width: parent.width
-        color: root.config.fg
-        font.pointSize: root.config.fontSize * 0.92
-        font.weight: Font.DemiBold
-        elide: Text.ElideRight
-        text: root.ssid
+    ShellButton {
+        id: cancelAction
+        objectName: "networkBackAction"
+        config: root.config
+        selected: root.visible && root.selectedIndex === 2
+        KeyNavigation.tab: connectAction
+        KeyNavigation.backtab: forgetAction
+        onActiveFocusChanged: if (activeFocus)
+            root.focused(2)
+        width: 26
+        height: 32
+        padding: 0
+        leftPadding: 0
+        rightPadding: 0
+        text: "‹"
+        Accessible.name: "Back"
+        onClicked: root.activated(2)
     }
 
-    Text {
-        renderType: Text.NativeRendering
-        color: root.config.muted
-        font.pointSize: root.config.fontSize * 0.77
-        text: root.selectedNetwork && root.selectedNetwork.connected ? "Connected" : "Saved network"
-    }
-
-    ActionRow {
+    ShellButton {
         id: connectAction
         objectName: "networkConnectAction"
         config: root.config
+        outlined: true
+        outlineColor: root.config.border
+        foregroundColor: !enabled ? root.config.muted : visuallyHighlighted ? root.config.selectionForeground : root.config.muted
         selected: root.visible && root.selectedIndex === 0
-        shortcutText: root.selectedNetwork && root.selectedNetwork.connected ? "[d]" : "[c]"
         KeyNavigation.tab: forgetAction
         KeyNavigation.backtab: cancelAction
         onActiveFocusChanged: if (activeFocus)
             root.focused(0)
-        width: parent.width
+        width: Math.max(0, (root.width - cancelAction.width - root.spacing * 2) / 2)
         height: 32
         text: root.selectedNetwork && root.selectedNetwork.connected ? "Disconnect" : "Connect"
         onClicked: root.activated(0)
     }
 
-    ActionRow {
+    ShellButton {
         id: forgetAction
         objectName: "networkForgetAction"
         config: root.config
         selected: root.visible && root.selectedIndex === 1
         destructive: true
-        shortcutText: "[f]"
+        outlined: true
+        outlineColor: root.config.border
         KeyNavigation.tab: cancelAction
         KeyNavigation.backtab: connectAction
         onActiveFocusChanged: if (activeFocus)
             root.focused(1)
-        width: parent.width
+        width: connectAction.width
         height: 32
-        text: "Forget"
+        text: root.confirmForget ? "Confirm" : "Forget"
         onClicked: root.activated(1)
-    }
-
-    ActionRow {
-        id: cancelAction
-        objectName: "networkBackAction"
-        config: root.config
-        selected: root.visible && root.selectedIndex === 2
-        shortcutText: "[Esc]"
-        cornerRadius: 3
-        KeyNavigation.tab: connectAction
-        KeyNavigation.backtab: forgetAction
-        onActiveFocusChanged: if (activeFocus)
-            root.focused(2)
-        width: parent.width
-        height: 32
-        text: "Back"
-        onClicked: root.activated(2)
     }
 }
