@@ -39,8 +39,8 @@ class RunnerTests(unittest.TestCase):
         with patch.object(runner, "run_suite", return_value=(True, "passed")) as run, \
                 contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(runner.main(["network", "network"]), 0)
-        self.assertEqual(run.call_count, 1)
-        self.assertEqual(run.call_args.args[:2], ("qml", "tests/network"))
+        self.assertEqual([call.args[:2] for call in run.call_args_list],
+                         runner.SUITES["network"])
 
     def test_failure_does_not_skip_remaining_suites(self):
         with patch.object(runner, "run_suite", side_effect=[(False, "failed"), (True, "passed")]) as run, \

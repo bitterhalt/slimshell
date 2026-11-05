@@ -140,7 +140,7 @@ class BluetoothPopupTests(unittest.TestCase):
     def test_popup_and_bar(self):
         with tempfile.TemporaryDirectory(prefix="bluetooth-popup-") as directory:
             base = Path(directory)
-            for name in ("Bluetooth.qml", "BluetoothPopup.qml", "DiscoveryState.qml", "Model.js"):
+            for name in ("Bluetooth.qml", "BluetoothPopup.qml", "BluetoothDeviceRow.qml", "DiscoveryState.qml", "Model.js"):
                 source = (ROOT / name).read_text()
                 if name.endswith(".qml"):
                     source = "\n".join(line for line in source.splitlines()
@@ -148,7 +148,8 @@ class BluetoothPopupTests(unittest.TestCase):
                                        and line != 'import "../../../components"')
                     source = 'import "."\n' + source
                 (base / name).write_text(source)
-            (base / "PopoutPanel.qml").write_text((ROOT.parents[2] / "components/PopoutPanel.qml").read_text())
+            for name in ("PopoutPanel.qml", "PanelSurface.qml", "SelectionIndicator.qml"):
+                (base / name).write_text((ROOT.parents[2] / "components" / name).read_text())
             (base / "qmldir").write_text("singleton Quickshell 1.0 Quickshell.qml\n")
             (base / "Quickshell.qml").write_text(
                 'pragma Singleton\nimport QtQuick\nQtObject { function iconPath(name) { return ""; } }'

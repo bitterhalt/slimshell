@@ -1,8 +1,8 @@
 import QtQuick
-import QtQuick.Controls.Basic
 import Quickshell
 import Quickshell.Services.Polkit
 import Quickshell.Wayland
+import "../polkit"
 
 Scope {
     id: root
@@ -13,21 +13,18 @@ Scope {
     readonly property var flow: agent.flow
 
     function clearResponse(): void {
-        responseField.text = "";
+        promptCard.clearResponse();
     }
 
     function focusPrompt(): void {
-        if (flow && flow.isResponseRequired)
-            responseField.forceActiveFocus();
-        else
-            cancelButton.forceActiveFocus();
+        promptCard.focusPrompt();
     }
 
     function submitResponse(): void {
         if (!flow || !flow.isResponseRequired)
             return;
-        const response = responseField.text;
-        responseField.text = "";
+        const response = promptCard.response;
+        clearResponse();
         flow.submit(response);
     }
 
@@ -71,169 +68,18 @@ Scope {
                 root.clearResponse();
         }
 
-        // Authentication prompt surface and focus handling.
-        Rectangle {
+        PolkitPrompt {
             id: promptCard
-
             anchors.fill: parent
-            color: root.config.bg
-            border.color: root.config.selectionBackground
-            border.width: 2
-            radius: root.config.popupRadius
-            implicitHeight: content.implicitHeight + 32
-
-            // Re-focus once the compositor actually gives the window keyboard focus
-            Window.onActiveChanged: {
-                if (Window.active)
-                    root.focusPrompt();
-            }
-
-            Column {
-                id: content
-
-                anchors.fill: parent
-                anchors.margins: 16
-                spacing: 10
-
-                Text {
-                    renderType: Text.NativeRendering
-                    width: parent.width
-                    color: root.config.fg
-                    font.pointSize: root.config.fontSize(1.05)
-                    font.weight: Font.DemiBold
-                    wrapMode: Text.WordWrap
-                    text: root.flow ? root.flow.message : "Authentication required"
-                }
-
-                Text {
-                    renderType: Text.NativeRendering
-                    width: parent.width
-                    visible: !!root.flow && root.flow.actionId !== ""
-                    color: root.config.muted
-                    font.pointSize: root.config.fontSize(0.78)
-                    wrapMode: Text.WordWrap
-                    text: root.flow ? root.flow.actionId : ""
-                }
-
-                Text {
-                    renderType: Text.NativeRendering
-                    width: parent.width
-                    visible: !!root.flow && root.flow.identities.length > 1
-                    color: root.config.fg
-                    font.pointSize: root.config.fontSize(0.86)
-                    text: "Authenticate as"
-                }
-
-                ComboBox {
-                    id: identityPicker
-
-                    width: parent.width
-                    visible: !!root.flow && root.flow.identities.length > 1
-                    model: root.flow ? root.flow.identities : []
-                    textRole: "displayName"
-                    currentIndex: root.flow ? root.flow.identities.indexOf(root.flow.selectedIdentity) : -1
-                    onActivated: index => {
-                        if (root.flow && index >= 0) {
-                            root.clearResponse();
-                            root.flow.selectedIdentity = root.flow.identities[index];
-                            Qt.callLater(() => root.focusPrompt());
-                        }
-                    }
-                }
-
-                Text {
-                    renderType: Text.NativeRendering
-                    width: parent.width
-                    visible: !!root.flow && root.flow.identities.length === 1
-                    color: root.config.muted
-                    font.pointSize: root.config.fontSize(0.86)
-                    text: root.flow && root.flow.selectedIdentity ? root.flow.selectedIdentity.displayName : ""
-                }
-
-                Text {
-                    renderType: Text.NativeRendering
-                    width: parent.width
-                    visible: !!root.flow && root.flow.supplementaryMessage !== ""
-                    color: root.flow && root.flow.supplementaryIsError ? root.config.urgent : root.config.muted
-                    font.pointSize: root.config.fontSize(0.82)
-                    wrapMode: Text.WordWrap
-                    text: root.flow ? root.flow.supplementaryMessage : ""
-                }
-
-                // PAM response field; identity and supplementary prompts appear above it.
-                TextField {
-                    id: responseField
-
-                    width: parent.width
-                    visible: !!root.flow && root.flow.isResponseRequired
-                    placeholderText: root.flow ? root.flow.inputPrompt : ""
-                    color: root.config.fg
-                    selectionColor: root.config.selectionBackground
-                    selectedTextColor: root.config.selectionForeground
-                    font.pointSize: root.config.fontSize(0.9)
-                    echoMode: root.flow && root.flow.responseVisible ? TextInput.Normal : TextInput.Password
-                    selectByMouse: true
-                    activeFocusOnTab: true
-                    onAccepted: root.submitResponse()
-
-                    // Grab focus as soon as the field actually appears
-                    onVisibleChanged: {
-                        if (visible)
-                            Qt.callLater(() => forceActiveFocus());
-                    }
-
-                    Keys.onPressed: event => {
-                        if (event.key === Qt.Key_Escape) {
-                            root.cancelRequest();
-                            event.accepted = true;
-                        }
-                    }
-
-                    background: Rectangle {
-                        color: root.config.bg
-                        radius: 4
-                        border.width: 1
-                        border.color: responseField.activeFocus ? root.config.selectionBackground : root.config.muted
-                    }
-                }
-
-                // Confirm or cancel the authentication request.
-                Row {
-                    width: parent.width
-                    spacing: 8
-                    layoutDirection: Qt.RightToLeft
-
-                    Button {
-                        id: cancelButton
-
-                        text: "Cancel"
-                        height: 28
-                        font.pointSize: root.config.fontSize(0.88)
-                        leftPadding: 10
-                        rightPadding: 10
-                        topPadding: 4
-                        bottomPadding: 4
-                        onClicked: root.cancelRequest()
-                        Keys.onPressed: event => {
-                            if (event.key === Qt.Key_Escape) {
-                                root.cancelRequest();
-                                event.accepted = true;
-                            }
-                        }
-                    }
-
-                    Button {
-                        visible: !!root.flow && root.flow.isResponseRequired
-                        text: "Authenticate"
-                        highlighted: true
-                        height: 28
-                        font.pointSize: root.config.fontSize(0.88)
-                        leftPadding: 10
-                        rightPadding: 10
-                        topPadding: 4
-                        bottomPadding: 4
-                        onClicked: root.submitResponse()
-                    }
+            config: root.config
+            flow: root.flow
+            onSubmitted: root.submitResponse()
+            onCancelled: root.cancelRequest()
+            onIdentitySelected: index => {
+                if (root.flow && index >= 0 && index < root.flow.identities.length) {
+                    root.clearResponse();
+                    root.flow.selectedIdentity = root.flow.identities[index];
+                    Qt.callLater(() => root.focusPrompt());
                 }
             }
         }
@@ -248,7 +94,6 @@ Scope {
             }
         }
 
-        // Refocus when PAM actually asks for input (often after the window is shown)
         Connections {
             target: root.flow
             ignoreUnknownSignals: true

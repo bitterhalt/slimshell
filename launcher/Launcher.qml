@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
+import "../components"
 
 import "Scorer.js" as Scorer
 import "Dmenu.js" as Dmenu
@@ -48,10 +49,6 @@ Item {
             ranks.set(appHistory[i], i);
         return ranks;
     }
-
-    // Nerd font glyphs
-    readonly property string iconRun: String.fromCodePoint(0xF018D)
-    readonly property string iconStar: String.fromCodePoint(0xF04CE)
 
     readonly property string placeholder: dmenuMode ? (dmenuPrompt !== "" ? dmenuPrompt : "Select") : runMode ? "Search binaries" : timerMode ? "Set a timer (e.g. 25m Focus)" : emojiMode ? "Search emoji" : fileMode ? "Search files" : "Search applications"
 
@@ -570,14 +567,11 @@ Item {
         margins.top: root.config.popupGap
         margins.left: root.targetScreen ? Math.max(0, Math.round((root.targetScreen.width - width) / 2)) : 0
 
-        Rectangle {
+        PanelSurface {
             id: card
 
+            config: root.config
             anchors.fill: parent
-            color: root.config.bg
-            border.color: root.config.border
-            border.width: 1
-            radius: root.config.popupRadius
             clip: true
 
             Rectangle {
@@ -742,77 +736,17 @@ Item {
                 model: root.results
                 currentIndex: root.selectedIndex
 
-                delegate: Item {
-                    id: resultRow
-
+                delegate: LauncherResultRow {
                     required property var modelData
                     required property int index
 
+                    config: root.config
+                    entry: modelData
                     width: ListView.view.width
                     height: root.rowHeight
-
-                    readonly property bool selected: index === root.selectedIndex
-
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: 4
-                        color: resultRow.selected ? root.config.selectionBackground : "transparent"
-                    }
-
-                    IconImage {
-                        id: appIcon
-
-                        anchors.left: parent.left
-                        anchors.leftMargin: 12
-                        anchors.verticalCenter: parent.verticalCenter
-                        implicitSize: 26
-                        visible: source.toString() !== ""
-                        source: modelData.icon ? Quickshell.iconPath(modelData.icon, true) : ""
-                    }
-
-                    Text {
-                        anchors.left: parent.left
-                        anchors.leftMargin: 12
-                        anchors.verticalCenter: parent.verticalCenter
-                        visible: modelData.type === "calculator" || modelData.type === "file" || modelData.type === "binary" || modelData.type === "emoji" || modelData.type === "timer-start" || modelData.type === "timer-active"
-                        color: resultRow.selected ? root.config.selectionForeground : root.config.selectionBackground
-                        font.family: modelData.type === "emoji" ? root.config.textFontFamily : root.config.iconFontFamily
-                        font.pointSize: root.config.iconSize * 1.5
-                        text: modelData.type === "emoji" ? modelData.emoji : modelData.type === "file" ? "󰈔" : modelData.type === "binary" ? (modelData.recent ? root.iconStar : root.iconRun) : modelData.type === "timer-start" || modelData.type === "timer-active" ? "󰔛" : "󰃬"
-                    }
-
-                    Column {
-                        anchors.left: parent.left
-                        anchors.leftMargin: modelData.type === "dmenu" ? 12 : 50
-                        anchors.right: parent.right
-                        anchors.rightMargin: 12
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: 1
-
-                        Text {
-                            renderType: Text.NativeRendering
-                            width: parent.width
-                            color: resultRow.selected ? root.config.selectionForeground : root.config.fg
-                            font.pointSize: root.config.fontSize(0.96)
-                            font.family: root.config.textFontFamily
-                            font.weight: Font.Medium
-                            elide: Text.ElideRight
-                            textFormat: modelData.type === "dmenu" ? Text.RichText : Text.AutoText
-                            text: modelData.type === "dmenu" ? Dmenu.richTextWithSymbols(modelData.text, root.config.iconFontFamily) : modelData.text
-                        }
-
-                        Text {
-                            renderType: Text.NativeRendering
-                            width: parent.width
-                            visible: modelData.type === "timer-active" || (modelData.subtitle || "") !== ""
-                            color: resultRow.selected ? root.config.selectionForeground : root.config.muted
-                            font.pointSize: root.config.fontSize(0.74)
-                            elide: Text.ElideRight
-                            // The model does not depend on the clock: only
-                            // this label updates on each countdown tick.
-                            text: modelData.type === "timer-active" ? root.formatRemaining(modelData.endAt - root.timerClock) : modelData.subtitle || ""
-                        }
-                    }
+                    selected: index === root.selectedIndex
+                    // Update the label, not the result model, on each clock tick.
+                    remainingText: modelData.type === "timer-active" ? root.formatRemaining(modelData.endAt - root.timerClock) : ""
                 }
             }
 

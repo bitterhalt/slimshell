@@ -20,16 +20,10 @@ Item {
     objectName: "audioVolumeRow"
     implicitHeight: root.row.kind === "playback" ? 56 : 44
 
-    Rectangle {
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.topMargin: 6
-        anchors.bottomMargin: 6
-        width: 3
-        radius: 1
-        color: root.config.selectionBackground
-        visible: root.selected
+    SelectionIndicator {
+        config: root.config
+        selected: root.selected
+        verticalInset: 6
     }
 
     HoverHandler {

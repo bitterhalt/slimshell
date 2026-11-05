@@ -16,7 +16,7 @@ SUITES = {
     "notifications": [("qml", "tests/notifications")],
     "audio": [("qml", "tests/audio")],
     "bluetooth": [("qml", "tests/bluetooth"), ("python", "tests/bluetooth")],
-    "network": [("qml", "tests/network")],
+    "network": [("qml", "tests/network"), ("python", "tests/network")],
     "workspaces": [("qml", "tests/workspaces")],
     "idle": [("qml", "tests/idle")],
     "launcher": [("qml", "tests/launcher"), ("python", "tests/launcher")],
@@ -26,9 +26,10 @@ SUITES = {
     "lock": [("python", "tests/lock")],
     "menus": [("qml", "tests/menus"), ("python", "tests/menus")],
     "privacy": [("python", "tests/privacy")],
-    "clipboard": [("python", "tests/clipboard")],
+    "clipboard": [("qml", "tests/clipboard"), ("python", "tests/clipboard")],
     "battery": [("python", "tests/battery")],
     "services": [("python", "tests/services")],
+    "polkit": [("qml", "tests/polkit"), ("python", "tests/polkit")],
     "runner": [("python", "tests")],
 }
 

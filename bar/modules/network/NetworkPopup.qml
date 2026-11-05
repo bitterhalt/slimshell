@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import "../../../components"
 import "Model.js" as Model
 import QtQuick
-import QtQuick.Controls
 import Quickshell.Networking
 
 PopoutPanel {
@@ -141,12 +140,7 @@ PopoutPanel {
 
     function focusAction(index) {
         selectedActionIndex = index;
-        if (index === 0)
-            connectAction.forceActiveFocus();
-        else if (index === 1)
-            forgetAction.forceActiveFocus();
-        else
-            cancelAction.forceActiveFocus();
+        actionPage.focusAction(index);
     }
 
     function openRow(row) {
@@ -159,7 +153,7 @@ PopoutPanel {
             selectedSsid = row.ssid;
             selectedActionIndex = 0;
             actionMode = true;
-            Qt.callLater(() => connectAction.forceActiveFocus());
+            Qt.callLater(() => actionPage.focusAction(0));
             return;
         }
         if (item.security === WifiSecurityType.Open) {
@@ -170,7 +164,7 @@ PopoutPanel {
         popupManager.hostFocusable = true;
         passwordMode = true;
         Qt.callLater(() => {
-            return wifiPassword.forceActiveFocus();
+            return wifiPassword.focusInput();
         });
     }
 
@@ -355,305 +349,37 @@ PopoutPanel {
     }
 
     // Connect, forget, and back actions for a selected network.
-    Column {
+    NetworkActions {
         id: actionPage
 
-        readonly property var selectedNetwork: root.network.networkForSsid(root.selectedSsid)
-
+        config: root.config
+        ssid: root.selectedSsid
+        selectedNetwork: root.network.networkForSsid(root.selectedSsid)
+        selectedIndex: root.selectedActionIndex
+        onFocused: index => root.selectedActionIndex = index
+        onActivated: index => root.activateAction(index)
         width: parent.width
-        spacing: 5
         visible: root.actionMode
-
-        Text {
-            renderType: Text.NativeRendering
-            width: parent.width
-            color: root.config.fg
-            font.pointSize: root.config.fontSize(0.92)
-            font.weight: Font.DemiBold
-            elide: Text.ElideRight
-            text: root.selectedSsid
-        }
-
-        Text {
-            renderType: Text.NativeRendering
-            color: root.config.muted
-            font.pointSize: root.config.fontSize(0.77)
-            text: parent.selectedNetwork && parent.selectedNetwork.connected ? "Connected" : "Saved network"
-        }
-
-        Button {
-            id: connectAction
-            KeyNavigation.tab: forgetAction
-            KeyNavigation.backtab: cancelAction
-            onActiveFocusChanged: if (activeFocus)
-                root.selectedActionIndex = 0
-            width: parent.width
-            height: 32
-            readonly property bool actionHighlighted: hovered || activeFocus || (root.actionMode && root.selectedActionIndex === 0)
-            text: actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "Disconnect" : "Connect"
-            onClicked: root.activateAction(0)
-
-            background: Rectangle {
-                radius: 4
-                color: connectAction.actionHighlighted ? root.config.selectionBackground : "transparent"
-                border.color: root.config.selectionBackground
-                border.width: 1
-            }
-
-            contentItem: Item {
-                Text {
-                    anchors.left: parent.left
-                    anchors.leftMargin: 10
-                    anchors.right: connectShortcut.left
-                    anchors.rightMargin: 8
-                    anchors.verticalCenter: parent.verticalCenter
-                    renderType: Text.NativeRendering
-                    textFormat: Text.PlainText
-                    color: connectAction.actionHighlighted ? root.config.selectionForeground : root.config.fg
-                    font.pointSize: root.config.fontSize(0.88)
-                    text: connectAction.text
-                }
-                Text {
-                    id: connectShortcut
-                    anchors.right: parent.right
-                    anchors.rightMargin: 10
-                    anchors.verticalCenter: parent.verticalCenter
-                    renderType: Text.NativeRendering
-                    textFormat: Text.PlainText
-                    color: connectAction.actionHighlighted ? root.config.selectionForeground : root.config.muted
-                    font.pointSize: root.config.fontSize(0.76)
-                    text: actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "[d]" : "[c]"
-                }
-            }
-        }
-
-        Button {
-            id: forgetAction
-            KeyNavigation.tab: cancelAction
-            KeyNavigation.backtab: connectAction
-            onActiveFocusChanged: if (activeFocus)
-                root.selectedActionIndex = 1
-            width: parent.width
-            height: 32
-            readonly property bool actionHighlighted: hovered || activeFocus || (root.actionMode && root.selectedActionIndex === 1)
-            text: "Forget"
-            onClicked: root.activateAction(1)
-
-            background: Rectangle {
-                radius: 4
-                color: forgetAction.actionHighlighted ? root.config.selectionBackground : "transparent"
-                border.color: root.config.selectionBackground
-                border.width: 1
-            }
-
-            contentItem: Item {
-                Text {
-                    anchors.left: parent.left
-                    anchors.leftMargin: 10
-                    anchors.right: forgetShortcut.left
-                    anchors.rightMargin: 8
-                    anchors.verticalCenter: parent.verticalCenter
-                    renderType: Text.NativeRendering
-                    textFormat: Text.PlainText
-                    color: forgetAction.actionHighlighted ? root.config.selectionForeground : root.config.urgent
-                    font.pointSize: root.config.fontSize(0.88)
-                    text: forgetAction.text
-                }
-                Text {
-                    id: forgetShortcut
-                    anchors.right: parent.right
-                    anchors.rightMargin: 10
-                    anchors.verticalCenter: parent.verticalCenter
-                    renderType: Text.NativeRendering
-                    textFormat: Text.PlainText
-                    color: forgetAction.actionHighlighted ? root.config.selectionForeground : root.config.muted
-                    font.pointSize: root.config.fontSize(0.76)
-                    text: "[f]"
-                }
-            }
-        }
-
-        Button {
-            id: cancelAction
-            KeyNavigation.tab: connectAction
-            KeyNavigation.backtab: forgetAction
-            onActiveFocusChanged: if (activeFocus)
-                root.selectedActionIndex = 2
-            width: parent.width
-            height: 32
-            readonly property bool actionHighlighted: hovered || activeFocus || (root.actionMode && root.selectedActionIndex === 2)
-            text: "Back"
-            onClicked: root.activateAction(2)
-
-            background: Rectangle {
-                radius: 3
-                color: cancelAction.actionHighlighted ? root.config.selectionBackground : "transparent"
-                border.color: root.config.selectionBackground
-                border.width: 1
-            }
-
-            contentItem: Item {
-                Text {
-                    anchors.left: parent.left
-                    anchors.leftMargin: 10
-                    anchors.right: backShortcut.left
-                    anchors.rightMargin: 8
-                    anchors.verticalCenter: parent.verticalCenter
-                    renderType: Text.NativeRendering
-                    textFormat: Text.PlainText
-                    color: cancelAction.actionHighlighted ? root.config.selectionForeground : root.config.fg
-                    font.pointSize: root.config.fontSize(0.88)
-                    text: "Back"
-                }
-                Text {
-                    id: backShortcut
-                    anchors.right: parent.right
-                    anchors.rightMargin: 10
-                    anchors.verticalCenter: parent.verticalCenter
-                    renderType: Text.NativeRendering
-                    textFormat: Text.PlainText
-                    color: cancelAction.actionHighlighted ? root.config.selectionForeground : root.config.muted
-                    font.pointSize: root.config.fontSize(0.76)
-                    text: "[Esc]"
-                }
-            }
-        }
     }
 
     // Password entry and connection feedback.
-    Column {
+    NetworkPasswordForm {
+        id: wifiPassword
+        config: root.config
+        ssid: root.selectedSsid
+        errorText: root.errorText
         width: parent.width
-        spacing: 8
         visible: root.passwordMode
-
-        Text {
-            renderType: Text.NativeRendering
-            width: parent.width
-            color: root.config.fg
-            font.pointSize: root.config.fontSize(0.92)
-            font.weight: Font.DemiBold
-            elide: Text.ElideRight
-            text: root.selectedSsid
-        }
-
-        Text {
-            renderType: Text.NativeRendering
-            color: root.config.muted
-            font.pointSize: root.config.fontSize(0.77)
-            text: "Enter network password"
-        }
-
-        TextField {
-            id: wifiPassword
-            renderType: Text.NativeRendering
-            KeyNavigation.tab: cancelPassword
-            KeyNavigation.backtab: connectButton
-
-            width: parent.width
-            height: 32
-            focus: root.passwordMode
-            onVisibleChanged: {
-                if (visible)
-                    Qt.callLater(() => {
-                        return forceActiveFocus();
-                    });
-            }
-            echoMode: TextInput.Password
-            passwordCharacter: "•"
-            placeholderText: "Password"
-            color: root.config.fg
-            placeholderTextColor: root.config.muted
-            selectionColor: root.config.selectionBackground
-            selectedTextColor: root.config.selectionForeground
-            font.pointSize: root.config.fontSize(0.92)
-            Keys.onReturnPressed: if (connectButton.enabled)
-                connectButton.clicked()
-            Keys.onEnterPressed: if (connectButton.enabled)
-                connectButton.clicked()
-
-            background: Rectangle {
-                color: root.config.bg
-                border.color: root.config.selectionBackground
-                border.width: 1
-                radius: root.config.popupRadius
-            }
-        }
-
-        Text {
-            renderType: Text.NativeRendering
-            width: parent.width
-            visible: root.errorText !== ""
-            color: root.config.urgent
-            font.pointSize: root.config.fontSize(0.77)
-            text: root.errorText
-        }
-
-        Row {
-            width: parent.width
-            height: 30
-            spacing: 6
-
-            Button {
-                id: cancelPassword
-                KeyNavigation.tab: connectButton
-                KeyNavigation.backtab: wifiPassword
-                width: (parent.width - 6) / 2
-                height: parent.height
-                text: "Cancel"
-                onClicked: root.resetState()
-
-                background: Rectangle {
-                    radius: 3
-                    color: cancelPassword.hovered || cancelPassword.activeFocus ? root.config.selectionBackground : "transparent"
-                    border.color: root.config.selectionBackground
-                    border.width: 1
-                }
-
-                contentItem: Text {
-                    renderType: Text.NativeRendering
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    color: cancelPassword.hovered || cancelPassword.activeFocus ? root.config.selectionForeground : root.config.fg
-                    font.pointSize: root.config.fontSize(0.85)
-                    text: cancelPassword.text
-                }
-            }
-
-            Button {
-                id: connectButton
-                KeyNavigation.tab: wifiPassword
-                KeyNavigation.backtab: cancelPassword
-
-                width: (parent.width - 6) / 2
-                height: parent.height
-                text: "Connect"
-                enabled: root.selectedSsid !== "" && wifiPassword.text.length > 0
-                onClicked: {
-                    var item = root.network.networkForSsid(root.selectedSsid);
-                    if (!item)
-                        return;
-
-                    root.errorText = "";
-                    item.connectWithPsk(wifiPassword.text);
-                    root.passwordMode = false;
-                    wifiPassword.text = "";
-                    Qt.callLater(() => root.forceActiveFocus());
-                }
-
-                background: Rectangle {
-                    radius: 3
-                    color: root.config.selectionBackground
-                }
-
-                contentItem: Text {
-                    renderType: Text.NativeRendering
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    color: connectButton.enabled ? root.config.selectionForeground : root.config.muted
-                    font.pointSize: root.config.fontSize(0.85)
-                    text: connectButton.text
-                }
-            }
+        onCancelled: root.resetState()
+        onSubmitted: password => {
+            const item = root.network.networkForSsid(root.selectedSsid);
+            if (!item)
+                return;
+            root.errorText = "";
+            item.connectWithPsk(password);
+            root.passwordMode = false;
+            wifiPassword.text = "";
+            Qt.callLater(() => root.forceActiveFocus());
         }
     }
 

@@ -290,7 +290,7 @@ PanelWindow {
             height: 34
             spacing: 8
 
-            TranslatorButton {
+            ShellButton {
                 id: sourceButton
 
                 config: root.config
@@ -303,7 +303,7 @@ PanelWindow {
                 KeyNavigation.backtab: copyButton.enabled ? copyButton : translateButton
             }
 
-            TranslatorButton {
+            ShellButton {
                 id: swapButton
 
                 config: root.config
@@ -321,7 +321,7 @@ PanelWindow {
                 KeyNavigation.backtab: sourceButton
             }
 
-            TranslatorButton {
+            ShellButton {
                 id: targetButton
 
                 config: root.config
@@ -564,7 +564,7 @@ PanelWindow {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 8
 
-                TranslatorButton {
+                ShellButton {
                     id: translateButton
 
                     config: root.config
@@ -575,7 +575,7 @@ PanelWindow {
                     KeyNavigation.backtab: outputArea
                 }
 
-                TranslatorButton {
+                ShellButton {
                     id: copyButton
 
                     config: root.config

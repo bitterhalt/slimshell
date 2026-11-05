@@ -168,48 +168,28 @@ Item {
                 anchors.rightMargin: 8
                 spacing: card.spacing
 
-                Button {
+                ShellButton {
                     id: toggleButton
 
+                    config: root.config
+                    outlined: true
                     width: (parent.width - card.spacing) / 2
                     height: 32
                     text: root.toggleLabel
                     focusPolicy: Qt.StrongFocus
                     onClicked: root.toggleIdle()
-
-                    background: FocusRing {
-                        config: root.config
-                        hovered: toggleButton.hovered
-                        focused: toggleButton.activeFocus
-                    }
-
-                    contentItem: ButtonLabel {
-                        config: root.config
-                        highlighted: toggleButton.hovered || toggleButton.activeFocus
-                        text: toggleButton.text
-                    }
                 }
 
-                Button {
+                ShellButton {
                     id: applyButton
 
+                    config: root.config
+                    outlined: true
                     width: (parent.width - card.spacing) / 2
                     height: 32
                     text: "Apply"
                     focusPolicy: Qt.StrongFocus
                     onClicked: root.applySettings()
-
-                    background: FocusRing {
-                        config: root.config
-                        hovered: applyButton.hovered
-                        focused: applyButton.activeFocus
-                    }
-
-                    contentItem: ButtonLabel {
-                        config: root.config
-                        highlighted: applyButton.hovered || applyButton.activeFocus
-                        text: applyButton.text
-                    }
                 }
             }
         }
@@ -277,27 +257,5 @@ Item {
                 onAccepted: row.accepted()
             }
         }
-    }
-
-    component FocusRing: Rectangle {
-        required property var config
-        required property bool hovered
-        required property bool focused
-
-        radius: 4
-        color: hovered || focused ? config.selectionBackground : "transparent"
-        border.width: 1
-        border.color: config.selectionBackground
-    }
-
-    component ButtonLabel: Text {
-        required property var config
-        property bool highlighted: false
-
-        renderType: Text.NativeRendering
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        color: highlighted ? config.selectionForeground : config.fg
-        font.pointSize: config.fontSize(0.88)
     }
 }

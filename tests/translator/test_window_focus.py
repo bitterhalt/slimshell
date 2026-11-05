@@ -44,7 +44,7 @@ TranslatorWindow {
         when: windowShown
         Component {
             id: hoverButtonComponent
-            TranslatorButton { config: dialog.config; text: "Translate"; x: 10; y: 100 }
+            ShellButton { config: dialog.config; text: "Translate"; x: 10; y: 100 }
         }
         function test_button_hover_uses_selection_foreground() {
             const button = createTemporaryObject(hoverButtonComponent, dialog.contentItem);
@@ -104,8 +104,8 @@ class TranslatorFocusTests(unittest.TestCase):
             source = re.sub(r"^\s*WlrLayershell\.keyboardFocus:[^\n]*\n\s*\?[^\n]*\n", "\n", source, flags=re.M)
             source = re.sub(r"^\s*WlrLayershell\.[^\n]*\n", "\n", source, flags=re.M)
             (base / "TranslatorWindow.qml").write_text('import "."\n' + source)
-            for name in ("TranslatorButton.qml", "Languages.js"):
-                (base / name).write_text((ROOT / name).read_text())
+            (base / "Languages.js").write_text((ROOT / "Languages.js").read_text())
+            (base / "ShellButton.qml").write_text((ROOT.parent / "components/ShellButton.qml").read_text())
             (base / "ShellToolTip.qml").write_text((ROOT.parent / "tests/fixtures/ShellToolTip.qml").read_text())
             (base / "qmldir").write_text("singleton Quickshell 1.0 Quickshell.qml\n")
             (base / "Quickshell.qml").write_text(

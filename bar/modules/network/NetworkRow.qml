@@ -1,4 +1,5 @@
 import QtQuick
+import "../../../components"
 
 Item {
     id: root
@@ -31,16 +32,9 @@ Item {
 
     implicitHeight: 40
 
-    Rectangle {
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.topMargin: 3
-        anchors.bottomMargin: 3
-        width: 3
-        radius: 1
-        color: root.config.selectionBackground
-        visible: root.selected
+    SelectionIndicator {
+        config: root.config
+        selected: root.selected
     }
 
     // Signal/lock icon beside the network name and status.

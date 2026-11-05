@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
+import "../components"
 
 // Draft preferences: only Save writes them; Escape/Cancel leaves them unchanged.
 FocusScope {
@@ -192,23 +193,13 @@ FocusScope {
         wrapMode: Text.WordWrap
     }
 
-    component SettingField: TextField {
+    component SettingField: ShellTextField {
+        config: root.config
         Layout.fillWidth: true
         Layout.minimumWidth: 0
         Layout.preferredWidth: 1
         Layout.preferredHeight: 32
-        color: root.config.fg
-        placeholderTextColor: root.config.muted
-        selectionColor: root.config.selectionBackground
-        selectedTextColor: root.config.selectionForeground
-        font.pointSize: root.config.fontSize(0.9)
-        selectByMouse: true
         onTextChanged: root.errorText = ""
-        background: Rectangle {
-            color: "transparent"
-            radius: 4
-            border.color: parent.activeFocus ? root.config.selectionBackground : root.config.border
-        }
     }
 
     component SettingCombo: ComboBox {
@@ -236,22 +227,11 @@ FocusScope {
         }
     }
 
-    component ActionButton: Button {
-        id: button
+    component ActionButton: ShellButton {
+        config: root.config
         font.pointSize: root.config.fontSize(0.85)
+        outlined: true
+        outlineColor: root.config.border
         opacity: enabled ? 1 : 0.5
-        contentItem: Text {
-            renderType: Text.NativeRendering
-            text: button.text
-            font: button.font
-            color: button.hovered || button.activeFocus ? root.config.selectionForeground : root.config.fg
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-        }
-        background: Rectangle {
-            radius: 4
-            color: button.hovered || button.activeFocus ? root.config.selectionBackground : "transparent"
-            border.color: button.activeFocus ? root.config.selectionBackground : root.config.border
-        }
     }
 }

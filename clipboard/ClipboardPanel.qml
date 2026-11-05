@@ -349,41 +349,15 @@ PanelWindow {
                     model: root.filteredEntries
                     currentIndex: root.selectedIndex
 
-                    delegate: Item {
-                        id: entryRow
+                    delegate: ClipboardHistoryRow {
                         required property var modelData
                         required property int index
 
+                        config: root.config
+                        entry: modelData
+                        selected: index === root.selectedIndex
                         width: ListView.view.width
                         height: root.rowHeight
-
-                        Rectangle {
-                            anchors.fill: parent
-                            radius: 5
-                            color: entryRow.index === root.selectedIndex ? root.config.selectionBackground : "transparent"
-                        }
-
-                        Text {
-                            anchors.left: parent.left
-                            anchors.leftMargin: 10
-                            anchors.verticalCenter: parent.verticalCenter
-                            color: entryRow.index === root.selectedIndex ? root.config.selectionForeground : root.config.selectionBackground
-                            font.family: root.config.iconFontFamily
-                            font.pointSize: root.config.iconSize
-                            text: entryRow.modelData.isImage ? "󰋩" : "󰉢"
-                        }
-
-                        Text {
-                            renderType: Text.NativeRendering
-                            anchors.left: parent.left
-                            anchors.leftMargin: 42
-                            anchors.right: parent.right
-                            anchors.rightMargin: 8
-                            anchors.verticalCenter: parent.verticalCenter
-                            color: entryRow.index === root.selectedIndex ? root.config.selectionForeground : root.config.fg
-                            font.pointSize: root.config.fontSize(0.88)
-                            text: entryRow.modelData.isImage ? "Image" : "Text"
-                        }
                     }
                 }
             }
@@ -394,43 +368,15 @@ PanelWindow {
                 color: root.config.border
             }
 
-            Item {
+            ClipboardPreview {
+                config: root.config
+                entry: root.selectedEntry
+                ready: root.previewReady
+                imagePath: root.previewPath
+                previewText: root.selectedText
+                historyEmpty: root.entries.length === 0
                 width: parent.width - root.historyWidth - 1
                 height: parent.height
-
-                Image {
-                    anchors.fill: parent
-                    anchors.margins: 16
-                    visible: root.previewReady && root.selectedEntry && root.selectedEntry.isImage
-                    source: root.previewReady ? "file://" + root.previewPath : ""
-                    fillMode: Image.PreserveAspectFit
-                    sourceSize.width: Math.ceil(width * Screen.devicePixelRatio)
-                    sourceSize.height: Math.ceil(height * Screen.devicePixelRatio)
-                    asynchronous: true
-                    cache: false
-                }
-
-                Text {
-                    renderType: Text.NativeRendering
-                    anchors.fill: parent
-                    anchors.margins: 18
-                    visible: root.selectedEntry && !root.selectedEntry.isImage
-                    color: root.config.fg
-                    font.family: "monospace"
-                    font.pointSize: root.config.fontSize(0.82)
-                    wrapMode: Text.WrapAnywhere
-                    text: root.selectedText
-                    clip: true
-                }
-
-                Text {
-                    renderType: Text.NativeRendering
-                    anchors.centerIn: parent
-                    visible: !root.selectedEntry
-                    color: root.config.muted
-                    font.pointSize: root.config.fontSize(0.9)
-                    text: root.entries.length === 0 ? "Clipboard history is empty" : "Select an item to preview"
-                }
             }
         }
 
