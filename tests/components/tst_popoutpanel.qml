@@ -74,7 +74,9 @@ Item {
         function test_page_changes_settle_synchronously() {
             const panel = createTemporaryObject(panelComponent, host);
             for (const count of [7, 2, 5, 0, 3]) {
-                panel.rows = Array.from({length: count}, (_, i) => i);
+                panel.rows = Array.from({
+                    length: count
+                }, (_, i) => i);
                 panel.prepareLayout();
                 compare(panel.implicitHeight, 24 + count * 32 + Math.max(0, count - 1) * 4);
             }

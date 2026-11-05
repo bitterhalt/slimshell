@@ -30,16 +30,16 @@ Rectangle {
 
     color: bg
     focus: true
-    Keys.onPressed: (event) => {
+    Keys.onPressed: event => {
         if (event.key === Qt.Key_Escape) {
             root.context.cancelPam();
             event.accepted = true;
-            return ;
+            return;
         }
         if (root.context.showFailure && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)) {
             root.context.tryUnlock();
             event.accepted = true;
-            return ;
+            return;
         }
         if (!root.context.pamActivated)
             root.context.requestUnlock();
@@ -52,7 +52,6 @@ Rectangle {
             } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                 if (root.context.currentText !== "")
                     root.context.submitPassword();
-
             } else if (event.text && !/[\x00-\x1f\x7f]/.test(event.text) && !(event.modifiers & Qt.MetaModifier) && (!(event.modifiers & Qt.ControlModifier) || (event.modifiers & Qt.AltModifier))) {
                 root.context.currentText += event.text;
             }
@@ -75,9 +74,7 @@ Rectangle {
                 const temperature = cached && cached.current && cached.current.temperature_2m;
                 if (typeof city === "string" && city.trim() !== "" && typeof temperature === "number" && Number.isFinite(temperature))
                     root.weatherText = city.trim() + " " + Math.round(temperature) + "°C";
-
-            } catch (_) {
-            }
+            } catch (_) {}
         }
         onFileChanged: reload()
         onLoadFailed: root.weatherText = ""
@@ -104,7 +101,6 @@ Rectangle {
                 to: 0.18
                 duration: 100
             }
-
         }
 
         ParallelAnimation {
@@ -123,9 +119,7 @@ Rectangle {
                 duration: 180
                 easing.type: Easing.OutQuad
             }
-
         }
-
     }
 
     SequentialAnimation {
@@ -158,7 +152,6 @@ Rectangle {
             to: 0
             duration: 65
         }
-
     }
 
     SystemClock {
@@ -194,7 +187,6 @@ Rectangle {
         function onPamActivatedChanged() {
             if (!root.context.pamActivated)
                 root.forceActiveFocus();
-
         }
 
         function onShowFailureChanged() {
@@ -271,7 +263,6 @@ Rectangle {
             opacity: 0.7
             text: root.weatherText
         }
-
     }
 
     // Password feedback and authentication status.
@@ -317,14 +308,15 @@ Rectangle {
                     anchors.fill: parent
                     acceptedButtons: Qt.AllButtons
                     cursorShape: Qt.ArrowCursor
-                    onWheel: event => { event.accepted = true; }
+                    onWheel: event => {
+                        event.accepted = true;
+                    }
                 }
 
                 Connections {
                     function onCurrentTextChanged() {
                         if (passwordBox.text !== root.context.currentText)
                             passwordBox.text = root.context.currentText;
-
                     }
 
                     target: root.context
@@ -372,17 +364,11 @@ Rectangle {
                                     color: newest ? root.config.selectionBackground : root.config.border
                                     scale: newest ? root.pulseScale : 1
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
 
         // Status message
@@ -413,7 +399,5 @@ Rectangle {
         transform: Translate {
             x: root.feedbackOffset
         }
-
     }
-
 }

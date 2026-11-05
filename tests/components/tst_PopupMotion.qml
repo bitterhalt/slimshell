@@ -118,7 +118,5 @@ TestCase {
             duration: 30
             surfaceHeight: 80
         }
-
     }
-
 }

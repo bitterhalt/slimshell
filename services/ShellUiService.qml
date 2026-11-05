@@ -17,46 +17,69 @@ Item {
 
     IpcHandler {
         target: "weather"
-        function toggle(): void { root.weatherActionRequested("toggle") }
-        function open(): void { root.weatherActionRequested("open") }
-        function close(): void { root.weatherActionRequested("close") }
+        function toggle(): void {
+            root.weatherActionRequested("toggle");
+        }
+        function open(): void {
+            root.weatherActionRequested("open");
+        }
+        function close(): void {
+            root.weatherActionRequested("close");
+        }
     }
 
     IpcHandler {
         target: "bluetooth"
-        function toggle(): void { root.bluetoothActionRequested("toggle") }
-        function open(): void { root.bluetoothActionRequested("open") }
-        function close(): void { root.bluetoothActionRequested("close") }
+        function toggle(): void {
+            root.bluetoothActionRequested("toggle");
+        }
+        function open(): void {
+            root.bluetoothActionRequested("open");
+        }
+        function close(): void {
+            root.bluetoothActionRequested("close");
+        }
     }
 
     IpcHandler {
         target: "audio"
-        function toggle(): void { root.audioActionRequested("toggle") }
-        function open(): void { root.audioActionRequested("open") }
-        function close(): void { root.audioActionRequested("close") }
+        function toggle(): void {
+            root.audioActionRequested("toggle");
+        }
+        function open(): void {
+            root.audioActionRequested("open");
+        }
+        function close(): void {
+            root.audioActionRequested("close");
+        }
     }
 
     IpcHandler {
         target: "network"
-        function toggle(): void { root.networkActionRequested("toggle") }
-        function open(): void { root.networkActionRequested("open") }
-        function close(): void { root.networkActionRequested("close") }
+        function toggle(): void {
+            root.networkActionRequested("toggle");
+        }
+        function open(): void {
+            root.networkActionRequested("open");
+        }
+        function close(): void {
+            root.networkActionRequested("close");
+        }
     }
 
     IpcHandler {
         target: "notificationCenter"
 
         function toggle(): void {
-            root.notificationCenterActionRequested("toggle")
+            root.notificationCenterActionRequested("toggle");
         }
 
         function open(): void {
-            root.notificationCenterActionRequested("open")
+            root.notificationCenterActionRequested("open");
         }
 
         function close(): void {
-            root.notificationCenterActionRequested("close")
+            root.notificationCenterActionRequested("close");
         }
     }
-
 }

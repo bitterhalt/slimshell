@@ -16,21 +16,19 @@ Rectangle {
     readonly property color criticalBorderColor: "#af3029"
     readonly property bool highlighted: selected || hover.hovered
     readonly property int expandedBodyLineLimit: 8
-    readonly property bool expandableBody:
-        bodyText.truncated || bodyText.text.length > 80 || expanded
+    readonly property bool expandableBody: bodyText.truncated || bodyText.text.length > 80 || expanded
     property string timeLabel: ""
     property string appIconSource: ""
     property var actionEntries: []
 
-    signal picked()
-    signal expandRequested()
+    signal picked
+    signal expandRequested
     signal actionRequested(var entry)
 
     implicitHeight: Math.max(46, content.implicitHeight) + 20
     radius: config.popupRadius
     border.width: 1
-    border.color: root.critical ? root.criticalBorderColor
-        : root.highlighted ? root.config.selectionBackground : root.config.border
+    border.color: root.critical ? root.criticalBorderColor : root.highlighted ? root.config.selectionBackground : root.config.border
     color: root.critical ? root.config.bg : Qt.alpha(root.config.selectionBackground, 0.05)
 
     HoverHandler {
@@ -41,9 +39,7 @@ Rectangle {
         onTapped: {
             const wasSelected = root.selected;
             root.picked();
-            if (root.expandableBody
-                    && (!wasSelected || root.actionEntries.length === 0
-                        || point.position.y < content.y + actions.y))
+            if (root.expandableBody && (!wasSelected || root.actionEntries.length === 0 || point.position.y < content.y + actions.y))
                 root.expandRequested();
         }
     }
@@ -76,8 +72,7 @@ Rectangle {
             anchors.centerIn: parent
             visible: !thumbnail.visible
             text: root.critical ? "󰀧" : "󰂚"
-            color: root.critical ? root.criticalBorderColor
-                : root.highlighted ? root.config.fg : root.config.muted
+            color: root.critical ? root.criticalBorderColor : root.highlighted ? root.config.fg : root.config.muted
             font.family: root.config.iconFontFamily
             font.pointSize: root.config.iconSize
         }
@@ -99,14 +94,11 @@ Rectangle {
                 id: title
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                width: Math.min(implicitWidth,
-                    Math.max(0, parent.width - timestamp.implicitWidth
-                        - (expandHint.visible ? expandHint.implicitWidth + 14 : 8)))
+                width: Math.min(implicitWidth, Math.max(0, parent.width - timestamp.implicitWidth - (expandHint.visible ? expandHint.implicitWidth + 14 : 8)))
                 renderType: Text.NativeRendering
                 textFormat: Text.PlainText
                 text: root.notification ? root.notification.summary || "Notification" : ""
-                color: root.critical ? root.criticalTextColor
-                    : root.config.fg
+                color: root.critical ? root.criticalTextColor : root.config.fg
                 font.pointSize: root.config.fontSize(0.96)
                 font.weight: Font.Medium
                 elide: Text.ElideRight
@@ -119,8 +111,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 renderType: Text.NativeRendering
                 text: root.timeLabel
-                color: root.critical ? root.criticalTextColor
-                    : root.highlighted ? root.config.fg : root.config.muted
+                color: root.critical ? root.criticalTextColor : root.highlighted ? root.config.fg : root.config.muted
                 font.pointSize: root.config.fontSize(0.72)
             }
 
@@ -147,8 +138,7 @@ Rectangle {
             renderType: Text.NativeRendering
             textFormat: Text.PlainText
             text: root.notification ? root.notification.body || "" : ""
-            color: root.critical ? root.criticalTextColor
-                : root.highlighted ? root.config.fg : root.config.muted
+            color: root.critical ? root.criticalTextColor : root.highlighted ? root.config.fg : root.config.muted
             font.pointSize: root.config.fontSize(0.85)
             wrapMode: Text.Wrap
             maximumLineCount: root.expanded ? root.expandedBodyLineLimit : 3
@@ -170,9 +160,7 @@ Rectangle {
                     width: Math.min(actions.width, caption.implicitWidth + 16)
                     height: 26
                     radius: 4
-                    color: actionMouse.containsMouse
-                        ? root.config.selectionBackground
-                        : root.critical ? root.config.bg : Qt.alpha(root.config.selectionBackground, 0.12)
+                    color: actionMouse.containsMouse ? root.config.selectionBackground : root.critical ? root.config.bg : Qt.alpha(root.config.selectionBackground, 0.12)
                     Text {
                         id: caption
                         anchors.centerIn: parent
@@ -180,9 +168,7 @@ Rectangle {
                         renderType: Text.NativeRendering
                         textFormat: Text.PlainText
                         text: (actionButton.modelData.key ? "[" + actionButton.modelData.key + "] " : "") + actionButton.modelData.label
-                        color: root.critical ? root.criticalTextColor
-                            : actionMouse.containsMouse
-                                ? root.config.selectionForeground : root.config.fg
+                        color: root.critical ? root.criticalTextColor : actionMouse.containsMouse ? root.config.selectionForeground : root.config.fg
                         font.pointSize: root.config.fontSize(0.78)
                         elide: Text.ElideRight
                     }
@@ -197,5 +183,4 @@ Rectangle {
             }
         }
     }
-
 }

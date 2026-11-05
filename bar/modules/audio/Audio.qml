@@ -36,7 +36,7 @@ Item {
         function onAudioActionRequested(action) {
             if (action === "close" || root.barWindow.screen !== root.uiService.targetScreen) {
                 root.closePopup();
-                return ;
+                return;
             }
             if (action === "open")
                 root.popupManager.openHost("audio", audioPopupComponent, root, true);
@@ -61,15 +61,15 @@ Item {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         cursorShape: Qt.PointingHandCursor
-        onClicked: (mouse) => {
+        onClicked: mouse => {
             if (mouse.button === Qt.LeftButton)
                 popupManager.toggleHost("audio", audioPopupComponent, root, true);
             else if (root.sink)
                 root.audioService.toggleMute(root.sink.id);
         }
-        onWheel: (wheel) => {
+        onWheel: wheel => {
             if (!root.sinkAudio)
-                return ;
+                return;
 
             root.audioService.adjustVolume(root.sink.id, wheel.angleDelta.y > 0 ? 0.05 : -0.05);
         }
@@ -79,9 +79,7 @@ Item {
     Component {
         id: profileBackendComponent
 
-        AudioProfiles {
-        }
-
+        AudioProfiles {}
     }
 
     Component {
@@ -92,7 +90,5 @@ Item {
             audioService: root.audioService
             profileBackend: profileBackendComponent
         }
-
     }
-
 }

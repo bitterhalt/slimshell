@@ -39,10 +39,8 @@ Item {
                     hostAnchorCenter = pos.x + anchorItem.width / 2;
                     if (screenWidth > 0)
                         anchorRightOffsets.set(key, screenWidth - hostAnchorCenter);
-
                 }
-            } catch (_) {
-            }
+            } catch (_) {}
         }
         hostFocusable = focusable === true;
         hostCentered = centered === true;
@@ -63,7 +61,7 @@ Item {
 
     function closeHost(key) {
         if (key !== undefined && key !== "" && activeKey !== key)
-            return ;
+            return;
 
         hostRequested = false;
     }
@@ -153,7 +151,6 @@ Item {
             anchors.fill: parent
             onClicked: manager.closeHost()
         }
-
     }
 
     component PopupSurface: PanelWindow {
@@ -198,9 +195,6 @@ Item {
             transform: Translate {
                 y: popupSurface.motion.contentOffset
             }
-
         }
-
     }
-
 }

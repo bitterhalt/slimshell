@@ -33,23 +33,21 @@ Item {
     property bool hellwalActive: false
 
     // Regex building blocks, defined once to avoid copy/paste typos
-    readonly property string colorNames:
-        "(background|foreground|selection_background|selection_foreground|color(?:1[0-5]|[0-9]))"
-    readonly property string hexValue:
-        "(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)"
+    readonly property string colorNames: "(background|foreground|selection_background|selection_foreground|color(?:1[0-5]|[0-9]))"
+    readonly property string hexValue: "(#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)"
 
     function applyFallback(): void {
-        bg = fallbackBg
-        fg = fallbackFg
-        muted = fallbackMuted
-        urgent = fallbackUrgent
-        selectionBackground = fallbackSelectionBackground
-        selectionForeground = fallbackSelectionForeground
-        hellwalActive = false
+        bg = fallbackBg;
+        fg = fallbackFg;
+        muted = fallbackMuted;
+        urgent = fallbackUrgent;
+        selectionBackground = fallbackSelectionBackground;
+        selectionForeground = fallbackSelectionForeground;
+        hellwalActive = false;
     }
 
     function parsePalette(text): var {
-        const colors = {}
+        const colors = {};
 
         const patterns = [
             // GTK:   @define-color name #hex
@@ -57,49 +55,43 @@ Item {
             // CSS:   --name: #hex
             new RegExp("--" + colorNames + "\\s*:\\s*" + hexValue, "g"),
             // SCSS:  $name: #hex
-            new RegExp("\\$" + colorNames + "\\s*:\\s*" + hexValue, "g"),
-        ]
+            new RegExp("\\$" + colorNames + "\\s*:\\s*" + hexValue, "g"),];
 
         for (const re of patterns) {
-            let match
+            let match;
             while ((match = re.exec(text)) !== null)
-                colors[match[1]] = match[2]
+                colors[match[1]] = match[2];
         }
 
-        const required = [
-            "background",
-            "foreground",
-            "color3",
-            "color6",
-        ]
+        const required = ["background", "foreground", "color3", "color6",];
 
         for (let i = 0; i < required.length; ++i) {
             if (!colors[required[i]])
-                return null
+                return null;
         }
 
-        return colors
+        return colors;
     }
 
     function applyPalette(text): void {
-        const colors = parsePalette(text)
+        const colors = parsePalette(text);
 
         if (!colors) {
-            applyFallback()
-            return
+            applyFallback();
+            return;
         }
 
-        bg = colors.background
-        fg = colors.foreground
-        muted = Qt.alpha(colors.foreground, mutedAlpha)
-        urgent = colors.color3
-        selectionBackground = colors.color6
-        selectionForeground = colors.background
-        hellwalActive = true
+        bg = colors.background;
+        fg = colors.foreground;
+        muted = Qt.alpha(colors.foreground, mutedAlpha);
+        urgent = colors.color3;
+        selectionBackground = colors.color6;
+        selectionForeground = colors.background;
+        hellwalActive = true;
     }
 
     function refresh(): void {
-        paletteFile.reload()
+        paletteFile.reload();
     }
 
     FileView {
@@ -118,11 +110,11 @@ Item {
         target: "theme"
 
         function refresh(): void {
-            root.refresh()
+            root.refresh();
         }
 
         function usingHellwal(): bool {
-            return root.hellwalActive
+            return root.hellwalActive;
         }
     }
 }

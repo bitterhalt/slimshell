@@ -7,7 +7,7 @@ FocusScope {
     required property var config
     required property var weatherData
 
-    signal closeRequested()
+    signal closeRequested
 
     implicitWidth: 360
     implicitHeight: content.implicitHeight + 32
@@ -17,9 +17,9 @@ FocusScope {
     Component.onCompleted: Qt.callLater(() => {
         return forceActiveFocus();
     })
-    Keys.onPressed: (event) => {
+    Keys.onPressed: event => {
         if (event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier))
-            return ;
+            return;
 
         if (event.key === Qt.Key_F5) {
             if (!weatherData.refreshing && !event.isAutoRepeat)
@@ -72,7 +72,6 @@ FocusScope {
                 color: root.config.muted
                 font.pointSize: root.config.fontSize(0.72)
             }
-
         }
 
         RowLayout {
@@ -90,7 +89,6 @@ FocusScope {
                     text: root.weatherData.data.icon || "✨"
                     font.pointSize: root.config.fontSize(3)
                 }
-
             }
 
             ColumnLayout {
@@ -112,13 +110,10 @@ FocusScope {
                     font.pointSize: root.config.fontSize(0.8)
                     text: root.weatherData.data.available ? root.weatherData.data.condition + " · Feels like " + root.weatherData.data.feels + "°" : root.weatherData.refreshing ? "Loading weather…" : "Weather unavailable"
                 }
-
             }
-
         }
 
-        Separator {
-        }
+        Separator {}
 
         GridLayout {
             Layout.fillWidth: true
@@ -162,7 +157,6 @@ FocusScope {
                 label: "Sunset"
                 value: root.weatherData.data.sunset || ""
             }
-
         }
 
         Rectangle {
@@ -180,7 +174,6 @@ FocusScope {
                 font.pointSize: root.config.fontSize(0.8)
                 text: root.weatherData.data.moon ? root.weatherData.data.moon.icon + "  " + root.weatherData.data.moon.name + " · " + root.weatherData.data.moon.illumination + "%" : "Moon information unavailable"
             }
-
         }
 
         RowLayout {
@@ -195,9 +188,7 @@ FocusScope {
                 font.pointSize: root.config.fontSize(0.72)
             }
 
-            Separator {
-            }
-
+            Separator {}
         }
 
         Repeater {
@@ -251,13 +242,9 @@ FocusScope {
                         text: forecastRow.modelData.rain + "%"
                         color: root.config.muted
                     }
-
                 }
-
             }
-
         }
-
     }
 
     component Label: Text {
@@ -316,9 +303,7 @@ FocusScope {
                 elide: Text.ElideRight
                 font.pointSize: root.config.fontSize(0.72)
             }
-
         }
-
     }
 
     component Separator: Rectangle {
@@ -326,5 +311,4 @@ FocusScope {
         implicitHeight: 1
         color: root.config.border
     }
-
 }

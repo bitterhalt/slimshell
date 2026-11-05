@@ -5,40 +5,49 @@ import "lock"
 import "services"
 
 ShellRoot {
-	ThemeService { id: lockTheme }
-	Config { id: lockConfig; theme: lockTheme }
-	ResumeService { id: lockResumeService }
-	// This stores all the information shared between the lock surfaces on each screen.
-	LockContext {
-		id: lockContext
+    ThemeService {
+        id: lockTheme
+    }
+    Config {
+        id: lockConfig
+        theme: lockTheme
+    }
+    ResumeService {
+        id: lockResumeService
+    }
+    // This stores all the information shared between the lock surfaces on each screen.
+    LockContext {
+        id: lockContext
 
-		onUnlocked: {
-			// Unlock the screen before exiting, or the compositor will display a
-			// fallback lock you can't interact with.
-			lock.locked = false;
+        onUnlocked: {
+            // Unlock the screen before exiting, or the compositor will display a
+            // fallback lock you can't interact with.
+            lock.locked = false;
 
-			Qt.quit();
-		}
-	}
+            Qt.quit();
+        }
+    }
 
-	WlSessionLock {
-		id: lock
+    WlSessionLock {
+        id: lock
 
-		// Lock the session immediately when quickshell starts.
-		locked: true
+        // Lock the session immediately when quickshell starts.
+        locked: true
 
-		WlSessionLockSurface {
-			LockSurface {
-				anchors.fill: parent
-				context: lockContext
-				config: lockConfig
-				resumeService: lockResumeService
-			}
-		}
-	}
+        WlSessionLockSurface {
+            LockSurface {
+                anchors.fill: parent
+                context: lockContext
+                config: lockConfig
+                resumeService: lockResumeService
+            }
+        }
+    }
 
-	IpcHandler {
-		target: "locker"
-		function isSecure(): bool { return lock.secure; }
-	}
+    IpcHandler {
+        target: "locker"
+        function isSecure(): bool {
+            return lock.secure;
+        }
+    }
 }

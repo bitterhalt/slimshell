@@ -23,22 +23,49 @@ Item {
 
     // Session actions remain built in; personal menus live in menus.json.
     readonly property var powerItems: [
-        { label: "Lock", icon: "󰌾", shortcut: "l", action: "lock" },
-        { label: "Log out", icon: "󰍃", shortcut: "e", command: "niri msg action quit", confirm: true },
-        { label: "Sleep", icon: "󰤄", shortcut: "z", action: "suspend" },
-        { label: "Restart", icon: "󰜉", shortcut: "r", command: "systemctl reboot", confirm: true },
-        { label: "Shut down", icon: "󰐥", shortcut: "s", command: "systemctl poweroff", confirm: true }
+        {
+            label: "Lock",
+            icon: "󰌾",
+            shortcut: "l",
+            action: "lock"
+        },
+        {
+            label: "Log out",
+            icon: "󰍃",
+            shortcut: "e",
+            command: "niri msg action quit",
+            confirm: true
+        },
+        {
+            label: "Sleep",
+            icon: "󰤄",
+            shortcut: "z",
+            action: "suspend"
+        },
+        {
+            label: "Restart",
+            icon: "󰜉",
+            shortcut: "r",
+            command: "systemctl reboot",
+            confirm: true
+        },
+        {
+            label: "Shut down",
+            icon: "󰐥",
+            shortcut: "s",
+            command: "systemctl poweroff",
+            confirm: true
+        }
     ]
-
 
     MenuConfig {
         id: menuConfig
         onMenusChanged: {
             if (root.page !== "power") {
-                root.confirmItem = null
-                root.confirmIndex = -1
-                root.selectedIndex = 0
-                Qt.callLater(() => menuCard.prepareLayout())
+                root.confirmItem = null;
+                root.confirmIndex = -1;
+                root.selectedIndex = 0;
+                Qt.callLater(() => menuCard.prepareLayout());
             }
         }
     }
@@ -46,154 +73,156 @@ Item {
     readonly property var currentItems: {
         if (confirmItem)
             return [
-                { label: "Yes", icon: "󰄬", shortcut: "y" },
-                { label: "No", icon: "󰅖", shortcut: "n" }
-            ]
+                {
+                    label: "Yes",
+                    icon: "󰄬",
+                    shortcut: "y"
+                },
+                {
+                    label: "No",
+                    icon: "󰅖",
+                    shortcut: "n"
+                }
+            ];
 
         switch (page) {
         case "power":
-            return powerItems
+            return powerItems;
         default:
-            return menuConfig.menus[page] || []
+            return menuConfig.menus[page] || [];
         }
     }
 
     readonly property string title: {
         switch (page) {
         case "power":
-            return "Power"
+            return "Power";
         default:
-            return page
+            return page;
         }
     }
 
     function open(name, screen): void {
-        cancelConfirmation()
-        page = name || "power"
+        cancelConfirmation();
+        page = name || "power";
         if (!["power", "user-menu1", "user-menu2", "user-menu3", "user-menu4"].includes(page))
-            page = "power"
-        menuScreen = screen || targetScreen
-        selectedIndex = 0
-        menuCard.prepareLayout()
-        opened = true
-        Qt.callLater(() => keyboardHandler.forceActiveFocus())
+            page = "power";
+        menuScreen = screen || targetScreen;
+        selectedIndex = 0;
+        menuCard.prepareLayout();
+        opened = true;
+        Qt.callLater(() => keyboardHandler.forceActiveFocus());
     }
 
     function close(): void {
-        cancelConfirmation()
-        opened = false
+        cancelConfirmation();
+        opened = false;
     }
 
     function toggle(name, screen): void {
-        const requestedPage = name || "power"
+        const requestedPage = name || "power";
         if (opened && page === requestedPage)
-            close()
+            close();
         else
-            open(requestedPage, screen)
+            open(requestedPage, screen);
     }
 
     function cancelConfirmation(): void {
         if (!confirmItem)
-            return
-
-        selectedIndex = confirmIndex
-        confirmItem = null
-        confirmIndex = -1
-        menuCard.prepareLayout()
+            return;
+        selectedIndex = confirmIndex;
+        confirmItem = null;
+        confirmIndex = -1;
+        menuCard.prepareLayout();
     }
 
     function back(): void {
         if (confirmItem) {
-            cancelConfirmation()
-            return
+            cancelConfirmation();
+            return;
         }
 
-        close()
+        close();
     }
 
     function selectNext(): void {
         if (currentItems.length === 0)
-            return
-
-        selectedIndex = (selectedIndex + 1) % currentItems.length
+            return;
+        selectedIndex = (selectedIndex + 1) % currentItems.length;
     }
 
     function selectPrevious(): void {
         if (currentItems.length === 0)
-            return
-
-        selectedIndex =
-            (selectedIndex - 1 + currentItems.length)
-            % currentItems.length
+            return;
+        selectedIndex = (selectedIndex - 1 + currentItems.length) % currentItems.length;
     }
 
     function activateIndex(index): void {
         if (confirmItem) {
-            const pending = confirmItem
+            const pending = confirmItem;
             if (index === 0) {
-                close()
+                close();
                 if (pending.command)
-                    config.run(pending.command)
+                    config.run(pending.command);
             } else {
-                cancelConfirmation()
+                cancelConfirmation();
             }
-            return
+            return;
         }
 
         if (index < 0 || index >= currentItems.length)
-            return
-
-        const item = currentItems[index]
+            return;
+        const item = currentItems[index];
 
         if (item.confirm) {
-            confirmItem = item
-            confirmIndex = index
-            selectedIndex = 1
-            menuCard.prepareLayout()
-            return
+            confirmItem = item;
+            confirmIndex = index;
+            selectedIndex = 1;
+            menuCard.prepareLayout();
+            return;
         }
 
         if (item.action === "wallpaper") {
-            const screen = menuWindow.screen
-            close()
-            wallpaperPicker.open(screen)
-            return
+            const screen = menuWindow.screen;
+            close();
+            wallpaperPicker.open(screen);
+            return;
         }
 
         if (item.action === "idleSettings") {
-            const screen = menuWindow.screen
-            close()
-            idleService.openSettings(screen)
-            return
+            const screen = menuWindow.screen;
+            close();
+            idleService.openSettings(screen);
+            return;
         }
 
         if (item.action === "suspend") {
-            close()
-            idleService.suspend()
-            return
+            close();
+            idleService.suspend();
+            return;
         }
 
         if (item.action === "lock") {
-            close()
-            lockService.lock()
-            return
+            close();
+            lockService.lock();
+            return;
         }
 
         if (item.page) {
-            page = item.page
-            selectedIndex = 0
-            menuCard.prepareLayout()
-            return
+            page = item.page;
+            selectedIndex = 0;
+            menuCard.prepareLayout();
+            return;
         }
 
         if (item.command) {
-            close()
-            config.run(item.command)
+            close();
+            config.run(item.command);
         }
     }
 
     function activateSelected(): void {
-        activateIndex(selectedIndex)
+        activateIndex(selectedIndex);
     }
 
     // Popup frame and keyboard focus scope for the selected page.
@@ -210,8 +239,7 @@ Item {
         implicitWidth: menuCard.implicitWidth
         implicitHeight: menuCard.implicitHeight
         margins.top: root.config.popupGap
-        margins.left: screen
-            ? Math.max(0, Math.round((screen.width - menuCard.implicitWidth) / 2)) : 0
+        margins.left: screen ? Math.max(0, Math.round((screen.width - menuCard.implicitWidth) / 2)) : 0
 
         visible: popupMotion.surfaceVisible
         color: "transparent"
@@ -220,8 +248,7 @@ Item {
 
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.namespace: "slim-submenu"
-        WlrLayershell.keyboardFocus: root.opened
-            ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+        WlrLayershell.keyboardFocus: root.opened ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
         PopupMotion {
             id: popupMotion
@@ -244,50 +271,46 @@ Item {
                 switch (event.key) {
                 case Qt.Key_Left:
                     if (root.page === "power") {
-                        root.selectPrevious()
-                        event.accepted = true
+                        root.selectPrevious();
+                        event.accepted = true;
                     }
-                    return
+                    return;
                 case Qt.Key_Right:
                     if (root.page === "power") {
-                        root.selectNext()
-                        event.accepted = true
+                        root.selectNext();
+                        event.accepted = true;
                     }
-                    return
+                    return;
                 case Qt.Key_Up:
                 case Qt.Key_Backtab:
-                    root.selectPrevious()
-                    event.accepted = true
-                    return
-
+                    root.selectPrevious();
+                    event.accepted = true;
+                    return;
                 case Qt.Key_Down:
                 case Qt.Key_Tab:
-                    root.selectNext()
-                    event.accepted = true
-                    return
-
+                    root.selectNext();
+                    event.accepted = true;
+                    return;
                 case Qt.Key_Return:
                 case Qt.Key_Enter:
-                    root.activateSelected()
-                    event.accepted = true
-                    return
-
+                    root.activateSelected();
+                    event.accepted = true;
+                    return;
                 case Qt.Key_Escape:
-                    root.back()
-                    event.accepted = true
-                    return
+                    root.back();
+                    event.accepted = true;
+                    return;
                 }
 
-                const key = event.text.toLowerCase()
+                const key = event.text.toLowerCase();
 
                 for (let i = 0; i < root.currentItems.length; ++i) {
                     if (root.currentItems[i].shortcut === key) {
-                        root.activateIndex(i)
-                        event.accepted = true
-                        return
+                        root.activateIndex(i);
+                        event.accepted = true;
+                        return;
                     }
                 }
-
             }
         }
 
@@ -308,7 +331,6 @@ Item {
 
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
-
 
             Text {
                 renderType: Text.NativeRendering
@@ -344,15 +366,12 @@ Item {
                     width: parent ? parent.width : 0
                     height: 32
 
-                    readonly property bool selected:
-                        root.selectedIndex === index
+                    readonly property bool selected: root.selectedIndex === index
 
                     Rectangle {
                         anchors.fill: parent
                         radius: 4
-                        color: menuItem.selected
-                            ? root.config.selectionBackground
-                            : "transparent"
+                        color: menuItem.selected ? root.config.selectionBackground : "transparent"
                     }
 
                     Text {
@@ -363,8 +382,7 @@ Item {
                         width: 22
                         horizontalAlignment: Text.AlignHCenter
 
-                        color: menuItem.selected
-                            ? root.config.selectionForeground : root.config.selectionBackground
+                        color: menuItem.selected ? root.config.selectionForeground : root.config.selectionBackground
                         font.family: root.config.iconFontFamily
                         font.pointSize: root.config.iconSize * 1.077
                         text: modelData.icon ?? ""
@@ -378,8 +396,7 @@ Item {
                         anchors.rightMargin: 8
                         anchors.verticalCenter: parent.verticalCenter
 
-                        color: menuItem.selected
-                            ? root.config.selectionForeground : root.config.fg
+                        color: menuItem.selected ? root.config.selectionForeground : root.config.fg
                         font.pointSize: root.config.fontSize(1)
                         font.weight: Font.Medium
                         elide: Text.ElideRight
@@ -393,16 +410,15 @@ Item {
                         anchors.rightMargin: 8
                         anchors.verticalCenter: parent.verticalCenter
 
-                        color: menuItem.selected
-                            ? root.config.selectionForeground : root.config.muted
+                        color: menuItem.selected ? root.config.selectionForeground : root.config.muted
                         font.family: root.config.iconFontFamily
                         font.pointSize: root.config.iconSize
                         text: "󰅂"
                     }
 
                     Text {
-                        renderType: Text.NativeRendering
                         id: keyHint
+                        renderType: Text.NativeRendering
 
                         anchors.right: parent.right
                         anchors.rightMargin: 6
@@ -410,19 +426,17 @@ Item {
 
                         width: 21
                         horizontalAlignment: Text.AlignHCenter
-                        color: menuItem.selected
-                            ? root.config.selectionForeground : root.config.fg
+                        color: menuItem.selected ? root.config.selectionForeground : root.config.fg
                         font.pointSize: root.config.fontSize(0.846)
                         text: modelData.shortcut ?? ""
                     }
-
                 }
             }
         }
 
         onVisibleChanged: {
             if (visible)
-                Qt.callLater(() => keyboardHandler.forceActiveFocus())
+                Qt.callLater(() => keyboardHandler.forceActiveFocus());
         }
     }
 
@@ -436,39 +450,43 @@ Item {
         target: "power"
 
         function toggle(): void {
-            root.toggle("power", root.targetScreen)
+            root.toggle("power", root.targetScreen);
         }
 
         function open(): void {
-            root.open("power")
+            root.open("power");
         }
 
         function close(): void {
             if (root.page === "power")
-                root.close()
+                root.close();
         }
     }
 
     IpcHandler {
         target: "menu"
 
-        function open(name: string): void { root.open(name) }
-        function toggle(name: string): void { root.toggle(name, root.targetScreen) }
+        function open(name: string): void {
+            root.open(name);
+        }
+        function toggle(name: string): void {
+            root.toggle(name, root.targetScreen);
+        }
 
         function packages(): void {
-            root.open("user-menu1")
+            root.open("user-menu1");
         }
 
         function settings(): void {
-            root.open("user-menu2")
+            root.open("user-menu2");
         }
 
         function system(): void {
-            root.open("user-menu3")
+            root.open("user-menu3");
         }
 
         function close(): void {
-            root.close()
+            root.close();
         }
     }
 }

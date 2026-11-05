@@ -15,16 +15,30 @@ Item {
         property color selectionBackground: "#bb9955"
         property string iconFontFamily: "sans-serif"
         property int popupRadius: 4
-        function fontSize(scale) { return 10 * scale; }
+        function fontSize(scale) {
+            return 10 * scale;
+        }
     }
     QtObject {
         id: weather
-        property var data: ({available: false, forecast: []})
+        property var data: ({
+                available: false,
+                forecast: []
+            })
         property bool refreshing: false
         property int calls: 0
-        function refresh(force) { calls++; refreshing = true; }
+        function refresh(force) {
+            calls++;
+            refreshing = true;
+        }
     }
-    Component { id: popupComponent; WeatherPopup { config: fixtureConfig; weatherData: weather } }
+    Component {
+        id: popupComponent
+        WeatherPopup {
+            config: fixtureConfig
+            weatherData: weather
+        }
+    }
     TestCase {
         name: "WeatherPopup"
         when: windowShown
@@ -34,7 +48,10 @@ Item {
             failOnWarning(/TypeError|ReferenceError|Binding loop|Unable to assign/);
             weather.refreshing = false;
             weather.calls = 0;
-            weather.data = {available: false, forecast: []};
+            weather.data = {
+                available: false,
+                forecast: []
+            };
             closes = 0;
             popup = createTemporaryObject(popupComponent, host);
             verify(popup !== null);
@@ -63,11 +80,33 @@ Item {
         }
         function test_complete_forecast_fits_surface() {
             weather.data = {
-                available: true, place: "Example", icon: "☀", temperature: 12,
-                condition: "Clear sky", feels: 10, humidity: 60, wind: 15,
-                windDirection: "NW", visibility: 10, uv: 1, sunrise: "07:00", sunset: "17:00",
-                moon: {icon: "🌕", name: "Full Moon", illumination: 100},
-                forecast: Array.from({length: 7}, () => ({day: "Mon", icon: "☀", high: 12, low: 5, rain: 20}))
+                available: true,
+                place: "Example",
+                icon: "☀",
+                temperature: 12,
+                condition: "Clear sky",
+                feels: 10,
+                humidity: 60,
+                wind: 15,
+                windDirection: "NW",
+                visibility: 10,
+                uv: 1,
+                sunrise: "07:00",
+                sunset: "17:00",
+                moon: {
+                    icon: "🌕",
+                    name: "Full Moon",
+                    illumination: 100
+                },
+                forecast: Array.from({
+                    length: 7
+                }, () => ({
+                            day: "Mon",
+                            icon: "☀",
+                            high: 12,
+                            low: 5,
+                            rain: 20
+                        }))
             };
             wait(50);
             verify(popup.height > 300);

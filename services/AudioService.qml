@@ -13,8 +13,7 @@ Item {
     readonly property var source: Pipewire.defaultAudioSource
     readonly property var sourceAudio: source ? source.audio : null
     readonly property var allNodes: Pipewire.nodes ? Pipewire.nodes.values : []
-    readonly property var trackedNodes: [...new Set([sink, source].concat(
-        allNodes.filter(node => node && node.audio)))].filter(node => !!node)
+    readonly property var trackedNodes: [...new Set([sink, source].concat(allNodes.filter(node => node && node.audio)))].filter(node => !!node)
     readonly property var outputRows: Model.deviceRows(allNodes, true, sink ? sink.id : -1)
     readonly property var inputRows: Model.deviceRows(allNodes, false, source ? source.id : -1)
     readonly property var streamRows: Model.playbackStreams(allNodes)
@@ -55,5 +54,7 @@ Item {
             node.audio.muted = !node.audio.muted;
     }
 
-    PwObjectTracker { objects: root.trackedNodes }
+    PwObjectTracker {
+        objects: root.trackedNodes
+    }
 }

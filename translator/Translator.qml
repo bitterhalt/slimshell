@@ -20,11 +20,11 @@ Item {
 
     function persistLanguages() {
         if (!preferencesReady || restoringPreferences)
-            return
+            return;
         languagePreferences.setText(JSON.stringify({
             source: sourceLanguage,
             target: targetLanguage
-        }))
+        }));
     }
 
     onSourceLanguageChanged: persistLanguages()
@@ -38,9 +38,15 @@ Item {
         animationType: "fade"
     }
 
-    function open() { opened = true }
-    function close() { opened = false }
-    function toggle() { opened = !opened }
+    function open() {
+        opened = true;
+    }
+    function close() {
+        opened = false;
+    }
+    function toggle() {
+        opened = !opened;
+    }
 
     LazyLoader {
         active: translatorMotion.surfaceVisible
@@ -60,31 +66,34 @@ Item {
     FileView {
         id: languagePreferences
         objectName: "translatorLanguagePreferences"
-        path: (Quickshell.env("XDG_DATA_HOME") || Quickshell.env("HOME") + "/.local/share")
-            + "/quickshell-translator.json"
+        path: (Quickshell.env("XDG_DATA_HOME") || Quickshell.env("HOME") + "/.local/share") + "/quickshell-translator.json"
         atomicWrites: true
         printErrors: false
         onLoaded: {
-            root.restoringPreferences = true
+            root.restoringPreferences = true;
             try {
-                const saved = JSON.parse(text())
-                if (typeof saved.source === "string"
-                    && Languages.sources().some(language => language.code === saved.source))
-                    root.sourceLanguage = saved.source
-                if (typeof saved.target === "string"
-                    && Languages.targets().some(language => language.code === saved.target))
-                    root.targetLanguage = saved.target
+                const saved = JSON.parse(text());
+                if (typeof saved.source === "string" && Languages.sources().some(language => language.code === saved.source))
+                    root.sourceLanguage = saved.source;
+                if (typeof saved.target === "string" && Languages.targets().some(language => language.code === saved.target))
+                    root.targetLanguage = saved.target;
             } catch (error) {}
-            root.restoringPreferences = false
-            root.preferencesReady = true
+            root.restoringPreferences = false;
+            root.preferencesReady = true;
         }
         onLoadFailed: root.preferencesReady = true
     }
 
     IpcHandler {
         target: "translator"
-        function open() { root.open() }
-        function close() { root.close() }
-        function toggle() { root.toggle() }
+        function open() {
+            root.open();
+        }
+        function close() {
+            root.close();
+        }
+        function toggle() {
+            root.toggle();
+        }
     }
 }

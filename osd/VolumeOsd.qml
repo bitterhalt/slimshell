@@ -17,44 +17,40 @@ Item {
     }
 
     readonly property var currentSink: Pipewire.defaultAudioSink
-    readonly property var sinkAudio:
-        currentSink && currentSink.audio ? currentSink.audio : null
+    readonly property var sinkAudio: currentSink && currentSink.audio ? currentSink.audio : null
 
     property bool volumeOsdVisible: false
 
     onCurrentSinkChanged: {
-        volumeOsdVisible = false
-        volumeOsdHideTimer.stop()
+        volumeOsdVisible = false;
+        volumeOsdHideTimer.stop();
     }
 
     // The OSD is only shown when asked to (keybinds via IPC), never in
     // reaction to volume events, so Bluetooth connects, startup and other
     // apps changing the volume don't pop it up.
     function showVolumeOsd() {
-        volumeOsdVisible = true
-        volumeOsdHideTimer.restart()
+        volumeOsdVisible = true;
+        volumeOsdHideTimer.restart();
     }
 
     function adjustVolume(delta) {
         if (!currentSink || !currentSink.ready || !sinkAudio)
-            return
-
+            return;
         if (sinkAudio.muted && delta > 0)
-            sinkAudio.muted = false
+            sinkAudio.muted = false;
 
         // Rounded so repeated steps don't drift (0.4999...).
-        sinkAudio.volume = Math.max(0, Math.min(config.maxVolume,
-            Math.round((sinkAudio.volume + delta) * 100) / 100))
+        sinkAudio.volume = Math.max(0, Math.min(config.maxVolume, Math.round((sinkAudio.volume + delta) * 100) / 100));
 
-        showVolumeOsd()
+        showVolumeOsd();
     }
 
     function toggleMute() {
         if (!currentSink || !currentSink.ready || !sinkAudio)
-            return
-
-        sinkAudio.muted = !sinkAudio.muted
-        showVolumeOsd()
+            return;
+        sinkAudio.muted = !sinkAudio.muted;
+        showVolumeOsd();
     }
 
     // Niri/keybind control:
@@ -66,15 +62,15 @@ Item {
         target: "volume"
 
         function up(): void {
-            osd.adjustVolume(0.05)
+            osd.adjustVolume(0.05);
         }
 
         function down(): void {
-            osd.adjustVolume(-0.05)
+            osd.adjustVolume(-0.05);
         }
 
         function mute(): void {
-            osd.toggleMute()
+            osd.toggleMute();
         }
     }
 
@@ -97,9 +93,7 @@ Item {
             }
 
             margins.top: config.popupGap
-            margins.left: osd.targetScreen
-                ? Math.max(0, Math.round((osd.targetScreen.width - width) / 2))
-                : 0
+            margins.left: osd.targetScreen ? Math.max(0, Math.round((osd.targetScreen.width - width) / 2)) : 0
 
             // OSDs should remain visible above fullscreen surfaces.
             WlrLayershell.layer: WlrLayer.Overlay

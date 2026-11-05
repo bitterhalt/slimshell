@@ -17,90 +17,75 @@ Item {
     readonly property bool busy: runningNow || prepareDirectory.running
 
     signal menuActionRequested(string action)
-    signal regionSelectionRequested()
+    signal regionSelectionRequested
 
     function captureDirectory(): string {
-        return Quickshell.env("HOME") + "/Videos/Captures"
+        return Quickshell.env("HOME") + "/Videos/Captures";
     }
 
     function makeOutputFile(): string {
-        const stamp = Qt.formatDateTime(
-            new Date(),
-            "yyyy-MM-dd-HH-mm-ss"
-        )
+        const stamp = Qt.formatDateTime(new Date(), "yyyy-MM-dd-HH-mm-ss");
 
-        return captureDirectory() + "/" + stamp + "_capture.mp4"
+        return captureDirectory() + "/" + stamp + "_capture.mp4";
     }
 
     function notify(title, message): void {
-        Quickshell.execDetached([
-            "notify-send",
-            "-a", "gpu-screen-recorder",
-            "-t", "3000",
-            title,
-            message
-        ])
+        Quickshell.execDetached(["notify-send", "-a", "gpu-screen-recorder", "-t", "3000", title, message]);
     }
 
     function canStart(): bool {
         if (!busy)
-            return true
+            return true;
 
-        notify("Screen record", "Recording already in progress")
-        return false
+        notify("Screen record", "Recording already in progress");
+        return false;
     }
 
     function prepare(target, withAudio, regionGeometry): void {
         if (!canStart())
-            return
-
-        pendingTarget = target
-        pendingAudio = withAudio
-        pendingRegion = regionGeometry || ""
-        outputFile = makeOutputFile()
-        prepareDirectory.running = true
+            return;
+        pendingTarget = target;
+        pendingAudio = withAudio;
+        pendingRegion = regionGeometry || "";
+        outputFile = makeOutputFile();
+        prepareDirectory.running = true;
     }
 
     function fullscreen(): void {
-        prepare(targetScreen ? targetScreen.name : "screen", true, "")
+        prepare(targetScreen ? targetScreen.name : "screen", true, "");
     }
 
     function startRegion(geometry): void {
         if (!geometry)
-            return
-
-        prepare("region", false, geometry)
+            return;
+        prepare("region", false, geometry);
     }
 
     function stop(): void {
         if (!runningNow) {
-            notify("Screen record", "No active recording")
-            return
+            notify("Screen record", "No active recording");
+            return;
         }
 
         // Signal only the process owned by this service.
-        recorderProcess.signal(2)
+        recorderProcess.signal(2);
     }
 
     function startRecorder(): void {
-        const command = [
-            "gpu-screen-recorder",
-            "-w", pendingTarget,
-            "-f", "60"
-        ]
+        const command = ["gpu-screen-recorder", "-w", pendingTarget, "-f", "60"];
 
         if (pendingAudio)
-            command.push("-a", "default_output")
+            command.push("-a", "default_output");
         if (pendingRegion !== "")
-            command.push("-region", pendingRegion)
+            command.push("-region", pendingRegion);
 
-        command.push("-o", outputFile)
+        command.push("-o", outputFile);
 
-        pendingTarget = ""
-        pendingAudio = false
-        pendingRegion = ""
-        recorderProcess.command = command
-        recorderProcess.running = true
+        pendingTarget = "";
+        pendingAudio = false;
+        pendingRegion = "";
+        recorderProcess.command = command;
+        recorderProcess.running = true;
     }
 
     Process {
@@ -110,18 +95,15 @@ Item {
 
         onExited: exitCode => {
             if (exitCode === 0) {
-                root.startRecorder()
-                return
+                root.startRecorder();
+                return;
             }
 
-            root.pendingTarget = ""
-            root.pendingAudio = false
-            root.pendingRegion = ""
-            root.outputFile = ""
-            root.notify(
-                "Screen record",
-                "Could not create capture directory"
-            )
+            root.pendingTarget = "";
+            root.pendingAudio = false;
+            root.pendingRegion = "";
+            root.outputFile = "";
+            root.notify("Screen record", "Could not create capture directory");
         }
     }
 
@@ -131,19 +113,13 @@ Item {
         onExited: exitCode => {
             if (root.outputFile !== "") {
                 if (exitCode === 0) {
-                    root.notify(
-                        "Screen record",
-                        "Recording saved to " + root.captureDirectory()
-                    )
+                    root.notify("Screen record", "Recording saved to " + root.captureDirectory());
                 } else {
-                    root.notify(
-                        "Screen record",
-                        "Recording stopped with an error"
-                    )
+                    root.notify("Screen record", "Recording stopped with an error");
                 }
             }
 
-            root.outputFile = ""
+            root.outputFile = "";
         }
     }
 
@@ -151,33 +127,33 @@ Item {
         target: "recorder"
 
         function toggle(): void {
-            root.menuActionRequested("toggle")
+            root.menuActionRequested("toggle");
         }
 
         function open(): void {
-            root.menuActionRequested("open")
+            root.menuActionRequested("open");
         }
 
         function close(): void {
-            root.menuActionRequested("close")
+            root.menuActionRequested("close");
         }
 
         function fullscreen(): void {
-            root.menuActionRequested("close")
-            root.fullscreen()
+            root.menuActionRequested("close");
+            root.fullscreen();
         }
 
         function region(): void {
-            root.regionSelectionRequested()
+            root.regionSelectionRequested();
         }
 
         function stop(): void {
-            root.menuActionRequested("close")
-            root.stop()
+            root.menuActionRequested("close");
+            root.stop();
         }
 
         function isRecording(): bool {
-            return root.runningNow
+            return root.runningNow;
         }
     }
 }

@@ -15,7 +15,7 @@ FocusScope {
     readonly property int popupHeight: 520
     readonly property int popupPadding: 10
 
-    signal closeRequested()
+    signal closeRequested
 
     implicitWidth: popupWidth
     implicitHeight: popupHeight
@@ -59,8 +59,7 @@ FocusScope {
     function iconSource(icon) {
         if (!icon)
             return "";
-        return icon.startsWith("/") || icon.startsWith("file:")
-            ? icon : Quickshell.iconPath(icon, true);
+        return icon.startsWith("/") || icon.startsWith("file:") ? icon : Quickshell.iconPath(icon, true);
     }
 
     function historyIconSource(notification) {
@@ -109,7 +108,9 @@ FocusScope {
         onCountChanged: Qt.callLater(root.keepSelectionVisible)
 
         // Preserve delegates when notifications arrive or disappear.
-        model: ScriptModel { values: history.rows }
+        model: ScriptModel {
+            values: history.rows
+        }
 
         delegate: HistoryCard {
             id: card
@@ -125,7 +126,8 @@ FocusScope {
             timeLabel: root.notificationService.timeLabel(modelData)
             appIconSource: root.historyIconSource(modelData)
             actionEntries: HistoryModel.actionsFor(modelData.actions)
-            onHeightChanged: if (selected) Qt.callLater(root.keepSelectionVisible)
+            onHeightChanged: if (selected)
+                Qt.callLater(root.keepSelectionVisible)
             onPicked: {
                 history.select(index);
                 root.forceActiveFocus();
@@ -149,8 +151,8 @@ FocusScope {
     }
 
     // Persistent keyboard hints and the DND toggle.
-        Item {
-            id: historyFooter
+    Item {
+        id: historyFooter
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -188,8 +190,7 @@ FocusScope {
                 visible: root.notificationService.dnd
                 renderType: Text.NativeRendering
                 text: "DND"
-                color: root.notificationService.dnd
-                    ? root.config.selectionBackground : root.config.muted
+                color: root.notificationService.dnd ? root.config.selectionBackground : root.config.muted
                 font.pointSize: root.config.fontSize(0.8)
             }
 

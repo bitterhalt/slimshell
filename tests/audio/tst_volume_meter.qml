@@ -11,7 +11,12 @@ Item {
     }
     Component {
         id: meterComponent
-        VolumeMeter { config: fixtureConfig; width: 126; height: 14; segmentCount: 20 }
+        VolumeMeter {
+            config: fixtureConfig
+            width: 126
+            height: 14
+            segmentCount: 20
+        }
     }
     TestCase {
         name: "OsdVolumeMeter"

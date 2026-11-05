@@ -26,9 +26,9 @@ Item {
         cursorShape: Qt.PointingHandCursor
         onClicked: mouse => {
             if (mouse.button === Qt.RightButton)
-                idleService.openSettings(barWindow.screen)
+                idleService.openSettings(barWindow.screen);
             else
-                idleService.toggle(barWindow.screen)
+                idleService.toggle(barWindow.screen);
         }
     }
 
@@ -43,7 +43,7 @@ Item {
 
         function onNotificationRequested(message, screen): void {
             if (barWindow.screen === screen)
-                idleNotifier.show(message)
+                idleNotifier.show(message);
         }
     }
 }

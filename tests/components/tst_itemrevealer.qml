@@ -10,7 +10,6 @@ Item {
 
     QtObject {
         id: fixtureConfig
-
     }
 
     QtObject {

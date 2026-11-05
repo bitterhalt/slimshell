@@ -11,7 +11,7 @@ Item {
     property string result: ""
     property int generation: 0
     readonly property bool busy: calculate.running || debounce.running
-    signal resultReady()
+    signal resultReady
 
     onActiveChanged: refresh()
     onQueryChanged: refresh()
@@ -19,18 +19,18 @@ Item {
 
     // qalc accepts * and /, not the typographic multiplication/division signs.
     function normalizeExpression(value): string {
-        let out = value.replace(/×/g, "*").replace(/÷/g, "/")
+        let out = value.replace(/×/g, "*").replace(/÷/g, "/");
         if (!/0[xX][0-9a-fA-F]/.test(out))
-            out = out.replace(/(\d|\))\s*[xX]\s*(?=[\d(.])/g, "$1*")
-        return out
+            out = out.replace(/(\d|\))\s*[xX]\s*(?=[\d(.])/g, "$1*");
+        return out;
     }
 
     function refresh(): void {
-        generation += 1
-        result = ""
-        debounce.stop()
+        generation += 1;
+        result = "";
+        debounce.stop();
         if (active)
-            debounce.restart()
+            debounce.restart();
     }
 
     Timer {
@@ -38,10 +38,10 @@ Item {
         interval: 120
         onTriggered: {
             if (!root.active || calculate.running)
-                return
-            calculate.generation = root.generation
-            calculate.command = ["qalc", "-t", root.normalizeExpression(root.expression)]
-            calculate.running = true
+                return;
+            calculate.generation = root.generation;
+            calculate.command = ["qalc", "-t", root.normalizeExpression(root.expression)];
+            calculate.running = true;
         }
     }
 
@@ -51,17 +51,17 @@ Item {
         stdout: StdioCollector {
             onStreamFinished: {
                 if (!root.active || calculate.generation !== root.generation)
-                    return
-                root.result = text.trim().split("\n")[0] || ""
-                root.resultReady()
+                    return;
+                root.result = text.trim().split("\n")[0] || "";
+                root.resultReady();
             }
         }
         onExited: exitCode => {
             if (calculate.generation === root.generation) {
                 if (exitCode !== 0)
-                    root.result = ""
+                    root.result = "";
             } else if (root.active) {
-                debounce.restart()
+                debounce.restart();
             }
         }
     }

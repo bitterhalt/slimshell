@@ -57,7 +57,6 @@ Rectangle {
             font.pointSize: config.iconSize
             text: root.critical ? "󰀧" : root.timerNotification ? "⏰" : "󰂚"
         }
-
     }
 
     Column {
@@ -92,7 +91,5 @@ Rectangle {
             elide: Text.ElideRight
             text: root.notification ? (root.notification.body || "") : ""
         }
-
     }
-
 }

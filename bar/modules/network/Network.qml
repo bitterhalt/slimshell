@@ -18,7 +18,7 @@ Item {
         function onNetworkActionRequested(action) {
             if (root.barWindow.screen !== root.uiService.targetScreen) {
                 root.popupManager.closeHost("network");
-                return ;
+                return;
             }
             if (action === "open")
                 root.popupManager.openHost("network", networkPopupComponent, root, true);
@@ -56,7 +56,5 @@ Item {
             config: root.config
             popupManager: root.popupManager
         }
-
     }
-
 }

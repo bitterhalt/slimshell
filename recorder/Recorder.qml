@@ -12,8 +12,7 @@ Item {
     required property var recorderService
 
     readonly property bool runningNow: recorderService.runningNow
-    readonly property bool ipcOwner:
-        barWindow.screen === recorderService.targetScreen
+    readonly property bool ipcOwner: barWindow.screen === recorderService.targetScreen
 
     property int selectedIndex: 0
     property bool opened: false
@@ -23,58 +22,57 @@ Item {
     height: 0
 
     function open(): void {
-        selectedIndex = 0
-        menuCard.prepareLayout()
-        opened = true
-        Qt.callLater(() => keyboardHandler.forceActiveFocus())
+        selectedIndex = 0;
+        menuCard.prepareLayout();
+        opened = true;
+        Qt.callLater(() => keyboardHandler.forceActiveFocus());
     }
 
     function close(): void {
-        opened = false
+        opened = false;
     }
 
     function toggle(): void {
-        opened ? close() : open()
+        opened ? close() : open();
     }
 
     function selectNext(): void {
-        selectedIndex = (selectedIndex + 1) % actionCount
+        selectedIndex = (selectedIndex + 1) % actionCount;
     }
 
     function selectPrevious(): void {
-        selectedIndex =
-            (selectedIndex - 1 + actionCount) % actionCount
+        selectedIndex = (selectedIndex - 1 + actionCount) % actionCount;
     }
 
     function activateSelected(): void {
         switch (selectedIndex) {
         case 0:
-            fullscreen()
-            break
+            fullscreen();
+            break;
         case 1:
-            region()
-            break
+            region();
+            break;
         case 2:
-            stop()
-            break
+            stop();
+            break;
         }
     }
 
     function fullscreen(): void {
-        close()
-        recorderService.fullscreen()
+        close();
+        recorderService.fullscreen();
     }
 
     function region(): void {
-        close()
+        close();
 
         if (recorderService.canStart())
-            regionSelector.open()
+            regionSelector.open();
     }
 
     function stop(): void {
-        close()
-        recorderService.stop()
+        close();
+        recorderService.stop();
     }
 
     // Full-screen drag selector used by the Region menu action.
@@ -85,7 +83,7 @@ Item {
         targetScreen: root.barWindow.screen
 
         onAccepted: geometry => {
-            root.recorderService.startRegion(geometry)
+            root.recorderService.startRegion(geometry);
         }
     }
 
@@ -103,8 +101,7 @@ Item {
         implicitWidth: menuCard.implicitWidth
         implicitHeight: menuCard.implicitHeight
         margins.top: root.config.popupGap
-        margins.left: root.barWindow.screen
-            ? Math.max(0, Math.round((root.barWindow.screen.width - menuCard.implicitWidth) / 2)) : 0
+        margins.left: root.barWindow.screen ? Math.max(0, Math.round((root.barWindow.screen.width - menuCard.implicitWidth) / 2)) : 0
 
         visible: popupMotion.surfaceVisible
         color: "transparent"
@@ -113,9 +110,7 @@ Item {
 
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.namespace: "slim-submenu"
-        WlrLayershell.keyboardFocus: root.opened
-            ? WlrKeyboardFocus.Exclusive
-            : WlrKeyboardFocus.None
+        WlrLayershell.keyboardFocus: root.opened ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
         FocusScope {
             id: keyboardHandler
@@ -128,44 +123,39 @@ Item {
                 switch (event.key) {
                 case Qt.Key_Up:
                 case Qt.Key_Backtab:
-                    root.selectPrevious()
-                    event.accepted = true
-                    return
-
+                    root.selectPrevious();
+                    event.accepted = true;
+                    return;
                 case Qt.Key_Down:
                 case Qt.Key_Tab:
-                    root.selectNext()
-                    event.accepted = true
-                    return
-
+                    root.selectNext();
+                    event.accepted = true;
+                    return;
                 case Qt.Key_Return:
                 case Qt.Key_Enter:
-                    root.activateSelected()
-                    event.accepted = true
-                    return
-
+                    root.activateSelected();
+                    event.accepted = true;
+                    return;
                 case Qt.Key_Escape:
-                    root.close()
-                    event.accepted = true
-                    return
+                    root.close();
+                    event.accepted = true;
+                    return;
                 }
 
                 switch (event.text.toLowerCase()) {
                 case "f":
-                    root.fullscreen()
-                    event.accepted = true
-                    break
-
+                    root.fullscreen();
+                    event.accepted = true;
+                    break;
                 case "r":
-                    root.region()
-                    event.accepted = true
-                    break
-
+                    root.region();
+                    event.accepted = true;
+                    break;
                 case "s":
                     if (root.runningNow)
-                        root.stop()
-                    event.accepted = true
-                    break
+                        root.stop();
+                    event.accepted = true;
+                    break;
                 }
             }
         }
@@ -175,7 +165,9 @@ Item {
 
             enabled: root.opened
             opacity: popupMotion.contentOpacity
-            transform: Translate { y: popupMotion.contentOffset }
+            transform: Translate {
+                y: popupMotion.contentOffset
+            }
             z: 1
             config: root.config
             contentWidth: 190
@@ -209,7 +201,6 @@ Item {
                 height: root.runningNow ? 32 : 0
             }
         }
-
     }
 
     PopupMotion {
@@ -235,8 +226,7 @@ Item {
         required property string label
         required property string keyHint
 
-        readonly property bool selected:
-            root.selectedIndex === menuItem.index
+        readonly property bool selected: root.selectedIndex === menuItem.index
 
         width: parent ? parent.width : 0
         height: 32
@@ -244,9 +234,7 @@ Item {
         Rectangle {
             anchors.fill: parent
             radius: 4
-            color: menuItem.selected
-                ? root.config.selectionBackground
-                : "transparent"
+            color: menuItem.selected ? root.config.selectionBackground : "transparent"
         }
 
         Text {
@@ -255,8 +243,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
 
             width: 22
-            color: menuItem.selected
-                ? root.config.selectionForeground : root.config.fg
+            color: menuItem.selected ? root.config.selectionForeground : root.config.fg
             font.family: root.config.iconFontFamily
             font.pointSize: root.config.iconSize * 1.077
             horizontalAlignment: Text.AlignHCenter
@@ -269,8 +256,7 @@ Item {
             anchors.leftMargin: 38
             anchors.verticalCenter: parent.verticalCenter
 
-            color: menuItem.selected
-                ? root.config.selectionForeground : root.config.fg
+            color: menuItem.selected ? root.config.selectionForeground : root.config.fg
             font.pointSize: root.config.fontSize(1)
             font.weight: Font.Medium
             text: menuItem.label
@@ -284,13 +270,11 @@ Item {
 
             width: 21
             horizontalAlignment: Text.AlignHCenter
-            color: menuItem.selected
-                ? root.config.selectionForeground : root.config.fg
+            color: menuItem.selected ? root.config.selectionForeground : root.config.fg
             font.pointSize: root.config.fontSize(0.846)
             font.weight: Font.Normal
             text: menuItem.keyHint
         }
-
     }
 
     Connections {
@@ -298,24 +282,24 @@ Item {
 
         function onMenuActionRequested(action): void {
             if (action === "close") {
-                root.close()
-                return
+                root.close();
+                return;
             }
 
             if (!root.ipcOwner) {
-                root.close()
-                return
+                root.close();
+                return;
             }
 
             if (action === "toggle")
-                root.toggle()
+                root.toggle();
             else if (action === "open")
-                root.open()
+                root.open();
         }
 
         function onRegionSelectionRequested(): void {
             if (root.ipcOwner)
-                root.region()
+                root.region();
         }
     }
 }

@@ -11,7 +11,10 @@ Item {
         property bool paired: false
         property bool pairing: false
     }
-    Component { id: watcherComponent; ConnectionWatcher {} }
+    Component {
+        id: watcherComponent
+        ConnectionWatcher {}
+    }
 
     TestCase {
         name: "BluetoothConnectionNotification"
@@ -19,7 +22,9 @@ Item {
         property int notifications: 0
 
         function createWatcher() {
-            watcher = createTemporaryObject(watcherComponent, host, {device: device});
+            watcher = createTemporaryObject(watcherComponent, host, {
+                device: device
+            });
             verify(watcher !== null);
             watcher.connectionReady.connect(item => {
                 compare(item, device);
@@ -93,7 +98,9 @@ Item {
         }
 
         function test_no_device() {
-            watcher = createTemporaryObject(watcherComponent, host, {device: null});
+            watcher = createTemporaryObject(watcherComponent, host, {
+                device: null
+            });
             verify(watcher !== null);
             verify(!watcher.ready);
         }

@@ -7,17 +7,16 @@ Item {
     // Niri state is fed by one long-running IPC event stream.
     // This avoids polling workspaces/focused-window every ~1 second.
     property var workspaces: []
-    property var windows: ({
-    })
+    property var windows: ({})
     property int focusedWindowId: -1
     property int reconnectDelay: 1000
     readonly property string focusedOutput: {
         for (let i = 0; i < workspaces.length; ++i) {
             if (workspaces[i].is_focused)
-                return workspaces[i].output || ""
+                return workspaces[i].output || "";
         }
 
-        return ""
+        return "";
     }
 
     function updateWorkspaceActivation(id, focused) {
@@ -29,13 +28,12 @@ Item {
             }
         }
         if (!target)
-            return ;
+            return;
 
         const updated = [];
         for (let i = 0; i < workspaces.length; ++i) {
             const old = workspaces[i];
-            const ws = Object.assign({
-            }, old);
+            const ws = Object.assign({}, old);
             if (ws.output === target.output)
                 ws.is_active = ws.id === id;
 
@@ -50,8 +48,7 @@ Item {
     function updateWorkspaceUrgency(id, urgent) {
         const updated = [];
         for (let i = 0; i < workspaces.length; ++i) {
-            const ws = Object.assign({
-            }, workspaces[i]);
+            const ws = Object.assign({}, workspaces[i]);
             if (ws.id === id)
                 ws.is_urgent = urgent;
 
@@ -61,77 +58,68 @@ Item {
     }
 
     function replaceWindows(newWindows) {
-        const next = {
-        };
+        const next = {};
         let focused = -1;
         for (let i = 0; i < newWindows.length; ++i) {
             const win = newWindows[i];
             next[win.id] = win;
             if (win.is_focused)
                 focused = win.id;
-
         }
         windows = next;
         focusedWindowId = focused;
     }
 
     function updateWindow(win) {
-        const next = Object.assign({
-        }, windows);
+        const next = Object.assign({}, windows);
         next[win.id] = win;
         windows = next;
         if (win.is_focused)
             focusedWindowId = win.id;
-
     }
 
     function removeWindow(id) {
-        const next = Object.assign({
-        }, windows);
+        const next = Object.assign({}, windows);
         delete next[id];
         windows = next;
         if (focusedWindowId === id)
             focusedWindowId = -1;
-
     }
 
     function handleNiriEvent(line) {
         if (!line || !line.trim())
-            return ;
+            return;
 
         try {
             const event = JSON.parse(line);
             reconnectDelay = 1000;
             if (event.WorkspacesChanged) {
                 workspaces = event.WorkspacesChanged.workspaces || [];
-                return ;
+                return;
             }
             if (event.WorkspaceActivated) {
-                updateWorkspaceActivation(
-                    event.WorkspaceActivated.id,
-                    event.WorkspaceActivated.focused === true
-                );
-                return ;
+                updateWorkspaceActivation(event.WorkspaceActivated.id, event.WorkspaceActivated.focused === true);
+                return;
             }
             if (event.WorkspaceUrgencyChanged) {
                 updateWorkspaceUrgency(event.WorkspaceUrgencyChanged.id, event.WorkspaceUrgencyChanged.urgent);
-                return ;
+                return;
             }
             if (event.WindowsChanged) {
                 replaceWindows(event.WindowsChanged.windows || []);
-                return ;
+                return;
             }
             if (event.WindowOpenedOrChanged) {
                 updateWindow(event.WindowOpenedOrChanged.window);
-                return ;
+                return;
             }
             if (event.WindowClosed) {
                 removeWindow(event.WindowClosed.id);
-                return ;
+                return;
             }
             if (event.WindowFocusChanged) {
                 focusedWindowId = event.WindowFocusChanged.id ?? -1;
-                return ;
+                return;
             }
         } catch (error) {
             console.warn("Could not parse niri event:", error);
@@ -144,8 +132,8 @@ Item {
         id: reconnect
         interval: service.reconnectDelay
         onTriggered: {
-            service.reconnectDelay = Math.min(service.reconnectDelay * 2, 30000)
-            niriEvents.running = true
+            service.reconnectDelay = Math.min(service.reconnectDelay * 2, 30000);
+            niriEvents.running = true;
         }
     }
 
@@ -154,14 +142,13 @@ Item {
 
         running: true
         command: ["niri", "msg", "--json", "event-stream"]
-        onRunningChanged: if (!running) reconnect.restart()
+        onRunningChanged: if (!running)
+            reconnect.restart()
 
         stdout: SplitParser {
-            onRead: (data) => {
+            onRead: data => {
                 return service.handleNiriEvent(data);
             }
         }
-
     }
-
 }

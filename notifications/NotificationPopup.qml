@@ -18,26 +18,26 @@ Scope {
     property var renderedToasts: []
     property var pendingFinish: []
     onToastsChanged: {
-        const retained = ToastPolicy.retainForExit(toasts, renderedToasts, maxToasts)
-        const dropped = renderedToasts.filter(item => retained.indexOf(item) === -1)
-        renderedToasts = retained
+        const retained = ToastPolicy.retainForExit(toasts, renderedToasts, maxToasts);
+        const dropped = renderedToasts.filter(item => retained.indexOf(item) === -1);
+        renderedToasts = retained;
         // Bursts must not create an unbounded number of retiring windows.
         for (const notification of dropped)
-            finishExit(notification)
+            finishExit(notification);
     }
 
     function finishExit(notification) {
-        const finish = pendingFinish.indexOf(notification) !== -1
-        pendingFinish = pendingFinish.filter(item => item !== notification)
-        renderedToasts = renderedToasts.filter(item => item !== notification)
+        const finish = pendingFinish.indexOf(notification) !== -1;
+        pendingFinish = pendingFinish.filter(item => item !== notification);
+        renderedToasts = renderedToasts.filter(item => item !== notification);
         if (finish)
-            notificationService.finishToast(notification)
+            notificationService.finishToast(notification);
     }
     // Non-transient toasts bumped off the stack remain in the center.
     property var overflowedNotifications: []
     readonly property int overflowCount: overflowedNotifications.length
 
-    signal openNotificationCenterRequested()
+    signal openNotificationCenterRequested
 
     readonly property int maxToasts: 3
     readonly property int toastWidth: 380
@@ -47,69 +47,64 @@ Scope {
     readonly property int defaultToastTimeoutMs: 5000
 
     function toastOffset(index) {
-        return index * (toastHeight + toastSpacing)
+        return index * (toastHeight + toastSpacing);
     }
 
     // expireTimeout is the raw D-Bus value in milliseconds (despite what the
     // Quickshell docs say): -1 = unspecified, 0 = never expire.
     function toastTimeoutMs(notification): int {
         if (!notification || notification.expireTimeout < 0)
-            return defaultToastTimeoutMs
+            return defaultToastTimeoutMs;
 
-        return Math.round(notification.expireTimeout)
+        return Math.round(notification.expireTimeout);
     }
 
     function show(newNotification): void {
         if (!newNotification || toasts.indexOf(newNotification) !== -1)
-            return
-
-        const next = [newNotification].concat(toasts)
+            return;
+        const next = [newNotification].concat(toasts);
 
         while (next.length > maxToasts) {
-            const overflowed = next.pop()
+            const overflowed = next.pop();
 
             if (overflowed.transient || notificationService.isHistoryExcluded(overflowed))
-                pendingFinish = pendingFinish.concat([overflowed])
+                pendingFinish = pendingFinish.concat([overflowed]);
             else
-                overflowedNotifications =
-                    overflowedNotifications.concat([overflowed])
+                overflowedNotifications = overflowedNotifications.concat([overflowed]);
         }
 
-        toasts = next
+        toasts = next;
     }
 
     // Remove from the stack only (e.g. the notification was closed elsewhere).
     function removeToast(notification): void {
-        toasts = toasts.filter(toast => toast !== notification)
+        toasts = toasts.filter(toast => toast !== notification);
 
         // The "+N more" count belongs to the current burst of toasts. Once
         // the stack is empty, forget it so it doesn't reappear on the next one.
         if (toasts.length === 0)
-            overflowedNotifications = []
+            overflowedNotifications = [];
     }
 
     function removeOverflowed(notification): void {
-        overflowedNotifications = overflowedNotifications.filter(
-            item => item !== notification
-        )
+        overflowedNotifications = overflowedNotifications.filter(item => item !== notification);
     }
 
     // Remove from the stack and let the service finish it (expires transients).
     function dismissToast(notification): void {
         if (toasts.indexOf(notification) === -1)
-            return
-        pendingFinish = pendingFinish.concat([notification])
-        removeToast(notification)
+            return;
+        pendingFinish = pendingFinish.concat([notification]);
+        removeToast(notification);
     }
 
     // Hides every toast; notifications stay in the center.
     function hide(): void {
-        const current = toasts
+        const current = toasts;
 
-        pendingFinish = pendingFinish.concat(current)
-        toasts = []
-        overflowedNotifications = []
-
+        pendingFinish = pendingFinish.concat(current);
+        toasts = [];
+        overflowedNotifications = [];
     }
 
     Connections {
@@ -117,7 +112,7 @@ Scope {
 
         function onDndChanged(): void {
             if (root.notificationService.dnd)
-                root.hide()
+                root.hide();
         }
     }
 
@@ -153,14 +148,7 @@ Scope {
             anchors.top: true
             anchors.left: true
             margins.top: root.config.popupGap + root.toastOffset(slot)
-            margins.left: root.targetScreen
-                ? Math.max(
-                    0,
-                    Math.round(
-                        (root.targetScreen.width - root.toastWidth) / 2
-                    )
-                )
-                : 0
+            margins.left: root.targetScreen ? Math.max(0, Math.round((root.targetScreen.width - root.toastWidth) / 2)) : 0
 
             WlrLayershell.namespace: "slim-notifications"
             WlrLayershell.layer: WlrLayer.Overlay
@@ -175,12 +163,11 @@ Scope {
                 onHoveredChanged: {
                     if (hovered) {
                         if (expiry.running)
-                            toastWindow.remainingMs = Math.max(1,
-                                toastWindow.remainingMs - (Date.now() - toastWindow.startedAt))
-                        expiry.stop()
+                            toastWindow.remainingMs = Math.max(1, toastWindow.remainingMs - (Date.now() - toastWindow.startedAt));
+                        expiry.stop();
                     } else if (toastWindow.toastActive && toastWindow.remainingMs > 0) {
-                        toastWindow.startedAt = Date.now()
-                        expiry.restart()
+                        toastWindow.startedAt = Date.now();
+                        expiry.restart();
                     }
                 }
             }
@@ -191,11 +178,12 @@ Scope {
                 width: parent.width
                 height: root.toastHeight
                 opacity: toastMotion.contentOpacity
-                transform: Translate { y: toastMotion.contentOffset }
+                transform: Translate {
+                    y: toastMotion.contentOffset
+                }
 
                 config: root.config
                 notification: toastWindow.modelData
-
             }
 
             MouseArea {
@@ -210,13 +198,14 @@ Scope {
             property double startedAt: 0
             Component.onCompleted: {
                 if (activeSlot < 0)
-                    Qt.callLater(() => root.finishExit(toastWindow.modelData))
+                    Qt.callLater(() => root.finishExit(toastWindow.modelData));
                 if (remainingMs > 0 && !hover.hovered) {
-                    startedAt = Date.now()
-                    expiry.start()
+                    startedAt = Date.now();
+                    expiry.start();
                 }
             }
-            onToastActiveChanged: if (!toastActive) expiry.stop()
+            onToastActiveChanged: if (!toastActive)
+                expiry.stop()
 
             // Hovering preserves the remaining countdown.
             Timer {
@@ -233,9 +222,9 @@ Scope {
                 function onClosed(): void {
                     // Closed notification objects cannot safely be retained
                     // for an exit; drop their surfaces immediately.
-                    root.pendingFinish = root.pendingFinish.filter(item => item !== toastWindow.modelData)
-                    root.renderedToasts = root.renderedToasts.filter(item => item !== toastWindow.modelData)
-                    root.removeToast(toastWindow.modelData)
+                    root.pendingFinish = root.pendingFinish.filter(item => item !== toastWindow.modelData);
+                    root.renderedToasts = root.renderedToasts.filter(item => item !== toastWindow.modelData);
+                    root.removeToast(toastWindow.modelData);
                 }
             }
         }
@@ -249,12 +238,7 @@ Scope {
         anchors.top: true
         anchors.left: true
         margins.top: root.config.popupGap + root.toastOffset(root.renderedToasts.length)
-        margins.left: root.targetScreen
-            ? Math.max(
-                0,
-                Math.round((root.targetScreen.width - root.toastWidth) / 2)
-            )
-            : 0
+        margins.left: root.targetScreen ? Math.max(0, Math.round((root.targetScreen.width - root.toastWidth) / 2)) : 0
 
         WlrLayershell.namespace: "slim-notifications"
         WlrLayershell.layer: WlrLayer.Overlay
@@ -287,7 +271,7 @@ Scope {
                     target: modelData
 
                     function onClosed(): void {
-                        root.removeOverflowed(modelData)
+                        root.removeOverflowed(modelData);
                     }
                 }
             }
@@ -297,7 +281,9 @@ Scope {
             anchors.fill: parent
             enabled: chipMotion.shown
             opacity: chipMotion.contentOpacity
-            transform: Translate { y: chipMotion.contentOffset }
+            transform: Translate {
+                y: chipMotion.contentOffset
+            }
             radius: root.config.popupRadius
             color: root.config.bg
             border.color: root.config.selectionBackground
@@ -316,8 +302,8 @@ Scope {
                 cursorShape: Qt.PointingHandCursor
 
                 onClicked: {
-                    root.hide()
-                    root.openNotificationCenterRequested()
+                    root.hide();
+                    root.openNotificationCenterRequested();
                 }
             }
         }

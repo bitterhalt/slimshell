@@ -38,9 +38,9 @@ PanelWindow {
     Connections {
         target: root.resumeService
         function onResumed(): void {
-            clock.enabled = false
+            clock.enabled = false;
             // Restore the visibility binding, rather than leaving a hidden clock enabled.
-            clock.enabled = Qt.binding(() => root.visible)
+            clock.enabled = Qt.binding(() => root.visible);
         }
     }
 
@@ -86,11 +86,8 @@ PanelWindow {
             font.weight: Font.DemiBold
             horizontalAlignment: Text.AlignRight
         }
-
     }
 
     // An empty input region lets all pointer events reach the desktop below.
-    mask: Region {
-    }
-
+    mask: Region {}
 }

@@ -82,7 +82,6 @@ PanelWindow {
             barWindow: barWindow
             niri: barWindow.niri
         }
-
     }
 
     // ---------------------------------------------------------
@@ -111,7 +110,6 @@ PanelWindow {
             notificationPopup: barWindow.notificationPopup
             uiService: barWindow.uiService
         }
-
     }
 
     // ---------------------------------------------------------
@@ -173,7 +171,5 @@ PanelWindow {
             barWindow: barWindow
             popupManager: popupManager
         }
-
     }
-
 }

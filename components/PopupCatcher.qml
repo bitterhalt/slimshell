@@ -7,7 +7,7 @@ PanelWindow {
 
     required property var targetScreen
 
-    signal dismissed()
+    signal dismissed
 
     screen: targetScreen
     visible: false
@@ -27,5 +27,4 @@ PanelWindow {
         anchors.fill: parent
         onClicked: root.dismissed()
     }
-
 }

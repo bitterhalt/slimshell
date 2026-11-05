@@ -5,9 +5,18 @@ import "../../bar/modules/network"
 Item {
     id: host
 
-    QtObject { id: wifi; property bool scannerEnabled: false }
-    QtObject { id: otherWifi; property bool scannerEnabled: false }
-    Component { id: scanComponent; ScanState {} }
+    QtObject {
+        id: wifi
+        property bool scannerEnabled: false
+    }
+    QtObject {
+        id: otherWifi
+        property bool scannerEnabled: false
+    }
+    Component {
+        id: scanComponent
+        ScanState {}
+    }
 
     TestCase {
         name: "WifiScan"
@@ -17,7 +26,10 @@ Item {
             failOnWarning(/TypeError|Binding loop/);
             wifi.scannerEnabled = false;
             otherWifi.scannerEnabled = false;
-            scan = createTemporaryObject(scanComponent, host, {wifiDevice: wifi, allowed: true});
+            scan = createTemporaryObject(scanComponent, host, {
+                wifiDevice: wifi,
+                allowed: true
+            });
             verify(scan !== null);
         }
 
@@ -30,8 +42,10 @@ Item {
 
         function test_multiple_popups_share_scan_ownership() {
             scan.toggle();
-            const second = createTemporaryObject(scanComponent, host,
-                {wifiDevice: wifi, allowed: true});
+            const second = createTemporaryObject(scanComponent, host, {
+                wifiDevice: wifi,
+                allowed: true
+            });
             verify(wifi.scannerEnabled);
             second.toggle();
             scan.toggle();
@@ -100,7 +114,10 @@ Item {
             scan = null;
             wait(0);
             verify(!wifi.scannerEnabled);
-            scan = createTemporaryObject(scanComponent, host, {wifiDevice: wifi, allowed: true});
+            scan = createTemporaryObject(scanComponent, host, {
+                wifiDevice: wifi,
+                allowed: true
+            });
             verify(!scan.resultsVisible);
             verify(!scan.requested);
         }

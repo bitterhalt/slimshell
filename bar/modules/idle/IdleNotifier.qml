@@ -24,9 +24,9 @@ Item {
     }
 
     function show(newState): void {
-        state = newState
-        toastShown = true
-        toastTimer.restart()
+        state = newState;
+        toastShown = true;
+        toastTimer.restart();
     }
 
     // Small idle status popup shown next to the bar module.
@@ -54,7 +54,9 @@ Item {
         Rectangle {
             anchors.fill: parent
             opacity: toastMotion.contentOpacity
-            transform: Translate { y: toastMotion.contentOffset }
+            transform: Translate {
+                y: toastMotion.contentOffset
+            }
 
             radius: root.config.popupRadius
             color: root.config.bg

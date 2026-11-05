@@ -19,7 +19,10 @@ class LauncherModeTests(unittest.TestCase):
             self.assertIsNotNone(match, name)
             methods.append(match.group())
         for name in ("apps", "run", "emoji", "timer", "files", "calculator"):
-            self.assertIn(f'function {name}(): void {{ root.toggleMode("{name}") }}', source)
+            self.assertRegex(
+                source,
+                rf'function {name}\(\):\s*void\s*\{{\s*root\.toggleMode\("{name}"\);?\s*\}}',
+            )
         with tempfile.TemporaryDirectory(prefix="launcher-modes-") as directory:
             base = Path(directory)
             (base / "Controller.qml").write_text('''import QtQuick

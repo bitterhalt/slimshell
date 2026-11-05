@@ -5,8 +5,7 @@ Item {
     id: root
 
     required property var notificationService
-    readonly property var rows: (notificationService.historyNotifications
-        ?? notificationService.notifications).slice().reverse()
+    readonly property var rows: (notificationService.historyNotifications ?? notificationService.notifications).slice().reverse()
     property string selectedId: ""
     property string expandedId: ""
     property int fallbackIndex: 0
@@ -14,8 +13,8 @@ Item {
     readonly property var selectedNotification: selectedIndex >= 0 ? rows[selectedIndex] : null
     readonly property var actions: Model.actionsFor(selectedNotification ? selectedNotification.actions : [])
 
-    signal selectionMoved()
-    signal closeRequested()
+    signal selectionMoved
+    signal closeRequested
 
     visible: false
     onRowsChanged: {
@@ -74,8 +73,7 @@ Item {
             return false;
         if (key === Qt.Key_Escape) {
             closeRequested();
-        } else if (key === Qt.Key_Up || key === Qt.Key_K || key === Qt.Key_Backtab
-                || (key === Qt.Key_Tab && (modifiers & Qt.ShiftModifier))) {
+        } else if (key === Qt.Key_Up || key === Qt.Key_K || key === Qt.Key_Backtab || (key === Qt.Key_Tab && (modifiers & Qt.ShiftModifier))) {
             move(-1);
         } else if (key === Qt.Key_Down || key === Qt.Key_J || key === Qt.Key_Tab) {
             move(1);
@@ -84,10 +82,12 @@ Item {
         } else if (key === Qt.Key_Return || key === Qt.Key_Enter) {
             // The default may share a label with a visible action and have
             // been deduplicated. Enter still invokes the original default.
-            const action = selectedNotification
-                ? selectedNotification.actions.find(action => action.identifier === "default") : null;
+            const action = selectedNotification ? selectedNotification.actions.find(action => action.identifier === "default") : null;
             if (action)
-                invoke({action: action, dismiss: Model.isCloseAction(action)});
+                invoke({
+                    action: action,
+                    dismiss: Model.isCloseAction(action)
+                });
         } else {
             const letter = (text || (key >= Qt.Key_A && key <= Qt.Key_Z ? String.fromCharCode(key) : "")).toLowerCase();
             const entry = actions.find(entry => entry.key !== "" && entry.key === letter);

@@ -47,7 +47,6 @@ Item {
     function applySettings() {
         if (saveSettings())
             close();
-
     }
 
     function toggleIdle() {
@@ -71,8 +70,7 @@ Item {
         focusable: root.opened
         WlrLayershell.namespace: "slim-barpopup"
         WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.keyboardFocus: root.opened
-            ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+        WlrLayershell.keyboardFocus: root.opened ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
         PopupMotion {
             id: popupMotion
@@ -190,7 +188,6 @@ Item {
                         highlighted: toggleButton.hovered || toggleButton.activeFocus
                         text: toggleButton.text
                     }
-
                 }
 
                 Button {
@@ -213,13 +210,9 @@ Item {
                         highlighted: applyButton.hovered || applyButton.activeFocus
                         text: applyButton.text
                     }
-
                 }
-
             }
-
         }
-
     }
 
     PopupCatcher {
@@ -236,7 +229,7 @@ Item {
         required property string label
         property alias text: input.text
 
-        signal accepted()
+        signal accepted
 
         function focusInput() {
             input.forceActiveFocus();
@@ -283,9 +276,7 @@ Item {
                 activeFocusOnTab: true
                 onAccepted: row.accepted()
             }
-
         }
-
     }
 
     component FocusRing: Rectangle {
@@ -309,5 +300,4 @@ Item {
         color: highlighted ? config.selectionForeground : config.fg
         font.pointSize: config.fontSize(0.88)
     }
-
 }

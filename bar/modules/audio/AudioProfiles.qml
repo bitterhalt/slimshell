@@ -75,7 +75,9 @@ Item {
     Process {
         id: subscription
         command: ["pactl", "subscribe"]
-        environment: ({LC_ALL: "C"})
+        environment: ({
+                LC_ALL: "C"
+            })
         stdout: SplitParser {
             onRead: data => {
                 if (root.active && Profiles.isCardEvent(data))
@@ -92,9 +94,15 @@ Item {
     Process {
         id: listProcess
         command: ["pactl", "--format=json", "list", "cards"]
-        environment: ({LC_ALL: "C"})
-        stdout: StdioCollector { onStreamFinished: root.listReply = text }
-        stderr: StdioCollector { onStreamFinished: root.listStderr = text.trim() }
+        environment: ({
+                LC_ALL: "C"
+            })
+        stdout: StdioCollector {
+            onStreamFinished: root.listReply = text
+        }
+        stderr: StdioCollector {
+            onStreamFinished: root.listStderr = text.trim()
+        }
         onExited: exitCode => {
             if (exitCode === 0) {
                 try {
@@ -115,8 +123,12 @@ Item {
 
     Process {
         id: setProcess
-        environment: ({LC_ALL: "C"})
-        stderr: StdioCollector { onStreamFinished: root.setStderr = text.trim() }
+        environment: ({
+                LC_ALL: "C"
+            })
+        stderr: StdioCollector {
+            onStreamFinished: root.setStderr = text.trim()
+        }
         onExited: exitCode => {
             if (exitCode === 0) {
                 root.applyError = "";

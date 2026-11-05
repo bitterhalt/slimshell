@@ -13,21 +13,20 @@ Item {
     property var menuStack: []
 
     function reset(): void {
-        currentMenu = menuHandle
-        menuStack = []
+        currentMenu = menuHandle;
+        menuStack = [];
     }
 
     function openSubmenu(entry): void {
-        menuStack = menuStack.concat([currentMenu])
-        currentMenu = entry
+        menuStack = menuStack.concat([currentMenu]);
+        currentMenu = entry;
     }
 
     function goBack(): void {
         if (menuStack.length === 0)
-            return
-
-        currentMenu = menuStack[menuStack.length - 1]
-        menuStack = menuStack.slice(0, -1)
+            return;
+        currentMenu = menuStack[menuStack.length - 1];
+        menuStack = menuStack.slice(0, -1);
     }
 
     implicitWidth: 190
@@ -77,8 +76,7 @@ Item {
                     anchors.leftMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
 
-                    color: backMouse.containsMouse
-                        ? root.config.selectionForeground : root.config.muted
+                    color: backMouse.containsMouse ? root.config.selectionForeground : root.config.muted
                     font.pointSize: root.config.fontSize(0.9)
                     text: "‹  Back"
                 }
@@ -166,8 +164,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     visible: entry.icon === "" && entry.buttonType !== QsMenuButtonType.None
-                    color: row.highlighted
-                        ? root.config.selectionForeground : root.config.selectionBackground
+                    color: row.highlighted ? root.config.selectionForeground : root.config.selectionBackground
                     font.pointSize: root.config.fontSize(0.9)
                     text: entry.checkState === Qt.Checked ? "✓" : ""
                 }
@@ -181,8 +178,7 @@ Item {
                 anchors.rightMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
 
-                color: row.highlighted
-                    ? root.config.selectionForeground : root.config.fg
+                color: row.highlighted ? root.config.selectionForeground : root.config.fg
                 font.pointSize: root.config.fontSize(0.92)
                 elide: Text.ElideRight
                 text: entry.text
@@ -196,8 +192,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
 
                 visible: entry.hasChildren
-                color: row.highlighted
-                    ? root.config.selectionForeground : root.config.muted
+                color: row.highlighted ? root.config.selectionForeground : root.config.muted
                 font.family: root.config.iconFontFamily
                 font.pointSize: root.config.iconSize
                 text: "󰅂"
@@ -214,10 +209,10 @@ Item {
 
                 onClicked: {
                     if (entry.hasChildren) {
-                        root.openSubmenu(entry)
+                        root.openSubmenu(entry);
                     } else {
-                        entry.triggered()
-                        root.popupManager.closeHost("trayMenu")
+                        entry.triggered();
+                        root.popupManager.closeHost("trayMenu");
                     }
                 }
             }

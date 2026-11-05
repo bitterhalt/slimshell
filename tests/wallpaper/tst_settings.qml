@@ -17,7 +17,9 @@ Item {
         property color selectionBackground: "#6699cc"
         property color selectionForeground: "#ffffff"
         property color border: "#444444"
-        function fontSize(scale) { return 10 * scale; }
+        function fontSize(scale) {
+            return 10 * scale;
+        }
     }
     QtObject {
         id: preferences
@@ -31,8 +33,16 @@ Item {
         function saveHellwalSettings(mode, dark, bright, background, color, grayScale) {
             if (background === "fixed" && !/^#[0-9a-fA-F]{6}$/.test(color))
                 return "Enter a hex color like #111111";
-            calls = calls.concat([{mode: mode, dark: dark, bright: bright,
-                background: background, color: color, grayScale: grayScale}]);
+            calls = calls.concat([
+                {
+                    mode: mode,
+                    dark: dark,
+                    bright: bright,
+                    background: background,
+                    color: color,
+                    grayScale: grayScale
+                }
+            ]);
             return "";
         }
     }
@@ -131,9 +141,7 @@ Item {
             findChild(panel, "wallpaperBackgroundMode").currentIndex = 1;
             panel.width = 300;
             waitForPolish(panel);
-            for (const name of ["wallpaperColorMode", "wallpaperBackgroundMode",
-                    "wallpaperDarkOffset", "wallpaperBrightOffset", "wallpaperGrayScale",
-                    "wallpaperBackgroundColor"]) {
+            for (const name of ["wallpaperColorMode", "wallpaperBackgroundMode", "wallpaperDarkOffset", "wallpaperBrightOffset", "wallpaperGrayScale", "wallpaperBackgroundColor"]) {
                 const control = findChild(panel, name);
                 tryVerify(() => {
                     const position = control.mapToItem(panel, 0, 0);

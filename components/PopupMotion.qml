@@ -20,86 +20,83 @@ Item {
 
     // Keep the surface mapped across the shown -> closing handoff.
     property bool surfaceVisible: false
-    readonly property real contentOpacity:
-        !animationsEnabled || animationType !== "fade" ? 1 : progress
-    readonly property real contentOffset:
-        !animationsEnabled || animationType !== "slide"
-            ? 0 : (progress - 1) * slideDistance
+    readonly property real contentOpacity: !animationsEnabled || animationType !== "fade" ? 1 : progress
+    readonly property real contentOffset: !animationsEnabled || animationType !== "slide" ? 0 : (progress - 1) * slideDistance
 
-    signal closed()
+    signal closed
 
     function restartEnter(): void {
         if (!shown)
-            return
-        progressAnimation.stop()
-        finishCloseTimer.stop()
-        progress = 0
-        animateTo(1, duration)
+            return;
+        progressAnimation.stop();
+        finishCloseTimer.stop();
+        progress = 0;
+        animateTo(1, duration);
     }
 
     onAnimationsEnabledChanged: {
         if (!initialized || animationsEnabled)
-            return
-        progressAnimation.stop()
-        finishCloseTimer.stop()
+            return;
+        progressAnimation.stop();
+        finishCloseTimer.stop();
         // Unmap before resetting the visual properties of a closing surface.
         if (!shown) {
-            surfaceVisible = false
-            closing = false
-            closed()
+            surfaceVisible = false;
+            closing = false;
+            closed();
         }
-        progress = shown ? 1 : 0
+        progress = shown ? 1 : 0;
     }
 
     onShownChanged: {
         if (!initialized)
-            return
-        progressAnimation.stop()
-        finishCloseTimer.stop()
+            return;
+        progressAnimation.stop();
+        finishCloseTimer.stop();
         if (shown) {
-            surfaceVisible = true
-            closing = false
-            animateTo(1, duration)
+            surfaceVisible = true;
+            closing = false;
+            animateTo(1, duration);
         } else if (animationsEnabled) {
-            closing = true
-            animateTo(0, duration)
+            closing = true;
+            animateTo(0, duration);
         } else {
-            closing = false
-            progress = 0
-            surfaceVisible = false
-            closed()
+            closing = false;
+            progress = 0;
+            surfaceVisible = false;
+            closed();
         }
     }
 
     function animateTo(value: real, duration: int): void {
         if (!animationsEnabled) {
-            progress = value
+            progress = value;
             if (value === 0) {
-                closing = false
-                surfaceVisible = false
-                closed()
+                closing = false;
+                surfaceVisible = false;
+                closed();
             }
-            return
+            return;
         }
 
-        progressAnimation.stop()
-        progressAnimation.from = progress
-        progressAnimation.to = value
-        progressAnimation.duration = duration
-        progressAnimation.start()
+        progressAnimation.stop();
+        progressAnimation.from = progress;
+        progressAnimation.to = value;
+        progressAnimation.duration = duration;
+        progressAnimation.start();
     }
 
     Component.onCompleted: {
-        initialized = true
-        surfaceVisible = shown
+        initialized = true;
+        surfaceVisible = shown;
         if (shown && animationsEnabled) {
-            progress = 0
+            progress = 0;
             Qt.callLater(() => {
                 if (motion.shown)
-                    motion.animateTo(1, motion.duration)
-            })
+                    motion.animateTo(1, motion.duration);
+            });
         } else {
-            progress = shown ? 1 : 0
+            progress = shown ? 1 : 0;
         }
     }
 
@@ -110,7 +107,7 @@ Item {
         easing.type: Easing.OutCubic
         onFinished: {
             if (!motion.shown && motion.progress <= 0)
-                finishCloseTimer.start()
+                finishCloseTimer.start();
         }
     }
 
@@ -121,9 +118,9 @@ Item {
         interval: 24
         onTriggered: {
             if (!motion.shown && motion.progress <= 0) {
-                motion.surfaceVisible = false
-                motion.closing = false
-                motion.closed()
+                motion.surfaceVisible = false;
+                motion.closing = false;
+                motion.closed();
             }
         }
     }

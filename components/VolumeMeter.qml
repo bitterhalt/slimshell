@@ -31,9 +31,6 @@ Item {
                 height: root.height
                 color: index < root.activeSegments ? root.config.selectionBackground : root.config.border
             }
-
         }
-
     }
-
 }

@@ -54,7 +54,6 @@ Item {
             values = parsed.values;
             if (parsed.warnings.length > 0)
                 console.warn("settings.json: using defaults for " + parsed.warnings.join(", "));
-
         } catch (error) {
             console.warn("Invalid settings.json; keeping previous settings");
         }
@@ -67,7 +66,6 @@ Item {
         const initial = settingsFile.text();
         if (!ready)
             applySettings(initial);
-
     }
 
     FileView {
@@ -88,5 +86,4 @@ Item {
     FontMetrics {
         id: systemFontMetrics
     }
-
 }

@@ -11,9 +11,7 @@ Item {
     required property var notificationPopup
     required property var uiService
 
-    readonly property bool active:
-        notificationService.dnd
-        || notificationService.notificationCount > 0
+    readonly property bool active: notificationService.dnd || notificationService.notificationCount > 0
 
     width: active ? 22 : 0
     height: barWindow.height
@@ -22,10 +20,7 @@ Item {
     Text {
         anchors.centerIn: parent
 
-        color: notificationService.dnd
-            || notificationService.notificationCount > 0
-            ? config.selectionBackground
-            : config.muted
+        color: notificationService.dnd || notificationService.notificationCount > 0 ? config.selectionBackground : config.muted
 
         font.family: config.iconFontFamily
         font.pointSize: config.iconSize
@@ -39,19 +34,13 @@ Item {
 
         onClicked: mouse => {
             if (mouse.button === Qt.RightButton) {
-                notificationService.toggleDnd()
-                return
+                notificationService.toggleDnd();
+                return;
             }
 
-            notificationPopup.hide()
+            notificationPopup.hide();
 
-            popupManager.toggleHost(
-                "notificationCenter",
-                notificationCenterComponent,
-                root,
-                true,
-                true
-            )
+            popupManager.toggleHost("notificationCenter", notificationCenterComponent, root, true, true);
         }
     }
 
@@ -72,33 +61,21 @@ Item {
 
         function onNotificationCenterActionRequested(action): void {
             if (action === "close") {
-                popupManager.closeHost("notificationCenter")
-                return
+                popupManager.closeHost("notificationCenter");
+                return;
             }
 
             if (barWindow.screen !== uiService.targetScreen) {
-                popupManager.closeHost("notificationCenter")
-                return
+                popupManager.closeHost("notificationCenter");
+                return;
             }
 
-            notificationPopup.hide()
+            notificationPopup.hide();
 
             if (action === "toggle") {
-                popupManager.toggleHost(
-                    "notificationCenter",
-                    notificationCenterComponent,
-                    root,
-                    true,
-                    true
-                )
+                popupManager.toggleHost("notificationCenter", notificationCenterComponent, root, true, true);
             } else if (action === "open") {
-                popupManager.openHost(
-                    "notificationCenter",
-                    notificationCenterComponent,
-                    root,
-                    true,
-                    true
-                )
+                popupManager.openHost("notificationCenter", notificationCenterComponent, root, true, true);
             }
         }
     }

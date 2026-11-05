@@ -20,9 +20,7 @@ Button {
         renderType: root.iconOnly ? Text.QtRendering : Text.NativeRendering
         text: root.text
         font.pointSize: root.config.fontSize(0.88)
-        color: !root.enabled ? root.config.muted
-            : root.down || root.hovered || root.activeFocus
-                ? root.config.selectionForeground : root.config.fg
+        color: !root.enabled ? root.config.muted : root.down || root.hovered || root.activeFocus ? root.config.selectionForeground : root.config.fg
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         elide: Text.ElideRight
@@ -30,10 +28,8 @@ Button {
 
     background: Rectangle {
         radius: 4
-        color: root.enabled && (root.down || root.hovered || root.activeFocus) ? root.config.selectionBackground
-            : root.tinted ? Qt.alpha(root.config.selectionBackground, 0.12) : "transparent"
+        color: root.enabled && (root.down || root.hovered || root.activeFocus) ? root.config.selectionBackground : root.tinted ? Qt.alpha(root.config.selectionBackground, 0.12) : "transparent"
         border.width: root.activeFocus ? 1 : 0
         border.color: root.config.selectionBackground
     }
-
 }

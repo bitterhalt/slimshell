@@ -19,268 +19,266 @@ import "translator"
 import "wallpaper"
 
 ShellRoot {
-  id: root
+    id: root
 
-  property bool barVisible: true
-  readonly property var activeScreen: {
-    const screens = Quickshell.screens
+    property bool barVisible: true
+    readonly property var activeScreen: {
+        const screens = Quickshell.screens;
 
-    if (!screens || screens.length === 0)
-      return null
+        if (!screens || screens.length === 0)
+            return null;
 
-    for (let i = 0; i < screens.length; ++i) {
-      if (screens[i].name === niriService.focusedOutput)
-        return screens[i]
+        for (let i = 0; i < screens.length; ++i) {
+            if (screens[i].name === niriService.focusedOutput)
+                return screens[i];
+        }
+
+        return screens[0];
     }
 
-    return screens[0]
-  }
+    ThemeService {
+        id: themeService
+    }
 
-  ThemeService {
-    id: themeService
-  }
+    Config {
+        id: appConfig
+        theme: themeService
+    }
 
-  Config {
-    id: appConfig
-    theme: themeService
-  }
+    SettingsService {
+        id: appSettingsService
+    }
 
-  SettingsService {
-    id: appSettingsService
-  }
+    ResumeService {
+        id: appResumeService
+    }
 
-  ResumeService {
-    id: appResumeService
-  }
-
-  PolkitService {
-    config: appConfig
-    targetScreen: root.activeScreen
-  }
-
-  NiriService {
-    id: niriService
-
-  }
-
-  AudioService {
-    id: appAudioService
-    config: appConfig
-  }
-
-  NetworkService {
-    id: appNetworkService
-  }
-
-  PrivacyService {
-    id: appPrivacyService
-  }
-
-  MainMenu {
-    id: mainMenu
-    config: appConfig
-    targetScreen: root.activeScreen
-    lockService: appLockService
-    idleService: appIdleService
-    wallpaperPicker: appWallpaperPicker
-  }
-
-  LockService {
-    id: appLockService
-  }
-
-  TimerService {
-    id: appTimerService
-  }
-
-  Loader {
-    active: appConfig.launcherEnabled
-
-    sourceComponent: Component {
-      Launcher {
+    PolkitService {
         config: appConfig
         targetScreen: root.activeScreen
-        timerService: appTimerService
-      }
-    }
-  }
-
-  Clipboard {
-    config: appConfig
-    targetScreen: root.activeScreen
-  }
-
-  Translator {
-    config: appConfig
-    targetScreen: root.activeScreen
-  }
-
-  Wallpaper {
-    id: appWallpaperPicker
-    config: appConfig
-    targetScreen: root.activeScreen
-    settingsService: appSettingsService
-  }
-
-  NotificationService {
-    id: appNotificationService
-    config: appConfig
-  }
-
-  NotificationPopup {
-    id: appNotificationPopup
-    config: appConfig
-    targetScreen: root.activeScreen
-    notificationService: appNotificationService
-  }
-
-  Connections {
-    target: appNotificationPopup
-
-    function onOpenNotificationCenterRequested(): void {
-      shellUiService.notificationCenterActionRequested("open")
-    }
-  }
-
-  Connections {
-    target: appNotificationService
-
-    function onToastSerialChanged(): void {
-      if (appNotificationService.historyOpenCount > 0) {
-        appNotificationService.finishToast(appNotificationService.toastNotification)
-        return
-      }
-      if (!appNotificationService.dnd
-          && appNotificationService.toastNotification) {
-        appNotificationPopup.show(
-          appNotificationService.toastNotification
-        )
-      }
     }
 
-    function onDndChanged(): void {
-      if (appNotificationService.dnd)
-        appNotificationPopup.hide()
-    }
-  }
-
-  BluetoothService {
-    id: appBluetoothService
-    config: appConfig
-  }
-
-  BluetoothNotifier {
-    config: appConfig
-    targetScreen: root.activeScreen
-    bluetoothService: appBluetoothService
-  }
-
-  BatteryService {
-    id: appBatteryService
-  }
-
-  WeatherService {
-    id: appWeatherService
-  }
-
-  IdleService {
-    id: appIdleService
-    settingsService: appSettingsService
-    lockService: appLockService
-    targetScreen: root.activeScreen
-  }
-
-  IdleSettings {
-    id: idleSettings
-    config: appConfig
-    idleService: appIdleService
-    settingsService: appSettingsService
-    targetScreen: root.activeScreen
-  }
-
-  Connections {
-    target: appIdleService
-    function onSettingsRequested(screen) { idleSettings.open(screen) }
-  }
-
-  RecorderService {
-    id: appRecorderService
-    targetScreen: root.activeScreen
-  }
-
-  ShellUiService {
-    id: shellUiService
-    targetScreen: root.activeScreen
-  }
-
-  VolumeOsd {
-    id: appVolumeOsd
-    config: appConfig
-    targetScreen: root.activeScreen
-  }
-
-  // Niri/keybind control:
-  //
-  //   qs ipc call bar toggle
-  //   qs ipc call bar hide
-  //   qs ipc call bar show
-  IpcHandler {
-    target: "bar"
-
-    function toggle(): void {
-      root.barVisible = !root.barVisible
+    NiriService {
+        id: niriService
     }
 
-    function hide(): void {
-      root.barVisible = false
+    AudioService {
+        id: appAudioService
+        config: appConfig
     }
 
-    function show(): void {
-      root.barVisible = true
+    NetworkService {
+        id: appNetworkService
     }
 
-    function isVisible(): bool {
-      return root.barVisible
+    PrivacyService {
+        id: appPrivacyService
     }
-  }
 
-  Variants {
-    model: Quickshell.screens
-
-    ZenCard {
-      required property var modelData
-
-      targetScreen: modelData
-      config: appConfig
-      resumeService: appResumeService
-      visible: !root.barVisible
+    MainMenu {
+        id: mainMenu
+        config: appConfig
+        targetScreen: root.activeScreen
+        lockService: appLockService
+        idleService: appIdleService
+        wallpaperPicker: appWallpaperPicker
     }
-  }
 
-  Variants {
-    model: Quickshell.screens
-
-    Bar {
-      required property var modelData
-
-      targetScreen: modelData
-      config: appConfig
-      niri: niriService
-      resumeService: appResumeService
-      notificationService: appNotificationService
-      notificationPopup: appNotificationPopup
-      bluetoothService: appBluetoothService
-      audioService: appAudioService
-      networkService: appNetworkService
-      privacyService: appPrivacyService
-      batteryService: appBatteryService
-      weatherService: appWeatherService
-      idleService: appIdleService
-      settingsService: appSettingsService
-      recorderService: appRecorderService
-      uiService: shellUiService
-
-      visible: root.barVisible
+    LockService {
+        id: appLockService
     }
-  }
+
+    TimerService {
+        id: appTimerService
+    }
+
+    Loader {
+        active: appConfig.launcherEnabled
+
+        sourceComponent: Component {
+            Launcher {
+                config: appConfig
+                targetScreen: root.activeScreen
+                timerService: appTimerService
+            }
+        }
+    }
+
+    Clipboard {
+        config: appConfig
+        targetScreen: root.activeScreen
+    }
+
+    Translator {
+        config: appConfig
+        targetScreen: root.activeScreen
+    }
+
+    Wallpaper {
+        id: appWallpaperPicker
+        config: appConfig
+        targetScreen: root.activeScreen
+        settingsService: appSettingsService
+    }
+
+    NotificationService {
+        id: appNotificationService
+        config: appConfig
+    }
+
+    NotificationPopup {
+        id: appNotificationPopup
+        config: appConfig
+        targetScreen: root.activeScreen
+        notificationService: appNotificationService
+    }
+
+    Connections {
+        target: appNotificationPopup
+
+        function onOpenNotificationCenterRequested(): void {
+            shellUiService.notificationCenterActionRequested("open");
+        }
+    }
+
+    Connections {
+        target: appNotificationService
+
+        function onToastSerialChanged(): void {
+            if (appNotificationService.historyOpenCount > 0) {
+                appNotificationService.finishToast(appNotificationService.toastNotification);
+                return;
+            }
+            if (!appNotificationService.dnd && appNotificationService.toastNotification) {
+                appNotificationPopup.show(appNotificationService.toastNotification);
+            }
+        }
+
+        function onDndChanged(): void {
+            if (appNotificationService.dnd)
+                appNotificationPopup.hide();
+        }
+    }
+
+    BluetoothService {
+        id: appBluetoothService
+        config: appConfig
+    }
+
+    BluetoothNotifier {
+        config: appConfig
+        targetScreen: root.activeScreen
+        bluetoothService: appBluetoothService
+    }
+
+    BatteryService {
+        id: appBatteryService
+    }
+
+    WeatherService {
+        id: appWeatherService
+    }
+
+    IdleService {
+        id: appIdleService
+        settingsService: appSettingsService
+        lockService: appLockService
+        targetScreen: root.activeScreen
+    }
+
+    IdleSettings {
+        id: idleSettings
+        config: appConfig
+        idleService: appIdleService
+        settingsService: appSettingsService
+        targetScreen: root.activeScreen
+    }
+
+    Connections {
+        target: appIdleService
+        function onSettingsRequested(screen) {
+            idleSettings.open(screen);
+        }
+    }
+
+    RecorderService {
+        id: appRecorderService
+        targetScreen: root.activeScreen
+    }
+
+    ShellUiService {
+        id: shellUiService
+        targetScreen: root.activeScreen
+    }
+
+    VolumeOsd {
+        id: appVolumeOsd
+        config: appConfig
+        targetScreen: root.activeScreen
+    }
+
+    // Niri/keybind control:
+    //
+    //   qs ipc call bar toggle
+    //   qs ipc call bar hide
+    //   qs ipc call bar show
+    IpcHandler {
+        target: "bar"
+
+        function toggle(): void {
+            root.barVisible = !root.barVisible;
+        }
+
+        function hide(): void {
+            root.barVisible = false;
+        }
+
+        function show(): void {
+            root.barVisible = true;
+        }
+
+        function isVisible(): bool {
+            return root.barVisible;
+        }
+    }
+
+    Variants {
+        model: Quickshell.screens
+
+        ZenCard {
+            required property var modelData
+
+            targetScreen: modelData
+            config: appConfig
+            resumeService: appResumeService
+            visible: !root.barVisible
+        }
+    }
+
+    Variants {
+        model: Quickshell.screens
+
+        Bar {
+            required property var modelData
+
+            targetScreen: modelData
+            config: appConfig
+            niri: niriService
+            resumeService: appResumeService
+            notificationService: appNotificationService
+            notificationPopup: appNotificationPopup
+            bluetoothService: appBluetoothService
+            audioService: appAudioService
+            networkService: appNetworkService
+            privacyService: appPrivacyService
+            batteryService: appBatteryService
+            weatherService: appWeatherService
+            idleService: appIdleService
+            settingsService: appSettingsService
+            recorderService: appRecorderService
+            uiService: shellUiService
+
+            visible: root.barVisible
+        }
+    }
 }

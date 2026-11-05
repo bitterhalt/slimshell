@@ -40,16 +40,16 @@ Item {
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: (mouse) => {
+                    onClicked: mouse => {
                         if (mouse.button === Qt.MiddleButton) {
                             trayItem.modelData.secondaryActivate();
-                            return ;
+                            return;
                         }
                         if (mouse.button === Qt.RightButton || trayItem.modelData.onlyMenu) {
                             if (trayItem.modelData.hasMenu)
                                 root.popupManager.toggleHost("trayMenu", trayMenuComponent, trayItem);
 
-                            return ;
+                            return;
                         }
                         trayItem.modelData.activate();
                     }
@@ -63,13 +63,8 @@ Item {
                         menuHandle: trayItem.modelData.menu
                         popupManager: root.popupManager
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

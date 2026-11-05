@@ -12,13 +12,9 @@ Item {
     required property var settingsService
 
     readonly property bool minimalLayout: settingsService.workspaceLayout === "minimal"
-    readonly property var outputWorkspaces: niri.workspaces
-        .filter(workspace => workspace.output === barWindow.screen.name)
-        .sort((a, b) => a.idx - b.idx)
-    readonly property var activeWorkspace:
-        outputWorkspaces.find(workspace => workspace.is_active) ?? null
-    readonly property var otherWorkspaces:
-        outputWorkspaces.filter(workspace => !workspace.is_active)
+    readonly property var outputWorkspaces: niri.workspaces.filter(workspace => workspace.output === barWindow.screen.name).sort((a, b) => a.idx - b.idx)
+    readonly property var activeWorkspace: outputWorkspaces.find(workspace => workspace.is_active) ?? null
+    readonly property var otherWorkspaces: outputWorkspaces.filter(workspace => !workspace.is_active)
     property bool layoutAnimationRequested: false
 
     implicitWidth: minimalLayout ? workspaceRevealer.implicitWidth : dotsRow.implicitWidth
@@ -30,15 +26,14 @@ Item {
         acceptedButtons: Qt.RightButton
         enabled: root.settingsService.settingsLoaded
         onTapped: {
-            root.layoutAnimationRequested = true
-            root.settingsService.saveWorkspaceLayout(
-                root.minimalLayout ? "dots" : "minimal")
+            root.layoutAnimationRequested = true;
+            root.settingsService.saveWorkspaceLayout(root.minimalLayout ? "dots" : "minimal");
         }
     }
 
     function focusWorkspace(workspace): void {
         if (workspace)
-            config.run(`niri msg action focus-workspace ${workspace.idx}`)
+            config.run(`niri msg action focus-workspace ${workspace.idx}`);
     }
 
     // Dots layout: active, urgent, and inactive workspaces for this output.
@@ -54,11 +49,17 @@ Item {
         scale: root.minimalLayout ? 0.88 : 1
 
         Behavior on opacity {
-            NumberAnimation { duration: 160; easing.type: Easing.OutCubic }
+            NumberAnimation {
+                duration: 160
+                easing.type: Easing.OutCubic
+            }
             enabled: root.layoutAnimationRequested
         }
         Behavior on scale {
-            NumberAnimation { duration: 160; easing.type: Easing.OutCubic }
+            NumberAnimation {
+                duration: 160
+                easing.type: Easing.OutCubic
+            }
             enabled: root.layoutAnimationRequested
         }
 
@@ -73,9 +74,7 @@ Item {
                 width: modelData.is_active ? 24 : 8
                 height: 8
                 radius: 4
-                color: workspaceDot.modelData.is_urgent ? root.config.urgent
-                    : workspaceDot.modelData.is_active
-                        ? root.config.selectionBackground : root.config.fg
+                color: workspaceDot.modelData.is_urgent ? root.config.urgent : workspaceDot.modelData.is_active ? root.config.selectionBackground : root.config.fg
                 opacity: workspaceDot.modelData.is_active ? 1 : 0.7
 
                 MouseArea {
@@ -101,11 +100,17 @@ Item {
         scale: root.minimalLayout ? 1 : 0.88
 
         Behavior on opacity {
-            NumberAnimation { duration: 160; easing.type: Easing.OutCubic }
+            NumberAnimation {
+                duration: 160
+                easing.type: Easing.OutCubic
+            }
             enabled: root.layoutAnimationRequested
         }
         Behavior on scale {
-            NumberAnimation { duration: 160; easing.type: Easing.OutCubic }
+            NumberAnimation {
+                duration: 160
+                easing.type: Easing.OutCubic
+            }
             enabled: root.layoutAnimationRequested
         }
 
@@ -125,9 +130,7 @@ Item {
                 color: root.config.selectionForeground
                 font.pointSize: root.config.fontSize(1)
                 font.weight: Font.DemiBold
-                text: root.activeWorkspace
-                    ? (root.activeWorkspace.name || String(root.activeWorkspace.idx))
-                    : "—"
+                text: root.activeWorkspace ? (root.activeWorkspace.name || String(root.activeWorkspace.idx)) : "—"
             }
 
             MouseArea {
@@ -149,11 +152,7 @@ Item {
                     width: workspaceName.implicitWidth + 16
                     height: 24
                     radius: 4
-                    color: workspaceMouse.containsMouse ? root.config.selectionBackground : Qt.alpha(
-                        workspaceItem.modelData.is_urgent
-                            ? root.config.urgent : root.config.selectionBackground,
-                        0.5
-                    )
+                    color: workspaceMouse.containsMouse ? root.config.selectionBackground : Qt.alpha(workspaceItem.modelData.is_urgent ? root.config.urgent : root.config.selectionBackground, 0.5)
 
                     Text {
                         id: workspaceName
@@ -161,12 +160,10 @@ Item {
                         renderType: Text.NativeRendering
 
                         anchors.centerIn: parent
-                        color: workspaceMouse.containsMouse ? root.config.selectionForeground : workspaceItem.modelData.is_urgent
-                            ? root.config.fg : root.config.selectionForeground
+                        color: workspaceMouse.containsMouse ? root.config.selectionForeground : workspaceItem.modelData.is_urgent ? root.config.fg : root.config.selectionForeground
                         font.pointSize: root.config.fontSize(1)
                         font.weight: Font.DemiBold
-                        text: workspaceItem.modelData.name
-                            || String(workspaceItem.modelData.idx)
+                        text: workspaceItem.modelData.name || String(workspaceItem.modelData.idx)
                     }
 
                     MouseArea {

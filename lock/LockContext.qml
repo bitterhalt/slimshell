@@ -20,18 +20,18 @@ Scope {
     readonly property alias pamResponseRequired: pam.responseRequired
     readonly property alias pamResponseVisible: pam.responseVisible
 
-    signal unlocked()
-    signal failed()
+    signal unlocked
+    signal failed
 
     function requestUnlock() {
         if (root.unlockInProgress)
-            return ;
+            return;
 
         if (root.pamActivated)
-            return ;
+            return;
 
         if (pam.active)
-            return ;
+            return;
 
         root.pamActivated = true;
         root.timedOut = false;
@@ -42,7 +42,7 @@ Scope {
 
     function tryUnlock() {
         if (root.unlockInProgress || pam.active)
-            return ;
+            return;
 
         root.timedOut = false;
         root.unlockInProgress = true;
@@ -78,7 +78,7 @@ Scope {
 
     function submitPassword() {
         if (!root.acceptingPassword)
-            return ;
+            return;
 
         if (pam.responseRequired && !root.unlockInProgress)
             respondToPam(root.currentText);
@@ -100,7 +100,6 @@ Scope {
     onCurrentTextChanged: {
         if (acceptingPassword)
             timeoutTimer.restart();
-
     }
 
     Timer {
@@ -123,12 +122,11 @@ Scope {
                 timeoutTimer.restart();
                 if (root.submitPending)
                     Qt.callLater(root.submitPassword);
-
             }
         }
-        onCompleted: (result) => {
+        onCompleted: result => {
             if (root.timedOut)
-                return ;
+                return;
 
             root.awaitingPasswordPrompt = false;
             root.submitPending = false;
@@ -142,9 +140,9 @@ Scope {
                 root.failed();
             }
         }
-        onError: (error) => {
+        onError: error => {
             if (root.timedOut)
-                return ;
+                return;
 
             root.awaitingPasswordPrompt = false;
             root.submitPending = false;
@@ -155,5 +153,4 @@ Scope {
             root.showFailure = true;
         }
     }
-
 }

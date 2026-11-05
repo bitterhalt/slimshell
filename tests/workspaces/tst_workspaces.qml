@@ -17,8 +17,12 @@ Item {
         property color fg: "white"
         property var commands: []
 
-        function fontSize(scale) { return 12 * scale; }
-        function run(command) { commands = commands.concat([command]); }
+        function fontSize(scale) {
+            return 12 * scale;
+        }
+        function run(command) {
+            commands = commands.concat([command]);
+        }
     }
 
     QtObject {
@@ -45,10 +49,38 @@ Item {
     QtObject {
         id: fixtureNiri
         property var workspaces: [
-            {id: 1, idx: 1, name: "Web", output: "A", is_active: true, is_urgent: false},
-            {id: 2, idx: 2, name: "Code", output: "A", is_active: false, is_urgent: true},
-            {id: 3, idx: 3, name: "Notes", output: "A", is_active: false, is_urgent: false},
-            {id: 4, idx: 1, name: "Other screen", output: "B", is_active: false, is_urgent: false}
+            {
+                id: 1,
+                idx: 1,
+                name: "Web",
+                output: "A",
+                is_active: true,
+                is_urgent: false
+            },
+            {
+                id: 2,
+                idx: 2,
+                name: "Code",
+                output: "A",
+                is_active: false,
+                is_urgent: true
+            },
+            {
+                id: 3,
+                idx: 3,
+                name: "Notes",
+                output: "A",
+                is_active: false,
+                is_urgent: false
+            },
+            {
+                id: 4,
+                idx: 1,
+                name: "Other screen",
+                output: "B",
+                is_active: false,
+                is_urgent: false
+            }
         ]
     }
 
@@ -100,8 +132,7 @@ Item {
             compare(activeName.color, fixtureConfig.selectionForeground);
             const dots = findChild(workspaces, "dotsRow");
             tryCompare(dots, "opacity", 0, 300);
-            verify(findChild(workspaces, "workspace-dot-1") === null
-                || !findChild(workspaces, "workspace-dot-1").visible);
+            verify(findChild(workspaces, "workspace-dot-1") === null || !findChild(workspaces, "workspace-dot-1").visible);
 
             const collapsedWidth = workspaces.implicitWidth;
             mouseMove(workspaces, 4, workspaces.height / 2);

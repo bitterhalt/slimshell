@@ -9,7 +9,7 @@ PanelWindow {
     required property var targetScreen
 
     signal accepted(string geometry)
-    signal canceled()
+    signal canceled
 
     screen: targetScreen
 
@@ -26,9 +26,7 @@ PanelWindow {
     focusable: true
 
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: visible
-        ? WlrKeyboardFocus.Exclusive
-        : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     property real startX: 0
     property real startY: 0
@@ -37,14 +35,14 @@ PanelWindow {
     property bool selecting: false
 
     function open(): void {
-        selecting = false
-        visible = true
-        Qt.callLater(() => keyboardHandler.forceActiveFocus())
+        selecting = false;
+        visible = true;
+        Qt.callLater(() => keyboardHandler.forceActiveFocus());
     }
 
     function close(): void {
-        selecting = false
-        visible = false
+        selecting = false;
+        visible = false;
     }
 
     // Selection outline follows the drag rectangle.
@@ -66,65 +64,49 @@ PanelWindow {
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
-        cursorShape: root.selecting
-            ? Qt.CrossCursor
-            : Qt.CrossCursor
+        cursorShape: root.selecting ? Qt.CrossCursor : Qt.CrossCursor
 
         onPressed: mouse => {
             if (mouse.button === Qt.RightButton) {
-                root.close()
-                root.canceled()
-                return
+                root.close();
+                root.canceled();
+                return;
             }
 
-            root.startX = mouse.x
-            root.startY = mouse.y
-            root.endX = mouse.x
-            root.endY = mouse.y
-            root.selecting = true
+            root.startX = mouse.x;
+            root.startY = mouse.y;
+            root.endX = mouse.x;
+            root.endY = mouse.y;
+            root.selecting = true;
         }
 
         onPositionChanged: mouse => {
             if (!root.selecting)
-                return
-
-            root.endX = mouse.x
-            root.endY = mouse.y
+                return;
+            root.endX = mouse.x;
+            root.endY = mouse.y;
         }
 
         onReleased: mouse => {
             if (!root.selecting || mouse.button !== Qt.LeftButton)
-                return
+                return;
+            root.endX = mouse.x;
+            root.endY = mouse.y;
 
-            root.endX = mouse.x
-            root.endY = mouse.y
+            const x = Math.round(Math.min(root.startX, root.endX));
+            const y = Math.round(Math.min(root.startY, root.endY));
+            const width = Math.round(Math.abs(root.endX - root.startX));
+            const height = Math.round(Math.abs(root.endY - root.startY));
 
-            const x = Math.round(
-                Math.min(root.startX, root.endX)
-            )
-            const y = Math.round(
-                Math.min(root.startY, root.endY)
-            )
-            const width = Math.round(
-                Math.abs(root.endX - root.startX)
-            )
-            const height = Math.round(
-                Math.abs(root.endY - root.startY)
-            )
-
-            root.selecting = false
-            root.visible = false
+            root.selecting = false;
+            root.visible = false;
 
             if (width < 10 || height < 10) {
-                root.canceled()
-                return
+                root.canceled();
+                return;
             }
 
-            root.accepted(
-                width + "x" + height + "+"
-                + (x + (root.targetScreen ? root.targetScreen.x : 0)) + "+"
-                + (y + (root.targetScreen ? root.targetScreen.y : 0))
-            )
+            root.accepted(width + "x" + height + "+" + (x + (root.targetScreen ? root.targetScreen.x : 0)) + "+" + (y + (root.targetScreen ? root.targetScreen.y : 0)));
         }
     }
 
@@ -135,8 +117,8 @@ PanelWindow {
         focus: true
 
         Keys.onEscapePressed: {
-            root.close()
-            root.canceled()
+            root.close();
+            root.canceled();
         }
     }
 }

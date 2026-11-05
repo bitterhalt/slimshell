@@ -12,10 +12,9 @@ Item {
     width: 380
     height: 650
     focus: true
-    Keys.onPressed: (event) => {
+    Keys.onPressed: event => {
         if (test.state && test.state.handleKey(event.key, event.modifiers, event.text))
             event.accepted = true;
-
     }
 
     QtObject {
@@ -36,7 +35,6 @@ Item {
         function fontSize(scale) {
             return 10 * scale;
         }
-
     }
 
     QtObject {
@@ -47,7 +45,7 @@ Item {
 
         function dismiss(note) {
             calls = calls.concat(["dismiss:" + note.id]);
-            notifications = notifications.filter((item) => {
+            notifications = notifications.filter(item => {
                 return item.id !== note.id;
             });
         }
@@ -56,7 +54,6 @@ Item {
             calls = calls.concat(["clear"]);
             notifications = [];
         }
-
     }
 
     Component {
@@ -65,15 +62,12 @@ Item {
         HistoryState {
             notificationService: service
         }
-
     }
 
     Component {
         id: cardComponent
 
-        HistoryCard {
-        }
-
+        HistoryCard {}
     }
 
     TestCase {
@@ -216,7 +210,7 @@ Item {
 
         function test_duplicate_labels_keep_one_button_but_preserve_default() {
             service.notifications = [notification(5, [action("edit", "Edit"), action("default", "Edit"), action("open", "Open"), action("close", "Close")])];
-            compare(state.actions.map((entry) => {
+            compare(state.actions.map(entry => {
                 return entry.label;
             }), ["Edit", "Open"]);
             press(Qt.Key_Return);
@@ -253,11 +247,11 @@ Item {
 
         function test_reserved_keys_and_collisions() {
             const entries = Model.actionsFor([action("open", "Open"), action("options", "Options"), action("copy", "Copy"), action("jump", "Jump"), action("close", "Close"), action("close2", "Close")]);
-            const keys = entries.map((item) => {
+            const keys = entries.map(item => {
                 return item.key;
             });
             compare(new Set(keys).size, keys.length);
-            verify(!entries.some((item) => {
+            verify(!entries.some(item => {
                 return item.label === "Close";
             }));
             compare(entries[0].key, "o");
@@ -284,7 +278,6 @@ Item {
                 const match = findText(child, value);
                 if (match)
                     return match;
-
             }
             return null;
         }
@@ -322,11 +315,14 @@ Item {
 
             const note = notification(1);
             note.image = "file:///tmp/screenshot.png";
-            const fallbackIcon = "data:image/svg+xml," + encodeURIComponent(
-                '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="blue"/></svg>');
+            const fallbackIcon = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="blue"/></svg>');
             card = createTemporaryObject(cardComponent, host, {
-                width: 340, height: 100, config: config, selected: true,
-                notification: note, appIconSource: fallbackIcon
+                width: 340,
+                height: 100,
+                config: config,
+                selected: true,
+                notification: note,
+                appIconSource: fallbackIcon
             });
             verify(findChild(card, "historyAppIcon").source.toString().startsWith("data:image/svg+xml,"));
             compare(findChild(card, "historyImagePreview"), null);
@@ -336,27 +332,53 @@ Item {
         }
 
         function test_low_urgency_toast_policy() {
-            verify(ToastPolicy.shouldShow({urgency: 0, lastGeneration: false}, false));
-            verify(ToastPolicy.shouldShow({urgency: 1, lastGeneration: false}, false));
-            verify(ToastPolicy.shouldShow({urgency: 2, lastGeneration: false}, false));
-            verify(!ToastPolicy.shouldShow({urgency: 0, lastGeneration: false}, true));
-            verify(!ToastPolicy.shouldShow({urgency: 1, lastGeneration: true}, false));
+            verify(ToastPolicy.shouldShow({
+                urgency: 0,
+                lastGeneration: false
+            }, false));
+            verify(ToastPolicy.shouldShow({
+                urgency: 1,
+                lastGeneration: false
+            }, false));
+            verify(ToastPolicy.shouldShow({
+                urgency: 2,
+                lastGeneration: false
+            }, false));
+            verify(!ToastPolicy.shouldShow({
+                urgency: 0,
+                lastGeneration: false
+            }, true));
+            verify(!ToastPolicy.shouldShow({
+                urgency: 1,
+                lastGeneration: true
+            }, false));
             verify(!ToastPolicy.shouldShow(null, false));
         }
 
         function test_history_exclusions_match_app_id_or_app_name() {
             const excludedApps = ["org.example.Chat", "Quiet Sender"];
-            const byDesktopEntry = {desktopEntry: "org.example.Chat", appName: "Chat"};
-            const byAppName = {desktopEntry: "", appName: "Quiet Sender"};
-            const tagged = {desktopEntry: "", appName: "nohistory"};
-            const normal = {desktopEntry: "org.example.Mail", appName: "Mail"};
+            const byDesktopEntry = {
+                desktopEntry: "org.example.Chat",
+                appName: "Chat"
+            };
+            const byAppName = {
+                desktopEntry: "",
+                appName: "Quiet Sender"
+            };
+            const tagged = {
+                desktopEntry: "",
+                appName: "nohistory"
+            };
+            const normal = {
+                desktopEntry: "org.example.Mail",
+                appName: "Mail"
+            };
 
             verify(HistoryPolicy.isExcluded(byDesktopEntry, excludedApps));
             verify(HistoryPolicy.isExcluded(byAppName, excludedApps));
             verify(HistoryPolicy.isExcluded(tagged, excludedApps));
             verify(!HistoryPolicy.isExcluded(normal, excludedApps));
-            compare(HistoryPolicy.visibleNotifications(
-                [byDesktopEntry, byAppName, tagged, normal], excludedApps), [normal]);
+            compare(HistoryPolicy.visibleNotifications([byDesktopEntry, byAppName, tagged, normal], excludedApps), [normal]);
             verify(ToastPolicy.shouldShow(tagged, false));
         }
 
@@ -366,8 +388,7 @@ Item {
                 "width": 340,
                 "config": config,
                 "critical": true,
-                "appIconSource": "data:image/svg+xml," + encodeURIComponent(
-                    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="black"/></svg>'),
+                "appIconSource": "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="black"/></svg>'),
                 "timeLabel": "12:34",
                 "notification": note,
                 "actionEntries": Model.actionsFor(note.actions)
@@ -379,7 +400,8 @@ Item {
             verify(!findChild(card, "historyAppIcon").visible);
             compare(card.border.color, card.criticalBorderColor);
             compare(card.color, config.bg);
-            for (const label of ["12:34", note.summary, note.body]) compare(findText(card, label).color, card.criticalTextColor)
+            for (const label of ["12:34", note.summary, note.body])
+                compare(findText(card, label).color, card.criticalTextColor);
             card.selected = true;
             waitForPolish(host.Window.window);
             compare(card.border.color, card.criticalBorderColor);
@@ -390,8 +412,11 @@ Item {
 
         function test_history_rows_have_subtle_card_surfaces() {
             const note = notification(1);
-            card = createTemporaryObject(cardComponent, host, {width: 340, config: config,
-                notification: note});
+            card = createTemporaryObject(cardComponent, host, {
+                width: 340,
+                config: config,
+                notification: note
+            });
             compare(card.color, Qt.alpha(config.selectionBackground, 0.05));
             compare(card.border.width, 1);
             compare(card.border.color, config.border);
@@ -447,7 +472,10 @@ Item {
             const note = notification(1);
             note.body = "This message should expand and reveal its extra wrapped lines. ".repeat(4);
             card = createTemporaryObject(cardComponent, host, {
-                width: 340, height: 120, config: config, notification: note
+                width: 340,
+                height: 120,
+                config: config,
+                notification: note
             });
             verify(card !== null);
             waitForPolish(host.Window.window);
@@ -482,7 +510,7 @@ Item {
                 "notification": note,
                 "actionEntries": Model.actionsFor(note.actions)
             });
-            card.actionRequested.connect((entry) => {
+            card.actionRequested.connect(entry => {
                 return entry.action ? entry.action.invoke() : closes++;
             });
             waitForPolish(host.Window.window);
@@ -495,5 +523,4 @@ Item {
         name: "NotificationHistory"
         when: windowShown
     }
-
 }

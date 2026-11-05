@@ -29,7 +29,12 @@ Item {
                 adapter.discovering = users > 0;
         }
     }
-    Component { id: stateComponent; DiscoveryState { bluetoothService: service } }
+    Component {
+        id: stateComponent
+        DiscoveryState {
+            bluetoothService: service
+        }
+    }
 
     TestCase {
         name: "BluetoothDiscovery"

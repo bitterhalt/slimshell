@@ -28,24 +28,16 @@ PanelWindow {
     readonly property int panelHeight: 420
     readonly property int historyWidth: 160
     readonly property int rowHeight: 36
-    readonly property string previewPath:
-        (Quickshell.env("XDG_RUNTIME_DIR") || "/tmp")
-        + "/quickshell/clipboard-preview-"
-        + Quickshell.processId + ".img"
+    readonly property string previewPath: (Quickshell.env("XDG_RUNTIME_DIR") || "/tmp") + "/quickshell/clipboard-preview-" + Quickshell.processId + ".img"
     readonly property var filteredEntries: {
-        const needle = query.trim().toLowerCase()
+        const needle = query.trim().toLowerCase();
 
         if (needle === "")
-            return entries
+            return entries;
 
-        return entries.filter(entry =>
-            entry.preview.toLowerCase().includes(needle)
-            || entry.mime.toLowerCase().includes(needle))
+        return entries.filter(entry => entry.preview.toLowerCase().includes(needle) || entry.mime.toLowerCase().includes(needle));
     }
-    readonly property var selectedEntry:
-        selectedIndex >= 0 && selectedIndex < filteredEntries.length
-            ? filteredEntries[selectedIndex]
-            : null
+    readonly property var selectedEntry: selectedIndex >= 0 && selectedIndex < filteredEntries.length ? filteredEntries[selectedIndex] : null
 
     PopupMotion {
         id: popupMotion
@@ -58,150 +50,125 @@ PanelWindow {
     }
 
     function open(): void {
-        query = ""
-        entries = []
-        selectedIndex = -1
-        selectedText = ""
-        previewReady = false
-        opened = true
-        refresh()
-        Qt.callLater(() => searchInput.forceActiveFocus())
+        query = "";
+        entries = [];
+        selectedIndex = -1;
+        selectedText = "";
+        previewReady = false;
+        opened = true;
+        refresh();
+        Qt.callLater(() => searchInput.forceActiveFocus());
     }
 
     function close(): void {
         if (!opened)
-            return
-        opened = false
-        previewDebounce.stop()
+            return;
+        opened = false;
+        previewDebounce.stop();
         if (textPreviewProcess.running)
-            textPreviewProcess.signal(15)
+            textPreviewProcess.signal(15);
         if (imagePreviewProcess.running)
-            imagePreviewProcess.signal(15)
+            imagePreviewProcess.signal(15);
     }
 
     function finishClose(): void {
         if (opened)
-            return
-        selectedIndex = -1
-        entries = []
-        query = ""
-        selectedText = ""
-        previewReady = false
-        pendingImageId = ""
-        pendingTextId = ""
-        previewEntryId = ""
+            return;
+        selectedIndex = -1;
+        entries = [];
+        query = "";
+        selectedText = "";
+        previewReady = false;
+        pendingImageId = "";
+        pendingTextId = "";
+        previewEntryId = "";
         if (imagePreviewProcess.running)
-            imagePreviewProcess.signal(15)
+            imagePreviewProcess.signal(15);
         else
-            cleanupPreview.running = true
+            cleanupPreview.running = true;
     }
 
     function refresh(): void {
         if (!listProcess.running)
-            listProcess.running = true
+            listProcess.running = true;
     }
 
     function select(index): void {
         if (!opened || index < 0 || index >= filteredEntries.length)
-            return
-
-        const entry = filteredEntries[index]
-        selectedIndex = index
+            return;
+        const entry = filteredEntries[index];
+        selectedIndex = index;
         if (previewEntryId === entry.id)
-            return
-
-        previewEntryId = entry.id
-        selectedText = ""
-        previewReady = false
+            return;
+        previewEntryId = entry.id;
+        selectedText = "";
+        previewReady = false;
 
         if (entry.isImage) {
-            pendingImageId = entry.id
-            pendingTextId = ""
+            pendingImageId = entry.id;
+            pendingTextId = "";
             if (textPreviewProcess.running)
-                textPreviewProcess.signal(15)
+                textPreviewProcess.signal(15);
         } else {
-            pendingImageId = ""
-            pendingTextId = entry.id
+            pendingImageId = "";
+            pendingTextId = entry.id;
 
             if (imagePreviewProcess.running)
-                imagePreviewProcess.signal(15)
+                imagePreviewProcess.signal(15);
         }
 
-        previewDebounce.restart()
+        previewDebounce.restart();
     }
 
     function startPendingTextPreview(): void {
-        if (!opened || previewDebounce.running
-                || textPreviewProcess.running || pendingTextId === "")
-            return
-
-        const entryId = pendingTextId
-        const entry = selectedEntry
-        pendingTextId = ""
+        if (!opened || previewDebounce.running || textPreviewProcess.running || pendingTextId === "")
+            return;
+        const entryId = pendingTextId;
+        const entry = selectedEntry;
+        pendingTextId = "";
 
         if (!entry || entry.id !== entryId || entry.isImage)
-            return
-
-        activeTextId = entryId
-        textPreviewProcess.command = [
-            "sh", "-c",
+            return;
+        activeTextId = entryId;
+        textPreviewProcess.command = ["sh", "-c",
             // Bound the collected output before it enters QML. Four bytes
             // per character leave room for the 12,000-character preview.
-            "printf '%s\\n' \"$1\" | cliphist decode | head -c 48000",
-            "clipboard-preview", entry.raw
-        ]
-        textPreviewProcess.running = true
+            "printf '%s\\n' \"$1\" | cliphist decode | head -c 48000", "clipboard-preview", entry.raw];
+        textPreviewProcess.running = true;
     }
 
     function startPendingImagePreview(): void {
-        if (!opened || previewDebounce.running
-                || imagePreviewProcess.running || pendingImageId === "")
-            return
-
-        const entryId = pendingImageId
-        const entry = selectedEntry
-        pendingImageId = ""
+        if (!opened || previewDebounce.running || imagePreviewProcess.running || pendingImageId === "")
+            return;
+        const entryId = pendingImageId;
+        const entry = selectedEntry;
+        pendingImageId = "";
 
         if (!entry || entry.id !== entryId || !entry.isImage)
-            return
-
-        activeImageId = entryId
-        imagePreviewProcess.command = [
-            "sh", "-lc",
-            "umask 077; printf '%s\\n' \"$1\" | cliphist decode > \"$2\"",
-            "clipboard-preview", entry.raw, previewPath
-        ]
-        imagePreviewProcess.running = true
+            return;
+        activeImageId = entryId;
+        imagePreviewProcess.command = ["sh", "-lc", "umask 077; printf '%s\\n' \"$1\" | cliphist decode > \"$2\"", "clipboard-preview", entry.raw, previewPath];
+        imagePreviewProcess.running = true;
     }
 
     function copySelected(): void {
-        const entry = selectedEntry
+        const entry = selectedEntry;
 
         if (!entry)
-            return
-
-        copyProcess.command = [
-            "sh", "-lc",
-            "printf '%s\\n' \"$1\" | cliphist decode | wl-copy",
-            "clipboard-copy", entry.raw
-        ]
-        copyProcess.running = true
-        close()
+            return;
+        copyProcess.command = ["sh", "-lc", "printf '%s\\n' \"$1\" | cliphist decode | wl-copy", "clipboard-copy", entry.raw];
+        copyProcess.running = true;
+        close();
     }
 
     function deleteSelected(): void {
-        const entry = selectedEntry
+        const entry = selectedEntry;
 
         if (!entry)
-            return
-
-        deleteProcess.entryId = entry.id
-        deleteProcess.command = [
-            "sh", "-lc",
-            "printf '%s\\n' \"$1\" | cliphist delete",
-            "clipboard-delete", entry.raw
-        ]
-        deleteProcess.running = true
+            return;
+        deleteProcess.entryId = entry.id;
+        deleteProcess.command = ["sh", "-lc", "printf '%s\\n' \"$1\" | cliphist delete", "clipboard-delete", entry.raw];
+        deleteProcess.running = true;
     }
 
     screen: targetScreen
@@ -218,9 +185,7 @@ PanelWindow {
     }
 
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: opened
-        ? WlrKeyboardFocus.Exclusive
-        : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: opened ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     MouseArea {
         anchors.fill: parent
@@ -293,44 +258,44 @@ PanelWindow {
                 clip: true
 
                 onTextChanged: {
-                    root.query = text
-                    root.selectedIndex = root.filteredEntries.length > 0 ? 0 : -1
+                    root.query = text;
+                    root.selectedIndex = root.filteredEntries.length > 0 ? 0 : -1;
                     if (root.selectedIndex >= 0)
-                        root.select(root.selectedIndex)
+                        root.select(root.selectedIndex);
                 }
 
                 Keys.onPressed: event => {
                     if (event.key === Qt.Key_0 && event.modifiers === Qt.ControlModifier) {
                         if (!wipeProcess.running)
-                            wipeProcess.running = true
-                        event.accepted = true
-                        return
+                            wipeProcess.running = true;
+                        event.accepted = true;
+                        return;
                     }
 
                     switch (event.key) {
                     case Qt.Key_Down:
                     case Qt.Key_Tab:
-                        root.select(root.selectedIndex + 1)
-                        event.accepted = true
-                        break
+                        root.select(root.selectedIndex + 1);
+                        event.accepted = true;
+                        break;
                     case Qt.Key_Up:
                     case Qt.Key_Backtab:
-                        root.select(root.selectedIndex - 1)
-                        event.accepted = true
-                        break
+                        root.select(root.selectedIndex - 1);
+                        event.accepted = true;
+                        break;
                     case Qt.Key_Return:
                     case Qt.Key_Enter:
-                        root.copySelected()
-                        event.accepted = true
-                        break
+                        root.copySelected();
+                        event.accepted = true;
+                        break;
                     case Qt.Key_Delete:
-                        root.deleteSelected()
-                        event.accepted = true
-                        break
+                        root.deleteSelected();
+                        event.accepted = true;
+                        break;
                     case Qt.Key_Escape:
-                        root.close()
-                        event.accepted = true
-                        break
+                        root.close();
+                        event.accepted = true;
+                        break;
                     }
                 }
 
@@ -346,7 +311,6 @@ PanelWindow {
                 font.pointSize: root.config.fontSize(1.0)
                 text: "Search clipboard"
             }
-
         }
 
         Rectangle {
@@ -396,21 +360,17 @@ PanelWindow {
                         Rectangle {
                             anchors.fill: parent
                             radius: 5
-                            color: entryRow.index === root.selectedIndex
-                                ? root.config.selectionBackground
-                                : "transparent"
+                            color: entryRow.index === root.selectedIndex ? root.config.selectionBackground : "transparent"
                         }
 
                         Text {
                             anchors.left: parent.left
                             anchors.leftMargin: 10
                             anchors.verticalCenter: parent.verticalCenter
-                            color: entryRow.index === root.selectedIndex
-                                ? root.config.selectionForeground : root.config.selectionBackground
+                            color: entryRow.index === root.selectedIndex ? root.config.selectionForeground : root.config.selectionBackground
                             font.family: root.config.iconFontFamily
                             font.pointSize: root.config.iconSize
-                            text: entryRow.modelData.isImage
-                                ? "󰋩" : "󰉢"
+                            text: entryRow.modelData.isImage ? "󰋩" : "󰉢"
                         }
 
                         Text {
@@ -420,12 +380,10 @@ PanelWindow {
                             anchors.right: parent.right
                             anchors.rightMargin: 8
                             anchors.verticalCenter: parent.verticalCenter
-                            color: entryRow.index === root.selectedIndex
-                                ? root.config.selectionForeground : root.config.fg
+                            color: entryRow.index === root.selectedIndex ? root.config.selectionForeground : root.config.fg
                             font.pointSize: root.config.fontSize(0.88)
                             text: entryRow.modelData.isImage ? "Image" : "Text"
                         }
-
                     }
                 }
             }
@@ -443,12 +401,8 @@ PanelWindow {
                 Image {
                     anchors.fill: parent
                     anchors.margins: 16
-                    visible: root.previewReady
-                        && root.selectedEntry
-                        && root.selectedEntry.isImage
-                    source: root.previewReady
-                        ? "file://" + root.previewPath
-                        : ""
+                    visible: root.previewReady && root.selectedEntry && root.selectedEntry.isImage
+                    source: root.previewReady ? "file://" + root.previewPath : ""
                     fillMode: Image.PreserveAspectFit
                     sourceSize.width: Math.ceil(width * Screen.devicePixelRatio)
                     sourceSize.height: Math.ceil(height * Screen.devicePixelRatio)
@@ -460,8 +414,7 @@ PanelWindow {
                     renderType: Text.NativeRendering
                     anchors.fill: parent
                     anchors.margins: 18
-                    visible: root.selectedEntry
-                        && !root.selectedEntry.isImage
+                    visible: root.selectedEntry && !root.selectedEntry.isImage
                     color: root.config.fg
                     font.family: "monospace"
                     font.pointSize: root.config.fontSize(0.82)
@@ -476,9 +429,7 @@ PanelWindow {
                     visible: !root.selectedEntry
                     color: root.config.muted
                     font.pointSize: root.config.fontSize(0.9)
-                    text: root.entries.length === 0
-                        ? "Clipboard history is empty"
-                        : "Select an item to preview"
+                    text: root.entries.length === 0 ? "Clipboard history is empty" : "Select an item to preview"
                 }
             }
         }
@@ -552,35 +503,29 @@ PanelWindow {
         stdout: StdioCollector {
             onStreamFinished: {
                 if (!root.opened)
-                    return
+                    return;
+                root.entries = text.trim().split("\n").map(line => {
+                    const fields = line.split("\t");
+                    if (fields.length < 2 || !/^\d+$/.test(fields[0]))
+                        return null;
 
-                root.entries = text.trim().split("\n")
-                    .map(line => {
-                        const fields = line.split("\t")
-                        if (fields.length < 2
-                                || !/^\d+$/.test(fields[0]))
-                            return null
+                    const preview = fields.slice(1).join("\t");
+                    const isImage = /^\[\[ binary data\b/.test(preview);
+                    const dimensions = preview.match(/\b(\d{2,5}x\d{2,5})\b/);
 
-                        const preview = fields.slice(1).join("\t")
-                        const isImage = /^\[\[ binary data\b/.test(preview)
-                        const dimensions = preview.match(/\b(\d{2,5}x\d{2,5})\b/)
+                    return {
+                        id: fields[0],
+                        raw: line,
+                        mime: isImage ? "image" : "text",
+                        preview: isImage ? `Image${dimensions ? ` (${dimensions[1]})` : ""}` : preview,
+                        isImage: isImage
+                    };
+                }).filter(entry => entry !== null);
 
-                        return {
-                            id: fields[0],
-                            raw: line,
-                            mime: isImage ? "image" : "text",
-                            preview: isImage
-                                ? `Image${dimensions ? ` (${dimensions[1]})` : ""}`
-                                : preview,
-                            isImage: isImage
-                        }
-                    })
-                    .filter(entry => entry !== null)
-
-                root.previewEntryId = ""
-                root.selectedIndex = root.filteredEntries.length > 0 ? 0 : -1
+                root.previewEntryId = "";
+                root.selectedIndex = root.filteredEntries.length > 0 ? 0 : -1;
                 if (root.selectedIndex >= 0)
-                    root.select(root.selectedIndex)
+                    root.select(root.selectedIndex);
             }
         }
     }
@@ -590,8 +535,8 @@ PanelWindow {
 
         interval: 100
         onTriggered: {
-            root.startPendingImagePreview()
-            root.startPendingTextPreview()
+            root.startPendingImagePreview();
+            root.startPendingTextPreview();
         }
     }
 
@@ -600,17 +545,16 @@ PanelWindow {
 
         stdout: StdioCollector {
             onStreamFinished: {
-                if (root.opened && root.selectedEntry
-                        && root.selectedEntry.id === root.activeTextId) {
-                    root.selectedText = text.slice(0, 12000)
+                if (root.opened && root.selectedEntry && root.selectedEntry.id === root.activeTextId) {
+                    root.selectedText = text.slice(0, 12000);
                 }
             }
         }
 
         onExited: {
-            root.activeTextId = ""
+            root.activeTextId = "";
             if (root.pendingTextId !== "")
-                root.startPendingTextPreview()
+                root.startPendingTextPreview();
         }
     }
 
@@ -618,17 +562,16 @@ PanelWindow {
         id: imagePreviewProcess
 
         onExited: exitCode => {
-            if (exitCode === 0 && root.opened && root.selectedEntry
-                    && root.selectedEntry.id === root.activeImageId) {
-                root.previewReady = true
+            if (exitCode === 0 && root.opened && root.selectedEntry && root.selectedEntry.id === root.activeImageId) {
+                root.previewReady = true;
             }
 
-            root.activeImageId = ""
+            root.activeImageId = "";
 
             if (root.pendingImageId !== "")
-                root.startPendingImagePreview()
+                root.startPendingImagePreview();
             else if (!root.opened && !popupMotion.closing)
-                cleanupPreview.running = true
+                cleanupPreview.running = true;
         }
     }
 
@@ -642,9 +585,9 @@ PanelWindow {
 
         onExited: exitCode => {
             if (exitCode === 0)
-                root.close()
+                root.close();
             else
-                console.warn("Clipboard history wipe failed (exit code " + exitCode + ")")
+                console.warn("Clipboard history wipe failed (exit code " + exitCode + ")");
         }
     }
 
@@ -654,17 +597,13 @@ PanelWindow {
 
         onExited: exitCode => {
             if (exitCode === 0 && root.opened) {
-                root.entries = root.entries.filter(entry =>
-                    entry.id !== deleteProcess.entryId)
-                root.selectedIndex = Math.min(
-                    root.selectedIndex,
-                    root.filteredEntries.length - 1
-                )
+                root.entries = root.entries.filter(entry => entry.id !== deleteProcess.entryId);
+                root.selectedIndex = Math.min(root.selectedIndex, root.filteredEntries.length - 1);
                 if (root.selectedIndex >= 0)
-                    root.select(root.selectedIndex)
+                    root.select(root.selectedIndex);
                 else {
-                    root.selectedText = ""
-                    root.previewReady = false
+                    root.selectedText = "";
+                    root.previewReady = false;
                 }
             }
         }
@@ -678,6 +617,6 @@ PanelWindow {
 
     Component.onDestruction: {
         if (opened)
-            cleanupPreview.running = true
+            cleanupPreview.running = true;
     }
 }

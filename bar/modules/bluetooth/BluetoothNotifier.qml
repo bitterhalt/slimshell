@@ -46,9 +46,8 @@ Item {
     }
 
     function showConnected(device) {
-        if (!device || !device.connected || !device.paired || device.pairing
-                || shouldIgnore(device) || (toastShown && batteryAlert))
-            return ;
+        if (!device || !device.connected || !device.paired || device.pairing || shouldIgnore(device) || (toastShown && batteryAlert))
+            return;
 
         deviceName = deviceLabel(device);
         deviceIcon = device.icon || "";
@@ -60,9 +59,10 @@ Item {
 
     function showBatteryWarning(device, percent, critical) {
         const warning = {
-            name: deviceLabel(device), icon: device.icon || "",
+            name: deviceLabel(device),
+            icon: device.icon || "",
             status: (critical ? "Battery critical" : "Battery low") + " · " + percent + "%"
-        }
+        };
         if (toastShown && batteryAlert) {
             batteryQueue = batteryQueue.concat([warning]);
             return;
@@ -96,7 +96,6 @@ Item {
             device: modelData
             onConnectionReady: device => root.showConnected(device)
         }
-
     }
 
     // Short-lived connection or battery alert card beside the bar.
@@ -120,7 +119,9 @@ Item {
         Rectangle {
             anchors.fill: parent
             opacity: toastMotion.contentOpacity
-            transform: Translate { y: toastMotion.contentOffset }
+            transform: Translate {
+                y: toastMotion.contentOffset
+            }
             radius: root.config.popupRadius
             color: root.batteryAlert ? root.config.bg : root.config.bg
             border.color: root.batteryAlert ? root.criticalBorderColor : root.config.border
@@ -152,7 +153,6 @@ Item {
                     font.pointSize: root.config.iconSize
                     text: root.batteryAlert ? "󰀧" : "󰂯"
                 }
-
             }
 
             Column {
@@ -180,14 +180,10 @@ Item {
                     font.pointSize: root.config.fontSize(0.8)
                     text: root.statusText
                 }
-
             }
-
         }
 
-        mask: Region {
-        }
-
+        mask: Region {}
     }
 
     Timer {
@@ -205,5 +201,4 @@ Item {
             }
         }
     }
-
 }

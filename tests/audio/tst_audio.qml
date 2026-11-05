@@ -10,10 +10,24 @@ Item {
     width: 480
     height: 450
 
-    Component { id: fixtureComponent; AudioFixture {} }
-    Component { id: stateComponent; AudioPopupState {} }
-    Component { id: popupComponent; AudioPopup { audioService: test.fixture } }
-    Component { id: profileComponent; ProfileFixture {} }
+    Component {
+        id: fixtureComponent
+        AudioFixture {}
+    }
+    Component {
+        id: stateComponent
+        AudioPopupState {}
+    }
+    Component {
+        id: popupComponent
+        AudioPopup {
+            audioService: test.fixture
+        }
+    }
+    Component {
+        id: profileComponent
+        ProfileFixture {}
+    }
 
     TestCase {
         id: test
@@ -28,7 +42,10 @@ Item {
             failOnWarning(/TypeError|Binding loop/);
             fixture = createTemporaryObject(fixtureComponent, host);
             profiles = createTemporaryObject(profileComponent, host);
-            controls = createTemporaryObject(stateComponent, host, {audioService: fixture, profiles: profiles});
+            controls = createTemporaryObject(stateComponent, host, {
+                audioService: fixture,
+                profiles: profiles
+            });
             verify(fixture !== null && controls !== null);
             controls.closeRequested.connect(() => fixture.closePopup());
         }
@@ -70,27 +87,43 @@ Item {
             compare(fixture.streamRows.length, 1);
             compare(fixture.outputRows[0].id, 1);
             compare(fixture.streamRows[0].kind, "playback");
-            const monitor = {id: 5, name: "speaker.monitor", audio: {}, isSink: false};
+            const monitor = {
+                id: 5,
+                name: "speaker.monitor",
+                audio: {},
+                isSink: false
+            };
             compare(Model.deviceRows([monitor], false, -1).length, 0);
         }
 
         function test_tab_navigation() {
             compare(controls.tabIndex, 0);
-            press(Qt.Key_Tab); compare(controls.tabIndex, 1);
-            press(Qt.Key_Tab, Qt.ShiftModifier); compare(controls.tabIndex, 0);
-            press(Qt.Key_Backtab); compare(controls.tabIndex, 3);
-            press(Qt.Key_L, Qt.ShiftModifier); compare(controls.tabIndex, 0);
-            press(Qt.Key_H, Qt.ShiftModifier); compare(controls.tabIndex, 3);
+            press(Qt.Key_Tab);
+            compare(controls.tabIndex, 1);
+            press(Qt.Key_Tab, Qt.ShiftModifier);
+            compare(controls.tabIndex, 0);
+            press(Qt.Key_Backtab);
+            compare(controls.tabIndex, 3);
+            press(Qt.Key_L, Qt.ShiftModifier);
+            compare(controls.tabIndex, 0);
+            press(Qt.Key_H, Qt.ShiftModifier);
+            compare(controls.tabIndex, 3);
         }
 
         function test_ctrl_arrows_switch_tabs() {
             compare(controls.tabIndex, 0);
-            press(Qt.Key_Right, Qt.ControlModifier); compare(controls.tabIndex, 1);
-            press(Qt.Key_Left, Qt.ControlModifier); compare(controls.tabIndex, 0);
-            press(Qt.Key_Left, Qt.ControlModifier); compare(controls.tabIndex, 3);
-            press(Qt.Key_Right, Qt.ControlModifier); compare(controls.tabIndex, 0);
-            press(Qt.Key_Right); compare(fixture.speakerAudio.volume, 0.55);
-            press(Qt.Key_Right, Qt.ControlModifier); compare(fixture.speakerAudio.volume, 0.55);
+            press(Qt.Key_Right, Qt.ControlModifier);
+            compare(controls.tabIndex, 1);
+            press(Qt.Key_Left, Qt.ControlModifier);
+            compare(controls.tabIndex, 0);
+            press(Qt.Key_Left, Qt.ControlModifier);
+            compare(controls.tabIndex, 3);
+            press(Qt.Key_Right, Qt.ControlModifier);
+            compare(controls.tabIndex, 0);
+            press(Qt.Key_Right);
+            compare(fixture.speakerAudio.volume, 0.55);
+            press(Qt.Key_Right, Qt.ControlModifier);
+            compare(fixture.speakerAudio.volume, 0.55);
             compare(controls.tabIndex, 1);
             press(Qt.Key_Return);
             verify(controls.contextOpen);
@@ -108,31 +141,47 @@ Item {
         }
 
         function test_volume_and_mute() {
-            press(Qt.Key_Right); compare(fixture.speakerAudio.volume, 0.55);
-            press(Qt.Key_H); compare(fixture.speakerAudio.volume, 0.5);
-            press(Qt.Key_Down); compare(controls.selectedRow.id, 2);
-            press(Qt.Key_M); compare(fixture.headsetAudio.muted, true);
+            press(Qt.Key_Right);
+            compare(fixture.speakerAudio.volume, 0.55);
+            press(Qt.Key_H);
+            compare(fixture.speakerAudio.volume, 0.5);
+            press(Qt.Key_Down);
+            compare(controls.selectedRow.id, 2);
+            press(Qt.Key_M);
+            compare(fixture.headsetAudio.muted, true);
             controls.setTab(1);
-            press(Qt.Key_L); compare(fixture.micAudio.volume, 0.45);
-            press(Qt.Key_M); compare(fixture.micAudio.muted, true);
+            press(Qt.Key_L);
+            compare(fixture.micAudio.volume, 0.45);
+            press(Qt.Key_M);
+            compare(fixture.micAudio.muted, true);
             controls.setTab(2);
-            press(Qt.Key_Left); compare(fixture.streamAudio.volume, 0.55);
-            press(Qt.Key_M); compare(fixture.streamAudio.muted, true);
+            press(Qt.Key_Left);
+            compare(fixture.streamAudio.volume, 0.55);
+            press(Qt.Key_M);
+            compare(fixture.streamAudio.muted, true);
             fixture.streamAudio.volume = 1.09;
-            press(Qt.Key_Right); compare(fixture.streamAudio.volume, 1);
+            press(Qt.Key_Right);
+            compare(fixture.streamAudio.volume, 1);
             fixture.streamAudio.volume = 0.01;
-            press(Qt.Key_Left); compare(fixture.streamAudio.volume, 0);
+            press(Qt.Key_Left);
+            compare(fixture.streamAudio.volume, 0);
         }
 
         function test_number_keys_set_absolute_volume() {
-            press(Qt.Key_1); compare(fixture.speakerAudio.volume, 0.1);
-            press(Qt.Key_4); compare(fixture.speakerAudio.volume, 0.4);
-            press(Qt.Key_9); compare(fixture.speakerAudio.volume, 0.9);
-            press(Qt.Key_0); compare(fixture.speakerAudio.volume, 1);
-            press(Qt.Key_QuoteLeft); compare(fixture.speakerAudio.volume, 0);
+            press(Qt.Key_1);
+            compare(fixture.speakerAudio.volume, 0.1);
+            press(Qt.Key_4);
+            compare(fixture.speakerAudio.volume, 0.4);
+            press(Qt.Key_9);
+            compare(fixture.speakerAudio.volume, 0.9);
+            press(Qt.Key_0);
+            compare(fixture.speakerAudio.volume, 1);
+            press(Qt.Key_QuoteLeft);
+            compare(fixture.speakerAudio.volume, 0);
 
             fixture.config.maxVolume = 0.8;
-            press(Qt.Key_0); compare(fixture.speakerAudio.volume, 0.8);
+            press(Qt.Key_0);
+            compare(fixture.speakerAudio.volume, 0.8);
         }
 
         function test_configurable_volume_ceiling() {
@@ -143,7 +192,10 @@ Item {
             fixture.speakerAudio.volume = 0.79;
             press(Qt.Key_Right);
             compare(fixture.speakerAudio.volume, 0.8);
-            popup = createTemporaryObject(popupComponent, host, {audioItem: fixture, profileBackend: profileComponent});
+            popup = createTemporaryObject(popupComponent, host, {
+                audioItem: fixture,
+                profileBackend: profileComponent
+            });
             const slider = findChild(popup, "audioVolumeSlider");
             verify(slider !== null);
             compare(slider.to, 0.8);
@@ -155,7 +207,10 @@ Item {
         }
 
         function test_input_and_playback_slider_ceiling() {
-            popup = createTemporaryObject(popupComponent, host, {audioItem: fixture, profileBackend: profileComponent});
+            popup = createTemporaryObject(popupComponent, host, {
+                audioItem: fixture,
+                profileBackend: profileComponent
+            });
             const state = findChild(popup, "audioPopupState");
             for (const tab of [1, 2]) {
                 state.tabIndex = tab;
@@ -233,12 +288,17 @@ Item {
             compare(controls.selectedRow.id, 1);
             controls.setTab(2);
             compare(controls.selectedIndex, -1);
-            press(Qt.Key_M); press(Qt.Key_Right); press(Qt.Key_Return);
+            press(Qt.Key_M);
+            press(Qt.Key_Right);
+            press(Qt.Key_Return);
             compare(fixture.calls.length, 0);
         }
 
         function test_popup_keyboard_and_live_slider() {
-            popup = createTemporaryObject(popupComponent, host, {audioItem: fixture, profileBackend: profileComponent});
+            popup = createTemporaryObject(popupComponent, host, {
+                audioItem: fixture,
+                profileBackend: profileComponent
+            });
             verify(popup !== null);
             const keyboard = findChild(popup, "audioKeyboard");
             const popupControls = findChild(popup, "audioPopupState");
@@ -279,7 +339,10 @@ Item {
         }
 
         function test_compact_rows_and_right_click_mute_feedback() {
-            popup = createTemporaryObject(popupComponent, host, {audioItem: fixture, profileBackend: profileComponent});
+            popup = createTemporaryObject(popupComponent, host, {
+                audioItem: fixture,
+                profileBackend: profileComponent
+            });
             waitForPolish(host.Window.window);
             const row = volumeRows(popup, [])[0];
             compare(row.height, 44);
@@ -299,7 +362,10 @@ Item {
         }
 
         function test_popup_mouse_controls() {
-            popup = createTemporaryObject(popupComponent, host, {audioItem: fixture, profileBackend: profileComponent});
+            popup = createTemporaryObject(popupComponent, host, {
+                audioItem: fixture,
+                profileBackend: profileComponent
+            });
             const keyboard = findChild(popup, "audioKeyboard");
             const popupControls = findChild(popup, "audioPopupState");
             tryVerify(() => keyboard.activeFocus);
@@ -340,7 +406,10 @@ Item {
         }
 
         function test_adaptive_height_and_scroll_limit() {
-            popup = createTemporaryObject(popupComponent, host, {audioItem: fixture, profileBackend: profileComponent});
+            popup = createTemporaryObject(popupComponent, host, {
+                audioItem: fixture,
+                profileBackend: profileComponent
+            });
             const popupControls = findChild(popup, "audioPopupState");
             waitForPolish(host.Window.window);
             const twoDeviceHeight = popup.implicitHeight;
@@ -354,7 +423,13 @@ Item {
             popupControls.setTab(0);
             const many = [];
             for (let i = 0; i < 10; ++i)
-                many.push({id: 10 + i, name: "Device " + i, audio: fixture.speakerAudio, isSink: true, isStream: false});
+                many.push({
+                    id: 10 + i,
+                    name: "Device " + i,
+                    audio: fixture.speakerAudio,
+                    isSink: true,
+                    isStream: false
+                });
             fixture.allNodes = many;
             waitForPolish(host.Window.window);
             verify(popup.desiredBodyHeight > popup.maximumBodyHeight);
@@ -367,11 +442,18 @@ Item {
         function test_keyboard_selection_scrolls_without_resizing_popup() {
             const many = [];
             for (let i = 0; i < 12; ++i)
-                many.push({id: 100 + i, name: "Device " + i,
-                    audio: fixture.speakerAudio, isSink: true, isStream: false});
+                many.push({
+                    id: 100 + i,
+                    name: "Device " + i,
+                    audio: fixture.speakerAudio,
+                    isSink: true,
+                    isStream: false
+                });
             fixture.allNodes = many;
-            popup = createTemporaryObject(popupComponent, host,
-                {audioItem: fixture, profileBackend: profileComponent});
+            popup = createTemporaryObject(popupComponent, host, {
+                audioItem: fixture,
+                profileBackend: profileComponent
+            });
             const popupControls = findChild(popup, "audioPopupState");
             const keyboard = findChild(popup, "audioKeyboard");
             const list = findChild(popup, "audioRows");
@@ -393,8 +475,10 @@ Item {
         }
 
         function test_short_list_does_not_scroll_while_selecting() {
-            popup = createTemporaryObject(popupComponent, host,
-                {audioItem: fixture, profileBackend: profileComponent});
+            popup = createTemporaryObject(popupComponent, host, {
+                audioItem: fixture,
+                profileBackend: profileComponent
+            });
             const popupControls = findChild(popup, "audioPopupState");
             const list = findChild(popup, "audioRows");
             waitForPolish(host.Window.window);
@@ -410,7 +494,10 @@ Item {
         }
 
         function test_single_row_list_hides_selection_marker() {
-            popup = createTemporaryObject(popupComponent, host, {audioItem: fixture, profileBackend: profileComponent});
+            popup = createTemporaryObject(popupComponent, host, {
+                audioItem: fixture,
+                profileBackend: profileComponent
+            });
             const popupControls = findChild(popup, "audioPopupState");
             popupControls.setTab(1);
             waitForPolish(host.Window.window);
@@ -421,7 +508,7 @@ Item {
             waitForPolish(host.Window.window);
             compare(popupControls.rows.length, 2);
             tryVerify(() => volumeRows(popup, []).length === 2);
-            compare(volumeRows(popup, []).filter((row) => {
+            compare(volumeRows(popup, []).filter(row => {
                 return row.selected;
             }).length, 1);
         }
@@ -433,11 +520,27 @@ Item {
             compare(cards[0].media, "Off");
             compare(cards[0].profiles[2].available, false);
             compare(cards[1].profiles[0].available, true);
-            const arrayFormat = Profiles.parse(JSON.stringify([{name: "card", active_profile: {name: "off"},
-                profiles: [{name: "off", description: "Off"}]}]));
+            const arrayFormat = Profiles.parse(JSON.stringify([
+                {
+                    name: "card",
+                    active_profile: {
+                        name: "off"
+                    },
+                    profiles: [
+                        {
+                            name: "off",
+                            description: "Off"
+                        }
+                    ]
+                }
+            ]));
             compare(arrayFormat[0].profiles[0].active, true);
             let rejected = false;
-            try { Profiles.parse('{}'); } catch (error) { rejected = true; }
+            try {
+                Profiles.parse('{}');
+            } catch (error) {
+                rejected = true;
+            }
             verify(rejected);
             verify(Profiles.isCardEvent("Event 'change' on card #42"));
             verify(Profiles.isCardEvent("Event 'new' on server #4294967295"));
@@ -471,7 +574,9 @@ Item {
 
         function test_config_no_volume_actions_or_refresh_key() {
             controls.setTab(3);
-            press(Qt.Key_M); press(Qt.Key_D); press(Qt.Key_Right);
+            press(Qt.Key_M);
+            press(Qt.Key_D);
+            press(Qt.Key_Right);
             compare(fixture.calls.length, 0);
             verify(!press(Qt.Key_R));
             compare(profiles.calls.length, 0);
@@ -497,7 +602,10 @@ Item {
         }
 
         function test_popup_config_backend_lifecycle() {
-            popup = createTemporaryObject(popupComponent, host, {audioItem: fixture, profileBackend: profileComponent});
+            popup = createTemporaryObject(popupComponent, host, {
+                audioItem: fixture,
+                profileBackend: profileComponent
+            });
             compare(findChild(popup, "audioProfiles"), null);
             const popupControls = findChild(popup, "audioPopupState");
             popupControls.setTab(3);

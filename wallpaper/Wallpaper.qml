@@ -30,12 +30,13 @@ Item {
         animationType: "fade"
     }
 
-    onOpenedChanged: if (!opened) noticeText = ""
+    onOpenedChanged: if (!opened)
+        noticeText = ""
     onNoticeTextChanged: {
         if (noticeText !== "")
-            noticeTimer.restart()
+            noticeTimer.restart();
         else
-            noticeTimer.stop()
+            noticeTimer.stop();
     }
 
     Timer {
@@ -50,72 +51,67 @@ Item {
         interval: 1000
         onTriggered: {
             if (!root.replyReceived && applyStdout.text.trim() !== "")
-                root.handleReply(applyStdout.text)
+                root.handleReply(applyStdout.text);
             if (!root.replyReceived)
-                root.errorText = root.applyExitCode === 0
-                    ? "No response from wallpaper helper" : "Could not run wallpaper helper"
+                root.errorText = root.applyExitCode === 0 ? "No response from wallpaper helper" : "Could not run wallpaper helper";
         }
     }
 
     function handleReply(text) {
-        root.replyReceived = true
+        root.replyReceived = true;
         try {
-            const reply = JSON.parse(text)
+            const reply = JSON.parse(text);
             if (reply.ok)
-                root.noticeText = root.opened ? "Wallpaper applied" : ""
+                root.noticeText = root.opened ? "Wallpaper applied" : "";
             else
-                root.errorText = reply.error || "Could not apply wallpaper"
+                root.errorText = reply.error || "Could not apply wallpaper";
         } catch (error) {
-            root.errorText = "Could not read the wallpaper helper response"
+            root.errorText = "Could not read the wallpaper helper response";
         }
     }
 
     function open(screen) {
-        menuScreen = screen || targetScreen
-        opened = true
+        menuScreen = screen || targetScreen;
+        opened = true;
     }
 
-    function close() { opened = false }
+    function close() {
+        opened = false;
+    }
     function toggle(screen) {
         if (opened)
-            close()
+            close();
         else
-            open(screen)
+            open(screen);
     }
 
     function apply(path, hellwal) {
         if (busy || !path)
-            return
-        errorText = ""
-        noticeText = ""
-        replyReceived = false
-        const command = ["python3", helperPath, "apply", path]
+            return;
+        errorText = "";
+        noticeText = "";
+        replyReceived = false;
+        const command = ["python3", helperPath, "apply", path];
         if (hellwal) {
-            command.push("--hellwal", "--mode", settingsService.hellwalMode,
-                "--dark-offset", String(settingsService.hellwalDarkOffset),
-                "--bright-offset", String(settingsService.hellwalBrightOffset),
-                "--gray-scale", String(settingsService.hellwalGrayScale))
+            command.push("--hellwal", "--mode", settingsService.hellwalMode, "--dark-offset", String(settingsService.hellwalDarkOffset), "--bright-offset", String(settingsService.hellwalBrightOffset), "--gray-scale", String(settingsService.hellwalGrayScale));
             if (settingsService.hellwalBackgroundMode === "fixed")
-                command.push("--static-background", settingsService.hellwalBackgroundColor)
+                command.push("--static-background", settingsService.hellwalBackgroundColor);
         }
-        applyProcess.command = command
-        applyProcess.running = true
+        applyProcess.command = command;
+        applyProcess.running = true;
     }
 
     function refreshHellwal() {
         if (busy)
-            return
-        errorText = ""
-        noticeText = ""
-        replyReceived = false
-        const command = ["python3", helperPath, "refresh", "--mode", settingsService.hellwalMode,
-            "--dark-offset", String(settingsService.hellwalDarkOffset),
-            "--bright-offset", String(settingsService.hellwalBrightOffset),
-            "--gray-scale", String(settingsService.hellwalGrayScale)]
+            return;
+        errorText = "";
+        noticeText = "";
+        replyReceived = false;
+        const command = ["python3", helperPath, "refresh", "--mode", settingsService.hellwalMode, "--dark-offset", String(settingsService.hellwalDarkOffset), "--bright-offset", String(settingsService.hellwalBrightOffset), "--gray-scale", String(settingsService.hellwalGrayScale)];
         if (settingsService.hellwalBackgroundMode === "fixed")
-            command.push("--static-background", settingsService.hellwalBackgroundColor)
-        applyProcess.command = command
-        applyProcess.running = true
+            command.push("--static-background", settingsService.hellwalBackgroundColor);
+        applyProcess.command = command;
+        applyProcess.running = true;
     }
 
     // The picker is disposable; an apply operation survives closing/reopening it.
@@ -140,15 +136,21 @@ Item {
         }
         stderr: StdioCollector {}
         onExited: exitCode => {
-            root.applyExitCode = exitCode
-            responseTimer.restart()
+            root.applyExitCode = exitCode;
+            responseTimer.restart();
         }
     }
 
     IpcHandler {
         target: "wallpaper"
-        function open() { root.open(root.targetScreen) }
-        function close() { root.close() }
-        function toggle() { root.toggle() }
+        function open() {
+            root.open(root.targetScreen);
+        }
+        function close() {
+            root.close();
+        }
+        function toggle() {
+            root.toggle();
+        }
     }
 }

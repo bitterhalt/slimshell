@@ -13,8 +13,8 @@ Item {
         return state ? `${state}  ·  ${security}` : security;
     }
 
-    signal activated()
-    signal focused()
+    signal activated
+    signal focused
 
     function strengthIcon(strength) {
         if (strength >= 0.75)
@@ -111,5 +111,4 @@ Item {
             root.activated();
         }
     }
-
 }

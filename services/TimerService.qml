@@ -14,7 +14,7 @@ Item {
     }
 
     function pruneExpired(now) {
-        const remaining = timers.filter((timer) => {
+        const remaining = timers.filter(timer => {
             return timer.endAt > now;
         });
         if (remaining.length !== timers.length) {
@@ -25,7 +25,7 @@ Item {
 
     function startTimer(seconds, note) {
         if (startProcess.running || seconds <= 0)
-            return ;
+            return;
 
         const unit = "quickshell-timer-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
         const message = note || "Timer finished";
@@ -39,7 +39,7 @@ Item {
     }
 
     function cancelTimer(unit) {
-        timers = timers.filter((timer) => {
+        timers = timers.filter(timer => {
             return timer.unit !== unit;
         });
         persist();
@@ -51,7 +51,7 @@ Item {
     Process {
         id: startProcess
 
-        onExited: (exitCode) => {
+        onExited: exitCode => {
             if (exitCode === 0 && root.pendingTimer) {
                 root.timers = root.timers.concat([root.pendingTimer]);
                 root.persist();
@@ -69,7 +69,7 @@ Item {
         onLoaded: {
             try {
                 const saved = JSON.parse(text());
-                root.timers = Array.isArray(saved) ? saved.filter((timer) => {
+                root.timers = Array.isArray(saved) ? saved.filter(timer => {
                     return timer.unit && timer.endAt > Date.now();
                 }) : [];
                 root.persist();
@@ -78,5 +78,4 @@ Item {
             }
         }
     }
-
 }

@@ -9,7 +9,7 @@ Item {
     readonly property var tabs: ["Outputs", "Inputs", "Playback", "Config"]
     property int tabIndex: 0
     property string profileCardKey: ""
-    readonly property var profileCard: profiles && profileCardKey !== "" ? profiles.cards.find((card) => {
+    readonly property var profileCard: profiles && profileCardKey !== "" ? profiles.cards.find(card => {
         return card.id === profileCardKey;
     }) || null : null
     property string selectedKey: ""
@@ -30,30 +30,34 @@ Item {
     }
     readonly property int selectedIndex: {
         if (profileCardKey !== "" && selectedKey === "") {
-            const activeIndex = rows.findIndex((row) => {
+            const activeIndex = rows.findIndex(row => {
                 return row.active;
             });
             if (activeIndex >= 0)
                 return activeIndex;
-
         }
         return Model.selectionIndex(rows, selectedKey);
     }
     readonly property var selectedRow: selectedIndex >= 0 ? rows[selectedIndex] : null
-    readonly property var contextActions: selectedRow && tabIndex !== 3 ? (selectedRow.kind === "playback" || selectedRow.active ? [{
-        "name": "Toggle mute",
-        "action": "mute"
-    }] : [{
-        "name": "Toggle mute",
-        "action": "mute"
-    }, {
-        "name": "Set as default",
-        "action": "default"
-    }]) : []
+    readonly property var contextActions: selectedRow && tabIndex !== 3 ? (selectedRow.kind === "playback" || selectedRow.active ? [
+            {
+                "name": "Toggle mute",
+                "action": "mute"
+            }
+        ] : [
+            {
+                "name": "Toggle mute",
+                "action": "mute"
+            },
+            {
+                "name": "Set as default",
+                "action": "default"
+            }
+        ]) : []
     readonly property string title: helpOpen ? "Audio help" : contextOpen ? "Options · " + (selectedRow ? selectedRow.name : "") : profileCard ? profileCard.name : tabs[tabIndex]
 
-    signal selectionMoved()
-    signal closeRequested()
+    signal selectionMoved
+    signal closeRequested
 
     function checkProfileCard() {
         if (profileCardKey !== "" && profiles && !profiles.loading && !profiles.changing && !profileCard) {
@@ -64,7 +68,7 @@ Item {
 
     function selectRow(index) {
         if (index < 0 || index >= rows.length)
-            return ;
+            return;
 
         selectedKey = String(rows[index].id);
         selectionMoved();
@@ -79,7 +83,7 @@ Item {
 
     function setTab(index) {
         if (index < 0 || index >= tabs.length)
-            return ;
+            return;
 
         contextOpen = false;
         helpOpen = false;
@@ -95,7 +99,7 @@ Item {
 
     function setDefault() {
         if (!selectedRow || selectedRow.active || tabIndex === 3)
-            return ;
+            return;
 
         if (selectedRow.kind === "output")
             audioService.setOutput(selectedRow.id);
@@ -106,13 +110,11 @@ Item {
     function toggleMute() {
         if (selectedRow && tabIndex !== 3)
             audioService.toggleMute(selectedRow.id);
-
     }
 
     function adjustVolume(delta) {
         if (selectedRow && tabIndex !== 3)
             audioService.adjustVolume(selectedRow.id, delta);
-
     }
 
     function setVolumePercent(value) {
@@ -123,7 +125,7 @@ Item {
     function activateSelected() {
         if (tabIndex === 3) {
             if (!selectedRow || !profiles || profiles.changing)
-                return ;
+                return;
 
             if (profileCardKey === "") {
                 const card = selectedRow.id;
@@ -196,15 +198,11 @@ Item {
             activateSelected();
         else if (contextOpen)
             return false;
-        else if (tabIndex !== 3 && selectedRow
-                && (key === Qt.Key_QuoteLeft || text === "`"))
+        else if (tabIndex !== 3 && selectedRow && (key === Qt.Key_QuoteLeft || text === "`"))
             setVolumePercent(0);
-        else if (tabIndex !== 3 && selectedRow
-                && !(modifiers & Qt.ShiftModifier)
-                && key >= Qt.Key_1 && key <= Qt.Key_9)
+        else if (tabIndex !== 3 && selectedRow && !(modifiers & Qt.ShiftModifier) && key >= Qt.Key_1 && key <= Qt.Key_9)
             setVolumePercent((key - Qt.Key_0) / 10);
-        else if (tabIndex !== 3 && selectedRow
-                && !(modifiers & Qt.ShiftModifier) && key === Qt.Key_0)
+        else if (tabIndex !== 3 && selectedRow && !(modifiers & Qt.ShiftModifier) && key === Qt.Key_0)
             setVolumePercent(1);
         else if (key === Qt.Key_Left || key === Qt.Key_H)
             adjustVolume(-0.05);
@@ -227,7 +225,7 @@ Item {
             Qt.callLater(root.checkProfileCard);
 
         // Never silently retarget an open action menu when a device disappears.
-        if (contextOpen && !rows.some((row) => {
+        if (contextOpen && !rows.some(row => {
             return String(row.id) === selectedKey;
         }))
             contextOpen = false;
@@ -239,10 +237,8 @@ Item {
         function onProfileApplied(cardName) {
             if (root.profileCardKey === cardName)
                 root.leaveProfiles();
-
         }
 
         target: root.profiles
     }
-
 }

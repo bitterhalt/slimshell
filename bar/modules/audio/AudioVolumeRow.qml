@@ -12,9 +12,9 @@ Item {
     property bool selected: false
     readonly property var nodeAudio: node && node.audio ? node.audio : null
 
-    signal picked()
-    signal optionsRequested()
-    signal muteRequested()
+    signal picked
+    signal optionsRequested
+    signal muteRequested
     signal volumeRequested(real value)
 
     objectName: "audioVolumeRow"
@@ -43,16 +43,14 @@ Item {
         hoverEnabled: true
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         cursorShape: Qt.PointingHandCursor
-        onClicked: (mouse) => {
+        onClicked: mouse => {
             root.picked();
             if (mouse.button === Qt.RightButton && root.nodeAudio)
                 root.muteRequested();
-
         }
-        onDoubleClicked: (mouse) => {
+        onDoubleClicked: mouse => {
             if (mouse.button === Qt.LeftButton)
                 root.optionsRequested();
-
         }
     }
 
@@ -122,7 +120,6 @@ Item {
         onPressedChanged: {
             if (pressed)
                 root.picked();
-
         }
         onMoved: root.volumeRequested(value)
 
@@ -141,7 +138,5 @@ Item {
             width: 0
             height: 0
         }
-
     }
-
 }

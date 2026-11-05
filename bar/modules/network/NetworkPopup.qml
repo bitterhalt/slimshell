@@ -98,8 +98,7 @@ PopoutPanel {
             return false;
         }
         if (actionMode && !helpOpen) {
-            const index = Model.actionShortcut(event.text,
-                !!actionPage.selectedNetwork && actionPage.selectedNetwork.connected);
+            const index = Model.actionShortcut(event.text, !!actionPage.selectedNetwork && actionPage.selectedNetwork.connected);
             if (index >= 0) {
                 activateAction(index);
                 event.accepted = true;
@@ -142,15 +141,18 @@ PopoutPanel {
 
     function focusAction(index) {
         selectedActionIndex = index;
-        if (index === 0) connectAction.forceActiveFocus();
-        else if (index === 1) forgetAction.forceActiveFocus();
-        else cancelAction.forceActiveFocus();
+        if (index === 0)
+            connectAction.forceActiveFocus();
+        else if (index === 1)
+            forgetAction.forceActiveFocus();
+        else
+            cancelAction.forceActiveFocus();
     }
 
     function openRow(row) {
         var item = network.networkForSsid(row.ssid);
         if (!item || item.stateChanging)
-            return ;
+            return;
 
         errorText = "";
         if (item.connected || item.known) {
@@ -158,11 +160,11 @@ PopoutPanel {
             selectedActionIndex = 0;
             actionMode = true;
             Qt.callLater(() => connectAction.forceActiveFocus());
-            return ;
+            return;
         }
         if (item.security === WifiSecurityType.Open) {
             item.connect();
-            return ;
+            return;
         }
         selectedSsid = row.ssid;
         popupManager.hostFocusable = true;
@@ -201,7 +203,6 @@ PopoutPanel {
             font.weight: Font.DemiBold
             text: root.passwordMode ? "Connect to Wi-Fi" : (root.actionMode ? "Wi-Fi network" : "Network")
         }
-
     }
 
     // Connected Ethernet/Wi-Fi and nearby access points.
@@ -249,9 +250,7 @@ PopoutPanel {
                     font.pointSize: root.config.fontSize(0.77)
                     text: root.network.wiredDevice ? root.network.wiredDevice.name : ""
                 }
-
             }
-
         }
 
         NetworkRow {
@@ -260,30 +259,33 @@ PopoutPanel {
             visible: height > 0
             config: root.config
             row: root.network.connectedWifi ? ({
-                ssid: root.network.connectedWifi.name,
-                strength: root.network.connectedWifi.signalStrength,
-                connected: true,
-                known: true
-            }) : ({ ssid: "", strength: 0, connected: true })
-            secured: root.network.connectedWifi
-                ? root.network.connectedWifi.security !== WifiSecurityType.Open : true
-            selected: root.network.connectedWifi !== null
-                && root.selectedSsid === root.network.connectedWifi.name
+                    ssid: root.network.connectedWifi.name,
+                    strength: root.network.connectedWifi.signalStrength,
+                    connected: true,
+                    known: true
+                }) : ({
+                    ssid: "",
+                    strength: 0,
+                    connected: true
+                })
+            secured: root.network.connectedWifi ? root.network.connectedWifi.security !== WifiSecurityType.Open : true
+            selected: root.network.connectedWifi !== null && root.selectedSsid === root.network.connectedWifi.name
             onFocused: {
                 if (root.network.connectedWifi) {
                     root.selectedSsid = root.network.connectedWifi.name;
-                    root.selectedNetworkIndex = root.selectableRows.findIndex(
-                        row => row.ssid === root.selectedSsid);
+                    root.selectedNetworkIndex = root.selectableRows.findIndex(row => row.ssid === root.selectedSsid);
                 }
             }
             onActivated: {
                 if (root.network.connectedWifi)
-                    root.openRow({ssid: root.network.connectedWifi.name});
+                    root.openRow({
+                        ssid: root.network.connectedWifi.name
+                    });
             }
         }
 
         Repeater {
-            model: root.showNearby ? root.network.networkRows.filter((row) => {
+            model: root.showNearby ? root.network.networkRows.filter(row => {
                 return !row.connected;
             }) : []
 
@@ -298,11 +300,9 @@ PopoutPanel {
                 secured: modelData.security !== WifiSecurityType.Open
                 enabled: !modelData.stateChanging
                 selected: modelData.ssid === root.selectedSsid
-                onFocused: root.selectNetwork(root.selectableRows.findIndex(
-                    row => row.ssid === modelData.ssid))
+                onFocused: root.selectNetwork(root.selectableRows.findIndex(row => row.ssid === modelData.ssid))
                 onActivated: root.openRow(modelData)
             }
-
         }
 
         Text {
@@ -332,8 +332,7 @@ PopoutPanel {
         Text {
             renderType: Text.NativeRendering
             width: parent.width
-            visible: root.showNearby && root.network.wifiDevice
-                && root.network.networkRows.length === 0
+            visible: root.showNearby && root.network.wifiDevice && root.network.networkRows.length === 0
             horizontalAlignment: Text.AlignHCenter
             color: root.config.muted
             font.pointSize: root.config.fontSize(0.85)
@@ -353,7 +352,6 @@ PopoutPanel {
             topPadding: 10
             bottomPadding: 10
         }
-
     }
 
     // Connect, forget, and back actions for a selected network.
@@ -387,11 +385,11 @@ PopoutPanel {
             id: connectAction
             KeyNavigation.tab: forgetAction
             KeyNavigation.backtab: cancelAction
-            onActiveFocusChanged: if (activeFocus) root.selectedActionIndex = 0
+            onActiveFocusChanged: if (activeFocus)
+                root.selectedActionIndex = 0
             width: parent.width
             height: 32
-            readonly property bool actionHighlighted: hovered || activeFocus
-                || (root.actionMode && root.selectedActionIndex === 0)
+            readonly property bool actionHighlighted: hovered || activeFocus || (root.actionMode && root.selectedActionIndex === 0)
             text: actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "Disconnect" : "Connect"
             onClicked: root.activateAction(0)
 
@@ -411,8 +409,7 @@ PopoutPanel {
                     anchors.verticalCenter: parent.verticalCenter
                     renderType: Text.NativeRendering
                     textFormat: Text.PlainText
-                    color: connectAction.actionHighlighted
-                        ? root.config.selectionForeground : root.config.fg
+                    color: connectAction.actionHighlighted ? root.config.selectionForeground : root.config.fg
                     font.pointSize: root.config.fontSize(0.88)
                     text: connectAction.text
                 }
@@ -423,8 +420,7 @@ PopoutPanel {
                     anchors.verticalCenter: parent.verticalCenter
                     renderType: Text.NativeRendering
                     textFormat: Text.PlainText
-                    color: connectAction.actionHighlighted
-                        ? root.config.selectionForeground : root.config.muted
+                    color: connectAction.actionHighlighted ? root.config.selectionForeground : root.config.muted
                     font.pointSize: root.config.fontSize(0.76)
                     text: actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "[d]" : "[c]"
                 }
@@ -435,11 +431,11 @@ PopoutPanel {
             id: forgetAction
             KeyNavigation.tab: cancelAction
             KeyNavigation.backtab: connectAction
-            onActiveFocusChanged: if (activeFocus) root.selectedActionIndex = 1
+            onActiveFocusChanged: if (activeFocus)
+                root.selectedActionIndex = 1
             width: parent.width
             height: 32
-            readonly property bool actionHighlighted: hovered || activeFocus
-                || (root.actionMode && root.selectedActionIndex === 1)
+            readonly property bool actionHighlighted: hovered || activeFocus || (root.actionMode && root.selectedActionIndex === 1)
             text: "Forget"
             onClicked: root.activateAction(1)
 
@@ -459,8 +455,7 @@ PopoutPanel {
                     anchors.verticalCenter: parent.verticalCenter
                     renderType: Text.NativeRendering
                     textFormat: Text.PlainText
-                    color: forgetAction.actionHighlighted
-                        ? root.config.selectionForeground : root.config.urgent
+                    color: forgetAction.actionHighlighted ? root.config.selectionForeground : root.config.urgent
                     font.pointSize: root.config.fontSize(0.88)
                     text: forgetAction.text
                 }
@@ -471,8 +466,7 @@ PopoutPanel {
                     anchors.verticalCenter: parent.verticalCenter
                     renderType: Text.NativeRendering
                     textFormat: Text.PlainText
-                    color: forgetAction.actionHighlighted
-                        ? root.config.selectionForeground : root.config.muted
+                    color: forgetAction.actionHighlighted ? root.config.selectionForeground : root.config.muted
                     font.pointSize: root.config.fontSize(0.76)
                     text: "[f]"
                 }
@@ -483,11 +477,11 @@ PopoutPanel {
             id: cancelAction
             KeyNavigation.tab: connectAction
             KeyNavigation.backtab: forgetAction
-            onActiveFocusChanged: if (activeFocus) root.selectedActionIndex = 2
+            onActiveFocusChanged: if (activeFocus)
+                root.selectedActionIndex = 2
             width: parent.width
             height: 32
-            readonly property bool actionHighlighted: hovered || activeFocus
-                || (root.actionMode && root.selectedActionIndex === 2)
+            readonly property bool actionHighlighted: hovered || activeFocus || (root.actionMode && root.selectedActionIndex === 2)
             text: "Back"
             onClicked: root.activateAction(2)
 
@@ -507,8 +501,7 @@ PopoutPanel {
                     anchors.verticalCenter: parent.verticalCenter
                     renderType: Text.NativeRendering
                     textFormat: Text.PlainText
-                    color: cancelAction.actionHighlighted
-                        ? root.config.selectionForeground : root.config.fg
+                    color: cancelAction.actionHighlighted ? root.config.selectionForeground : root.config.fg
                     font.pointSize: root.config.fontSize(0.88)
                     text: "Back"
                 }
@@ -519,15 +512,12 @@ PopoutPanel {
                     anchors.verticalCenter: parent.verticalCenter
                     renderType: Text.NativeRendering
                     textFormat: Text.PlainText
-                    color: cancelAction.actionHighlighted
-                        ? root.config.selectionForeground : root.config.muted
+                    color: cancelAction.actionHighlighted ? root.config.selectionForeground : root.config.muted
                     font.pointSize: root.config.fontSize(0.76)
                     text: "[Esc]"
                 }
             }
-
         }
-
     }
 
     // Password entry and connection feedback.
@@ -554,8 +544,8 @@ PopoutPanel {
         }
 
         TextField {
-            renderType: Text.NativeRendering
             id: wifiPassword
+            renderType: Text.NativeRendering
             KeyNavigation.tab: cancelPassword
             KeyNavigation.backtab: connectButton
 
@@ -565,9 +555,8 @@ PopoutPanel {
             onVisibleChanged: {
                 if (visible)
                     Qt.callLater(() => {
-                    return forceActiveFocus();
-                });
-
+                        return forceActiveFocus();
+                    });
             }
             echoMode: TextInput.Password
             passwordCharacter: "•"
@@ -577,8 +566,10 @@ PopoutPanel {
             selectionColor: root.config.selectionBackground
             selectedTextColor: root.config.selectionForeground
             font.pointSize: root.config.fontSize(0.92)
-            Keys.onReturnPressed: if (connectButton.enabled) connectButton.clicked()
-            Keys.onEnterPressed: if (connectButton.enabled) connectButton.clicked()
+            Keys.onReturnPressed: if (connectButton.enabled)
+                connectButton.clicked()
+            Keys.onEnterPressed: if (connectButton.enabled)
+                connectButton.clicked()
 
             background: Rectangle {
                 color: root.config.bg
@@ -586,7 +577,6 @@ PopoutPanel {
                 border.width: 1
                 radius: root.config.popupRadius
             }
-
         }
 
         Text {
@@ -623,12 +613,10 @@ PopoutPanel {
                     renderType: Text.NativeRendering
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
-                    color: cancelPassword.hovered || cancelPassword.activeFocus
-                        ? root.config.selectionForeground : root.config.fg
+                    color: cancelPassword.hovered || cancelPassword.activeFocus ? root.config.selectionForeground : root.config.fg
                     font.pointSize: root.config.fontSize(0.85)
                     text: cancelPassword.text
                 }
-
             }
 
             Button {
@@ -643,7 +631,7 @@ PopoutPanel {
                 onClicked: {
                     var item = root.network.networkForSsid(root.selectedSsid);
                     if (!item)
-                        return ;
+                        return;
 
                     root.errorText = "";
                     item.connectWithPsk(wifiPassword.text);
@@ -661,16 +649,12 @@ PopoutPanel {
                     renderType: Text.NativeRendering
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
-                    color: connectButton.enabled
-                        ? root.config.selectionForeground : root.config.muted
+                    color: connectButton.enabled ? root.config.selectionForeground : root.config.muted
                     font.pointSize: root.config.fontSize(0.85)
                     text: connectButton.text
                 }
-
             }
-
         }
-
     }
 
     // Keyboard help for the scan and popup shortcuts.
@@ -681,10 +665,7 @@ PopoutPanel {
         color: root.config.muted
         font.pointSize: root.config.fontSize(0.74)
         wrapMode: Text.WordWrap
-        text: root.actionMode
-            ? (actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "d Disconnect" : "c Connect")
-                + " · f Forget · Esc Back"
-            : "↑/↓ or j/k Select · Enter Connect · Ctrl+S Scan/Stop · ?/Esc Help/Close"
+        text: root.actionMode ? (actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "d Disconnect" : "c Connect") + " · f Forget · Esc Back" : "↑/↓ or j/k Select · Enter Connect · Ctrl+S Scan/Stop · ?/Esc Help/Close"
     }
 
     // Bottom connection status and scan controls.
@@ -720,11 +701,7 @@ PopoutPanel {
             renderType: Text.NativeRendering
             color: root.config.muted
             font.pointSize: root.config.fontSize(0.78)
-            text: root.network.wiredConnected ? "Ethernet connected"
-                : !root.network.wifiDevice ? "No Wi-Fi adapter"
-                : !Networking.wifiEnabled ? "Wi-Fi off"
-                : scanState.requested ? "Ctrl+S: Stop scan" : "Ctrl+S: Scan"
+            text: root.network.wiredConnected ? "Ethernet connected" : !root.network.wifiDevice ? "No Wi-Fi adapter" : !Networking.wifiEnabled ? "Wi-Fi off" : scanState.requested ? "Ctrl+S: Stop scan" : "Ctrl+S: Scan"
         }
     }
-
 }

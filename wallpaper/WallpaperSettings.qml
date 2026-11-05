@@ -12,36 +12,33 @@ FocusScope {
     required property var settingsService
     required property bool busy
     property string errorText: ""
-    signal saved()
-    signal cancelled()
+    signal saved
+    signal cancelled
 
     function begin(): void {
-        errorText = ""
-        modeInput.currentIndex = settingsService.hellwalMode === "light" ? 1 : 0
-        backgroundModeInput.currentIndex = settingsService.hellwalBackgroundMode === "fixed" ? 1 : 0
-        darkOffsetInput.text = String(settingsService.hellwalDarkOffset)
-        brightOffsetInput.text = String(settingsService.hellwalBrightOffset)
-        grayScaleInput.text = String(settingsService.hellwalGrayScale)
-        backgroundInput.text = settingsService.hellwalBackgroundColor
-        Qt.callLater(() => modeInput.forceActiveFocus())
+        errorText = "";
+        modeInput.currentIndex = settingsService.hellwalMode === "light" ? 1 : 0;
+        backgroundModeInput.currentIndex = settingsService.hellwalBackgroundMode === "fixed" ? 1 : 0;
+        darkOffsetInput.text = String(settingsService.hellwalDarkOffset);
+        brightOffsetInput.text = String(settingsService.hellwalBrightOffset);
+        grayScaleInput.text = String(settingsService.hellwalGrayScale);
+        backgroundInput.text = settingsService.hellwalBackgroundColor;
+        Qt.callLater(() => modeInput.forceActiveFocus());
     }
 
     function save(): void {
         if (busy)
-            return
-        const dark = darkOffsetInput.text.trim()
-        const bright = brightOffsetInput.text.trim()
-        const grayScale = grayScaleInput.text.trim()
+            return;
+        const dark = darkOffsetInput.text.trim();
+        const bright = brightOffsetInput.text.trim();
+        const grayScale = grayScaleInput.text.trim();
         if (dark === "" || bright === "" || grayScale === "") {
-            errorText = "Offsets must be between 0 and 1"
-            return
+            errorText = "Offsets must be between 0 and 1";
+            return;
         }
-        errorText = settingsService.saveHellwalSettings(
-            modeInput.currentIndex === 1 ? "light" : "dark", Number(dark), Number(bright),
-            backgroundModeInput.currentIndex === 1 ? "fixed" : "dynamic", backgroundInput.text,
-            Number(grayScale))
+        errorText = settingsService.saveHellwalSettings(modeInput.currentIndex === 1 ? "light" : "dark", Number(dark), Number(bright), backgroundModeInput.currentIndex === 1 ? "fixed" : "dynamic", backgroundInput.text, Number(grayScale));
         if (errorText === "")
-            saved()
+            saved();
     }
 
     Shortcut {
@@ -89,7 +86,9 @@ FocusScope {
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    SettingLabel { text: "Mode" }
+                    SettingLabel {
+                        text: "Mode"
+                    }
                     SettingCombo {
                         id: modeInput
                         objectName: "wallpaperColorMode"
@@ -98,7 +97,9 @@ FocusScope {
                 }
                 ColumnLayout {
                     Layout.fillWidth: true
-                    SettingLabel { text: "Background" }
+                    SettingLabel {
+                        text: "Background"
+                    }
                     SettingCombo {
                         id: backgroundModeInput
                         objectName: "wallpaperBackgroundMode"
@@ -107,7 +108,9 @@ FocusScope {
                 }
                 ColumnLayout {
                     Layout.fillWidth: true
-                    SettingLabel { text: "Dark offset (0–1)" }
+                    SettingLabel {
+                        text: "Dark offset (0–1)"
+                    }
                     SettingField {
                         id: darkOffsetInput
                         objectName: "wallpaperDarkOffset"
@@ -116,7 +119,9 @@ FocusScope {
                 }
                 ColumnLayout {
                     Layout.fillWidth: true
-                    SettingLabel { text: "Bright offset (0–1)" }
+                    SettingLabel {
+                        text: "Bright offset (0–1)"
+                    }
                     SettingField {
                         id: brightOffsetInput
                         objectName: "wallpaperBrightOffset"
@@ -125,7 +130,9 @@ FocusScope {
                 }
                 ColumnLayout {
                     Layout.fillWidth: true
-                    SettingLabel { text: "Grayscale (0–1, 0 = off)" }
+                    SettingLabel {
+                        text: "Grayscale (0–1, 0 = off)"
+                    }
                     SettingField {
                         id: grayScaleInput
                         objectName: "wallpaperGrayScale"
@@ -136,7 +143,9 @@ FocusScope {
                     Layout.fillWidth: true
                     enabled: backgroundModeInput.currentIndex === 1
                     opacity: enabled ? 1 : 0.5
-                    SettingLabel { text: "Fixed background color" }
+                    SettingLabel {
+                        text: "Fixed background color"
+                    }
                     SettingField {
                         id: backgroundInput
                         objectName: "wallpaperBackgroundColor"
@@ -160,9 +169,18 @@ FocusScope {
         RowLayout {
             Layout.fillWidth: true
             spacing: 8
-            Item { Layout.fillWidth: true }
-            ActionButton { text: "Cancel"; onClicked: root.cancelled() }
-            ActionButton { text: "Save"; enabled: !root.busy; onClicked: root.save() }
+            Item {
+                Layout.fillWidth: true
+            }
+            ActionButton {
+                text: "Cancel"
+                onClicked: root.cancelled()
+            }
+            ActionButton {
+                text: "Save"
+                enabled: !root.busy
+                onClicked: root.save()
+            }
         }
     }
 
@@ -226,8 +244,7 @@ FocusScope {
             renderType: Text.NativeRendering
             text: button.text
             font: button.font
-            color: button.hovered || button.activeFocus
-                ? root.config.selectionForeground : root.config.fg
+            color: button.hovered || button.activeFocus ? root.config.selectionForeground : root.config.fg
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
         }

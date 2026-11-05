@@ -33,7 +33,5 @@ Item {
             anchors.margins: panel.padding
             spacing: panel.spacing
         }
-
     }
-
 }

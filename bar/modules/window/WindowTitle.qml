@@ -49,5 +49,4 @@ Item {
             return win && win.title ? win.title : "";
         }
     }
-
 }

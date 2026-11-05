@@ -40,7 +40,6 @@ Item {
         onTriggered: {
             if (revealHover.hovered)
                 root.revealActive = true;
-
         }
     }
 
@@ -70,7 +69,6 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
         }
-
     }
 
     Behavior on revealProgress {
@@ -78,7 +76,5 @@ Item {
             duration: root.revealDuration
             easing.type: Easing.OutCubic
         }
-
     }
-
 }

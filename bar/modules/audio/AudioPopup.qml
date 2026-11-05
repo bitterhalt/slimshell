@@ -11,26 +11,21 @@ PopoutPanel {
     required property Component profileBackend
     property bool profilesLoaded: false
     config: audioItem.config
-    contentWidth: Math.min(420, audioItem.barWindow.screen
-        ? audioItem.barWindow.screen.width - config.popupGap * 2 : 420)
+    contentWidth: Math.min(420, audioItem.barWindow.screen ? audioItem.barWindow.screen.width - config.popupGap * 2 : 420)
     padding: 10
     readonly property int rowHeight: popupState.tabIndex === 3 ? 40 : popupState.tabIndex === 2 ? 56 : 44
     readonly property int rowSpacing: 2
     readonly property int chromeHeight: 12 + status.height + root.spacing + footer.height
-    readonly property real desiredBodyHeight: popupState.helpOpen ? helpRows.implicitHeight
-        : popupState.contextOpen ? optionRows.implicitHeight
-        : Math.max(rowHeight, popupState.rows.length * (rowHeight + rowSpacing) - rowSpacing)
-    readonly property real maximumBodyHeight: Math.max(rowHeight, Math.min(316,
-        root.audioItem.barWindow.screen
-            ? root.audioItem.barWindow.screen.height - root.config.popupGap - root.padding * 2 - chromeHeight - 24
-            : 316))
+    readonly property real desiredBodyHeight: popupState.helpOpen ? helpRows.implicitHeight : popupState.contextOpen ? optionRows.implicitHeight : Math.max(rowHeight, popupState.rows.length * (rowHeight + rowSpacing) - rowSpacing)
+    readonly property real maximumBodyHeight: Math.max(rowHeight, Math.min(316, root.audioItem.barWindow.screen ? root.audioItem.barWindow.screen.height - root.config.popupGap - root.padding * 2 - chromeHeight - 24 : 316))
 
     AudioPopupState {
         id: popupState
         objectName: "audioPopupState"
         audioService: root.audioService
         profiles: profileLoader.item
-        onTabIndexChanged: if (tabIndex === 3) root.profilesLoaded = true
+        onTabIndexChanged: if (tabIndex === 3)
+            root.profilesLoaded = true
         onCloseRequested: root.audioItem.closePopup()
         onSelectionMoved: selectionViewTimer.restart()
     }
@@ -56,9 +51,9 @@ PopoutPanel {
             // ListView geometry can differ by a fraction of a pixel. Don't
             // reposition a short list that already fits in the viewport.
             if (rowsView.contentHeight <= rowsView.height + 1)
-                return
+                return;
             if (popupState.selectedIndex >= 0)
-                rowsView.positionViewAtIndex(popupState.selectedIndex, ListView.Contain)
+                rowsView.positionViewAtIndex(popupState.selectedIndex, ListView.Contain);
         }
     }
 
@@ -130,8 +125,7 @@ PopoutPanel {
                         ChoiceRow {
                             config: root.config
                             title: entry.modelData.name + (entry.modelData.available === false ? " (unavailable)" : "")
-                            subtitle: entry.modelData.kind === "card" ? entry.modelData.media
-                                : entry.modelData.active ? "Active" : ""
+                            subtitle: entry.modelData.kind === "card" ? entry.modelData.media : entry.modelData.active ? "Active" : ""
                             selected: popupState.rows.length > 1 && entry.index === popupState.selectedIndex
                             enabled: entry.modelData.available !== false && !(popupState.profiles && popupState.profiles.changing)
                             onActivated: {
@@ -146,11 +140,7 @@ PopoutPanel {
                     renderType: Text.NativeRendering
                     anchors.centerIn: parent
                     visible: popupState.rows.length === 0
-                    text: popupState.tabIndex === 3
-                        ? (popupState.profiles && popupState.profiles.loading ? "Loading audio cards…" : "No audio cards")
-                        : popupState.tabIndex === 2 ? "No playback streams"
-                        : popupState.tabIndex === 1
-                            ? "No input devices" : "No output devices"
+                    text: popupState.tabIndex === 3 ? (popupState.profiles && popupState.profiles.loading ? "Loading audio cards…" : "No audio cards") : popupState.tabIndex === 2 ? "No playback streams" : popupState.tabIndex === 1 ? "No input devices" : "No output devices"
                     color: root.config.muted
                     font.pointSize: root.config.fontSize(0.86)
                 }
@@ -191,16 +181,46 @@ PopoutPanel {
                 visible: popupState.helpOpen
                 Repeater {
                     model: [
-                        {name: "Select row", key: "↑ / ↓   k / j"},
-                        {name: "Adjust volume", key: "← / →   h / l"},
-                        {name: "Set volume", key: "` / 1–0"},
-                        {name: "Toggle mute", key: "m"},
-                        {name: "Set default output / input", key: "d"},
-                        {name: "Open options", key: "Enter / c"},
-                        {name: "Previous tab", key: "Ctrl+← / Shift+Tab / H"},
-                        {name: "Next tab", key: "Ctrl+→ / Tab / L"},
-                        {name: "Show / hide help", key: "?"},
-                        {name: "Back / close", key: "Esc"}
+                        {
+                            name: "Select row",
+                            key: "↑ / ↓   k / j"
+                        },
+                        {
+                            name: "Adjust volume",
+                            key: "← / →   h / l"
+                        },
+                        {
+                            name: "Set volume",
+                            key: "` / 1–0"
+                        },
+                        {
+                            name: "Toggle mute",
+                            key: "m"
+                        },
+                        {
+                            name: "Set default output / input",
+                            key: "d"
+                        },
+                        {
+                            name: "Open options",
+                            key: "Enter / c"
+                        },
+                        {
+                            name: "Previous tab",
+                            key: "Ctrl+← / Shift+Tab / H"
+                        },
+                        {
+                            name: "Next tab",
+                            key: "Ctrl+→ / Tab / L"
+                        },
+                        {
+                            name: "Show / hide help",
+                            key: "?"
+                        },
+                        {
+                            name: "Back / close",
+                            key: "Esc"
+                        }
                     ]
                     delegate: Item {
                         id: helpRow
@@ -237,20 +257,8 @@ PopoutPanel {
             anchors.bottom: footer.top
             anchors.bottomMargin: root.spacing
             height: 18
-            text: popupState.helpOpen
-                ? "Volume range: 0–" + Math.round((popupState.tabIndex === 0 ? root.config.maxVolume : Math.min(1, root.config.maxVolume)) * 100) + "% · keyboard step: 5% · ? Close help"
-                : popupState.tabIndex === 3
-                    ? (popupState.profiles && (popupState.profiles.errorText
-                        || (popupState.profiles.changing ? "Applying profile…" : "")
-                        || (popupState.profiles.loading ? "Loading cards…" : "")))
-                        || (popupState.profileCard
-                            ? popupState.profileCard.name + " · Enter Apply · Esc Back"
-                            : "Enter Profiles · ? Help")
-                : popupState.contextOpen
-                    ? "Options · " + (popupState.selectedRow ? popupState.selectedRow.name : "") + " · Esc Back · ? Help"
-                    : "? Help"
-            color: popupState.tabIndex === 3 && popupState.profiles && popupState.profiles.errorText
-                ? root.config.urgent : root.config.muted
+            text: popupState.helpOpen ? "Volume range: 0–" + Math.round((popupState.tabIndex === 0 ? root.config.maxVolume : Math.min(1, root.config.maxVolume)) * 100) + "% · keyboard step: 5% · ? Close help" : popupState.tabIndex === 3 ? (popupState.profiles && (popupState.profiles.errorText || (popupState.profiles.changing ? "Applying profile…" : "") || (popupState.profiles.loading ? "Loading cards…" : ""))) || (popupState.profileCard ? popupState.profileCard.name + " · Enter Apply · Esc Back" : "Enter Profiles · ? Help") : popupState.contextOpen ? "Options · " + (popupState.selectedRow ? popupState.selectedRow.name : "") + " · Esc Back · ? Help" : "? Help"
+            color: popupState.tabIndex === 3 && popupState.profiles && popupState.profiles.errorText ? root.config.urgent : root.config.muted
             font.pointSize: root.config.fontSize(0.72)
             elide: Text.ElideRight
             verticalAlignment: Text.AlignVCenter
@@ -293,8 +301,7 @@ PopoutPanel {
                         required property int index
                         width: parent.width / popupState.tabs.length
                         height: 26
-                        readonly property bool highlighted:
-                            popupState.tabIndex === index || tabMouse.containsMouse
+                        readonly property bool highlighted: popupState.tabIndex === index || tabMouse.containsMouse
 
                         Rectangle {
                             anchors.fill: parent
@@ -307,8 +314,7 @@ PopoutPanel {
                             anchors.centerIn: parent
                             objectName: "audioTabLabel-" + tab.modelData
                             text: tab.modelData
-                            color: tab.highlighted
-                                ? root.config.selectionForeground : root.config.muted
+                            color: tab.highlighted ? root.config.selectionForeground : root.config.muted
                             font.pointSize: root.config.fontSize(0.82)
                             font.weight: tab.highlighted ? Font.DemiBold : Font.Normal
                         }
@@ -334,7 +340,7 @@ PopoutPanel {
         property string title: ""
         property string subtitle: ""
         property bool selected: false
-        signal activated()
+        signal activated
         height: 40
         opacity: enabled ? 1 : 0.45
 
@@ -360,8 +366,7 @@ PopoutPanel {
                 renderType: Text.NativeRendering
                 width: parent.width
                 text: choice.title
-                color: choiceMouse.containsMouse
-                    ? choice.config.selectionBackground : choice.config.fg
+                color: choiceMouse.containsMouse ? choice.config.selectionBackground : choice.config.fg
                 font.pointSize: choice.config.fontSize(0.88)
                 font.weight: choice.selected ? Font.DemiBold : Font.Normal
                 elide: Text.ElideRight

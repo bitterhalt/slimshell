@@ -13,59 +13,55 @@ Item {
     property int generation: 0
     property bool pending: false
     readonly property bool busy: search.running || debounce.running
-    signal resultsReady()
-    signal fileOpened()
+    signal resultsReady
+    signal fileOpened
 
     onActiveChanged: refresh()
     onNeedleChanged: refresh()
 
     function refresh(): void {
-        generation += 1
-        pending = active && needle.length >= 2
-        results = []
-        debounce.stop()
+        generation += 1;
+        pending = active && needle.length >= 2;
+        results = [];
+        debounce.stop();
         if (search.running) {
-            search.signal(15)
-            return
+            search.signal(15);
+            return;
         }
         if (pending)
-            debounce.restart()
+            debounce.restart();
     }
 
     function fileItem(path): var {
-        const parts = path.split("/")
-        return {type: "file", path: path, text: parts[parts.length - 1] || path,
-            subtitle: path, icon: ""}
+        const parts = path.split("/");
+        return {
+            type: "file",
+            path: path,
+            text: parts[parts.length - 1] || path,
+            subtitle: path,
+            icon: ""
+        };
     }
 
     function open(path): void {
         if (mimeProcess.running)
-            return
-        mimeProcess.path = path
-        mimeProcess.command = ["file", "--mime-type", "-b", "--", path]
-        mimeProcess.running = true
+            return;
+        mimeProcess.path = path;
+        mimeProcess.command = ["file", "--mime-type", "-b", "--", path];
+        mimeProcess.running = true;
     }
 
     function launchFile(path, mime): void {
-        const home = Quickshell.env("HOME") || ""
-        const editor = Quickshell.env("EDITOR") || "nvim"
-        const terminal = Quickshell.env("TERMINAL") || "foot"
-        const isText = mime.startsWith("text/") || /\.(sh|py|conf)$/.test(path)
+        const home = Quickshell.env("HOME") || "";
+        const editor = Quickshell.env("EDITOR") || "nvim";
+        const terminal = Quickshell.env("TERMINAL") || "foot";
+        const isText = mime.startsWith("text/") || /\.(sh|py|conf)$/.test(path);
         if (!isText) {
-            Quickshell.execDetached(["xdg-open", path])
+            Quickshell.execDetached(["xdg-open", path]);
         } else if (home === "" || !path.startsWith(home + "/")) {
-            Quickshell.execDetached([
-                terminal, "-e", "sh", "-c",
-                'printf "File: %s\\n\\nEnter: edit normally\\ns: sudoedit (administrator)\\nAnything else: cancel\\n> " "$1"; '
-                + 'IFS= read -r choice || exit 0; '
-                + 'case "$choice" in '
-                + '"") exec "$2" "$1" ;; '
-                + 's|S) exec sudoedit -- "$1" ;; '
-                + '*) exit 0 ;; esac',
-                "launcher-edit", path, editor
-            ])
+            Quickshell.execDetached([terminal, "-e", "sh", "-c", 'printf "File: %s\\n\\nEnter: edit normally\\ns: sudoedit (administrator)\\nAnything else: cancel\\n> " "$1"; ' + 'IFS= read -r choice || exit 0; ' + 'case "$choice" in ' + '"") exec "$2" "$1" ;; ' + 's|S) exec sudoedit -- "$1" ;; ' + '*) exit 0 ;; esac', "launcher-edit", path, editor]);
         } else {
-            Quickshell.execDetached([terminal, "-e", editor, path])
+            Quickshell.execDetached([terminal, "-e", editor, path]);
         }
     }
 
@@ -74,29 +70,11 @@ Item {
         interval: 180
         onTriggered: {
             if (search.running || !root.active || root.needle.length < 2)
-                return
-            root.pending = false
-            search.generation = root.generation
-            search.command = [
-                "fd", "-H", "-t", "f", "--max-results", "100",
-                "--exclude", "*.png", "--exclude", "*.jpg",
-                "--exclude", "*.jpeg", "--exclude", "*.webp",
-                "--exclude", "*.gif", "--exclude", "*.bmp",
-                "--exclude", "*.svg", "--exclude", "*.mp4",
-                "--exclude", "*.mkv", "--exclude", "*.webm",
-                "--exclude", "*.mov", "--exclude", "*.avi",
-                "--exclude", "*.ttf", "--exclude", "*.otf",
-                "--exclude", "*.woff", "--exclude", "*.woff2",
-                "--exclude", "*.so", "--exclude", "*.so.*",
-                "--exclude", "*.exe", "--exclude", "*.dll",
-                "--exclude", "*.zip", "--exclude", "*.7z",
-                "--exclude", "*.tar", "--exclude", "*.gz",
-                "--", root.needle,
-                Quickshell.env("HOME") + "/.config",
-                Quickshell.env("HOME") + "/Documents",
-                Quickshell.env("HOME") + "/.local/bin", "/etc"
-            ]
-            search.running = true
+                return;
+            root.pending = false;
+            search.generation = root.generation;
+            search.command = ["fd", "-H", "-t", "f", "--max-results", "100", "--exclude", "*.png", "--exclude", "*.jpg", "--exclude", "*.jpeg", "--exclude", "*.webp", "--exclude", "*.gif", "--exclude", "*.bmp", "--exclude", "*.svg", "--exclude", "*.mp4", "--exclude", "*.mkv", "--exclude", "*.webm", "--exclude", "*.mov", "--exclude", "*.avi", "--exclude", "*.ttf", "--exclude", "*.otf", "--exclude", "*.woff", "--exclude", "*.woff2", "--exclude", "*.so", "--exclude", "*.so.*", "--exclude", "*.exe", "--exclude", "*.dll", "--exclude", "*.zip", "--exclude", "*.7z", "--exclude", "*.tar", "--exclude", "*.gz", "--", root.needle, Quickshell.env("HOME") + "/.config", Quickshell.env("HOME") + "/Documents", Quickshell.env("HOME") + "/.local/bin", "/etc"];
+            search.running = true;
         }
     }
 
@@ -106,16 +84,15 @@ Item {
         stdout: StdioCollector {
             onStreamFinished: {
                 if (!root.active || search.generation !== root.generation)
-                    return
-                root.results = text.trim().split("\n")
-                    .filter(path => path.length > 0).map(path => root.fileItem(path))
-                root.resultsReady()
+                    return;
+                root.results = text.trim().split("\n").filter(path => path.length > 0).map(path => root.fileItem(path));
+                root.resultsReady();
             }
         }
         stderr: StdioCollector {}
         onExited: {
             if (root.pending && root.active && root.needle.length >= 2)
-                debounce.restart()
+                debounce.restart();
         }
     }
 
@@ -124,10 +101,10 @@ Item {
         property string path: ""
         stdout: StdioCollector {
             onStreamFinished: {
-                const mime = text.trim()
+                const mime = text.trim();
                 if (mime !== "")
-                    root.launchFile(mimeProcess.path, mime)
-                root.fileOpened()
+                    root.launchFile(mimeProcess.path, mime);
+                root.fileOpened();
             }
         }
     }

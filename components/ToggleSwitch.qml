@@ -6,7 +6,7 @@ Item {
     required property var config
     property bool checked: false
 
-    signal toggled()
+    signal toggled
 
     implicitWidth: 32
     implicitHeight: 18
@@ -32,5 +32,4 @@ Item {
         cursorShape: Qt.PointingHandCursor
         onClicked: control.toggled()
     }
-
 }

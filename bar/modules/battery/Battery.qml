@@ -32,5 +32,4 @@ Item {
             text: battery.icon
         }
     }
-
 }

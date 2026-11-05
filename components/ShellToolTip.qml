@@ -12,16 +12,16 @@ PopupWindow {
     property bool delayElapsed: false
 
     function updateDelay(): void {
-        showTimer.stop()
-        delayElapsed = false
+        showTimer.stop();
+        delayElapsed = false;
         if (shown && text !== "")
-            showTimer.start()
+            showTimer.start();
     }
     onShownChanged: updateDelay()
     onAnchorItemChanged: updateDelay()
     onTextChanged: {
         if (!visible)
-            updateDelay()
+            updateDelay();
     }
     Component.onCompleted: updateDelay()
 

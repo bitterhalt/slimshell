@@ -33,12 +33,12 @@ PanelWindow {
 
         const needle = languageSearch.text.trim().toLowerCase();
         const choices = picker === "source" ? Languages.sources() : Languages.targets();
-        return choices.filter((language) => {
+        return choices.filter(language => {
             return language.label.toLowerCase().includes(needle) || language.code.toLowerCase().includes(needle);
         });
     }
 
-    signal closeRequested()
+    signal closeRequested
 
     Binding {
         target: root.popupMotion
@@ -65,7 +65,7 @@ PanelWindow {
 
     function translate() {
         if (busy || picker !== "" || sourceInput.text.trim() === "")
-            return ;
+            return;
 
         clearResult();
         pendingRequest = JSON.stringify({
@@ -80,7 +80,7 @@ PanelWindow {
 
     function copyResult() {
         if (translation === "" || copyProcess.running)
-            return ;
+            return;
 
         pendingCopy = translation;
         copyProcess.stdinEnabled = true;
@@ -89,7 +89,7 @@ PanelWindow {
 
     function openPicker(which) {
         if (busy)
-            return ;
+            return;
 
         languageSearch.text = "";
         pickerIndex = 0;
@@ -108,7 +108,7 @@ PanelWindow {
 
     function moveLanguage(direction) {
         if (languageRows.length === 0)
-            return ;
+            return;
 
         pickerIndex = (pickerIndex + direction + languageRows.length) % languageRows.length;
         languageList.positionViewAtIndex(pickerIndex, ListView.Contain);
@@ -116,7 +116,7 @@ PanelWindow {
 
     function chooseLanguage(index) {
         if (index < 0 || index >= languageRows.length)
-            return ;
+            return;
 
         const code = languageRows[index].code;
         if (picker === "source")
@@ -130,7 +130,7 @@ PanelWindow {
     function swapLanguages() {
         const source = sourceLanguage || detectedLanguage;
         if (busy || source === "")
-            return ;
+            return;
 
         const previousTarget = targetLanguage.split("-")[0];
         const previousText = sourceInput.text;
@@ -159,8 +159,7 @@ PanelWindow {
     margins.left: targetScreen ? Math.max(0, Math.round((targetScreen.width - width) / 2)) : 0
     WlrLayershell.namespace: "slim-translator"
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: root.popupMotion.shown
-        ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: root.popupMotion.shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     Component.onCompleted: Qt.callLater(root.focusInput)
     Component.onDestruction: {
         if (translateProcess.running)
@@ -168,7 +167,6 @@ PanelWindow {
 
         if (copyProcess.running)
             copyProcess.signal(15);
-
     }
 
     Process {
@@ -180,11 +178,10 @@ PanelWindow {
             stdinEnabled = false;
             root.pendingRequest = "";
         }
-        onExited: (exitCode) => {
+        onExited: exitCode => {
             root.pendingRequest = "";
             if (exitCode !== 0 && !root.replyReceived)
                 root.errorText = "Could not run the DeepL helper";
-
         }
 
         stdout: StdioCollector {
@@ -197,7 +194,6 @@ PanelWindow {
                         root.detectedLanguage = reply.detected || "";
                         if (reply.text.trim() === sourceInput.text.trim())
                             root.noticeText = root.detectedLanguage === root.targetLanguage.split("-")[0] ? "Already " + Languages.label(root.detectedLanguage) + "; change target language" : "DeepL returned unchanged text";
-
                     } else {
                         root.errorText = reply.error || "Translation failed";
                     }
@@ -208,9 +204,7 @@ PanelWindow {
         }
         // Unexpected Python errors must not leak request data into shell logs.
 
-        stderr: StdioCollector {
-        }
-
+        stderr: StdioCollector {}
     }
 
     Process {
@@ -218,18 +212,17 @@ PanelWindow {
 
         command: ["wl-copy"]
         environment: ({
-            "DEEPL_API": null
-        })
+                "DEEPL_API": null
+            })
         onStarted: {
             write(root.pendingCopy);
             stdinEnabled = false;
             root.pendingCopy = "";
         }
-        onExited: (exitCode) => {
+        onExited: exitCode => {
             root.copied = exitCode === 0;
             if (exitCode !== 0)
                 root.errorText = "Could not copy the translation";
-
         }
     }
 
@@ -340,7 +333,6 @@ PanelWindow {
                 KeyNavigation.tab: sourceInput
                 KeyNavigation.backtab: swapButton.enabled ? swapButton : sourceButton
             }
-
         }
 
         Item {
@@ -405,7 +397,6 @@ PanelWindow {
                             }
                         }
                     }
-
                 }
 
                 Rectangle {
@@ -445,9 +436,7 @@ PanelWindow {
                         KeyNavigation.tab: translateButton.enabled ? translateButton : copyButton
                         KeyNavigation.backtab: sourceInput
                     }
-
                 }
-
             }
 
             Column {
@@ -470,7 +459,7 @@ PanelWindow {
                     selectedTextColor: root.config.selectionForeground
                     font.pointSize: root.config.fontSize(0.92)
                     onTextChanged: root.pickerIndex = 0
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         switch (event.key) {
                         case Qt.Key_Down:
                         case Qt.Key_Tab:
@@ -496,7 +485,6 @@ PanelWindow {
                         border.width: 1
                         border.color: root.config.selectionBackground
                     }
-
                 }
 
                 ListView {
@@ -535,13 +523,9 @@ PanelWindow {
                             onEntered: root.pickerIndex = parent.index
                             onClicked: root.chooseLanguage(parent.index)
                         }
-
                     }
-
                 }
-
             }
-
         }
 
         // Translate/copy buttons and current status.
@@ -601,11 +585,7 @@ PanelWindow {
                     KeyNavigation.tab: sourceButton
                     KeyNavigation.backtab: translateButton.enabled ? translateButton : outputArea
                 }
-
             }
-
         }
-
     }
-
 }
