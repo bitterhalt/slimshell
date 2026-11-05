@@ -1,8 +1,9 @@
 import QtQuick
 
 // Inert view: the panel owns fetching/decoding and supplies the preview data.
-Item {
+Rectangle {
     id: root
+    objectName: "clipboardPreviewCard"
 
     required property var config
     required property var entry
@@ -10,6 +11,12 @@ Item {
     property string imagePath: ""
     property string previewText: ""
     property bool historyEmpty: true
+
+    radius: 5
+    color: Qt.alpha(config.selectionBackground, 0.05)
+    border.color: config.border
+    border.width: 1
+    clip: true
 
     Image {
         anchors.fill: parent

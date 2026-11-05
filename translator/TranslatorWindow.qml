@@ -344,9 +344,9 @@ PanelWindow {
             anchors.bottom: footer.top
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.leftMargin: 1
-            anchors.rightMargin: 1
-            anchors.bottomMargin: 1
+            anchors.leftMargin: root.config.panelPadding + 1
+            anchors.rightMargin: root.config.panelPadding + 1
+            anchors.bottomMargin: root.config.spacingControl
 
             // Input text and translated result panes.
             Column {
@@ -358,9 +358,17 @@ PanelWindow {
                     id: sourceScroll
 
                     width: parent.width
-                    height: (parent.height - parent.spacing * 2 - 1) / 2
+                    height: (parent.height - parent.spacing) / 2
                     contentWidth: availableWidth
                     clip: true
+
+                    background: Rectangle {
+                        objectName: "translatorSourceCard"
+                        radius: 5
+                        color: Qt.alpha(root.config.selectionBackground, 0.05)
+                        border.color: root.config.border
+                        border.width: 1
+                    }
 
                     TextArea {
                         id: sourceInput
@@ -400,17 +408,19 @@ PanelWindow {
                     }
                 }
 
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: root.config.border
-                }
-
                 ScrollView {
                     width: parent.width
                     height: sourceScroll.height
                     contentWidth: availableWidth
                     clip: true
+
+                    background: Rectangle {
+                        objectName: "translatorOutputCard"
+                        radius: 5
+                        color: Qt.alpha(root.config.selectionBackground, 0.05)
+                        border.color: root.config.border
+                        border.width: 1
+                    }
 
                     TextArea {
                         id: outputArea
@@ -442,9 +452,6 @@ PanelWindow {
 
             Column {
                 anchors.fill: parent
-                anchors.leftMargin: root.config.panelPadding
-                anchors.rightMargin: root.config.panelPadding
-                anchors.bottomMargin: root.config.panelPadding
                 visible: root.picker !== ""
                 spacing: root.config.spacingControl
 
@@ -545,7 +552,11 @@ PanelWindow {
             height: Math.max(footerActions.implicitHeight, footerStatus.implicitHeight) + root.config.panelPadding * 2
 
             Rectangle {
-                width: parent.width
+                objectName: "translatorFooterSeparator"
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: root.config.panelPadding
+                anchors.rightMargin: root.config.panelPadding
                 height: 1
                 color: root.config.border
             }

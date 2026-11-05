@@ -86,6 +86,20 @@ TranslatorWindow {
             compare(header.y, dialog.config.panelPadding + 1);
             compare(header.spacing, dialog.config.spacingControl);
             compare(body.y - header.y - header.height, dialog.config.panelPadding);
+            compare(body.x, header.x);
+            compare(body.width, header.width);
+            compare(body.y + body.height + dialog.config.spacingControl, footer.y);
+            const sourceCard = findChild(dialog.contentItem, "translatorSourceCard");
+            const outputCard = findChild(dialog.contentItem, "translatorOutputCard");
+            const separator = findChild(dialog.contentItem, "translatorFooterSeparator");
+            for (const card of [sourceCard, outputCard]) {
+                compare(card.color, Qt.alpha(dialog.config.selectionBackground, 0.05));
+                compare(card.border.color, dialog.config.border);
+                compare(card.radius, 5);
+            }
+            compare(sourceCard.height, outputCard.height);
+            compare(separator.x, dialog.config.panelPadding);
+            compare(separator.width, footer.width - dialog.config.panelPadding * 2);
             compare(source.leftPadding, dialog.config.panelPadding);
             compare(source.topPadding, dialog.config.panelPadding);
             compare(footer.height, 28 + dialog.config.panelPadding * 2);

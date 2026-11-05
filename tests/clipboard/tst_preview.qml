@@ -51,6 +51,10 @@ Item {
         function test_empty_and_text_states() {
             failOnWarning(/TypeError|ReferenceError|Binding loop|Unable to assign/);
             const preview = createTemporaryObject(previewComponent, host);
+            compare(preview.color, Qt.alpha(fixtureConfig.selectionBackground, 0.05));
+            compare(preview.border.color, fixtureConfig.border);
+            compare(preview.border.width, 1);
+            compare(preview.radius, 5);
             const empty = findChild(preview, "clipboardPreviewEmpty");
             const text = findChild(preview, "clipboardPreviewText");
             verify(empty.visible);

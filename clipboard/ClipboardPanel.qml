@@ -313,38 +313,27 @@ PanelWindow {
             }
         }
 
-        Rectangle {
-            anchors.top: header.bottom
-            anchors.left: parent.left
-            anchors.leftMargin: 1
-            anchors.right: parent.right
-            anchors.rightMargin: 1
-            height: 1
-            z: 1
-            color: root.config.border
-        }
-
         // Left: compact history rows. Right: preview for the selected entry.
         Row {
+            objectName: "clipboardBody"
             anchors.top: header.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.leftMargin: 1
-            anchors.rightMargin: 1
-            anchors.topMargin: 1
+            anchors.leftMargin: root.config.panelPadding + 1
+            anchors.rightMargin: root.config.panelPadding + 1
             anchors.bottom: footer.top
+            anchors.bottomMargin: root.config.spacingControl
+            spacing: root.config.spacingControl
 
-            Rectangle {
+            Item {
                 width: root.historyWidth
                 height: parent.height
-                color: root.config.bg
 
                 ListView {
                     id: entriesList
                     objectName: "clipboardEntries"
 
                     anchors.fill: parent
-                    anchors.margins: root.config.spacingControl
                     clip: true
                     spacing: root.config.spacingTight
                     model: root.filteredEntries
@@ -363,12 +352,6 @@ PanelWindow {
                 }
             }
 
-            Rectangle {
-                width: 1
-                height: parent.height
-                color: root.config.border
-            }
-
             ClipboardPreview {
                 config: root.config
                 entry: root.selectedEntry
@@ -376,7 +359,7 @@ PanelWindow {
                 imagePath: root.previewPath
                 previewText: root.selectedText
                 historyEmpty: root.entries.length === 0
-                width: parent.width - root.historyWidth - 1
+                width: Math.max(0, parent.width - root.historyWidth - parent.spacing)
                 height: parent.height
             }
         }
@@ -392,9 +375,12 @@ PanelWindow {
             height: Math.max(footerLabels.implicitHeight, footerHint.implicitHeight) + root.config.panelPadding * 2
 
             Rectangle {
+                objectName: "clipboardFooterSeparator"
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
+                anchors.leftMargin: root.config.panelPadding
+                anchors.rightMargin: root.config.panelPadding
                 height: 1
                 color: root.config.border
             }
