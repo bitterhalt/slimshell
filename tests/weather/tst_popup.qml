@@ -15,7 +15,8 @@ Item {
         property color selectionBackground: "#bb9955"
         property string iconFontFamily: "sans-serif"
         property int popupRadius: 4
-        readonly property real fontSize: 10
+        property real fontSize: 10
+        property real iconSize: 10
     }
     QtObject {
         id: weather
@@ -44,6 +45,8 @@ Item {
         property int closes: 0
         function init() {
             failOnWarning(/TypeError|ReferenceError|Binding loop|Unable to assign/);
+            fixtureConfig.fontSize = 10;
+            fixtureConfig.iconSize = 10;
             weather.refreshing = false;
             weather.calls = 0;
             weather.data = {
@@ -75,6 +78,44 @@ Item {
             const hint = findChild(popup, "weatherRefreshHint");
             mouseClick(hint, hint.width / 2, hint.height / 2);
             compare(weather.calls, 0);
+        }
+        function test_icon_and_text_sizes_are_independent() {
+            weather.data = {
+                available: true,
+                temperature: 12,
+                moon: {
+                    icon: "🌕",
+                    name: "Full Moon",
+                    illumination: 100
+                },
+                forecast: [
+                    {
+                        day: "Mon",
+                        icon: "☀",
+                        high: 12,
+                        low: 5,
+                        rain: 20
+                    }
+                ]
+            };
+            waitForPolish(host.Window.window);
+            const main = findChild(popup, "weatherConditionIcon");
+            const temperature = findChild(popup, "weatherTemperature");
+            const detail = findChild(popup, "weatherDetailIcon");
+            const moon = findChild(popup, "weatherMoonIcon");
+            const forecast = findChild(popup, "weatherForecastIcon-0");
+            fixtureConfig.iconSize = 12;
+            fuzzyCompare(main.font.pointSize, 36, 0.01);
+            fuzzyCompare(detail.font.pointSize, 12, 0.01);
+            fuzzyCompare(moon.font.pointSize, 9.6, 0.01);
+            fuzzyCompare(forecast.font.pointSize, 15.6, 0.01);
+            fuzzyCompare(temperature.font.pointSize, 28, 0.01);
+            fixtureConfig.fontSize = 12;
+            fuzzyCompare(temperature.font.pointSize, 33.6, 0.01);
+            fuzzyCompare(main.font.pointSize, 36, 0.01);
+            popup.mainIconSize = 40;
+            fuzzyCompare(main.font.pointSize, 40, 0.01);
+            fuzzyCompare(detail.font.pointSize, 12, 0.01);
         }
         function test_complete_forecast_fits_surface() {
             weather.data = {

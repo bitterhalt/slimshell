@@ -7,6 +7,12 @@ FocusScope {
     required property var config
     required property var weatherData
 
+    // Weather keeps its own proportions, independently of text sizing.
+    property real mainIconSize: config.iconSize * 3
+    property real forecastIconSize: config.iconSize * 1.3
+    property real detailIconSize: config.iconSize
+    property real moonIconSize: config.iconSize * 0.8
+
     signal closeRequested
 
     implicitWidth: 360
@@ -85,9 +91,10 @@ FocusScope {
                 color: Qt.alpha(root.config.selectionBackground, 0.1)
 
                 Text {
+                    objectName: "weatherConditionIcon"
                     anchors.centerIn: parent
                     text: root.weatherData.data.icon || "✨"
-                    font.pointSize: root.config.fontSize * 3
+                    font.pointSize: root.mainIconSize
                 }
             }
 
@@ -97,6 +104,7 @@ FocusScope {
                 spacing: 0
 
                 Label {
+                    objectName: "weatherTemperature"
                     Layout.fillWidth: true
                     text: root.weatherData.data.available ? root.weatherData.data.temperature + "°C" : "N/A"
                     font.pointSize: root.config.fontSize * 2.8
@@ -165,14 +173,25 @@ FocusScope {
             radius: root.config.popupRadius
             color: Qt.alpha(root.config.selectionBackground, 0.12)
 
-            Label {
+            RowLayout {
                 anchors.fill: parent
                 anchors.leftMargin: 10
                 anchors.rightMargin: 10
-                verticalAlignment: Text.AlignVCenter
-                elide: Text.ElideRight
-                font.pointSize: root.config.fontSize * 0.8
-                text: root.weatherData.data.moon ? root.weatherData.data.moon.icon + "  " + root.weatherData.data.moon.name + " · " + root.weatherData.data.moon.illumination + "%" : "Moon information unavailable"
+                spacing: 4
+
+                Label {
+                    objectName: "weatherMoonIcon"
+                    visible: !!root.weatherData.data.moon
+                    text: root.weatherData.data.moon ? root.weatherData.data.moon.icon : ""
+                    font.pointSize: root.moonIconSize
+                }
+
+                Label {
+                    Layout.fillWidth: true
+                    elide: Text.ElideRight
+                    font.pointSize: root.config.fontSize * 0.8
+                    text: root.weatherData.data.moon ? root.weatherData.data.moon.name + " · " + root.weatherData.data.moon.illumination + "%" : "Moon information unavailable"
+                }
             }
         }
 
@@ -219,9 +238,10 @@ FocusScope {
                     }
 
                     Label {
+                        objectName: "weatherForecastIcon-" + forecastRow.index
                         Layout.preferredWidth: 28
                         text: forecastRow.modelData.icon
-                        font.pointSize: root.config.fontSize * 1.3
+                        font.pointSize: root.forecastIconSize
                         horizontalAlignment: Text.AlignHCenter
                     }
 
@@ -233,7 +253,6 @@ FocusScope {
                     Icon {
                         text: "󰖗"
                         color: root.config.muted
-                        font.pointSize: root.config.fontSize * 1
                     }
 
                     Label {
@@ -255,8 +274,9 @@ FocusScope {
     }
 
     component Icon: Label {
+        objectName: "weatherDetailIcon"
         font.family: root.config.iconFontFamily
-        font.pointSize: root.config.fontSize * 1
+        font.pointSize: root.detailIconSize
     }
 
     component Detail: RowLayout {
