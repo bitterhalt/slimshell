@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Window
-import "HistoryModel.js" as HistoryModel
+import "../components"
 
 Rectangle {
     id: root
@@ -28,8 +28,16 @@ Rectangle {
     implicitHeight: Math.max(46, content.implicitHeight) + 20
     radius: config.popupRadius
     border.width: 1
-    border.color: root.critical ? root.criticalBorderColor : root.highlighted ? root.config.selectionBackground : root.config.border
+    border.color: root.critical ? root.criticalBorderColor : root.config.border
     color: root.critical ? root.config.bg : Qt.alpha(root.config.selectionBackground, 0.05)
+
+    SelectionIndicator {
+        objectName: "historySelectionIndicator"
+        config: root.config
+        selected: root.selected
+        anchors.leftMargin: root.border.width
+        verticalInset: 6
+    }
 
     HoverHandler {
         id: hover

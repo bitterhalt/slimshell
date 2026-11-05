@@ -428,7 +428,7 @@ Item {
             tryVerify(() => hover.hovered);
             compare(card.color, Qt.alpha(config.selectionBackground, 0.05));
             compare(card.opacity, 1);
-            compare(card.border.color, config.selectionBackground);
+            compare(card.border.color, config.border);
             mouseMove(host, host.width - 1, host.height - 1);
             tryVerify(() => !hover.hovered);
             compare(card.opacity, 1);
@@ -437,7 +437,14 @@ Item {
             // HoverHandler in the actual UI.
             card.selected = true;
             compare(card.color, Qt.alpha(config.selectionBackground, 0.05));
-            compare(card.border.color, config.selectionBackground);
+            compare(card.border.color, config.border);
+            const indicator = findChild(card, "historySelectionIndicator");
+            verify(indicator !== null);
+            verify(indicator.visible);
+            compare(indicator.color, config.selectionBackground);
+            compare(indicator.width, 3);
+            card.selected = false;
+            verify(!indicator.visible);
             compare(findText(card, note.summary).color, config.fg);
         }
 
