@@ -22,7 +22,7 @@ Item {
 
     IconImage {
         anchors.left: parent.left
-        anchors.leftMargin: 12
+        anchors.leftMargin: root.config.panelPadding
         anchors.verticalCenter: parent.verticalCenter
         implicitSize: 26
         visible: source.toString() !== ""
@@ -31,7 +31,7 @@ Item {
 
     Text {
         anchors.left: parent.left
-        anchors.leftMargin: 12
+        anchors.leftMargin: root.config.panelPadding
         anchors.verticalCenter: parent.verticalCenter
         visible: root.entry.type === "calculator" || root.entry.type === "file" || root.entry.type === "binary" || root.entry.type === "emoji" || root.entry.type === "timer-start" || root.entry.type === "timer-active"
         color: root.selected ? root.config.selectionForeground : root.config.selectionBackground
@@ -42,11 +42,11 @@ Item {
 
     Column {
         anchors.left: parent.left
-        anchors.leftMargin: root.entry.type === "dmenu" ? 12 : 50
+        anchors.leftMargin: root.entry.type === "dmenu" ? root.config.panelPadding : root.config.panelPadding + 26 + root.config.spacingControl
         anchors.right: parent.right
-        anchors.rightMargin: 12
+        anchors.rightMargin: root.config.panelPadding
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 1
+        spacing: root.config.spacingTight
 
         Text {
             objectName: "launcherResultTitle"

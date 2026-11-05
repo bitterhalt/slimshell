@@ -1,6 +1,7 @@
 """Render the real result delegate with inert Quickshell icon integration."""
 import os
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 import unittest
@@ -18,6 +19,19 @@ class LauncherResultRowTests(unittest.TestCase):
             (base / "LauncherResultRow.qml").write_text('import "."\n' + source)
             (base / "Dmenu.js").write_text((ROOT / "launcher/Dmenu.js").read_text())
             (base / "ControlConfig.qml").write_text((ROOT / "tests/components/ControlConfig.qml").read_text())
+            launcher = (ROOT / "launcher/Launcher.qml").read_text()
+            metrics = []
+            for name in ("panelInset", "inputHeight", "contentSpacing", "rowHeight", "availableDmenuRows", "cardHeight"):
+                match = re.search(r"^    readonly property int " + name + r":[^\n]+", launcher, re.M)
+                self.assertIsNotNone(match, name)
+                metrics.append(match.group())
+            (base / "LayoutMetrics.qml").write_text('''import QtQuick
+QtObject {
+    required property var config
+    property var targetScreen: null
+    property int maxVisibleRows: 7
+    property int visibleRows: 7
+''' + "\n".join(metrics) + "\n}\n")
             (base / "qmldir").write_text("singleton Quickshell 1.0 Quickshell.qml\n")
             (base / "Quickshell.qml").write_text(
                 'pragma Singleton\nimport QtQuick\nQtObject { function iconPath(name, fallback) { return ""; } }'
@@ -35,8 +49,23 @@ Item {
         id: rowComponent
         LauncherResultRow { config: fixtureConfig; entry: ({type: "application", text: "Test app", icon: ""}); width: 400; height: 46 }
     }
+    Component { id: metricsComponent; LayoutMetrics { config: fixtureConfig } }
     TestCase {
         name: "LauncherResultRowView"
+        function test_card_spacing_and_dmenu_screen_fit() {
+            failOnWarning(/TypeError|ReferenceError|Binding loop|Unable to assign/);
+            const metrics = createTemporaryObject(metricsComponent, host);
+            compare(metrics.panelInset, fixtureConfig.panelPadding + 1);
+            compare(metrics.inputHeight - metrics.panelInset, metrics.rowHeight);
+            compare(metrics.contentSpacing, fixtureConfig.panelPadding);
+            compare(metrics.cardHeight, metrics.inputHeight + metrics.rowHeight * 7 + metrics.contentSpacing + metrics.panelInset);
+            metrics.targetScreen = {height: 400};
+            metrics.visibleRows = metrics.availableDmenuRows;
+            verify(metrics.cardHeight <= 400 - fixtureConfig.popupGap * 2);
+            verify(metrics.cardHeight + metrics.rowHeight > 400 - fixtureConfig.popupGap * 2);
+            metrics.targetScreen = {height: 40};
+            compare(metrics.availableDmenuRows, 0);
+        }
         function test_result_kinds_data() {
             return ["application", "binary", "emoji", "file", "calculator", "timer-start", "timer-active", "dmenu"].map(type => ({tag: type, type: type}));
         }
@@ -46,6 +75,8 @@ Item {
             row.entry = {type: data.type, text: "Synthetic result", icon: "", emoji: "🙂", subtitle: "Detail"};
             const title = findChild(row, "launcherResultTitle");
             const subtitle = findChild(row, "launcherResultSubtitle");
+            compare(title.parent.x, fixtureConfig.panelPadding + (data.type === "dmenu" ? 0 : 26 + fixtureConfig.spacingControl));
+            compare(title.parent.spacing, fixtureConfig.spacingTight);
             verify(title.text.includes("Synthetic result"));
             row.selected = true;
             compare(title.color, fixtureConfig.selectionForeground);

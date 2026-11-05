@@ -58,9 +58,10 @@ Item {
 
     readonly property int maxVisibleRows: 7
     readonly property int rowHeight: 46
-    readonly property int inputHeight: 50
+    readonly property int panelInset: config.panelPadding + 1
+    readonly property int inputHeight: panelInset + rowHeight
     readonly property int contentWidth: 400
-    readonly property int contentSpacing: 8
+    readonly property int contentSpacing: config.panelPadding
     readonly property bool fileMode: !runMode && !emojiMode && !timerMode && !dmenuMode && query.trim().startsWith("/")
     readonly property string fileNeedle: fileMode ? query.trim().slice(1).trim() : ""
 
@@ -201,10 +202,10 @@ Item {
 
     // Normal modes stay fixed; dmenu can choose a row count per request.
     readonly property bool fileSearching: files.busy
-    readonly property int availableDmenuRows: targetScreen ? Math.max(0, Math.floor((targetScreen.height - config.popupGap * 2 - inputHeight - contentSpacing * 2 - 2) / rowHeight)) : maxVisibleRows
+    readonly property int availableDmenuRows: targetScreen ? Math.max(0, Math.floor((targetScreen.height - config.popupGap * 2 - inputHeight - contentSpacing - panelInset) / rowHeight)) : maxVisibleRows
     readonly property int visibleRows: dmenuMode ? Dmenu.visibleRows(dmenuLines, dmenuMinimalLines, dmenuItems.length, availableDmenuRows) : maxVisibleRows
 
-    readonly property int cardHeight: inputHeight + visibleRows * rowHeight + contentSpacing * 2 + 2
+    readonly property int cardHeight: inputHeight + visibleRows * rowHeight + contentSpacing + panelInset
 
     function close(): void {
         finalizeClose();
@@ -578,9 +579,6 @@ Item {
                 id: searchBackground
 
                 anchors.fill: searchInput
-                anchors.leftMargin: 8
-                anchors.rightMargin: 8
-                anchors.topMargin: 8
                 color: root.config.bg
                 radius: 4
                 border.width: 1
@@ -594,11 +592,14 @@ Item {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
-                height: root.inputHeight
-                leftPadding: 18
-                rightPadding: 18
-                topPadding: searchBackground.anchors.topMargin
-                bottomPadding: searchBackground.anchors.bottomMargin
+                anchors.topMargin: root.panelInset
+                anchors.leftMargin: root.panelInset
+                anchors.rightMargin: root.panelInset
+                height: root.inputHeight - root.panelInset
+                leftPadding: root.config.spacingControl
+                rightPadding: root.config.spacingControl
+                topPadding: root.config.spacingTight
+                bottomPadding: root.config.spacingTight
                 focus: true
                 verticalAlignment: TextInput.AlignVCenter
                 color: root.config.fg
@@ -711,8 +712,8 @@ Item {
 
             Text {
                 renderType: Text.NativeRendering
-                anchors.left: parent.left
-                anchors.leftMargin: 18
+                anchors.left: searchInput.left
+                anchors.leftMargin: searchInput.leftPadding
                 anchors.verticalCenter: searchBackground.verticalCenter
                 visible: searchInput.text.length === 0
                 color: root.config.muted
@@ -726,11 +727,11 @@ Item {
                 anchors.top: searchInput.bottom
                 anchors.topMargin: root.contentSpacing
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: root.contentSpacing
+                anchors.bottomMargin: root.panelInset
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.leftMargin: searchBackground.anchors.leftMargin
-                anchors.rightMargin: searchBackground.anchors.rightMargin
+                anchors.leftMargin: root.panelInset
+                anchors.rightMargin: root.panelInset
                 clip: true
                 interactive: false
                 model: root.results
@@ -753,7 +754,7 @@ Item {
             Text {
                 renderType: Text.NativeRendering
                 anchors.top: searchInput.bottom
-                anchors.topMargin: 18
+                anchors.topMargin: root.config.panelPadding
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: root.visibleRows > 0 && root.results.length === 0
                 color: root.config.muted
