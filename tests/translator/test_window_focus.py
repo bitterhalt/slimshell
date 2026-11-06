@@ -67,8 +67,8 @@ TranslatorWindow {
             const footer = findChild(dialog.contentItem, "translatorFooter");
             const body = findChild(dialog.contentItem, "translatorBody");
             const source = findChild(dialog.contentItem, "translatorSourceInput");
-            compare(header.x, dialog.config.panelPadding + 1);
-            compare(header.y, dialog.config.panelPadding + 1);
+            compare(header.x, dialog.config.panelPadding);
+            compare(header.y, dialog.config.panelPadding);
             compare(header.spacing, dialog.config.spacingControl);
             compare(body.y - header.y - header.height, dialog.config.panelPadding);
             compare(body.x, header.x);

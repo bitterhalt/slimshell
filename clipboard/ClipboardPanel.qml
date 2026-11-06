@@ -223,7 +223,6 @@ PanelWindow {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.margins: 1 // Keep content inside the surface outline.
             height: Math.max(32, searchInput.implicitHeight) + root.config.panelPadding * 2
             z: 1
 
@@ -318,8 +317,8 @@ PanelWindow {
             anchors.top: header.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.leftMargin: root.config.panelPadding + 1
-            anchors.rightMargin: root.config.panelPadding + 1
+            anchors.leftMargin: root.config.panelPadding
+            anchors.rightMargin: root.config.panelPadding
             anchors.bottom: footer.top
             anchors.bottomMargin: root.config.spacingControl
             spacing: root.config.spacingControl
@@ -370,7 +369,6 @@ PanelWindow {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            anchors.margins: 1
             height: Math.max(footerLabels.implicitHeight, footerHint.implicitHeight) + root.config.panelPadding * 2
 
             PanelSeparator {

@@ -87,18 +87,18 @@ Item {
             const body = findChild(surface, "clipboardBody");
             const preview = findChild(surface, "clipboardPreviewCard");
             const separator = findChild(surface, "clipboardFooterSeparator");
-            compare(header.x + frame.x, fixtureConfig.panelPadding + 1);
-            compare(surface.width - header.x - frame.x - frame.width, fixtureConfig.panelPadding + 1);
-            compare(header.y + frame.y, fixtureConfig.panelPadding + 1);
+            compare(header.x + frame.x, fixtureConfig.panelPadding);
+            compare(surface.width - header.x - frame.x - frame.width, fixtureConfig.panelPadding);
+            compare(header.y + frame.y, fixtureConfig.panelPadding);
             compare(entries.x, 0);
-            compare(body.x, fixtureConfig.panelPadding + 1);
+            compare(body.x, fixtureConfig.panelPadding);
             compare(preview.x - entries.parent.width, fixtureConfig.spacingControl);
             compare(body.y + body.height + fixtureConfig.spacingControl, footer.y);
             compare(separator.x, fixtureConfig.panelPadding);
             compare(separator.width, footer.width - fixtureConfig.panelPadding * 2);
             compare(entries.spacing, fixtureConfig.spacingTight);
-            compare(footer.x, 1);
-            compare(surface.height - footer.y - footer.height, 1);
+            compare(footer.x, 0);
+            compare(surface.height - footer.y - footer.height, 0);
             verify(footer.height > fixtureConfig.panelPadding * 2);
         }
     }

@@ -248,7 +248,7 @@ PanelWindow {
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: root.config.panelPadding + parent.border.width
+            anchors.margins: root.config.panelPadding
             spacing: root.config.spacingControl
 
             // Search field spans the picker above the thumbnail list and preview.

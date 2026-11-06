@@ -284,7 +284,7 @@ PanelWindow {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.margins: root.config.panelPadding + parent.border.width
+            anchors.margins: root.config.panelPadding
             spacing: root.config.spacingControl
 
             ShellButton {
@@ -341,8 +341,8 @@ PanelWindow {
             anchors.bottom: footer.top
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.leftMargin: root.config.panelPadding + 1
-            anchors.rightMargin: root.config.panelPadding + 1
+            anchors.leftMargin: root.config.panelPadding
+            anchors.rightMargin: root.config.panelPadding
             anchors.bottomMargin: root.config.spacingControl
 
             // Input text and translated result panes.

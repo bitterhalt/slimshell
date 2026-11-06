@@ -326,7 +326,7 @@ Item {
             z: 1
             config: root.config
             contentWidth: 260
-            padding: root.config.panelPadding + 1 // Inside the one-pixel surface border.
+            padding: root.config.panelPadding
             spacing: root.config.spacingTight
 
             anchors.top: parent.top

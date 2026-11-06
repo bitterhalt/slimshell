@@ -57,7 +57,7 @@ Item {
         function test_card_spacing_and_dmenu_screen_fit() {
             failOnWarning(/TypeError|ReferenceError|Binding loop|Unable to assign/);
             const metrics = createTemporaryObject(metricsComponent, host);
-            compare(metrics.panelInset, fixtureConfig.panelPadding + 1);
+            compare(metrics.panelInset, fixtureConfig.panelPadding);
             compare(metrics.rowHeight, 36);
             compare(metrics.inputHeight - metrics.panelInset, metrics.rowHeight);
             compare(metrics.contentSpacing, fixtureConfig.panelPadding);
