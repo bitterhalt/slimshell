@@ -174,14 +174,14 @@ Rectangle {
                     id: actionButton
                     required property var modelData
                     objectName: "historyAction-" + modelData.key
-                    width: Math.min(actions.width, caption.implicitWidth + 12)
-                    height: 26
+                    width: Math.min(actions.width, caption.implicitWidth + root.config.spacingControl * 2)
+                    height: Math.max(26, caption.implicitHeight + root.config.spacingControl * 2)
                     radius: 4
                     color: actionMouse.containsMouse ? root.config.selectionBackground : root.critical ? root.config.bg : Qt.alpha(root.config.selectionBackground, 0.12)
                     Text {
                         id: caption
                         anchors.centerIn: parent
-                        width: Math.max(0, parent.width - 12)
+                        width: Math.max(0, parent.width - root.config.spacingControl * 2)
                         renderType: Text.NativeRendering
                         textFormat: Text.PlainText
                         text: (actionButton.modelData.key ? "[" + actionButton.modelData.key + "] " : "") + actionButton.modelData.label
