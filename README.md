@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/slimshell.svg" alt="Slimshell: a slim rat walking along a thin bar" width="100%">
+  <img src="assets/slimshell.svg"  width="100%">
 </p>
 
 <p align="center">

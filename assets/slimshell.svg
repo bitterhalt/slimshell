@@ -1,47 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="420" viewBox="0 0 1600 420" role="img" aria-labelledby="title desc">
-  <title id="title">Slimshell — geometric slim rat logo, wide version</title>
-  <desc id="desc">A wider banner version of the Slimshell logo with a slimmer geometric gray rat and a gold tail that becomes a long underline, beside the Slimshell wordmark.</desc>
-
+  <title id="title">SlimShell</title>
+  <desc id="desc">SlimShell logo with gold Slim, off-white Shell, subtitle and straight gold underline on a #101010 background.</desc>
   <rect width="1600" height="420" fill="#101010"/>
-
-  <!-- Tail joins the long gold underline. -->
-  <path d="M 197,201 C 142,200 94,233 91,264 C 89,283 102,296 155,296 L 1508,296"
-        fill="none" stroke="#D9A04E" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
-
-  <!-- Rear legs, below the body. -->
-  <path d="M 270,238 L 235,293 L 260,293 L 294,258 Z" fill="#E4E4E4"/>
-  <path d="M 321,245 L 292,293 L 317,293 L 347,259 Z" fill="#C5C5C5"/>
-
-  <!-- Forelegs. -->
-  <path d="M 485,237 L 453,293 L 478,293 L 515,251 Z" fill="#EEEEEE"/>
-  <path d="M 513,240 L 538,293 L 562,293 L 537,239 Z" fill="#C2C2C2"/>
-
-  <!-- Geometric elongated body and pointed snout. -->
-  <path d="M 224,260 C 255,212 299,188 370,186 L 500,186 L 569,213 L 639,233 L 557,261 L 221,261 L 242,245 Z"
-        fill="#E8E8E8"/>
-
-  <!-- Clean angular underbody accent. -->
-  <path d="M 257,244 L 500,244 L 455,255 L 240,255 Z" fill="#D2D2D2"/>
-
-  <!-- Ears. -->
-  <circle cx="504" cy="181" r="30" fill="#E8E8E8"/>
-  <circle cx="504" cy="181" r="21" fill="#C98079"/>
-
-  <!-- Eye. -->
-  <circle cx="559" cy="228" r="7" fill="#101010"/>
-
-  <!-- Pointed nose and whiskers. -->
-  <circle cx="629" cy="233" r="7" fill="#D9A04E"/>
-  <g fill="none" stroke="#D9A04E" stroke-width="3.5" stroke-linecap="round">
-    <path d="M 635,230 L 678,214"/>
-    <path d="M 638,236 L 681,237"/>
-    <path d="M 635,243 L 676,257"/>
+  <g font-family="DejaVu Sans, sans-serif" font-weight="bold" font-size="120" letter-spacing="-5">
+    <text x="800" y="194" text-anchor="end" fill="#E7AA50">Slim</text>
+    <text x="800" y="194" text-anchor="start" fill="#E6E6E6">Shell</text>
   </g>
-
-  <!-- Wordmark. -->
-  <g font-family="DejaVu Sans, Arial, sans-serif" font-weight="bold" font-size="116" letter-spacing="-5">
-    <text x="760" y="205" fill="#D9A04E">Slim</text>
-    <text x="1056" y="205" fill="#E2E2E2">shell</text>
-  </g>
-  <text x="768" y="267" fill="#BDBDBD" font-family="DejaVu Sans Mono, monospace" font-size="36" letter-spacing="0">a slim Quickshell config</text>
+  <text x="800" y="261" text-anchor="middle" font-family="DejaVu Sans Mono, monospace" font-size="38" letter-spacing="0.4" fill="#BFBFBF">a slim Quickshell config</text>
+  <line x1="380" y1="298" x2="1220" y2="298" stroke="#E7AA50" stroke-width="8" stroke-linecap="round"/>
 </svg>
