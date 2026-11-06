@@ -28,7 +28,7 @@ Rectangle {
     signal actionRequested(var entry)
 
     readonly property real collapsedHeight: HistoryModel.collapsedCardHeight(config)
-    implicitHeight: expanded ? Math.max(collapsedHeight, content.implicitHeight + 20) : collapsedHeight
+    implicitHeight: expanded ? Math.ceil(Math.max(collapsedHeight, content.implicitHeight + 20)) : collapsedHeight
     radius: config.popupRadius
     border.width: 1
     border.color: root.critical ? root.criticalBorderColor : root.config.border

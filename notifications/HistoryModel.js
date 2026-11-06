@@ -15,7 +15,7 @@ function iconSource(icon, resolveIcon) {
 function collapsedCardHeight(config) {
     // One summary line, one reserved body-preview line, compact spacing and
     // padding. Keep this shared with NotificationCenter's size estimate.
-    return Math.max(56, Number(config.fontSize || 14) * 3.2 + 22)
+    return Math.ceil(Math.max(56, Number(config.fontSize || 14) * 3.2 + 22))
 }
 
 function historyWindowHeight(config, count, footerHeight, padding, spacing, maxHeight) {

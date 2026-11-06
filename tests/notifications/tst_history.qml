@@ -319,6 +319,7 @@ Item {
             waitForPolish(host.Window.window);
             const sharedHeight = card.implicitHeight;
             verify(sharedHeight < 70);
+            compare(sharedHeight, Math.round(sharedHeight));
             verify(findChild(card, "historyBodyText").truncated);
 
             card.destroy();
