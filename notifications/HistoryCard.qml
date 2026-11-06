@@ -166,7 +166,7 @@ Rectangle {
         Flow {
             id: actions
             width: parent.width
-            spacing: 4
+            spacing: root.config.spacingTight
             visible: root.expanded
             Repeater {
                 model: root.selected && root.expanded ? root.actionEntries : []
