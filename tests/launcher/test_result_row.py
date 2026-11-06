@@ -49,7 +49,7 @@ Item {
     ControlConfig { id: fixtureConfig }
     Component {
         id: rowComponent
-        LauncherResultRow { config: fixtureConfig; entry: ({type: "application", text: "Test app", icon: ""}); width: 400; height: 40 }
+        LauncherResultRow { config: fixtureConfig; entry: ({type: "application", text: "Test app", icon: ""}); width: 400; height: 36 }
     }
     Component { id: metricsComponent; LayoutMetrics { config: fixtureConfig } }
     TestCase {
@@ -58,7 +58,7 @@ Item {
             failOnWarning(/TypeError|ReferenceError|Binding loop|Unable to assign/);
             const metrics = createTemporaryObject(metricsComponent, host);
             compare(metrics.panelInset, fixtureConfig.panelPadding + 1);
-            compare(metrics.rowHeight, 40);
+            compare(metrics.rowHeight, 36);
             compare(metrics.inputHeight - metrics.panelInset, metrics.rowHeight);
             compare(metrics.contentSpacing, fixtureConfig.panelPadding);
             compare(metrics.cardHeight, metrics.inputHeight + metrics.rowHeight * 7 + metrics.contentSpacing + metrics.panelInset);
@@ -79,7 +79,7 @@ Item {
             const title = findChild(row, "launcherResultTitle");
             const subtitle = findChild(row, "launcherResultSubtitle");
             compare(title.parent.x, fixtureConfig.panelPadding + (data.type === "dmenu" ? 0 : 26 + fixtureConfig.spacingControl));
-            compare(title.parent.spacing, fixtureConfig.spacingTight);
+            compare(title.parent.spacing, 0);
             verify(title.parent.implicitHeight <= row.height);
             verify(title.text.includes("Synthetic result"));
             row.selected = true;
