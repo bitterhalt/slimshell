@@ -5,11 +5,13 @@ Only the imports are removed from the controller copy; its logic is unchanged.
 The doubles never launch cliphist, create a window, or touch clipboard history.
 """
 
-import os
 from pathlib import Path
-import subprocess
+import sys
 import tempfile
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tests.qml_support import run_qml_tests
 
 
 CONTROLLER = Path(__file__).resolve().parents[2] / "clipboard/Clipboard.qml"
@@ -142,12 +144,7 @@ class LazyClipboardTests(unittest.TestCase):
                 "tst_controller.qml": TEST,
             }.items():
                 (base / name).write_text(text)
-            result = subprocess.run(
-                ["/usr/lib/qt6/bin/qmltestrunner", "-input", folder, "-o", "-,txt"],
-                env={**os.environ, "QT_QPA_PLATFORM": "offscreen"},
-                capture_output=True, text=True, timeout=20,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            run_qml_tests(folder)
 
 
 if __name__ == "__main__":

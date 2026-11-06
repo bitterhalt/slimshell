@@ -282,11 +282,9 @@ PopoutPanel {
             anchors.bottom: parent.bottom
             height: 26 + root.spacing
 
-            Rectangle {
+            PanelSeparator {
+                config: root.config
                 anchors.top: parent.top
-                width: parent.width
-                height: 1
-                color: root.config.border
             }
             Row {
                 anchors.left: parent.left

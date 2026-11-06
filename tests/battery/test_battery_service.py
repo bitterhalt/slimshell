@@ -1,10 +1,12 @@
 """Test battery bindings with UPower doubles; no live shell or laptop needed."""
 
-import os
 from pathlib import Path
-import subprocess
+import sys
 import tempfile
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tests.qml_support import run_qml_tests
 
 
 SERVICE = Path(__file__).resolve().parents[2] / "services/BatteryService.qml"
@@ -127,12 +129,7 @@ class BatteryServiceTests(unittest.TestCase):
                 "Discharging, Empty, FullyCharged, PendingCharge, PendingDischarge } }\n"
             )
             (base / "tst_battery.qml").write_text(TEST)
-            result = subprocess.run(
-                ["/usr/lib/qt6/bin/qmltestrunner", "-input", folder, "-o", "-,txt"],
-                env={**os.environ, "QT_QPA_PLATFORM": "offscreen"},
-                capture_output=True, text=True, timeout=20,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            run_qml_tests(folder)
 
 
 if __name__ == "__main__":

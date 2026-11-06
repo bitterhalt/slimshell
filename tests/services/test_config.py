@@ -1,11 +1,13 @@
 """Offline JSON config/adapter tests with in-memory files, never live settings."""
 
 import json
-import os
 from pathlib import Path
-import subprocess
+import sys
 import tempfile
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tests.qml_support import copy_control_config, run_qml_tests
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -17,15 +19,10 @@ import "."
 import "config/Schema.js" as Schema
 Item {
     id: host
-    QtObject {
+    ControlConfig {
         id: fixtureTheme
-        property color bg: "#101010"
-        property color fg: "#eeeeee"
-        property color muted: "#888888"
-        property color urgent: "#ff5555"
-        property color selectionBackground: "#6699cc"
-        readonly property color border: Qt.alpha(selectionBackground, 0.45)
-        property color selectionForeground: "#ffffff"
+        urgent: "#ff5555"
+        border: Qt.alpha(selectionBackground, 0.45)
     }
     Component { id: configComponent; Config { theme: fixtureTheme } }
     Component { id: settingsComponent; SettingsService {} }
@@ -142,8 +139,8 @@ class ConfigTests(unittest.TestCase):
                 source = "\n".join(line for line in source.splitlines()
                                    if not line.startswith("import Quickshell"))
                 (base / name).write_text('import "."\n' + source)
-            for folder, name in (("config", "Schema.js"), ("idle", "Duration.js")):
-                (base / folder).mkdir()
+            for folder, name in (("config", "Schema.js"), ("config", "Value.js"), ("idle", "Duration.js")):
+                (base / folder).mkdir(exist_ok=True)
                 (base / folder / name).write_text((ROOT / "services" / folder / name).read_text())
             (base / "qmldir").write_text(
                 "singleton Quickshell 1.0 Quickshell.qml\n"
@@ -175,10 +172,6 @@ QtObject {
     signal loadFailed()
 }
 ''')
+            copy_control_config(base)
             (base / "tst_config.qml").write_text(TEST)
-            result = subprocess.run(
-                ["/usr/lib/qt6/bin/qmltestrunner", "-input", directory, "-o", "-,txt"],
-                env={**os.environ, "QT_QPA_PLATFORM": "offscreen"},
-                capture_output=True, text=True, timeout=20,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            run_qml_tests(directory)

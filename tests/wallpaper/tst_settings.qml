@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import QtTest
+import "../components"
 import "../../wallpaper"
 
 Item {
@@ -8,23 +9,11 @@ Item {
     width: 660
     height: 500
 
-    QtObject {
+    ControlConfig {
         id: fixtureConfig
-        property color bg: "#111111"
-        property color fg: "#eeeeee"
-        property color muted: "#aaaaaa"
-        property color urgent: "#ff5555"
-        property color selectionBackground: "#6699cc"
-        property color selectionForeground: "#ffffff"
-        property color border: "#444444"
-        property int spacingTight: 4
-        property int spacingControl: 8
-        property int panelPadding: 12
-        property int previewPadding: 16
-        readonly property real fontSize: 10
-        readonly property real textSizeNormal: fontSize
-        readonly property real textSizeMedium: fontSize * 0.88
-        readonly property real textSizeSmall: fontSize * 0.76
+        bg: "#111111"
+        muted: "#aaaaaa"
+        urgent: "#ff5555"
     }
     QtObject {
         id: preferences

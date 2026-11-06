@@ -61,7 +61,10 @@ Item {
             createWatcher();
             device.connected = true;
             compare(notifications, 1);
+
             device.connected = false;
+            compare(notifications, 1);
+
             device.connected = true;
             compare(notifications, 2);
         }

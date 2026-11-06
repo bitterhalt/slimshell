@@ -108,13 +108,9 @@ Item {
             mask: Region {}
 
             // Segmented level; dim the whole meter when muted, like the audio popup.
-            Rectangle {
+            PanelSurface {
                 anchors.fill: parent
-
-                color: config.bg
-                border.color: config.border
-                border.width: 1
-                radius: config.popupRadius
+                config: osd.config
 
                 VolumeMeter {
                     objectName: "osdVolumeMeter"

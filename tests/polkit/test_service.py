@@ -1,9 +1,11 @@
 """Test prompt/service wiring with an inert agent and offscreen windows."""
-import os
 from pathlib import Path
-import subprocess
+import sys
 import tempfile
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tests.qml_support import copy_control_config, run_qml_tests
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -23,7 +25,7 @@ class PolkitServiceTests(unittest.TestCase):
             (base / "PolkitPrompt.qml").write_text(source)
             for name in ("PanelSurface.qml", "ShellButton.qml", "ShellTextField.qml"):
                 (base / name).write_text((ROOT / "components" / name).read_text())
-            (base / "ControlConfig.qml").write_text((ROOT / "tests/components/ControlConfig.qml").read_text())
+            copy_control_config(base)
             (base / "Scope.qml").write_text("import QtQuick\nItem {}")
             (base / "PolkitAgent.qml").write_text('''import QtQuick
 QtObject {
@@ -104,9 +106,4 @@ Item {
     }
 }
 ''')
-            result = subprocess.run(
-                ["/usr/lib/qt6/bin/qmltestrunner", "-input", directory, "-o", "-,txt"],
-                env={**os.environ, "QT_QPA_PLATFORM": "offscreen"},
-                capture_output=True, text=True, timeout=20,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            run_qml_tests(directory)

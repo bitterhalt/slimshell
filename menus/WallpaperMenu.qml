@@ -237,17 +237,14 @@ PanelWindow {
         onDismissed: root.closeRequested()
     }
 
-    Rectangle {
+    PanelSurface {
         anchors.fill: parent
+        config: root.config
         enabled: root.popupMotion.shown
         opacity: root.popupMotion.contentOpacity
         transform: Translate {
             y: root.popupMotion.contentOffset
         }
-        color: root.config.bg
-        border.color: root.config.border
-        border.width: 1
-        radius: root.config.popupRadius
 
         ColumnLayout {
             anchors.fill: parent

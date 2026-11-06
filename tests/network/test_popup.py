@@ -1,9 +1,11 @@
 """Exercise the actual popup with fake networking; never touch live Wi-Fi."""
-import os
 from pathlib import Path
-import subprocess
+import sys
 import tempfile
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tests.qml_support import copy_control_config, run_qml_tests
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -21,10 +23,10 @@ class NetworkPopupTests(unittest.TestCase):
                                        and line != 'import "../../../components"')
                     source = 'import "."\n' + source
                 (base / name).write_text(source)
-            for name in ("PopoutPanel.qml", "PanelSurface.qml", "ShellButton.qml", "ShellTextField.qml",
-                         "ActionRow.qml", "SelectionIndicator.qml", "ShellIconButton.qml"):
+            for name in ("PopoutPanel.qml", "PanelSurface.qml", "PanelSeparator.qml", "ShellButton.qml",
+                         "ShellTextField.qml", "ActionRow.qml", "SelectionIndicator.qml", "ShellIconButton.qml"):
                 (base / name).write_text((ROOT / "components" / name).read_text())
-            (base / "ControlConfig.qml").write_text((ROOT / "tests/components/ControlConfig.qml").read_text())
+            copy_control_config(base)
             (base / "qmldir").write_text("singleton Networking 1.0 Networking.qml\n")
             (base / "Networking.qml").write_text(
                 "pragma Singleton\nimport QtQuick\nQtObject { property bool wifiEnabled: true }"
@@ -196,9 +198,4 @@ Item {
     }
 }
 ''')
-            result = subprocess.run(
-                ["/usr/lib/qt6/bin/qmltestrunner", "-input", directory, "-o", "-,txt"],
-                env={**os.environ, "QT_QPA_PLATFORM": "offscreen"},
-                capture_output=True, text=True, timeout=20,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            run_qml_tests(directory)

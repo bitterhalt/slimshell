@@ -2,6 +2,7 @@ import "../../notifications"
 import "../../notifications/HistoryModel.js" as Model
 import "../../notifications/HistoryPolicy.js" as HistoryPolicy
 import "../../notifications/ToastPolicy.js" as ToastPolicy
+import "../components"
 import QtQuick
 import QtQuick.Window
 import QtTest
@@ -17,25 +18,16 @@ Item {
             event.accepted = true;
     }
 
-    QtObject {
+    ControlConfig {
         id: config
 
-        property color fg: "white"
-        property color muted: "#888888"
-        property color bg: "#111111"
-        property color urgent: "red"
-        property color selectionBackground: "#b8865e"
-        readonly property color border: Qt.alpha(selectionBackground, 0.45)
-        property color selectionForeground: "#18120d"
-        property string textFontFamily: "sans-serif"
-        property string iconFontFamily: "sans-serif"
-        property real iconSize: 10
-        property int popupRadius: 4
-
-        readonly property real fontSize: 10
-        readonly property real textSizeNormal: fontSize
-        readonly property real textSizeMedium: fontSize * 0.88
-        readonly property real textSizeSmall: fontSize * 0.76
+        bg: "#111111"
+        fg: "white"
+        muted: "#888888"
+        urgent: "red"
+        selectionBackground: "#b8865e"
+        border: Qt.alpha(selectionBackground, 0.45)
+        selectionForeground: "#18120d"
     }
 
     QtObject {
@@ -309,6 +301,21 @@ Item {
             verify(findText(card, "[o] Open") !== null);
             compare(findText(card, "[c] Close"), null);
             verify(card.implicitHeight > unselectedHeight);
+        }
+
+        function test_icon_sources_use_the_shared_resolver() {
+            let resolved = [];
+            const resolve = (name, fallback) => {
+                resolved.push([name, fallback]);
+                return "/icons/" + name;
+            };
+            compare(Model.iconSource("camera", resolve), "/icons/camera");
+            compare(resolved[0][0], "camera");
+            compare(resolved[0][1], true);
+            compare(Model.iconSource("/tmp/icon.png", resolve), "/tmp/icon.png");
+            compare(Model.iconSource("file:///tmp/icon.png", resolve), "file:///tmp/icon.png");
+            compare(Model.iconSource("", resolve), "");
+            compare(resolved.length, 1);
         }
 
         function test_image_hints_are_icons_not_large_previews() {

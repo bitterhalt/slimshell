@@ -1,10 +1,12 @@
 """Check wallpaper helper arguments without running ImageMagick or awww."""
 
-import os
 from pathlib import Path
-import subprocess
+import sys
 import tempfile
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tests.qml_support import run_qml_tests
 
 
 ROOT = Path(__file__).resolve().parents[2] / "wallpaper"
@@ -72,6 +74,10 @@ class WallpaperControllerTests(unittest.TestCase):
                                and line not in ('import "../components"', 'import "../menus"'))
             (base / "Wallpaper.qml").write_text('import "."\n' + source)
             (base / "PopupMotion.qml").write_text((ROOT.parent / "components/PopupMotion.qml").read_text())
+            (base / "PopupIpcHandler.qml").write_text(
+                (ROOT.parent / "components/PopupIpcHandler.qml").read_text()
+                .replace("import Quickshell.Io", 'import "."')
+            )
             (base / "qmldir").write_text("singleton Quickshell 1.0 Quickshell.qml\n")
             (base / "Quickshell.qml").write_text(
                 'pragma Singleton\nimport QtQuick\nQtObject { function env(name) { return "/synthetic-home"; } }\n'
@@ -98,9 +104,4 @@ class WallpaperControllerTests(unittest.TestCase):
             for name, body in doubles.items():
                 (base / f"{name}.qml").write_text("import QtQuick\n" + body)
             (base / "tst_controller.qml").write_text(TEST)
-            result = subprocess.run(
-                ["/usr/lib/qt6/bin/qmltestrunner", "-input", directory, "-o", "-,txt"],
-                env={**os.environ, "QT_QPA_PLATFORM": "offscreen"},
-                capture_output=True, text=True, timeout=20,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            run_qml_tests(directory)

@@ -1,11 +1,13 @@
 """Exercise the real translator UI offscreen; processes and layer-shell are inert."""
 
-import os
 from pathlib import Path
 import re
-import subprocess
+import sys
 import tempfile
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tests.qml_support import copy_control_config, run_qml_tests
 
 
 ROOT = Path(__file__).resolve().parents[2] / "translator"
@@ -25,26 +27,9 @@ TranslatorWindow {
         property real contentOffset: 0
         property real surfaceHeight: 0
     }
-    config: QtObject {
-        property color bg: "#101010"
-        property color fg: "#eeeeee"
-        property color muted: "#888888"
-        property color urgent: "#ff5555"
-        property color selectionBackground: "#6699cc"
-        readonly property color border: Qt.alpha(selectionBackground, 0.45)
-        property color selectionForeground: "#ffffff"
-        property int popupGap: 16
-        property int popupRadius: 4
-        property int spacingTight: 4
-        property int spacingControl: 8
-        property int panelPadding: 12
-        property int previewPadding: 16
-        property string iconFontFamily: "sans-serif"
-        property real iconSize: 10
-        readonly property real fontSize: 10
-        readonly property real textSizeNormal: fontSize
-        readonly property real textSizeMedium: fontSize * 0.88
-        readonly property real textSizeSmall: fontSize * 0.76
+    config: ControlConfig {
+        border: Qt.alpha(selectionBackground, 0.45)
+        urgent: "#ff5555"
     }
     TestCase {
         name: "TranslatorKeyboardFocus"
@@ -139,6 +124,8 @@ class TranslatorFocusTests(unittest.TestCase):
             source = re.sub(r"^\s*WlrLayershell\.[^\n]*\n", "\n", source, flags=re.M)
             (base / "TranslatorWindow.qml").write_text('import "."\n' + source)
             (base / "Languages.js").write_text((ROOT / "Languages.js").read_text())
+            (base / "PanelSeparator.qml").write_text((ROOT.parent / "components/PanelSeparator.qml").read_text())
+            (base / "PanelSurface.qml").write_text((ROOT.parent / "components/PanelSurface.qml").read_text())
             (base / "ShellButton.qml").write_text((ROOT.parent / "components/ShellButton.qml").read_text())
             (base / "ShellToolTip.qml").write_text((ROOT.parent / "tests/fixtures/ShellToolTip.qml").read_text())
             (base / "qmldir").write_text("singleton Quickshell 1.0 Quickshell.qml\n")
@@ -188,10 +175,6 @@ class TranslatorFocusTests(unittest.TestCase):
             }
             for name, body in doubles.items():
                 (base / f"{name}.qml").write_text("import QtQuick\nimport QtQuick.Window\n" + body)
+            copy_control_config(base)
             (base / "tst_focus.qml").write_text(TEST)
-            result = subprocess.run(
-                ["/usr/lib/qt6/bin/qmltestrunner", "-input", directory, "-o", "-,txt"],
-                env={**os.environ, "QT_QPA_PLATFORM": "offscreen"},
-                capture_output=True, text=True, timeout=30,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            run_qml_tests(directory, timeout=30)

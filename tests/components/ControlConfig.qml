@@ -19,8 +19,8 @@ QtObject {
     property string iconFontFamily: "sans-serif"
     property real iconSize: 10
 
-    readonly property real fontSize: 10
+    property real fontSize: 10
     readonly property real textSizeNormal: fontSize
     readonly property real textSizeMedium: fontSize * 0.88
-    readonly property real textSizeSmall: fontSize * 0.76
+    readonly property real textSizeSmall: fontSize * 0.78
 }

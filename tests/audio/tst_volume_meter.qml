@@ -1,13 +1,14 @@
 import QtQuick
 import QtTest
+import "../components"
 import "../../components"
 
 Item {
     id: host
-    QtObject {
+    ControlConfig {
         id: fixtureConfig
-        property color selectionBackground: "#bb8855"
-        property color border: "#554433"
+        selectionBackground: "#bb8855"
+        border: "#554433"
     }
     Component {
         id: meterComponent

@@ -1,22 +1,19 @@
 import QtQuick
 import QtTest
+import "../components"
 import "../../weather"
 
 Item {
     id: host
     width: 500
     height: 900
-    QtObject {
+    ControlConfig {
         id: fixtureConfig
-        property color fg: "white"
-        property color muted: "gray"
-        property color bg: "#151515"
-        property color border: "#776655"
-        property color selectionBackground: "#bb9955"
-        property string iconFontFamily: "sans-serif"
-        property int popupRadius: 4
-        property real fontSize: 10
-        property real iconSize: 10
+        fg: "white"
+        muted: "gray"
+        bg: "#151515"
+        border: "#776655"
+        selectionBackground: "#bb9955"
     }
     QtObject {
         id: weather

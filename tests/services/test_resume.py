@@ -1,9 +1,11 @@
 """Resume signals and real bar-clock wiring, with inert D-Bus and clock objects."""
-import os
 from pathlib import Path
-import subprocess
+import sys
 import tempfile
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tests.qml_support import copy_control_config, run_qml_tests
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -45,21 +47,18 @@ class ResumeTests(unittest.TestCase):
             }
             for name, body in doubles.items():
                 (base / f"{name}.qml").write_text("import QtQuick\n" + body)
+            copy_control_config(base)
             (base / "tst_resume.qml").write_text('''import QtQuick
 import QtTest
 import "."
 Item {
     id: host
-    QtObject {
+    ControlConfig {
         id: fixtureConfig
-        property color fg: "white"
-        property color selectionBackground: "orange"
+        fg: "white"
+        selectionBackground: "orange"
         property string clockFormat: "HH:mm"
         property string clockAlternativeFormat: "dddd, d MMMM"
-        readonly property real fontSize: 10
-        readonly property real textSizeNormal: fontSize
-        readonly property real textSizeMedium: fontSize * 0.88
-        readonly property real textSizeSmall: fontSize * 0.76
     }
     QtObject { id: fixtureBar; property int height: 30; property var screen: null }
     QtObject {
@@ -124,9 +123,4 @@ Item {
     }
 }
 ''')
-            result = subprocess.run(
-                ["/usr/lib/qt6/bin/qmltestrunner", "-input", directory, "-o", "-,txt"],
-                env={**os.environ, "QT_QPA_PLATFORM": "offscreen"},
-                capture_output=True, text=True, timeout=20,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            run_qml_tests(directory)

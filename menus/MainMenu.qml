@@ -357,80 +357,16 @@ Item {
             Repeater {
                 model: root.currentItems
 
-                delegate: Item {
-                    id: menuItem
-
+                delegate: MenuRow {
                     required property var modelData
                     required property int index
 
-                    width: parent ? parent.width : 0
-                    height: 32
-
-                    readonly property bool selected: root.selectedIndex === index
-
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: 4
-                        color: menuItem.selected ? root.config.selectionBackground : "transparent"
-                    }
-
-                    Text {
-                        id: rowIcon
-                        anchors.left: parent.left
-                        anchors.leftMargin: root.config.spacingControl
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        width: 22
-                        horizontalAlignment: Text.AlignHCenter
-
-                        color: menuItem.selected ? root.config.selectionForeground : root.config.selectionBackground
-                        font.family: root.config.iconFontFamily
-                        font.pointSize: root.config.iconSize
-                        text: modelData.icon ?? ""
-                    }
-
-                    Text {
-                        renderType: Text.NativeRendering
-                        anchors.left: rowIcon.right
-                        anchors.leftMargin: root.config.spacingControl
-                        anchors.right: keyHint.left
-                        anchors.rightMargin: root.config.spacingControl
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        color: menuItem.selected ? root.config.selectionForeground : root.config.fg
-                        font.pointSize: root.config.textSizeMedium
-                        font.weight: Font.Medium
-                        elide: Text.ElideRight
-                        text: modelData.label
-                        textFormat: Text.PlainText
-                    }
-
-                    Text {
-                        visible: modelData.page !== undefined
-                        anchors.right: keyHint.left
-                        anchors.rightMargin: root.config.spacingControl
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        color: menuItem.selected ? root.config.selectionForeground : root.config.muted
-                        font.family: root.config.iconFontFamily
-                        font.pointSize: root.config.iconSize
-                        text: "󰅂"
-                    }
-
-                    Text {
-                        id: keyHint
-                        renderType: Text.NativeRendering
-
-                        anchors.right: parent.right
-                        anchors.rightMargin: root.config.spacingControl
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        width: 21
-                        horizontalAlignment: Text.AlignHCenter
-                        color: menuItem.selected ? root.config.selectionForeground : root.config.fg
-                        font.pointSize: root.config.textSizeSmall
-                        text: modelData.shortcut ?? ""
-                    }
+                    config: root.config
+                    selected: root.selectedIndex === index
+                    icon: modelData.icon ?? ""
+                    label: modelData.label
+                    keyHint: modelData.shortcut ?? ""
+                    submenu: modelData.page !== undefined
                 }
             }
         }
@@ -447,19 +383,14 @@ Item {
         onDismissed: root.close()
     }
 
-    IpcHandler {
+    PopupIpcHandler {
         target: "power"
-
-        function toggle(): void {
-            root.toggle("power", root.targetScreen);
-        }
-
-        function open(): void {
-            root.open("power");
-        }
-
-        function close(): void {
-            if (root.page === "power")
+        handleAction: action => {
+            if (action === "toggle")
+                root.toggle("power", root.targetScreen);
+            else if (action === "open")
+                root.open("power");
+            else if (root.page === "power")
                 root.close();
         }
     }

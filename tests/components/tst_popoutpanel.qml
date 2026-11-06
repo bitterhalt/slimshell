@@ -7,12 +7,11 @@ Item {
     width: 500
     height: 500
 
-    QtObject {
+    ControlConfig {
         id: fixtureConfig
-        property color bg: "#222222"
-        property color selectionBackground: "#444444"
-        readonly property color border: Qt.alpha(selectionBackground, 0.45)
-        property int popupRadius: 4
+        bg: "#222222"
+        selectionBackground: "#444444"
+        border: Qt.alpha(selectionBackground, 0.45)
     }
 
     Component {

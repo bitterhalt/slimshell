@@ -1,15 +1,13 @@
 .pragma library
 
+.import "../services/config/Value.js" as Value
+
 const pages = ["user-menu1", "user-menu2", "user-menu3", "user-menu4"]
 const actions = ["idleSettings", "wallpaper", "lock", "suspend"]
 
-function object(value) {
-    return value !== null && typeof value === "object" && !Array.isArray(value)
-}
-
 function parse(text) {
     const document = JSON.parse(text)
-    if (!object(document) || Object.keys(document).some(key => !pages.includes(key)))
+    if (!Value.isObject(document) || Object.keys(document).some(key => !pages.includes(key)))
         throw new Error("Expected user-menu1 through user-menu4 lists")
     const result = {}
     for (const page of pages) {
@@ -19,7 +17,7 @@ function parse(text) {
         const shortcuts = new Set()
         result[page] = entries.map((entry, index) => {
             const location = page + "[" + index + "]"
-            if (!object(entry) || Object.keys(entry).some(key =>
+            if (!Value.isObject(entry) || Object.keys(entry).some(key =>
                     !["label", "icon", "shortcut", "command", "action", "page", "confirm"].includes(key)))
                 throw new Error(location + ": invalid menu entry")
             if (typeof entry.label !== "string" || entry.label.trim() === "")

@@ -198,7 +198,6 @@ Item {
                 label: "Stop"
                 keyHint: "s"
                 visible: root.runningNow
-                height: root.runningNow ? 32 : 0
             }
         }
     }
@@ -218,63 +217,17 @@ Item {
         onDismissed: root.close()
     }
 
-    component RecorderMenuItem: Item {
+    component RecorderMenuItem: MenuRow {
         id: menuItem
 
         required property int index
-        required property string icon
-        required property string label
-        required property string keyHint
 
-        readonly property bool selected: root.selectedIndex === menuItem.index
-
-        width: parent ? parent.width : 0
-        height: 32
-
-        Rectangle {
-            anchors.fill: parent
-            radius: 4
-            color: menuItem.selected ? root.config.selectionBackground : "transparent"
-        }
-
-        Text {
-            anchors.left: parent.left
-            anchors.leftMargin: 7
-            anchors.verticalCenter: parent.verticalCenter
-
-            width: 22
-            color: menuItem.selected ? root.config.selectionForeground : root.config.fg
-            font.family: root.config.iconFontFamily
-            font.pointSize: root.config.iconSize * 1.077
-            horizontalAlignment: Text.AlignHCenter
-            text: menuItem.icon
-        }
-
-        Text {
-            renderType: Text.NativeRendering
-            anchors.left: parent.left
-            anchors.leftMargin: 38
-            anchors.verticalCenter: parent.verticalCenter
-
-            color: menuItem.selected ? root.config.selectionForeground : root.config.fg
-            font.pointSize: root.config.textSizeMedium
-            font.weight: Font.Medium
-            text: menuItem.label
-        }
-
-        Text {
-            renderType: Text.NativeRendering
-            anchors.right: parent.right
-            anchors.rightMargin: 6
-            anchors.verticalCenter: parent.verticalCenter
-
-            width: 21
-            horizontalAlignment: Text.AlignHCenter
-            color: menuItem.selected ? root.config.selectionForeground : root.config.fg
-            font.pointSize: root.config.textSizeSmall
-            font.weight: Font.Normal
-            text: menuItem.keyHint
-        }
+        config: root.config
+        selected: root.selectedIndex === menuItem.index
+        accentIcon: false
+        iconInset: 7
+        hintInset: 6
+        iconScale: 1.077
     }
 
     Connections {

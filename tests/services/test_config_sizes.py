@@ -1,9 +1,11 @@
 """Numeric size bindings from the real Config, with an inert settings reader."""
-import os
 from pathlib import Path
-import subprocess
+import sys
 import tempfile
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tests.qml_support import copy_control_config, run_qml_tests
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -18,7 +20,8 @@ class ConfigSizeTests(unittest.TestCase):
             source = source.replace('"config/Schema.js"', '"Schema.js"')
             (base / "Config.qml").write_text('import "."\n' + source)
             (base / "Schema.js").write_text((ROOT / "services/config/Schema.js").read_text())
-            (base / "ControlConfig.qml").write_text((ROOT / "tests/components/ControlConfig.qml").read_text())
+            (base / "Value.js").write_text((ROOT / "services/config/Value.js").read_text())
+            copy_control_config(base)
             (base / "FileView.qml").write_text('''import QtQuick
 Item {
     property string path: ""
@@ -54,27 +57,22 @@ Item {
             compare(config.fontSize, base);
             compare(config.textSizeNormal, base);
             fuzzyCompare(config.textSizeMedium, base * 0.88, 0.001);
-            fuzzyCompare(config.textSizeSmall, base * 0.76, 0.001);
+            fuzzyCompare(config.textSizeSmall, base * 0.78, 0.001);
             compare(config.iconSize, base);
             config.applySettings('{"appearance":{"fontScale":1.5,"iconScale":1.2}}');
             fuzzyCompare(config.fontSize, base * 1.5, 0.001);
             fuzzyCompare(config.textSizeNormal, base * 1.5, 0.001);
             fuzzyCompare(config.textSizeMedium, base * 1.5 * 0.88, 0.001);
-            fuzzyCompare(config.textSizeSmall, base * 1.5 * 0.76, 0.001);
+            fuzzyCompare(config.textSizeSmall, base * 1.5 * 0.78, 0.001);
             fuzzyCompare(config.iconSize, base * 1.5 * 1.2, 0.001);
             fuzzyCompare(config.fontSize * 0.88, base * 1.5 * 0.88, 0.001);
             config.applySettings('{"appearance":{"fontScale":1.5,"iconScale":0.8}}');
             fuzzyCompare(config.textSizeMedium, base * 1.5 * 0.88, 0.001);
-            fuzzyCompare(config.textSizeSmall, base * 1.5 * 0.76, 0.001);
+            fuzzyCompare(config.textSizeSmall, base * 1.5 * 0.78, 0.001);
             fuzzyCompare(config.fontSize, base * 1.5, 0.001);
             fuzzyCompare(config.iconSize, base * 1.5 * 0.8, 0.001);
         }
     }
 }
 ''')
-            result = subprocess.run(
-                ["/usr/lib/qt6/bin/qmltestrunner", "-input", directory, "-o", "-,txt"],
-                env={**os.environ, "QT_QPA_PLATFORM": "offscreen"},
-                capture_output=True, text=True, timeout=20,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            run_qml_tests(directory)

@@ -64,7 +64,7 @@ PanelWindow {
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
-        cursorShape: root.selecting ? Qt.CrossCursor : Qt.CrossCursor
+        cursorShape: Qt.CrossCursor
 
         onPressed: mouse => {
             if (mouse.button === Qt.RightButton) {

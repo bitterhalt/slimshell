@@ -1,5 +1,6 @@
 import QtQuick
 import QtTest
+import "../components"
 import "../../bar/modules/workspaces"
 
 Item {
@@ -8,19 +9,16 @@ Item {
     width: 500
     height: 80
 
-    QtObject {
+    ControlConfig {
         id: fixtureConfig
 
-        property color urgent: "red"
-        property color selectionBackground: "orange"
-        property color selectionForeground: "black"
-        property color fg: "white"
+        urgent: "red"
+        selectionBackground: "orange"
+        selectionForeground: "black"
+        fg: "white"
+        fontSize: 12
         property var commands: []
 
-        readonly property real fontSize: 12
-        readonly property real textSizeNormal: fontSize
-        readonly property real textSizeMedium: fontSize * 0.88
-        readonly property real textSizeSmall: fontSize * 0.76
         function run(command) {
             commands = commands.concat([command]);
         }

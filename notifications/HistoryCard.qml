@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Window
 import "../components"
+import "../components/CriticalColors.js" as CriticalColors
 
 Rectangle {
     id: root
@@ -12,8 +13,8 @@ Rectangle {
     property bool selected: false
     property bool critical: false
     property bool expanded: false
-    readonly property color criticalTextColor: "#ad8301"
-    readonly property color criticalBorderColor: "#af3029"
+    readonly property color criticalTextColor: CriticalColors.text
+    readonly property color criticalBorderColor: CriticalColors.border
     readonly property bool highlighted: selected || hover.hovered
     readonly property int expandedBodyLineLimit: 8
     readonly property bool expandableBody: bodyText.truncated || bodyText.text.length > 80 || expanded

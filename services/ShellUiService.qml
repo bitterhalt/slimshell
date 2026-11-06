@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../components"
 
 Item {
     id: root
@@ -15,71 +16,28 @@ Item {
     signal networkActionRequested(string action)
     signal weatherActionRequested(string action)
 
-    IpcHandler {
+    PopupIpcHandler {
         target: "weather"
-        function toggle(): void {
-            root.weatherActionRequested("toggle");
-        }
-        function open(): void {
-            root.weatherActionRequested("open");
-        }
-        function close(): void {
-            root.weatherActionRequested("close");
-        }
+        handleAction: action => root.weatherActionRequested(action)
     }
 
-    IpcHandler {
+    PopupIpcHandler {
         target: "bluetooth"
-        function toggle(): void {
-            root.bluetoothActionRequested("toggle");
-        }
-        function open(): void {
-            root.bluetoothActionRequested("open");
-        }
-        function close(): void {
-            root.bluetoothActionRequested("close");
-        }
+        handleAction: action => root.bluetoothActionRequested(action)
     }
 
-    IpcHandler {
+    PopupIpcHandler {
         target: "audio"
-        function toggle(): void {
-            root.audioActionRequested("toggle");
-        }
-        function open(): void {
-            root.audioActionRequested("open");
-        }
-        function close(): void {
-            root.audioActionRequested("close");
-        }
+        handleAction: action => root.audioActionRequested(action)
     }
 
-    IpcHandler {
+    PopupIpcHandler {
         target: "network"
-        function toggle(): void {
-            root.networkActionRequested("toggle");
-        }
-        function open(): void {
-            root.networkActionRequested("open");
-        }
-        function close(): void {
-            root.networkActionRequested("close");
-        }
+        handleAction: action => root.networkActionRequested(action)
     }
 
-    IpcHandler {
+    PopupIpcHandler {
         target: "notificationCenter"
-
-        function toggle(): void {
-            root.notificationCenterActionRequested("toggle");
-        }
-
-        function open(): void {
-            root.notificationCenterActionRequested("open");
-        }
-
-        function close(): void {
-            root.notificationCenterActionRequested("close");
-        }
+        handleAction: action => root.notificationCenterActionRequested(action)
     }
 }

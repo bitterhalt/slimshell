@@ -1,6 +1,4 @@
 import QtQuick
-import Quickshell
-import Quickshell.Wayland
 import "../../../components"
 
 Item {
@@ -14,100 +12,20 @@ Item {
     property string state: ""
     property bool toastShown: false
 
-    PopupMotion {
-        id: toastMotion
-        shown: root.toastShown
-        animationsEnabled: root.config.popupAnimations
-        animationType: "slide"
-        duration: 150
-        surfaceHeight: toast.height
-    }
-
     function show(newState): void {
         state = newState;
         toastShown = true;
         toastTimer.restart();
     }
 
-    // Small idle status popup shown next to the bar module.
-    PanelWindow {
-        id: toast
-
-        screen: root.barWindow.screen
-
-        // Anchored to the top edge only and sized to the card, so compositor
-        // effects (a niri shadow) wrap the card, not a full-width strip.
-        anchors.top: true
-
-        margins.top: root.config.popupGap
-
-        WlrLayershell.namespace: "slim-notifications"
-        WlrLayershell.layer: WlrLayer.Overlay
-
-        exclusiveZone: 0
-        implicitWidth: 160
-        implicitHeight: 62
-        visible: toastMotion.surfaceVisible
-        color: "transparent"
-        mask: Region {}
-
-        Rectangle {
-            anchors.fill: parent
-            opacity: toastMotion.contentOpacity
-            transform: Translate {
-                y: toastMotion.contentOffset
-            }
-
-            radius: root.config.popupRadius
-            color: root.config.bg
-            border.color: root.config.border
-            border.width: 1
-
-            Item {
-                id: iconBox
-
-                anchors.left: parent.left
-                anchors.leftMargin: 12
-                anchors.verticalCenter: parent.verticalCenter
-
-                width: 34
-                height: 34
-
-                Text {
-                    anchors.centerIn: parent
-                    color: root.config.selectionBackground
-                    font.family: root.config.iconFontFamily
-                    font.pointSize: root.config.iconSize
-                    text: "󱐋"
-                }
-            }
-
-            Column {
-                anchors.left: iconBox.right
-                anchors.leftMargin: 10
-                anchors.right: parent.right
-                anchors.rightMargin: 12
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 1
-
-                Text {
-                    renderType: Text.NativeRendering
-                    width: parent.width
-                    color: root.config.fg
-                    font.pointSize: root.config.textSizeNormal
-                    font.weight: Font.DemiBold
-                    elide: Text.ElideRight
-                    text: "Idle timer"
-                }
-
-                Text {
-                    renderType: Text.NativeRendering
-                    color: root.config.muted
-                    font.pointSize: root.config.textSizeSmall
-                    text: root.state
-                }
-            }
-        }
+    BarToast {
+        config: root.config
+        targetScreen: root.barWindow.screen
+        shown: root.toastShown
+        surfaceWidth: 160
+        iconText: "󱐋"
+        title: "Idle timer"
+        subtitle: root.state
     }
 
     Timer {

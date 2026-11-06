@@ -58,12 +58,9 @@ PopupWindow {
         wrapMode: Text.NoWrap
     }
 
-    Rectangle {
+    PanelSurface {
         anchors.fill: parent
-        color: root.config.bg
-        border.color: root.config.border
-        border.width: 1
-        radius: root.config.popupRadius
+        config: root.config
 
         Text {
             id: caption

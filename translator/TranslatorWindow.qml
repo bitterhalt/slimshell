@@ -240,17 +240,14 @@ PanelWindow {
         }
     }
 
-    Rectangle {
+    PanelSurface {
         anchors.fill: parent
+        config: root.config
         enabled: root.popupMotion.shown
         opacity: root.popupMotion.contentOpacity
         transform: Translate {
             y: root.popupMotion.contentOffset
         }
-        color: root.config.bg
-        border.color: root.config.border
-        border.width: 1
-        radius: root.config.popupRadius
         clip: true
 
         // Initial completion can precede compositor keyboard activation.
@@ -551,14 +548,10 @@ PanelWindow {
             anchors.bottomMargin: 1
             height: Math.max(footerActions.implicitHeight, footerStatus.implicitHeight) + root.config.panelPadding * 2
 
-            Rectangle {
+            PanelSeparator {
                 objectName: "translatorFooterSeparator"
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.leftMargin: root.config.panelPadding
-                anchors.rightMargin: root.config.panelPadding
-                height: 1
-                color: root.config.border
+                config: root.config
+                horizontalInset: root.config.panelPadding
             }
 
             Text {

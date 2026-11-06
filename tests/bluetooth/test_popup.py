@@ -1,9 +1,11 @@
 """Exercise the real Bluetooth bar/popup offscreen with inert icon integration."""
-import os
 from pathlib import Path
-import subprocess
+import sys
 import tempfile
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tests.qml_support import copy_control_config, run_qml_tests
 
 ROOT = Path(__file__).resolve().parents[2] / "bar/modules/bluetooth"
 
@@ -14,22 +16,15 @@ Item {
     id: host
     width: 500
     height: 600
-    QtObject {
+    ControlConfig {
         id: fixtureConfig
-        property color bg: "#111111"
-        property color fg: "white"
-        property color muted: "gray"
-        property color urgent: "red"
-        property color border: "#444444"
-        property color selectionBackground: "orange"
-        property color selectionForeground: "black"
-        property int popupRadius: 4
-        property string iconFontFamily: "sans-serif"
-        property real iconSize: 12
-        readonly property real fontSize: 10
-        readonly property real textSizeNormal: fontSize
-        readonly property real textSizeMedium: fontSize * 0.88
-        readonly property real textSizeSmall: fontSize * 0.76
+        bg: "#111111"
+        fg: "white"
+        muted: "gray"
+        urgent: "red"
+        selectionBackground: "orange"
+        selectionForeground: "black"
+        iconSize: 12
     }
     QtObject {
         id: fixtureAdapter
@@ -163,7 +158,7 @@ class BluetoothPopupTests(unittest.TestCase):
                                        and line != 'import "../../../components"')
                     source = 'import "."\n' + source
                 (base / name).write_text(source)
-            for name in ("PopoutPanel.qml", "PanelSurface.qml", "SelectionIndicator.qml", "ShellButton.qml", "ShellIconButton.qml"):
+            for name in ("PopoutPanel.qml", "PanelSurface.qml", "PanelSeparator.qml", "SelectionIndicator.qml", "ShellButton.qml", "ShellIconButton.qml"):
                 (base / name).write_text((ROOT.parents[2] / "components" / name).read_text())
             (base / "qmldir").write_text("singleton Quickshell 1.0 Quickshell.qml\n")
             (base / "Quickshell.qml").write_text(
@@ -172,10 +167,6 @@ class BluetoothPopupTests(unittest.TestCase):
             (base / "IconImage.qml").write_text(
                 'import QtQuick\nItem { property int implicitSize: 18; property url source: "" }'
             )
+            copy_control_config(base)
             (base / "tst_popup.qml").write_text(TEST)
-            result = subprocess.run(
-                ["/usr/lib/qt6/bin/qmltestrunner", "-input", directory, "-o", "-,txt"],
-                env={**os.environ, "QT_QPA_PLATFORM": "offscreen"},
-                capture_output=True, text=True, timeout=20,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            run_qml_tests(directory)

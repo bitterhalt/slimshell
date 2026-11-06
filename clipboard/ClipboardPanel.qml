@@ -373,15 +373,11 @@ PanelWindow {
             anchors.margins: 1
             height: Math.max(footerLabels.implicitHeight, footerHint.implicitHeight) + root.config.panelPadding * 2
 
-            Rectangle {
+            PanelSeparator {
                 objectName: "clipboardFooterSeparator"
+                config: root.config
+                horizontalInset: root.config.panelPadding
                 anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.leftMargin: root.config.panelPadding
-                anchors.rightMargin: root.config.panelPadding
-                height: 1
-                color: root.config.border
             }
 
             Row {

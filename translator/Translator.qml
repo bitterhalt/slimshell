@@ -84,16 +84,8 @@ Item {
         onLoadFailed: root.preferencesReady = true
     }
 
-    IpcHandler {
+    PopupIpcHandler {
         target: "translator"
-        function open() {
-            root.open();
-        }
-        function close() {
-            root.close();
-        }
-        function toggle() {
-            root.toggle();
-        }
+        handleAction: action => root[action]()
     }
 }

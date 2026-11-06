@@ -56,21 +56,9 @@ FocusScope {
             list.contentY = item.y + item.height - list.height;
     }
 
-    function iconSource(icon) {
-        if (!icon)
-            return "";
-        return icon.startsWith("/") || icon.startsWith("file:") ? icon : Quickshell.iconPath(icon, true);
-    }
-
     function historyIconSource(notification) {
-        const appIcon = notification ? notification.appIcon || "" : "";
-        if (appIcon)
-            return iconSource(appIcon);
-
-        const icon = HistoryModel.iconFromImage(notification ? notification.image : "");
-        if (!icon)
-            return "";
-        return icon.startsWith("/") ? icon : iconSource(icon);
+        const icon = notification ? (notification.appIcon || HistoryModel.iconFromImage(notification.image)) : "";
+        return HistoryModel.iconSource(icon, (name, fallback) => Quickshell.iconPath(name, fallback));
     }
 
     HistoryState {
@@ -81,12 +69,9 @@ FocusScope {
         onCloseRequested: root.closeRequested()
     }
 
-    Rectangle {
+    PanelSurface {
         anchors.fill: parent
-        color: root.config.bg
-        border.color: root.config.border
-        border.width: 1
-        radius: root.config.popupRadius
+        config: root.config
     }
 
     // Scrollable history; selecting a card exposes its actions inline.
@@ -159,12 +144,9 @@ FocusScope {
         anchors.margins: root.popupPadding
         height: Math.max(shortcutHint.implicitHeight, dndControls.implicitHeight) + 8
 
-        Rectangle {
-            anchors.left: parent.left
-            anchors.right: parent.right
+        PanelSeparator {
+            config: root.config
             anchors.top: parent.top
-            height: 1
-            color: root.config.border
         }
 
         Text {

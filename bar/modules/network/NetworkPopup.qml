@@ -430,12 +430,9 @@ PopoutPanel {
         height: Math.max(footerStatus.implicitHeight, scanButton.height) + root.spacing
         visible: !root.passwordMode && !root.actionMode
 
-        Rectangle {
-            anchors.left: parent.left
-            anchors.right: parent.right
+        PanelSeparator {
+            config: root.config
             anchors.top: parent.top
-            height: 1
-            color: root.config.border
         }
 
         Text {

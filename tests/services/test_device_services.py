@@ -1,10 +1,12 @@
 """Shared audio/network services tested without PipeWire or NetworkManager."""
 
-import os
 from pathlib import Path
-import subprocess
+import sys
 import tempfile
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tests.qml_support import copy_control_config, run_qml_tests
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -121,9 +123,10 @@ class DeviceServiceTests(unittest.TestCase):
                     (ROOT / "bar" / "modules" / feature / "Model.js").read_text()
                 )
             fixture = (ROOT / "tests/audio/AudioFixture.qml").read_text()
-            (base / "AudioFixture.qml").write_text(
-                fixture.replace('"../../bar/modules/audio/Model.js"', '"audioModel.js"')
-            )
+            fixture = fixture.replace('"../../bar/modules/audio/Model.js"', '"audioModel.js"')
+            fixture = fixture.replace('import "../components"', 'import "."')
+            (base / "AudioFixture.qml").write_text(fixture)
+            copy_control_config(base)
             (base / "qmldir").write_text(
                 "singleton Pipewire 1.0 Pipewire.qml\n"
                 "singleton Networking 1.0 Networking.qml\n"
@@ -154,9 +157,4 @@ QtObject {
                 "import QtQuick\nQtObject { property var objects: [] }\n"
             )
             (base / "tst_devices.qml").write_text(TEST)
-            result = subprocess.run(
-                ["/usr/lib/qt6/bin/qmltestrunner", "-input", directory, "-o", "-,txt"],
-                env={**os.environ, "QT_QPA_PLATFORM": "offscreen"},
-                capture_output=True, text=True, timeout=20,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            run_qml_tests(directory)

@@ -1,10 +1,12 @@
 """Exercise Launcher mode-routing methods without applications, helpers or IPC."""
-import os
 from pathlib import Path
 import re
-import subprocess
+import sys
 import tempfile
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tests.qml_support import run_qml_tests
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -113,9 +115,4 @@ Item {
     }
 }
 ''')
-            result = subprocess.run(
-                ["/usr/lib/qt6/bin/qmltestrunner", "-input", directory, "-o", "-,txt"],
-                env={**os.environ, "QT_QPA_PLATFORM": "offscreen"},
-                capture_output=True, text=True, timeout=20,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            run_qml_tests(directory)

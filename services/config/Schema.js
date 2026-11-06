@@ -1,5 +1,7 @@
 .pragma library
 
+.import "Value.js" as Value
+
 // QML-facing name: [JSON group, key, fallback, kind, minimum, maximum].
 const fields = {
     fontScale: ["appearance", "fontScale", 1, "number", 0.5, 3],
@@ -20,10 +22,6 @@ const fields = {
     bluetoothBatteryWarningPercent: ["bluetooth", "batteryWarningPercent", 20, "integer", 0, 100],
     bluetoothBatteryCriticalPercent: ["bluetooth", "batteryCriticalPercent", 10, "integer", 0, 100],
     bluetoothBatteryRearmMargin: ["bluetooth", "batteryRearmMargin", 5, "integer", 0, 100]
-}
-
-function object(value) {
-    return value !== null && typeof value === "object" && !Array.isArray(value)
 }
 
 function defaults() {
@@ -50,7 +48,7 @@ function valid(value, field) {
 
 function parse(text) {
     const document = JSON.parse(text)
-    if (!object(document))
+    if (!Value.isObject(document))
         throw new Error("Expected an object")
     const values = defaults()
     const warnings = new Set()
@@ -64,7 +62,7 @@ function parse(text) {
     for (const group of Object.keys(document)) {
         if (!Object.prototype.hasOwnProperty.call(groups, group)) {
             warnings.add(group + " (unknown)")
-        } else if (object(document[group])) {
+        } else if (Value.isObject(document[group])) {
             for (const key of Object.keys(document[group])) {
                 if (!groups[group].has(key))
                     warnings.add(group + "." + key + " (unknown)")
@@ -76,7 +74,7 @@ function parse(text) {
         const section = document[field[0]]
         if (section === undefined)
             continue
-        if (!object(section)) {
+        if (!Value.isObject(section)) {
             warnings.add(field[0])
             continue
         }

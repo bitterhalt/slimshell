@@ -2,8 +2,6 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import Quickshell.Wayland
-import Quickshell.Widgets
 import "../../../components"
 
 Item {
@@ -17,21 +15,8 @@ Item {
     property string deviceIcon: ""
     property string statusText: "Connected"
     property bool batteryAlert: false
-    // Match critical notification cards, regardless of the current theme.
-    readonly property color criticalBorderColor: "#af3029"
-    readonly property color criticalTextColor: "#ad8301"
     property var batteryQueue: []
     property bool toastShown: false
-
-    PopupMotion {
-        id: toastMotion
-        shown: root.toastShown
-        animationsEnabled: root.config.popupAnimations
-        animationType: "slide"
-        duration: 150
-        surfaceHeight: toast.height
-        onClosed: root.batteryAlert = false
-    }
 
     function deviceLabel(device) {
         if (!device)
@@ -98,92 +83,17 @@ Item {
         }
     }
 
-    // Short-lived connection or battery alert card beside the bar.
-    PanelWindow {
-        id: toast
-
-        screen: root.targetScreen
-        margins.top: root.config.popupGap
-        WlrLayershell.namespace: "slim-notifications"
-        WlrLayershell.layer: WlrLayer.Overlay
-        exclusiveZone: 0
-        implicitWidth: root.batteryAlert ? 200 : 200
-        implicitHeight: 62
-        visible: toastMotion.surfaceVisible
-        color: "transparent"
-
-        // Anchored to the top edge only and sized to the card, so compositor
-        // effects (a niri shadow) wrap the card, not a full-width strip.
-        anchors.top: true
-
-        Rectangle {
-            anchors.fill: parent
-            opacity: toastMotion.contentOpacity
-            transform: Translate {
-                y: toastMotion.contentOffset
-            }
-            radius: root.config.popupRadius
-            color: root.batteryAlert ? root.config.bg : root.config.bg
-            border.color: root.batteryAlert ? root.criticalBorderColor : root.config.border
-            border.width: 1
-
-            Item {
-                id: iconBox
-
-                anchors.left: parent.left
-                anchors.leftMargin: 12
-                anchors.verticalCenter: parent.verticalCenter
-                width: 34
-                height: 34
-
-                IconImage {
-                    id: imageIcon
-
-                    anchors.centerIn: parent
-                    implicitSize: 26
-                    source: root.deviceIcon ? Quickshell.iconPath(root.deviceIcon) : ""
-                    visible: !root.batteryAlert && source.toString() !== ""
-                }
-
-                Text {
-                    anchors.centerIn: parent
-                    visible: !imageIcon.visible
-                    color: root.batteryAlert ? root.criticalTextColor : root.config.selectionBackground
-                    font.family: root.config.iconFontFamily
-                    font.pointSize: root.config.iconSize
-                    text: root.batteryAlert ? "󰀧" : "󰂯"
-                }
-            }
-
-            Column {
-                anchors.left: iconBox.right
-                anchors.leftMargin: 10
-                anchors.right: parent.right
-                anchors.rightMargin: 12
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 1
-
-                Text {
-
-                    renderType: Text.NativeRendering
-                    width: parent.width
-                    color: root.batteryAlert ? root.criticalTextColor : root.config.fg
-                    font.pointSize: root.config.textSizeNormal
-                    font.weight: Font.DemiBold
-                    elide: Text.ElideRight
-                    text: root.deviceName
-                }
-
-                Text {
-                    renderType: Text.NativeRendering
-                    color: root.batteryAlert ? root.criticalTextColor : root.config.muted
-                    font.pointSize: root.config.textSizeSmall
-                    text: root.statusText
-                }
-            }
-        }
-
-        mask: Region {}
+    BarToast {
+        config: root.config
+        targetScreen: root.targetScreen
+        shown: root.toastShown
+        surfaceWidth: 200
+        iconSource: root.deviceIcon ? Quickshell.iconPath(root.deviceIcon) : ""
+        iconText: root.batteryAlert ? "󰀧" : "󰂯"
+        title: root.deviceName
+        subtitle: root.statusText
+        critical: root.batteryAlert
+        onClosed: root.batteryAlert = false
     }
 
     Timer {

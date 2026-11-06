@@ -141,16 +141,15 @@ Item {
         }
     }
 
-    IpcHandler {
+    PopupIpcHandler {
         target: "wallpaper"
-        function open() {
-            root.open(root.targetScreen);
-        }
-        function close() {
-            root.close();
-        }
-        function toggle() {
-            root.toggle();
+        handleAction: action => {
+            if (action === "open")
+                root.open(root.targetScreen);
+            else if (action === "toggle")
+                root.toggle(root.targetScreen);
+            else
+                root.close();
         }
     }
 }

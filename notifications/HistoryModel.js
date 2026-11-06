@@ -5,6 +5,13 @@ function iconFromImage(image) {
     return image.startsWith("image://icon/") ? image.substring(13) : ""
 }
 
+function iconSource(icon, resolveIcon) {
+    icon = String(icon || "")
+    if (!icon)
+        return ""
+    return icon.startsWith("/") || icon.startsWith("file:") ? icon : resolveIcon(icon, true)
+}
+
 function actionLabel(action) {
     return action.text || (action.identifier === "default" ? "Open" : "Action")
 }

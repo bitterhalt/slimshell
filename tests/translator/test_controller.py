@@ -1,10 +1,12 @@
 """Test real lazy-loader/motion wiring without creating a translator surface."""
 
-import os
 from pathlib import Path
-import subprocess
+import sys
 import tempfile
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tests.qml_support import run_qml_tests
 
 
 ROOT = Path(__file__).resolve().parents[2] / "translator"
@@ -25,6 +27,10 @@ class TranslatorControllerTests(unittest.TestCase):
             )
             (base / "PopupMotion.qml").write_text(
                 (ROOT.parent / "components/PopupMotion.qml").read_text()
+            )
+            (base / "PopupIpcHandler.qml").write_text(
+                (ROOT.parent / "components/PopupIpcHandler.qml").read_text()
+                .replace("import Quickshell.Io", 'import "."')
             )
             (base / "LazyLoader.qml").write_text('''import QtQuick
 Item {
@@ -111,9 +117,4 @@ Item {
     }
 }
 ''')
-            result = subprocess.run(
-                ["/usr/lib/qt6/bin/qmltestrunner", "-input", directory, "-o", "-,txt"],
-                env={**os.environ, "QT_QPA_PLATFORM": "offscreen"},
-                capture_output=True, text=True, timeout=20,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            run_qml_tests(directory)

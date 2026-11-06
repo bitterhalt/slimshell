@@ -1,26 +1,14 @@
 import QtQuick
+import "../components"
 import "../../bar/modules/audio/Model.js" as Model
 
 // Fake PipeWire state for offline tests. No service imports or desktop writes.
 Item {
     id: root
-    property QtObject config: QtObject {
-        property color bg: "#101010"
-        property color fg: "#eeeeee"
-        property color muted: "#888888"
-        property color selectionBackground: "#6699cc"
-        readonly property color border: Qt.alpha(selectionBackground, 0.45)
-        property color selectionForeground: "#ffffff"
+    property QtObject config: ControlConfig {
+        border: Qt.alpha(selectionBackground, 0.45)
+        urgent: "#cc3333"
         property real maxVolume: 1.1
-        property color urgent: "#cc3333"
-        property string iconFontFamily: "sans-serif"
-        property real iconSize: 10
-        property int popupGap: 16
-        property int popupRadius: 4
-        readonly property real fontSize: 10
-        readonly property real textSizeNormal: fontSize
-        readonly property real textSizeMedium: fontSize * 0.88
-        readonly property real textSizeSmall: fontSize * 0.76
     }
     property var barWindow: ({
             screen: {

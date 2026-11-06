@@ -1,9 +1,11 @@
 """Exercise tooltip styling/timing with an offscreen Window, never a layer surface."""
-import os
 from pathlib import Path
-import subprocess
+import sys
 import tempfile
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tests.qml_support import copy_control_config, run_qml_tests
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -14,6 +16,8 @@ class ToolTipTests(unittest.TestCase):
             base = Path(directory)
             source = (ROOT / "components/ShellToolTip.qml").read_text()
             (base / "ShellToolTip.qml").write_text(source.replace("import Quickshell", 'import "."'))
+            (base / "PanelSurface.qml").write_text((ROOT / "components/PanelSurface.qml").read_text())
+            copy_control_config(base)
             (base / "PopupWindow.qml").write_text('''import QtQuick
 import QtQuick.Window
 Window {
@@ -51,17 +55,11 @@ Item {
     width: 500
     height: 500
     Item { id: fixtureAnchor; width: 28; height: 26 }
-    QtObject {
+    ControlConfig {
         id: fixtureConfig
-        property color bg: "#111111"
-        property color fg: "#dddddd"
-        property color border: "#665544"
-        property int popupRadius: 4
-        property string textFontFamily: "sans-serif"
-        readonly property real fontSize: 10
-        readonly property real textSizeNormal: fontSize
-        readonly property real textSizeMedium: fontSize * 0.88
-        readonly property real textSizeSmall: fontSize * 0.76
+        bg: "#111111"
+        fg: "#dddddd"
+        border: "#665544"
     }
     Component {
         id: tooltipComponent
@@ -128,9 +126,4 @@ Item {
     }
 }
 ''')
-            result = subprocess.run(
-                ["/usr/lib/qt6/bin/qmltestrunner", "-input", directory, "-o", "-,txt"],
-                env={**os.environ, "QT_QPA_PLATFORM": "offscreen"},
-                capture_output=True, text=True, timeout=20,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            run_qml_tests(directory)

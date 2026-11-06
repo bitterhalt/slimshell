@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Widgets
+import "../../../components"
 
 Item {
     id: root
@@ -41,13 +42,9 @@ Item {
         menu: root.currentMenu
     }
 
-    Rectangle {
+    PanelSurface {
         anchors.fill: parent
-
-        color: root.config.bg
-        border.color: root.config.border
-        border.width: 1
-        radius: root.config.popupRadius
+        config: root.config
 
         Column {
             id: menuColumn
@@ -115,15 +112,10 @@ Item {
             width: menuColumn.width
             height: 9
 
-            Rectangle {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.leftMargin: 6
-                anchors.rightMargin: 6
+            PanelSeparator {
+                config: root.config
+                horizontalInset: 6
                 anchors.verticalCenter: parent.verticalCenter
-
-                height: 1
-                color: root.config.border
             }
         }
     }

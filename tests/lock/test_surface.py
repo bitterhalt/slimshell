@@ -1,10 +1,12 @@
 """Test lock-screen feedback with an inert context; never start PAM or lock."""
-import os
 from pathlib import Path
 import re
-import subprocess
+import sys
 import tempfile
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tests.qml_support import copy_control_config, run_qml_tests
 
 ROOT = Path(__file__).resolve().parents[2] / "lock"
 
@@ -15,15 +17,11 @@ Item {
     id: host
     width: 800
     height: 700
-    QtObject {
+    ControlConfig {
         id: fixtureConfig
-        property color bg: "#111111"
-        property color fg: "#eeeeee"
-        property color muted: "#888888"
-        property color urgent: "#ff4444"
-        property color selectionBackground: "#6699cc"
-        property color border: "#446688"
-        property color selectionForeground: "white"
+        bg: "#111111"
+        border: "#446688"
+        urgent: "#ff4444"
     }
     QtObject {
         id: auth
@@ -222,10 +220,6 @@ QtObject {
     property date date: new Date(2026, 10, 2)
 }
 ''')
+            copy_control_config(base)
             (base / "tst_surface.qml").write_text(TEST)
-            result = subprocess.run(
-                ["/usr/lib/qt6/bin/qmltestrunner", "-input", directory, "-o", "-,txt"],
-                env={**os.environ, "QT_QPA_PLATFORM": "offscreen"},
-                capture_output=True, text=True, timeout=20,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            run_qml_tests(directory)

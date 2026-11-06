@@ -1,3 +1,4 @@
+import "../components/CriticalColors.js" as CriticalColors
 import "HistoryModel.js" as HistoryModel
 import QtQuick
 import Quickshell
@@ -14,15 +15,8 @@ Rectangle {
     readonly property string imageIcon: HistoryModel.iconFromImage(notification ? notification.image : "")
     readonly property bool critical: notification && notification.urgency === NotificationUrgency.Critical
     readonly property bool timerNotification: notification && notification.appName === "QuickShell Timer"
-    readonly property color criticalBorderColor: "#af3029"
-    readonly property color criticalTextColor: "#ad8301"
-
-    function iconSource(icon) {
-        if (!icon)
-            return "";
-
-        return icon.startsWith("/") || icon.startsWith("file:") ? icon : Quickshell.iconPath(icon, true);
-    }
+    readonly property color criticalBorderColor: CriticalColors.border
+    readonly property color criticalTextColor: CriticalColors.text
 
     implicitHeight: 100
     clip: true
@@ -46,7 +40,7 @@ Rectangle {
 
             anchors.fill: parent
             visible: !root.critical && !root.timerNotification && source.toString() !== ""
-            source: root.iconSource(root.notification ? (root.notification.appIcon || root.imageIcon) : "")
+            source: HistoryModel.iconSource(root.notification ? (root.notification.appIcon || root.imageIcon) : "", (name, fallback) => Quickshell.iconPath(name, fallback))
         }
 
         Text {

@@ -13,8 +13,13 @@ Item {
 
     visible: false
     onConnectedChanged: {
-        if (!connected)
+        // Do not check while disconnecting: `ready` may still hold its previous
+        // value, which would mark the watcher notified again and swallow the
+        // next reconnect.
+        if (!connected) {
             notified = false;
+            return;
+        }
         checkConnection();
     }
     onReadyChanged: checkConnection()

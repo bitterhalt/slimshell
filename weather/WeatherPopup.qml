@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import "../components"
 
 FocusScope {
     id: root
@@ -38,11 +39,9 @@ FocusScope {
         }
     }
 
-    Rectangle {
+    PanelSurface {
         anchors.fill: parent
-        color: root.config.bg
-        border.color: root.config.border
-        radius: root.config.popupRadius
+        config: root.config
     }
 
     ColumnLayout {

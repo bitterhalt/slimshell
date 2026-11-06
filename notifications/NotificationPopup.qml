@@ -277,17 +277,15 @@ Scope {
             }
         }
 
-        Rectangle {
+        PanelSurface {
             anchors.fill: parent
+            config: root.config
             enabled: chipMotion.shown
             opacity: chipMotion.contentOpacity
             transform: Translate {
                 y: chipMotion.contentOffset
             }
-            radius: root.config.popupRadius
-            color: root.config.bg
             border.color: root.config.selectionBackground
-            border.width: 1
 
             Text {
                 renderType: Text.NativeRendering

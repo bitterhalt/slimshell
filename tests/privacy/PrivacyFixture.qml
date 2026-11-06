@@ -1,5 +1,6 @@
 import QtQuick
 import QtTest
+import "../components"
 import "Model.js" as Model
 import "."
 
@@ -7,14 +8,12 @@ Item {
     id: host
     width: 400
     height: 100
-    QtObject {
+    ControlConfig {
         id: fixtureConfig
-        property color fg: "#dddddd"
-        property color selectionBackground: "#aa7755"
-        property color selectionForeground: "#111111"
-        property string iconFontFamily: "sans-serif"
-        property int iconSize: 12
-        property int popupRadius: 4
+        fg: "#dddddd"
+        selectionBackground: "#aa7755"
+        selectionForeground: "#111111"
+        iconSize: 12
     }
     QtObject {
         id: fixtureBar
