@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Window
 import "../components"
 import "../components/CriticalColors.js" as CriticalColors
+import "HistoryModel.js" as HistoryModel
 
 Rectangle {
     id: root
@@ -17,7 +18,7 @@ Rectangle {
     readonly property color criticalBorderColor: CriticalColors.border
     readonly property bool highlighted: selected || hover.hovered
     readonly property int expandedBodyLineLimit: 8
-    readonly property bool expandableBody: bodyText.truncated || bodyText.text.length > 80 || expanded
+    readonly property bool expandableBody: bodyText.truncated || bodyText.text.length > 80 || actionEntries.length > 0 || expanded
     property string timeLabel: ""
     property string appIconSource: ""
     property var actionEntries: []
@@ -26,7 +27,8 @@ Rectangle {
     signal expandRequested
     signal actionRequested(var entry)
 
-    implicitHeight: Math.max(46, content.implicitHeight) + 20
+    readonly property real collapsedHeight: HistoryModel.collapsedCardHeight(config)
+    implicitHeight: expanded ? Math.max(collapsedHeight, content.implicitHeight + 20) : collapsedHeight
     radius: config.popupRadius
     border.width: 1
     border.color: root.critical ? root.criticalBorderColor : root.config.border
@@ -92,7 +94,7 @@ Rectangle {
         x: 16
         y: 10
         width: Math.max(0, imageBox.x - x - 12)
-        spacing: 4
+        spacing: root.config.spacingTight
 
         // Summary and timestamp share the first line, followed by the message body.
         Item {
@@ -150,18 +152,24 @@ Rectangle {
             color: root.critical ? root.criticalTextColor : root.highlighted ? root.config.fg : root.config.muted
             font.pointSize: root.config.textSizeMedium
             wrapMode: Text.Wrap
-            maximumLineCount: root.expanded ? root.expandedBodyLineLimit : 3
+            maximumLineCount: root.expanded ? root.expandedBodyLineLimit : 1
             elide: root.expanded ? Text.ElideNone : Text.ElideRight
         }
 
-        // Selected notification actions appear below the message.
+        Item {
+            width: parent.width
+            height: Math.max(1, root.config.textSizeMedium * 1.35)
+            visible: !root.expanded && bodyText.text.length === 0
+        }
+
+        // Actions are revealed with the expanded message, not on selection.
         Flow {
             id: actions
             width: parent.width
             spacing: 6
-            visible: root.selected
+            visible: root.expanded
             Repeater {
-                model: root.selected ? root.actionEntries : []
+                model: root.selected && root.expanded ? root.actionEntries : []
                 delegate: Rectangle {
                     id: actionButton
                     required property var modelData

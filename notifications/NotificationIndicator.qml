@@ -50,6 +50,8 @@ Item {
         NotificationCenter {
             config: root.config
             notificationService: root.notificationService
+            availableWidth: root.barWindow.screen ? root.barWindow.screen.width : 0
+            availableHeight: root.barWindow.screen ? root.barWindow.screen.height : 0
             onCloseRequested: root.popupManager.closeHost("notificationCenter")
             Component.onCompleted: root.notificationService.historyOpenCount += 1
             Component.onDestruction: root.notificationService.historyOpenCount -= 1

@@ -298,9 +298,46 @@ Item {
             waitForPolish(host.Window.window);
             compare(findText(card, note.summary).color, config.fg);
             compare(findText(card, "12:34").color, config.fg);
-            verify(findText(card, "[o] Open") !== null);
+            compare(findText(card, "[o] Open"), null);
             compare(findText(card, "[c] Close"), null);
+            compare(card.implicitHeight, unselectedHeight);
+            card.expanded = true;
+            waitForPolish(host.Window.window);
+            verify(findText(card, "[o] Open") !== null);
             verify(card.implicitHeight > unselectedHeight);
+        }
+
+        function test_collapsed_cards_share_a_compact_height() {
+            const withBody = notification(1);
+            withBody.body = "A longer body that should still be clipped to one line in the collapsed card.";
+            card = createTemporaryObject(cardComponent, host, {
+                width: 340,
+                config: config,
+                notification: withBody
+            });
+            verify(card !== null);
+            waitForPolish(host.Window.window);
+            const sharedHeight = card.implicitHeight;
+            verify(sharedHeight < 70);
+            verify(findChild(card, "historyBodyText").truncated);
+
+            card.destroy();
+            card = null;
+            card = createTemporaryObject(cardComponent, host, {
+                width: 340,
+                config: config,
+                notification: notification(2)
+            });
+            waitForPolish(host.Window.window);
+            compare(card.implicitHeight, sharedHeight);
+        }
+
+        function test_history_height_grows_with_rows_and_is_capped() {
+            const emptyHeight = Model.historyWindowHeight(config, 0, 24, 10, 4, 500);
+            const populatedHeight = Model.historyWindowHeight(config, 4, 24, 10, 4, 500);
+            compare(emptyHeight, 140);
+            verify(populatedHeight > emptyHeight);
+            compare(Model.historyWindowHeight(config, 100, 24, 10, 4, 300), 300);
         }
 
         function test_icon_sources_use_the_shared_resolver() {
@@ -411,6 +448,7 @@ Item {
             for (const label of ["12:34", note.summary, note.body])
                 compare(findText(card, label).color, card.criticalTextColor);
             card.selected = true;
+            card.expanded = true;
             waitForPolish(host.Window.window);
             compare(card.border.color, card.criticalBorderColor);
             compare(findText(card, "[o] Open").color, card.criticalTextColor);
@@ -522,6 +560,7 @@ Item {
                 "width": 340,
                 "config": config,
                 "selected": true,
+                "expanded": true,
                 "notification": note,
                 "actionEntries": Model.actionsFor(note.actions)
             });

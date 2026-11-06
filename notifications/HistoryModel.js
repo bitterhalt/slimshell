@@ -12,6 +12,20 @@ function iconSource(icon, resolveIcon) {
     return icon.startsWith("/") || icon.startsWith("file:") ? icon : resolveIcon(icon, true)
 }
 
+function collapsedCardHeight(config) {
+    // One summary line, one reserved body-preview line, compact spacing and
+    // padding. Keep this shared with NotificationCenter's size estimate.
+    return Math.max(56, Number(config.fontSize || 14) * 3.2 + 22)
+}
+
+function historyWindowHeight(config, count, footerHeight, padding, spacing, maxHeight) {
+    const rows = Math.max(0, Number(count) || 0)
+    const cardSpacing = Math.max(0, rows - 1) * spacing
+    const contentHeight = padding * 2 + 8 + footerHeight
+        + rows * collapsedCardHeight(config) + cardSpacing
+    return Math.min(maxHeight, Math.max(Math.min(140, maxHeight), contentHeight))
+}
+
 function actionLabel(action) {
     return action.text || (action.identifier === "default" ? "Open" : "Action")
 }
