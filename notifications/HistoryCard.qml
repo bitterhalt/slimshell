@@ -166,7 +166,7 @@ Rectangle {
         Flow {
             id: actions
             width: parent.width
-            spacing: root.config.spacingTight
+            spacing: 6
             visible: root.expanded
             Repeater {
                 model: root.selected && root.expanded ? root.actionEntries : []
@@ -174,14 +174,14 @@ Rectangle {
                     id: actionButton
                     required property var modelData
                     objectName: "historyAction-" + modelData.key
-                    width: Math.min(actions.width, caption.implicitWidth + root.config.spacingControl * 2)
-                    height: Math.max(26, caption.implicitHeight + root.config.spacingControl * 2)
+                    width: Math.min(actions.width, caption.implicitWidth + 16)
+                    height: 26
                     radius: 4
                     color: actionMouse.containsMouse ? root.config.selectionBackground : root.critical ? root.config.bg : Qt.alpha(root.config.selectionBackground, 0.12)
                     Text {
                         id: caption
                         anchors.centerIn: parent
-                        width: Math.max(0, parent.width - root.config.spacingControl * 2)
+                        width: Math.max(0, parent.width - 16)
                         renderType: Text.NativeRendering
                         textFormat: Text.PlainText
                         text: (actionButton.modelData.key ? "[" + actionButton.modelData.key + "] " : "") + actionButton.modelData.label
