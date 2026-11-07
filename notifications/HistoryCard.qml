@@ -83,9 +83,9 @@ Rectangle {
         Text {
             anchors.centerIn: parent
             visible: !thumbnail.visible
-            text: root.critical ? "󰀧" : root.timerNotification ? "⏰" : "󰂚"
+            text: root.critical ? "󰀧" : root.timerNotification ? "󱎫" : "󰂚"
             color: root.critical ? root.criticalBorderColor : root.timerNotification ? root.config.selectionBackground : root.highlighted ? root.config.fg : root.config.muted
-            font.family: root.timerNotification && !root.critical ? root.config.textFontFamily : root.config.iconFontFamily
+            font.family: root.config.iconFontFamily
             font.pointSize: root.config.iconSize
         }
     }

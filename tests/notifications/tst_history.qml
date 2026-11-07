@@ -388,10 +388,11 @@ Item {
                 notification: note,
                 appIconSource: "camera"
             });
-            const icon = findText(card, "⏰");
+            const icon = findText(card, "󱎫");
             verify(card.timerNotification);
             verify(icon !== null);
-            compare(icon.font.family, config.textFontFamily);
+            compare(icon.font.family, config.iconFontFamily);
+            compare(icon.font.pointSize, config.iconSize * 1.5);
             compare(icon.color, config.selectionBackground);
             compare(findChild(card, "historyAppIcon").source.toString(), "");
         }

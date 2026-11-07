@@ -459,7 +459,7 @@ Item {
         const readyAt = new Date(timer.endAt);
         const hours = String(readyAt.getHours()).padStart(2, "0");
         const minutes = String(readyAt.getMinutes()).padStart(2, "0");
-        return (timer.note || "Timer") + " Ready: " + hours + ":" + minutes;
+        return (timer.note || "Timer") + " -> " + hours + ":" + minutes;
     }
 
     function applicationRank(id): int {
