@@ -36,7 +36,6 @@ Item {
     property bool opened: false
     property bool quitOnClose: false
     property int selectedIndex: 0
-    property double timerClock: 0
     property int prunes: 0
     property alias input: searchInput
     readonly property bool dmenuMode: mode === "dmenu"

@@ -9,6 +9,8 @@ Item {
     property var pendingTimer: null
     readonly property string timersPath: (Quickshell.env("HOME") || "") + "/.cache/quickshell-timers.json"
 
+    onTimersChanged: schedulePrune()
+
     function persist() {
         timersFile.setText(JSON.stringify(timers));
     }
@@ -20,7 +22,26 @@ Item {
         if (remaining.length !== timers.length) {
             timers = remaining;
             persist();
+        } else
+            schedulePrune();
+    }
+
+    function schedulePrune() {
+        pruneTimer.stop();
+        if (timers.length === 0)
+            return;
+
+        let nextEndAt = Number.POSITIVE_INFINITY;
+        for (const timer of timers) {
+            const endAt = Number(timer.endAt);
+            if (Number.isFinite(endAt))
+                nextEndAt = Math.min(nextEndAt, endAt);
         }
+        if (!Number.isFinite(nextEndAt))
+            return;
+
+        pruneTimer.interval = Math.max(1, Math.min(2147483647, Math.ceil(nextEndAt - Date.now())));
+        pruneTimer.start();
     }
 
     function startTimer(seconds, note) {
@@ -47,6 +68,12 @@ Item {
     }
 
     visible: false
+
+    Timer {
+        id: pruneTimer
+        repeat: false
+        onTriggered: root.pruneExpired(Date.now())
+    }
 
     Process {
         id: startProcess

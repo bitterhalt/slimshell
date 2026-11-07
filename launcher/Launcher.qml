@@ -35,7 +35,6 @@ Item {
     // Result file awaited by the caller; empty when no request is pending.
     property string dmenuOutPath: ""
     readonly property string dmenuSessionId: Date.now().toString() + "-" + Math.random().toString()
-    property double timerClock: Date.now()
 
     // App IDs only, newest first; separate from binary run history.
     property var appHistory: []
@@ -312,8 +311,7 @@ Item {
         selectedIndex = 0;
 
         if (timerMode) {
-            timerClock = Date.now();
-            timerService.pruneExpired(timerClock);
+            timerService.pruneExpired(Date.now());
         }
 
         searchInput.forceActiveFocus();
@@ -375,10 +373,8 @@ Item {
         } else if (item.type === "timer-start") {
             timerService.startTimer(item.seconds, item.note);
             searchInput.text = "";
-            timerClock = Date.now();
         } else if (item.type === "timer-active") {
             timerService.cancelTimer(item.unit);
-            timerClock = Date.now();
         } else if (item.type === "application") {
             item.entry.execute();
             recordApplication(item.entry.id);
@@ -759,16 +755,6 @@ Item {
                 font.pointSize: root.config.textSizeMedium
                 text: root.dmenuMode ? "No matches" : root.calcPrefix ? (root.calcExpression === "" ? "Type an expression" : calculator.busy ? "Calculating…" : "Can't evaluate expression") : root.runMode ? (runState.loading ? "Loading binaries…" : "No binaries found") : root.timerMode ? (root.query.trim() === "" ? "No active timers" : "Try 25m, 45s, 1:30, or 2h Focus") : root.emojiMode ? "No emoji found" : root.fileMode && root.fileNeedle.length < 2 ? "Type at least two characters after /" : root.fileMode && root.fileSearching ? "Searching…" : root.fileMode ? "No files found" : "No applications found"
             }
-        }
-    }
-
-    Timer {
-        interval: 1000
-        repeat: true
-        running: root.opened && root.timerMode
-        onTriggered: {
-            root.timerClock = Date.now();
-            root.timerService.pruneExpired(root.timerClock);
         }
     }
 
