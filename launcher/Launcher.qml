@@ -136,8 +136,7 @@ Item {
 
         return timerService.timers.slice().sort((a, b) => a.endAt - b.endAt).map(timer => ({
                     type: "timer-active",
-                    text: timer.note || "Timer",
-                    endAt: timer.endAt,
+                    text: activeTimerLabel(timer, Date.now()),
                     icon: "󰔛",
                     unit: timer.unit
                 }));
@@ -458,6 +457,11 @@ Item {
         }
 
         return seconds + "s";
+    }
+
+    function activeTimerLabel(timer, now): string {
+        const remainingSeconds = Math.max(0, Math.ceil((timer.endAt - now) / 1000));
+        return (timer.note || "Timer") + " · " + formatDuration(remainingSeconds);
     }
 
     function applicationRank(id): int {

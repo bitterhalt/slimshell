@@ -16,7 +16,7 @@ class LauncherModeTests(unittest.TestCase):
         source = (ROOT / "launcher/Launcher.qml").read_text()
         methods = []
         for name in ("reset", "close", "finalizeClose", "cancelDmenu", "openApplications",
-                     "toggleApplications", "setMode", "toggleMode"):
+                     "toggleApplications", "setMode", "toggleMode", "formatDuration", "activeTimerLabel"):
             match = re.search(r"^    function " + name + r"\([^\n]*\{.*?^    }", source, re.M | re.S)
             self.assertIsNotNone(match, name)
             methods.append(match.group())
@@ -111,6 +111,11 @@ Item {
             controller.toggleApplications();
             compare(controller.mode, "apps");
             verify(controller.opened);
+        }
+        function test_active_timer_label_uses_static_remaining_time() {
+            const controller = createTemporaryObject(controllerComponent, host);
+            compare(controller.activeTimerLabel({note: "Focus", endAt: 121000}, 1000), "Focus · 2m");
+            compare(controller.activeTimerLabel({note: "", endAt: 31000}, 1000), "Timer · 30s");
         }
     }
 }
