@@ -335,8 +335,10 @@ Item {
 
         function test_history_height_grows_with_rows_and_is_capped() {
             const emptyHeight = Model.historyWindowHeight(config, 0, 24, 10, 4, 500);
+            const oneRowHeight = Model.historyWindowHeight(config, 1, 24, 10, 4, 500);
             const populatedHeight = Model.historyWindowHeight(config, 4, 24, 10, 4, 500);
             compare(emptyHeight, 140);
+            compare(oneRowHeight, 10 * 2 + 8 + 24 + Model.collapsedCardHeight(config) + 120);
             verify(populatedHeight > emptyHeight);
             compare(Model.historyWindowHeight(config, 100, 24, 10, 4, 300), 300);
         }
