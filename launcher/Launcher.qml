@@ -461,7 +461,7 @@ Item {
 
     function activeTimerLabel(timer, now): string {
         const remainingSeconds = Math.max(0, Math.ceil((timer.endAt - now) / 1000));
-        return (timer.note || "Timer") + " · " + formatDuration(remainingSeconds);
+        return (timer.note || "Timer") + " Ready: " + formatDuration(remainingSeconds);
     }
 
     function applicationRank(id): int {

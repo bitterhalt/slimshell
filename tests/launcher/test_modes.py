@@ -114,8 +114,8 @@ Item {
         }
         function test_active_timer_label_uses_static_remaining_time() {
             const controller = createTemporaryObject(controllerComponent, host);
-            compare(controller.activeTimerLabel({note: "Focus", endAt: 121000}, 1000), "Focus · 2m");
-            compare(controller.activeTimerLabel({note: "", endAt: 31000}, 1000), "Timer · 30s");
+            compare(controller.activeTimerLabel({note: "Focus", endAt: 121000}, 1000), "Focus Ready: 2m");
+            compare(controller.activeTimerLabel({note: "", endAt: 31000}, 1000), "Timer Ready: 30s");
         }
     }
 }
