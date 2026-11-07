@@ -136,7 +136,7 @@ Item {
 
         return timerService.timers.slice().sort((a, b) => a.endAt - b.endAt).map(timer => ({
                     type: "timer-active",
-                    text: activeTimerLabel(timer, Date.now()),
+                    text: activeTimerLabel(timer),
                     icon: "󰔛",
                     unit: timer.unit
                 }));
@@ -459,9 +459,11 @@ Item {
         return seconds + "s";
     }
 
-    function activeTimerLabel(timer, now): string {
-        const remainingSeconds = Math.max(0, Math.ceil((timer.endAt - now) / 1000));
-        return (timer.note || "Timer") + " Ready: " + formatDuration(remainingSeconds);
+    function activeTimerLabel(timer): string {
+        const readyAt = new Date(timer.endAt);
+        const hours = String(readyAt.getHours()).padStart(2, "0");
+        const minutes = String(readyAt.getMinutes()).padStart(2, "0");
+        return (timer.note || "Timer") + " Ready: " + hours + ":" + minutes;
     }
 
     function applicationRank(id): int {

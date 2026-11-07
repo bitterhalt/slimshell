@@ -112,10 +112,12 @@ Item {
             compare(controller.mode, "apps");
             verify(controller.opened);
         }
-        function test_active_timer_label_uses_static_remaining_time() {
+        function test_active_timer_label_uses_static_ready_time() {
             const controller = createTemporaryObject(controllerComponent, host);
-            compare(controller.activeTimerLabel({note: "Focus", endAt: 121000}, 1000), "Focus Ready: 2m");
-            compare(controller.activeTimerLabel({note: "", endAt: 31000}, 1000), "Timer Ready: 30s");
+            const readyAt = new Date(0);
+            readyAt.setHours(7, 5, 0, 0);
+            compare(controller.activeTimerLabel({note: "Focus", endAt: readyAt.getTime()}), "Focus Ready: 07:05");
+            compare(controller.activeTimerLabel({note: "", endAt: readyAt.getTime()}), "Timer Ready: 07:05");
         }
     }
 }
