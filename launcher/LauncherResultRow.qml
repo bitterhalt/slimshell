@@ -53,23 +53,12 @@ Item {
             renderType: Text.NativeRendering
             width: parent.width
             color: root.selected ? root.config.selectionForeground : root.config.fg
-            font.pointSize: root.config.textSizeMedium
+            font.pointSize: root.config.textSizeNormal
             font.family: root.config.textFontFamily
-            font.weight: Font.Medium
             elide: Text.ElideRight
             textFormat: root.entry.type === "dmenu" ? Text.RichText : Text.AutoText
             text: root.entry.type === "dmenu" ? Dmenu.richTextWithSymbols(root.entry.text, root.config.iconFontFamily) : root.entry.text
         }
 
-        Text {
-            objectName: "launcherResultSubtitle"
-            renderType: Text.NativeRendering
-            width: parent.width
-            visible: root.entry.type === "timer-active" || (root.entry.subtitle || "") !== ""
-            color: root.selected ? root.config.selectionForeground : root.config.muted
-            font.pointSize: root.config.textSizeSmall
-            elide: Text.ElideRight
-            text: root.entry.type === "timer-active" ? root.remainingText : root.entry.subtitle || ""
-        }
     }
 }
