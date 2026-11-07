@@ -48,7 +48,7 @@ Rectangle {
             visible: root.critical || root.timerNotification || !appIcon.visible
             color: root.critical ? root.criticalTextColor : root.timerNotification ? config.selectionBackground : config.muted
             font.family: config.iconFontFamily
-            font.pointSize: config.iconSize * 1.50
+            font.pointSize: config.iconSize
             text: root.critical ? "󰀧" : root.timerNotification ? "󱎫" : "󰂚"
         }
     }

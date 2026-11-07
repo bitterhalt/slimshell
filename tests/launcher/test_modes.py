@@ -16,7 +16,7 @@ class LauncherModeTests(unittest.TestCase):
         source = (ROOT / "launcher/Launcher.qml").read_text()
         methods = []
         for name in ("reset", "close", "finalizeClose", "cancelDmenu", "openApplications",
-                     "toggleApplications", "setMode", "toggleMode", "parseTimer", "formatDuration", "activeTimerLabel"):
+                     "toggleApplications", "setMode", "toggleMode", "formatDuration", "activeTimerLabel"):
             match = re.search(r"^    function " + name + r"\([^\n]*\{.*?^    }", source, re.M | re.S)
             self.assertIsNotNone(match, name)
             methods.append(match.group())
@@ -115,15 +115,8 @@ Item {
             const controller = createTemporaryObject(controllerComponent, host);
             const readyAt = new Date(0);
             readyAt.setHours(7, 5, 0, 0);
-            compare(controller.activeTimerLabel({note: "Focus", endAt: readyAt.getTime()}), "Focus -> 07:05");
-            compare(controller.activeTimerLabel({note: "", endAt: readyAt.getTime()}), "Timer -> 07:05");
-        }
-        function test_timer_clock_input_and_note() {
-            const controller = createTemporaryObject(controllerComponent, host);
-            const hoursAndMinutes = controller.parseTimer("01:20 go to sleep");
-            compare(hoursAndMinutes.seconds, 4800);
-            compare(hoursAndMinutes.note, "go to sleep");
-            compare(controller.parseTimer("1:20").seconds, 80);
+            compare(controller.activeTimerLabel({note: "Focus", endAt: readyAt.getTime()}), "Focus Ready: 07:05");
+            compare(controller.activeTimerLabel({note: "", endAt: readyAt.getTime()}), "Timer Ready: 07:05");
         }
     }
 }

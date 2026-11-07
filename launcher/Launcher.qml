@@ -48,7 +48,7 @@ Item {
         return ranks;
     }
 
-    readonly property string placeholder: dmenuMode ? (dmenuPrompt !== "" ? dmenuPrompt : "Select") : runMode ? "Search binaries" : timerMode ? "Set a timer (e.g. 25m or 01:20)" : emojiMode ? "Search emojis" : fileMode ? "Search files" : "Search applications"
+    readonly property string placeholder: dmenuMode ? (dmenuPrompt !== "" ? dmenuPrompt : "Select") : runMode ? "Search binaries" : timerMode ? "Set a timer (e.g. 25m Focus)" : emojiMode ? "Search emojis" : fileMode ? "Search files" : "Search applications"
 
     property string query: ""
     readonly property string calculatorResult: calculator.result
@@ -400,17 +400,6 @@ Item {
 
         if (value === "")
             return null;
-
-        // Zero-padded HH:MM means hours and minutes; unpadded M:SS stays
-        // compatible with the existing minutes-and-seconds form.
-        const hoursClockMatch = value.match(/^(\d{2,}):([0-5]\d)(?:\s+(.+))?$/);
-        if (hoursClockMatch) {
-            const seconds = Number(hoursClockMatch[1]) * 3600 + Number(hoursClockMatch[2]) * 60;
-            return seconds > 0 ? {
-                seconds: seconds,
-                note: (hoursClockMatch[3] || "").trim()
-            } : null;
-        }
 
         const clockMatch = value.match(/^(\d+):([0-5]?\d)(?:\s+(.+))?$/);
         if (clockMatch) {
@@ -764,7 +753,7 @@ Item {
                 visible: root.visibleRows > 0 && root.results.length === 0
                 color: root.config.muted
                 font.pointSize: root.config.textSizeMedium
-                text: root.dmenuMode ? "No matches" : root.calcPrefix ? (root.calcExpression === "" ? "Type an expression" : calculator.busy ? "Calculating…" : "Can't evaluate expression") : root.runMode ? (runState.loading ? "Loading binaries…" : "No binaries found") : root.timerMode ? (root.query.trim() === "" ? "No active timers" : "Try 25m, 45s, 1:30, 01:20, or 2h Focus") : root.emojiMode ? "No emoji found" : root.fileMode && root.fileNeedle.length < 2 ? "Type at least two characters after /" : root.fileMode && root.fileSearching ? "Searching…" : root.fileMode ? "No files found" : "No applications found"
+                text: root.dmenuMode ? "No matches" : root.calcPrefix ? (root.calcExpression === "" ? "Type an expression" : calculator.busy ? "Calculating…" : "Can't evaluate expression") : root.runMode ? (runState.loading ? "Loading binaries…" : "No binaries found") : root.timerMode ? (root.query.trim() === "" ? "No active timers" : "Try 25m, 45s, 1:30, or 2h Focus") : root.emojiMode ? "No emoji found" : root.fileMode && root.fileNeedle.length < 2 ? "Type at least two characters after /" : root.fileMode && root.fileSearching ? "Searching…" : root.fileMode ? "No files found" : "No applications found"
             }
         }
     }
