@@ -353,9 +353,10 @@ PanelWindow {
 
                 ScrollView {
                     id: sourceScroll
+                    objectName: "translatorSourceScroll"
 
                     width: parent.width
-                    height: (parent.height - parent.spacing) / 2
+                    height: Math.floor((parent.height - parent.spacing) / 2)
                     contentWidth: availableWidth
                     clip: true
 
@@ -406,6 +407,7 @@ PanelWindow {
                 }
 
                 ScrollView {
+                    objectName: "translatorOutputScroll"
                     width: parent.width
                     height: sourceScroll.height
                     contentWidth: availableWidth
