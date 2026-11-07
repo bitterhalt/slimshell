@@ -24,7 +24,7 @@ Item {
     // Internal layout rhythm; popupGap remains the window-to-screen gap.
     readonly property int spacingTight: 4
     readonly property int spacingControl: 8
-    readonly property int panelPadding: 10
+    readonly property int panelPadding: 12
     readonly property int previewPadding: 16
     readonly property bool popupAnimations: values.popupAnimations
     readonly property int notificationHistoryLimit: values.notificationHistoryLimit

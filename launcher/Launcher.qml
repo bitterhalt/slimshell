@@ -757,7 +757,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: root.visibleRows > 0 && root.results.length === 0
                 color: root.config.muted
-                font.pointSize: root.config.textSizeMedium
+                font.pointSize: root.config.textSizeNormal
                 text: root.dmenuMode ? "No matches" : root.calcPrefix ? (root.calcExpression === "" ? "Type an expression" : calculator.busy ? "Calculating…" : "Can't evaluate expression") : root.runMode ? (runState.loading ? "Loading binaries…" : "No binaries found") : root.timerMode ? (root.query.trim() === "" ? "No active timers" : "Try 25m, 45s, 1:30, or 2h Focus") : root.emojiMode ? "No emoji found" : root.fileMode && root.fileNeedle.length < 2 ? "Type at least two characters after /" : root.fileMode && root.fileSearching ? "Searching…" : root.fileMode ? "No files found" : "No applications found"
             }
         }

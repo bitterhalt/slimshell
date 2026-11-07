@@ -39,7 +39,7 @@ Rectangle {
         config: root.config
         selected: root.selected
         anchors.leftMargin: root.border.width
-        verticalInset: 6
+        verticalInset: 8
     }
 
     HoverHandler {

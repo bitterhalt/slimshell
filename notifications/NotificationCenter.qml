@@ -15,7 +15,7 @@ FocusScope {
     property real availableHeight: 0
     readonly property real popupWidth: availableWidth > 0 ? Math.max(1, Math.min(380, availableWidth - config.popupGap * 2)) : 380
     readonly property real maxPopupHeight: availableHeight > 0 ? Math.max(120, Math.min(availableHeight - config.popupGap * 2, availableHeight * 0.65)) : 520
-    readonly property int popupPadding: 10
+    readonly property int popupPadding: config.panelPadding
 
     signal closeRequested
 
