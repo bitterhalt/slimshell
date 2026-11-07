@@ -20,10 +20,17 @@ function collapsedCardHeight(config) {
 
 function historyWindowHeight(config, count, footerHeight, padding, spacing, maxHeight) {
     const rows = Math.max(0, Number(count) || 0)
+    const cardHeight = collapsedCardHeight(config)
     const cardSpacing = Math.max(0, rows - 1) * spacing
+    // Reserve room for one expanded card without resizing on selection.
+    const expandedRoom = rows > 0 ? 120 : 0
     const contentHeight = padding * 2 + 8 + footerHeight
-        + rows * collapsedCardHeight(config) + cardSpacing
-    return Math.min(maxHeight, Math.max(Math.min(140, maxHeight), contentHeight))
+        + rows * cardHeight + cardSpacing + expandedRoom
+    const minimumRows = rows > 0 ? 2 : 0
+    const minimumHeight = rows > 0
+        ? padding * 2 + 8 + footerHeight + minimumRows * cardHeight + (minimumRows - 1) * spacing + expandedRoom
+        : 140
+    return Math.min(maxHeight, Math.max(Math.min(minimumHeight, maxHeight), contentHeight))
 }
 
 function actionLabel(action) {
