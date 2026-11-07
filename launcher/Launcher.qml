@@ -460,11 +460,6 @@ Item {
         return seconds + "s";
     }
 
-    function formatRemaining(milliseconds): string {
-        const seconds = Math.max(0, Math.ceil(milliseconds / 1000));
-        return formatDuration(seconds) + " remaining · select to cancel";
-    }
-
     function applicationRank(id): int {
         const rank = appHistoryRanks.get(id);
         return rank === undefined ? appHistoryKept : rank;
@@ -745,8 +740,6 @@ Item {
                     width: ListView.view.width
                     height: root.rowHeight
                     selected: index === root.selectedIndex
-                    // Update the label, not the result model, on each clock tick.
-                    remainingText: modelData.type === "timer-active" ? root.formatRemaining(modelData.endAt - root.timerClock) : ""
                 }
             }
 

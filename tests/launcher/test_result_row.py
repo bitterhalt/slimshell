@@ -78,6 +78,7 @@ Item {
             row.entry = {type: data.type, text: "Synthetic result", icon: "", emoji: "🙂", subtitle: "Detail"};
             const title = findChild(row, "launcherResultTitle");
             const subtitle = findChild(row, "launcherResultSubtitle");
+            compare(subtitle, null);
             compare(title.parent.x, fixtureConfig.panelPadding + (data.type === "dmenu" ? 0 : 26 + fixtureConfig.spacingControl));
             compare(title.parent.spacing, 0);
             verify(title.parent.implicitHeight <= row.height);
@@ -86,14 +87,6 @@ Item {
             compare(title.color, fixtureConfig.selectionForeground);
             row.selected = false;
             compare(title.color, fixtureConfig.fg);
-            if (data.type === "timer-active") {
-                row.remainingText = "1m remaining";
-                compare(subtitle.text, "1m remaining");
-                row.remainingText = "59s remaining";
-                compare(subtitle.text, "59s remaining");
-            } else {
-                compare(subtitle.text, "Detail");
-            }
             compare(title.textFormat, data.type === "dmenu" ? Text.RichText : Text.AutoText);
         }
     }

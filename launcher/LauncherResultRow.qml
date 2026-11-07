@@ -10,7 +10,6 @@ Item {
     required property var config
     required property var entry
     property bool selected: false
-    property string remainingText: ""
     readonly property string iconRun: String.fromCodePoint(0xF018D)
     readonly property string iconStar: String.fromCodePoint(0xF04CE)
 
@@ -59,6 +58,5 @@ Item {
             textFormat: root.entry.type === "dmenu" ? Text.RichText : Text.AutoText
             text: root.entry.type === "dmenu" ? Dmenu.richTextWithSymbols(root.entry.text, root.config.iconFontFamily) : root.entry.text
         }
-
     }
 }
