@@ -21,8 +21,9 @@ function collapsedCardHeight(config) {
 function historyWindowHeight(config, count, footerHeight, padding, spacing, maxHeight) {
     const rows = Math.max(0, Number(count) || 0)
     const cardSpacing = Math.max(0, rows - 1) * spacing
+    const expandedRoom = rows > 0 ? 120 : 0
     const contentHeight = padding * 2 + 8 + footerHeight
-        + rows * collapsedCardHeight(config) + cardSpacing
+    + rows * collapsedCardHeight(config) + cardSpacing + expandedRoom
     return Math.min(maxHeight, Math.max(Math.min(140, maxHeight), contentHeight))
 }
 
