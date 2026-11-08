@@ -25,7 +25,7 @@ class LauncherModeTests(unittest.TestCase):
                 source,
                 rf'function {name}\(\):\s*void\s*\{{\s*root\.toggleMode\("{name}"\);?\s*\}}',
             )
-        self.assertRegex(source, r'function search\(\):\s*void\s*\{\s*root\.toggleMode\("apps"\);?\s*\}')
+        self.assertRegex(source, r'function search\(\):\s*void\s*\{\s*root\.toggleMode\("files"\);?\s*\}')
         with tempfile.TemporaryDirectory(prefix="launcher-modes-") as directory:
             base = Path(directory)
             (base / "Controller.qml").write_text('''import QtQuick

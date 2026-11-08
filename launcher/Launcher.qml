@@ -681,7 +681,7 @@ Item {
             root.toggleMode("apps");
         }
         function search(): void {
-            root.toggleMode("apps");
+            root.toggleMode("files");
         }
         function run(): void {
             root.toggleMode("run");
