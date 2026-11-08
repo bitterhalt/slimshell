@@ -67,7 +67,7 @@ FocusScope {
                 Layout.fillWidth: true
                 Layout.minimumWidth: 0
                 text: root.weatherData.data.place || "Weather"
-                font.bold: true
+                font.weight: Font.DemiBold
                 font.family: root.config.textFontFamily
                 font.pointSize: root.config.textSizeNormal
                 elide: Text.ElideRight
@@ -112,7 +112,7 @@ FocusScope {
                     text: root.weatherData.data.available ? root.weatherData.data.temperature + "°C" : "N/A"
                     font.pointSize: root.mainTemperatureSize
                     font.family: root.config.textFontFamily
-                    font.bold: true
+                    font.weight: Font.Bold
                 }
 
                 Label {
@@ -177,25 +177,40 @@ FocusScope {
             radius: root.config.popupRadius
             color: Qt.alpha(root.config.selectionBackground, 0.12)
 
-            RowLayout {
+            Item {
                 anchors.fill: parent
-                anchors.leftMargin: 10
-                anchors.rightMargin: 10
-                spacing: 4
 
                 Label {
                     objectName: "weatherMoonIcon"
                     visible: !!root.weatherData.data.moon
+                    anchors.left: parent.left
+                    anchors.leftMargin: 10
+                    anchors.verticalCenter: parent.verticalCenter
                     text: root.weatherData.data.moon ? root.weatherData.data.moon.icon : ""
                     font.pointSize: root.moonIconSize * 1.30
                 }
 
                 Label {
-                    Layout.fillWidth: true
-                    elide: Text.ElideRight
+                    objectName: "weatherMoonName"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: Math.max(0, parent.width - 88)
+                    horizontalAlignment: Text.AlignHCenter
+                    elide: Text.ElideMiddle
                     font.pointSize: root.config.textSizeSmall
-                    text: root.weatherData.data.moon ? root.weatherData.data.moon.name + " · " + root.weatherData.data.moon.illumination + "%" : "Moon information unavailable"
+                    text: root.weatherData.data.moon ? root.weatherData.data.moon.name : "Moon information unavailable"
                     font.family: root.config.textFontFamily
+                }
+
+                Label {
+                    objectName: "weatherMoonIllumination"
+                    anchors.right: parent.right
+                    anchors.rightMargin: 10
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 34
+                    horizontalAlignment: Text.AlignRight
+                    font.pointSize: root.config.textSizeMedium
+                    text: root.weatherData.data.moon ? root.weatherData.data.moon.illumination + "%" : ""
                 }
             }
         }
@@ -205,8 +220,8 @@ FocusScope {
             spacing: 10
 
             Label {
-                text: "7-DAY FORECAST"
                 renderType: Text.NativeRendering
+                text: "7-DAY FORECAST"
                 color: root.config.muted
                 font.weight: Font.DemiBold
                 font.pointSize: root.config.textSizeSmall
@@ -240,6 +255,7 @@ FocusScope {
                         Layout.preferredWidth: 34
                         text: forecastRow.modelData.day
                         font.weight: Font.DemiBold
+                        font.pointSize: root.config.textSizeMedium
                     }
 
                     Label {
