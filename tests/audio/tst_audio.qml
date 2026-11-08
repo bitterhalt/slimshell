@@ -625,5 +625,21 @@ Item {
             popupControls.setTab(3);
             verify(backend.active);
         }
+        function test_profile_rows_use_compact_spacing() {
+            popup = createTemporaryObject(popupComponent, host, {
+                audioItem: fixture,
+                profileBackend: profileComponent
+            });
+            const popupControls = findChild(popup, "audioPopupState");
+            popupControls.setTab(3);
+            waitForPolish(host.Window.window);
+            const list = findChild(popup, "audioRows");
+            const firstRow = findChild(popup, "audioRow-0");
+            compare(popup.rowHeight, 32);
+            compare(popup.rowSpacing, 0);
+            verify(firstRow !== null);
+            compare(firstRow.height, 32);
+            compare(list.contentHeight, popupControls.rows.length * 32);
+        }
     }
 }

@@ -13,8 +13,8 @@ PopoutPanel {
     config: audioItem.config
     contentWidth: Math.min(420, audioItem.barWindow.screen ? audioItem.barWindow.screen.width - config.popupGap * 2 : 420)
     padding: 10
-    readonly property int rowHeight: popupState.tabIndex === 3 ? 40 : popupState.tabIndex === 2 ? 56 : 44
-    readonly property int rowSpacing: 2
+    readonly property int rowHeight: popupState.tabIndex === 3 ? 32 : popupState.tabIndex === 2 ? 56 : 44
+    readonly property int rowSpacing: popupState.tabIndex === 3 ? 0 : 2
     readonly property int chromeHeight: 12 + status.height + root.spacing + footer.height
     readonly property real desiredBodyHeight: popupState.helpOpen ? helpRows.implicitHeight : popupState.contextOpen ? optionRows.implicitHeight : Math.max(rowHeight, popupState.rows.length * (rowHeight + rowSpacing) - rowSpacing)
     readonly property real maximumBodyHeight: Math.max(rowHeight, Math.min(316, root.audioItem.barWindow.screen ? root.audioItem.barWindow.screen.height - root.config.popupGap - root.padding * 2 - chromeHeight - 24 : 316))
@@ -94,6 +94,7 @@ PopoutPanel {
                     id: entry
                     required property var modelData
                     required property int index
+                    objectName: "audioRow-" + index
                     width: rowsView.width
                     height: root.rowHeight
                     Loader {
@@ -338,15 +339,15 @@ PopoutPanel {
         property string subtitle: ""
         property bool selected: false
         signal activated
-        height: 40
+        height: root.rowHeight
         opacity: enabled ? 1 : 0.45
 
         Rectangle {
             anchors.left: parent.left
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            anchors.topMargin: 6
-            anchors.bottomMargin: 6
+            anchors.topMargin: 4
+            anchors.bottomMargin: 4
             width: 2
             radius: 1
             color: choice.config.selectionBackground
@@ -358,7 +359,7 @@ PopoutPanel {
             anchors.leftMargin: 8
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 2
+            spacing: 1
             Text {
                 renderType: Text.NativeRendering
                 width: parent.width
