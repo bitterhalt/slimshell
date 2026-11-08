@@ -13,7 +13,7 @@ PopoutPanel {
     config: audioItem.config
     contentWidth: Math.min(420, audioItem.barWindow.screen ? audioItem.barWindow.screen.width - config.popupGap * 2 : 420)
     padding: 10
-    readonly property int rowHeight: popupState.tabIndex === 3 ? 32 : popupState.tabIndex === 2 ? 56 : 44
+    readonly property int rowHeight: popupState.tabIndex === 3 ? 26 : popupState.tabIndex === 2 ? 56 : 44
     readonly property int rowSpacing: popupState.tabIndex === 3 ? 0 : 2
     readonly property int chromeHeight: 12 + status.height + root.spacing + footer.height
     readonly property real desiredBodyHeight: popupState.helpOpen ? helpRows.implicitHeight : popupState.contextOpen ? optionRows.implicitHeight : Math.max(rowHeight, popupState.rows.length * (rowHeight + rowSpacing) - rowSpacing)
@@ -346,8 +346,8 @@ PopoutPanel {
             anchors.left: parent.left
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            anchors.topMargin: 4
-            anchors.bottomMargin: 4
+            anchors.topMargin: 3
+            anchors.bottomMargin: 3
             width: 2
             radius: 1
             color: choice.config.selectionBackground
@@ -359,7 +359,7 @@ PopoutPanel {
             anchors.leftMargin: 8
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 1
+            spacing: 0
             Text {
                 renderType: Text.NativeRendering
                 width: parent.width

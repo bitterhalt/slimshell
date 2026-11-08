@@ -635,11 +635,11 @@ Item {
             waitForPolish(host.Window.window);
             const list = findChild(popup, "audioRows");
             const firstRow = findChild(popup, "audioRow-0");
-            compare(popup.rowHeight, 32);
+            compare(popup.rowHeight, 26);
             compare(popup.rowSpacing, 0);
             verify(firstRow !== null);
-            compare(firstRow.height, 32);
-            compare(list.contentHeight, popupControls.rows.length * 32);
+            compare(firstRow.height, 26);
+            compare(list.contentHeight, popupControls.rows.length * 26);
         }
     }
 }
