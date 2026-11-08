@@ -29,6 +29,7 @@ Item {
 
     // Binding: updates automatically whenever selectionBackground changes
     readonly property color border: Qt.alpha(selectionBackground, borderAlpha)
+    // readonly property color border: Qt.tint(bg, Qt.alpha(selectionBackground, borderAlpha))
 
     property bool hellwalActive: false
 

@@ -161,7 +161,7 @@ FocusScope {
             compact: true
             filled: true
             opacity: hovered ? 0.8 : 1
-            enabled: history.rows.length > 0
+            visible: history.rows.length > 0
             text: "Clear all"
             onClicked: {
                 root.notificationService.clearAll();
