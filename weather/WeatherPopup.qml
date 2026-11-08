@@ -10,6 +10,7 @@ FocusScope {
 
     // Weather keeps its own proportions, independently of text sizing.
     property real mainIconSize: config.iconSize * 3
+    property real mainTemperatureSize: config.fontSize * 2.8
     property real forecastIconSize: config.iconSize * 1.3
     property real detailIconSize: config.iconSize
     property real moonIconSize: config.iconSize * 0.8
@@ -67,7 +68,8 @@ FocusScope {
                 Layout.minimumWidth: 0
                 text: root.weatherData.data.place || "Weather"
                 font.bold: true
-                font.pointSize: root.config.fontSize * 1
+                font.family: root.config.textFontFamily
+                font.pointSize: root.config.textSizeNormal
                 elide: Text.ElideRight
             }
 
@@ -75,7 +77,8 @@ FocusScope {
                 objectName: "weatherRefreshHint"
                 text: root.weatherData.refreshing ? "Refreshing…" : "F5 Refresh"
                 color: root.config.muted
-                font.pointSize: root.config.fontSize * 0.72
+                font.family: root.config.textFontFamily
+                font.pointSize: root.config.textSizeSmall
             }
         }
 
@@ -94,6 +97,7 @@ FocusScope {
                     anchors.centerIn: parent
                     text: root.weatherData.data.icon || "✨"
                     font.pointSize: root.mainIconSize
+                    font.family: root.config.textFontFamily
                 }
             }
 
@@ -106,7 +110,8 @@ FocusScope {
                     objectName: "weatherTemperature"
                     Layout.fillWidth: true
                     text: root.weatherData.data.available ? root.weatherData.data.temperature + "°C" : "N/A"
-                    font.pointSize: root.config.fontSize * 2.8
+                    font.pointSize: root.mainTemperatureSize
+                    font.family: root.config.textFontFamily
                     font.bold: true
                 }
 
@@ -114,7 +119,7 @@ FocusScope {
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
                     color: root.config.muted
-                    font.pointSize: root.config.fontSize * 0.8
+                    font.pointSize: root.config.textSizeSmall
                     text: root.weatherData.data.available ? root.weatherData.data.condition + " · Feels like " + root.weatherData.data.feels + "°" : root.weatherData.refreshing ? "Loading weather…" : "Weather unavailable"
                 }
             }
@@ -188,8 +193,9 @@ FocusScope {
                 Label {
                     Layout.fillWidth: true
                     elide: Text.ElideRight
-                    font.pointSize: root.config.fontSize * 0.8
+                    font.pointSize: root.config.textSizeSmall
                     text: root.weatherData.data.moon ? root.weatherData.data.moon.name + " · " + root.weatherData.data.moon.illumination + "%" : "Moon information unavailable"
+                    font.family: root.config.textFontFamily
                 }
             }
         }
@@ -203,7 +209,7 @@ FocusScope {
                 renderType: Text.NativeRendering
                 color: root.config.muted
                 font.weight: Font.DemiBold
-                font.pointSize: root.config.fontSize * 0.72
+                font.pointSize: root.config.textSizeSmall
             }
 
             Separator {}
@@ -241,6 +247,7 @@ FocusScope {
                         Layout.preferredWidth: 28
                         text: forecastRow.modelData.icon
                         font.pointSize: root.forecastIconSize
+                        font.family: root.config.textFontFamily
                         horizontalAlignment: Text.AlignHCenter
                     }
 
@@ -269,7 +276,8 @@ FocusScope {
         renderType: Text.NativeRendering
         textFormat: Text.PlainText
         color: root.config.fg
-        font.pointSize: root.config.fontSize * 0.9
+        font.family: root.config.textFontFamily
+        font.pointSize: root.config.textSizeMedium
     }
 
     component Icon: Label {
@@ -300,7 +308,7 @@ FocusScope {
             text: detail.label
             color: root.config.muted
             elide: Text.ElideRight
-            font.pointSize: root.config.fontSize * 0.72
+            font.pointSize: root.config.textSizeSmall
         }
 
         Rectangle {
@@ -320,7 +328,7 @@ FocusScope {
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignRight
                 elide: Text.ElideRight
-                font.pointSize: root.config.fontSize * 0.72
+                font.pointSize: root.config.textSizeSmall
             }
         }
     }

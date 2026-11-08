@@ -110,8 +110,13 @@ Item {
             fixtureConfig.fontSize = 12;
             fuzzyCompare(temperature.font.pointSize, 33.6, 0.01);
             fuzzyCompare(main.font.pointSize, 36, 0.01);
+            compare(main.font.family, fixtureConfig.textFontFamily);
+            compare(temperature.font.family, fixtureConfig.textFontFamily);
+            compare(detail.font.family, fixtureConfig.iconFontFamily);
             popup.mainIconSize = 40;
             fuzzyCompare(main.font.pointSize, 40, 0.01);
+            popup.mainTemperatureSize = 42;
+            fuzzyCompare(temperature.font.pointSize, 42, 0.01);
             fuzzyCompare(detail.font.pointSize, 12, 0.01);
         }
         function test_complete_forecast_fits_surface() {
