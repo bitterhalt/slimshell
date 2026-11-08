@@ -16,9 +16,9 @@ PopoutPanel {
     readonly property var pairedRows: deviceRows.filter(row => {
         return row.paired && !row.connected;
     })
-    readonly property var availableRows: deviceRows.filter(row => {
+    readonly property var availableRows: discoveryState.requested ? deviceRows.filter(row => {
         return !row.paired && !row.connected;
-    })
+    }) : []
     readonly property var popupRows: connectedRows.concat(pairedRows, availableRows)
     property string selectedAddress: ""
     property bool confirmForget: false
@@ -110,7 +110,7 @@ PopoutPanel {
         forgetAddress = "";
     }
 
-    onPopupRowsChanged: Qt.callLater(() => {
+    onPopupRowsChanged: {
         if (confirmForget && !forgetTarget)
             cancelForget();
 
@@ -118,7 +118,7 @@ PopoutPanel {
             return row.address === selectedAddress;
         }))
             selectedAddress = popupRows[0].address;
-    })
+    }
     focus: true
     Component.onCompleted: {
         root.cancelForget();

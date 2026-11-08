@@ -36,7 +36,8 @@ Item {
         property var adapter: fixtureAdapter
         property var devices: [
             {address: "a", name: "Alpha", paired: true, connected: true},
-            {address: "b", name: "Beta", paired: true, connected: false}
+            {address: "b", name: "Beta", paired: true, connected: false},
+            {address: "c", name: "Nearby", paired: false, connected: false}
         ]
         property int toggles: 0
         property int trusts: 0
@@ -123,9 +124,12 @@ Item {
             mouseClick(button, button.width / 2, button.height / 2);
             compare(service.scans, 1);
             compare(button.text, "Stop");
+            compare(manager.popup.availableRows.length, 1);
             mouseClick(button, button.width / 2, button.height / 2);
             compare(service.scans, 0);
             compare(button.text, "Scan");
+            compare(manager.popup.availableRows.length, 0);
+            verify(!manager.popup.popupRows.some(row => row.address === "c"));
         }
         function test_reopen_preserves_selection_but_resets_popup_state() {
             manager.popup.selectDevice(1);
