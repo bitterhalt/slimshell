@@ -86,9 +86,11 @@ FocusScope {
             Layout.fillWidth: true
             spacing: 14
 
-            Item {
+            Rectangle {
                 Layout.preferredWidth: 78
                 Layout.preferredHeight: 78
+                radius: root.config.popupRadius
+                color: Qt.alpha(root.config.selectionBackground, 0.1)
 
                 Text {
                     objectName: "weatherConditionIcon"
@@ -169,9 +171,11 @@ FocusScope {
             }
         }
 
-        Item {
+        Rectangle {
             Layout.fillWidth: true
             implicitHeight: 30
+            radius: root.config.popupRadius
+            color: Qt.alpha(root.config.selectionBackground, 0.12)
 
             RowLayout {
                 anchors.fill: parent
@@ -214,7 +218,7 @@ FocusScope {
         Repeater {
             model: root.weatherData.data.forecast || []
 
-            delegate: Item {
+            delegate: Rectangle {
                 id: forecastRow
 
                 required property var modelData
@@ -223,6 +227,8 @@ FocusScope {
                 objectName: "weatherForecast-" + index
                 Layout.fillWidth: true
                 implicitHeight: 25
+                radius: root.config.popupRadius
+                color: Qt.alpha(root.config.selectionBackground, index % 2 === 0 ? 0.1 : 0.05)
 
                 RowLayout {
                     anchors.fill: parent
