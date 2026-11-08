@@ -639,6 +639,7 @@ Item {
             compare(popup.rowSpacing, 2);
             verify(firstRow !== null);
             compare(firstRow.height, 32);
+            compare(findChild(firstRow, "audioChoiceSelection").width, 3);
             compare(list.contentHeight, popupControls.rows.length * 32 + (popupControls.rows.length - 1) * 2);
             popupControls.selectRow(0);
             popupControls.activateSelected();

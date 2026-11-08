@@ -342,16 +342,11 @@ PopoutPanel {
         height: root.rowHeight
         opacity: enabled ? 1 : 0.45
 
-        Rectangle {
-            anchors.left: parent.left
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.topMargin: 3
-            anchors.bottomMargin: 3
-            width: 2
-            radius: 1
-            color: choice.config.selectionBackground
-            visible: choice.selected
+        SelectionIndicator {
+            objectName: "audioChoiceSelection"
+            config: choice.config
+            selected: choice.selected
+            verticalInset: 3
         }
         Column {
             anchors.left: parent.left
