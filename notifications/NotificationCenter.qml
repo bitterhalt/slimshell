@@ -137,29 +137,35 @@ FocusScope {
         font.pointSize: root.config.textSizeMedium
     }
 
-    // Persistent keyboard hints and the DND toggle.
+    // Clear action and the DND toggle.
     Item {
         id: historyFooter
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.margins: root.popupPadding
-        height: Math.max(shortcutHint.implicitHeight, dndControls.implicitHeight) + 8
+        height: Math.max(clearAllButton.implicitHeight, dndControls.implicitHeight) + 8
 
         PanelSeparator {
             config: root.config
             anchors.top: parent.top
         }
 
-        Text {
-            id: shortcutHint
+        ShellButton {
+            id: clearAllButton
+            objectName: "notificationClearAllButton"
             anchors.left: parent.left
             anchors.top: parent.top
-            anchors.topMargin: 10
-            renderType: Text.NativeRendering
-            color: root.config.muted
-            font.pointSize: root.config.textSizeSmall
-            text: "x Dismiss · Ctrl+x Clear all"
+            anchors.topMargin: 8
+            config: root.config
+            compact: true
+            destructive: true
+            enabled: history.rows.length > 0
+            text: "Clear all"
+            onClicked: {
+                root.notificationService.clearAll();
+                root.forceActiveFocus();
+            }
         }
 
         Row {
