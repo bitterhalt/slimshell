@@ -159,7 +159,8 @@ FocusScope {
             anchors.topMargin: 8
             config: root.config
             compact: true
-            destructive: true
+            filled: true
+            opacity: hovered ? 0.8 : 1
             enabled: history.rows.length > 0
             text: "Clear all"
             onClicked: {
@@ -187,15 +188,10 @@ FocusScope {
                 id: dndSwitch
                 config: root.config
                 checked: root.notificationService.dnd
-                opacity: dndHover.hovered ? 0.8 : 1
+                opacity: checked ? 1 : 0.65
                 onToggled: {
                     root.notificationService.toggleDnd();
                     root.forceActiveFocus();
-                }
-
-                HoverHandler {
-                    id: dndHover
-                    cursorShape: Qt.PointingHandCursor
                 }
             }
         }
