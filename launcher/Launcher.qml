@@ -680,6 +680,9 @@ Item {
         function apps(): void {
             root.toggleMode("apps");
         }
+        function search(): void {
+            root.toggleMode("apps");
+        }
         function run(): void {
             root.toggleMode("run");
         }
