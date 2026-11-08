@@ -18,10 +18,11 @@ Item {
     property bool opened: false
     property bool quitOnClose: false
     // Mode order for Ctrl+← / Ctrl+→ cycling.
-    readonly property var modes: ["apps", "run", "emoji"]
+    readonly property var modes: ["apps", "run", "emoji", "files"]
     property string mode: "apps"
     readonly property bool runMode: mode === "run"
     readonly property bool emojiMode: mode === "emoji"
+    readonly property bool fileMode: mode === "files"
     // dmenu mode is entered only through `qs ipc call launcher dmenu`, so it
     // is not part of `modes` and can't be reached by cycling.
     readonly property bool dmenuMode: mode === "dmenu"
@@ -58,12 +59,11 @@ Item {
     readonly property int inputHeight: panelInset + rowHeight
     readonly property int contentWidth: 380
     readonly property int contentSpacing: config.panelPadding
-    readonly property bool fileMode: !runMode && !emojiMode && !dmenuMode && query.trim().startsWith("/")
-    readonly property string fileNeedle: fileMode ? query.trim().slice(1).trim() : ""
+    readonly property string fileNeedle: fileMode ? query.trim() : ""
 
     // "=" prefix hands everything after it to qalc, so units, functions and
     // words work too ("=5 km to miles", "=sqrt(2)", "=1x3").
-    readonly property bool calcPrefix: !runMode && !emojiMode && !dmenuMode && query.trim().startsWith("=")
+    readonly property bool calcPrefix: !runMode && !emojiMode && !fileMode && !dmenuMode && query.trim().startsWith("=")
     readonly property string calcExpression: calcPrefix ? query.trim().slice(1).trim() : query.trim()
 
     // Plain math without the prefix is still detected automatically.
@@ -72,7 +72,7 @@ Item {
             return calcExpression.length > 0;
 
         const value = query.trim();
-        return !runMode && !emojiMode && !dmenuMode && !fileMode && /[0-9]/.test(value) && (/[+\-*/%^×÷]/.test(value) || /\d\s*[xX]\s*[\d(.]/.test(value)) && /^[0-9\s+\-*/%^().,xX×÷]+$/.test(value);
+        return !runMode && !emojiMode && !fileMode && !dmenuMode && /[0-9]/.test(value) && (/[+\-*/%^×÷]/.test(value) || /\d\s*[xX]\s*[\d(.]/.test(value)) && /^[0-9\s+\-*/%^().,xX×÷]+$/.test(value);
     }
 
     readonly property var applications: {
@@ -146,7 +146,7 @@ Item {
                     })).filter(item => item.score > 0).sort((a, b) => b.score - a.score || applicationRank(a.entry.id) - applicationRank(b.entry.id) || a.text.localeCompare(b.text));
         }
 
-        if (!runMode && !dmenuMode && calculatorResult !== "") {
+        if (!runMode && !fileMode && !dmenuMode && calculatorResult !== "") {
             entries.unshift({
                 type: "calculator",
                 text: calculatorResult,
@@ -205,9 +205,9 @@ Item {
     }
 
     function toggleMode(name): void {
-        if (!modes.concat(["files", "calculator"]).includes(name))
+        if (!modes.concat(["calculator"]).includes(name))
             return;
-        const currentMode = fileMode ? "files" : calcPrefix || calculatorQuery ? "calculator" : mode;
+        const currentMode = calcPrefix || calculatorQuery ? "calculator" : mode;
         if (opened && currentMode === name) {
             close();
             return;
@@ -216,9 +216,9 @@ Item {
         cancelDmenu();
         reset();
         opened = true;
-        setMode(name === "files" || name === "calculator" ? "apps" : name);
-        if (name === "files" || name === "calculator") {
-            searchInput.text = name === "files" ? "/" : "=";
+        setMode(name === "calculator" ? "apps" : name);
+        if (name === "calculator") {
+            searchInput.text = "=";
             searchInput.cursorPosition = searchInput.text.length;
         }
         Qt.callLater(() => searchInput.forceActiveFocus());
@@ -285,16 +285,6 @@ Item {
         const currentIndex = modes.indexOf(mode);
         const nextIndex = (currentIndex + direction + modes.length) % modes.length;
         setMode(modes[nextIndex]);
-    }
-
-    function openFileSearch(): void {
-        if (dmenuMode)
-            return;
-        setMode("apps");
-        searchInput.text = "/";
-        searchInput.cursorPosition = 1;
-        selectedIndex = 0;
-        searchInput.forceActiveFocus();
     }
 
     function navigateResults(direction): void {
@@ -560,7 +550,7 @@ Item {
                         break;
                     case Qt.Key_S:
                         if (control) {
-                            root.openFileSearch();
+                            root.setMode("files");
                             event.accepted = true;
                         }
                         break;
@@ -637,7 +627,7 @@ Item {
                 visible: root.visibleRows > 0 && root.results.length === 0
                 color: root.config.muted
                 font.pointSize: root.config.textSizeMedium
-                text: root.dmenuMode ? "No matches" : root.calcPrefix ? (root.calcExpression === "" ? "Type an expression" : calculator.busy ? "Calculating…" : "Can't evaluate expression") : root.runMode ? (runState.loading ? "Loading binaries…" : "No binaries found") : root.emojiMode ? "No emoji found" : root.fileMode && root.fileNeedle.length < 2 ? "Type at least two characters after /" : root.fileMode && root.fileSearching ? "Searching…" : root.fileMode ? "No files found" : "No applications found"
+                text: root.dmenuMode ? "No matches" : root.calcPrefix ? (root.calcExpression === "" ? "Type an expression" : calculator.busy ? "Calculating…" : "Can't evaluate expression") : root.runMode ? (runState.loading ? "Loading binaries…" : "No binaries found") : root.emojiMode ? "No emoji found" : root.fileMode && root.fileNeedle.length < 2 ? "Type at least two characters to search files" : root.fileMode && root.fileSearching ? "Searching…" : root.fileMode ? "No files found" : "No applications found"
             }
         }
     }

@@ -38,7 +38,7 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 | `bluetooth`          | `toggle`, `open`, `close`                                                 | Show or hide the Bluetooth menu                          |
 | `clipboard`          | `toggle`, `open`, `close`, `refresh`, `copySelected`, `deleteSelected`    | Control the clipboard picker                             |
 | `idle`               | `toggle`, `isDisabled`, `settings`                                        | Control idle handling or open its settings               |
-| `launcher`           | `toggle`, `open`, `close`, `apps`, `search`, `run`, `emoji`, `files`, `calculator` | Open, switch, or toggle launcher modes (`search` opens File Search) |
+| `launcher`           | `toggle`, `open`, `close`, `apps`, `search`, `run`, `emoji`, `files`, `calculator` | Open, switch, or toggle launcher modes; `search` opens File Search |
 | `lock`               | `lock`                                                                    | Lock the session                                         |
 | `locker`             | `isSecure`                                                                | Query whether the separate lock-screen process is secure |
 | `menu`               | `open <name>`, `toggle <name>`, `close`, `packages`, `settings`, `system` | Open a user menu or close it                             |
@@ -66,9 +66,9 @@ Launcher modes. Switch directly with the shortcuts below, or cycle with **Ctrl+â
 | Apps   | `Ctrl+A` | Search and launch desktop applications          |
 | Run    | `Ctrl+B` | Run binaries, with recently used commands first |
 | Emoji  | `Ctrl+E` | Search by name and copy the selected emoji      |
-| Search | `Ctrl+S` | Search local files by name                      |
+| Files  | `Ctrl+S` | Search local files by name                      |
 
-In Apps mode, `/<word>` searches files and `=expression` calculates with `qalc`. Plain math works too.
+In Apps mode, `=expression` calculates with `qalc`. Plain math works too. Use `Ctrl+S` or cycle modes to search local files.
 
 ## Dmenu mode
 

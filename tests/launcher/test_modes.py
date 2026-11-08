@@ -16,7 +16,7 @@ class LauncherModeTests(unittest.TestCase):
         source = (ROOT / "launcher/Launcher.qml").read_text()
         methods = []
         for name in ("reset", "close", "finalizeClose", "cancelDmenu", "openApplications",
-                     "toggleApplications", "setMode", "toggleMode"):
+                     "toggleApplications", "setMode", "toggleMode", "cycleMode"):
             match = re.search(r"^    function " + name + r"\([^\n]*\{.*?^    }", source, re.M | re.S)
             self.assertIsNotNone(match, name)
             methods.append(match.group())
@@ -31,7 +31,7 @@ class LauncherModeTests(unittest.TestCase):
             (base / "Controller.qml").write_text('''import QtQuick
 Item {
     id: root
-    property var modes: ["apps", "run", "emoji"]
+    property var modes: ["apps", "run", "emoji", "files"]
     property string mode: "apps"
     property string query: ""
     property bool opened: false
@@ -40,7 +40,7 @@ Item {
     property int prunes: 0
     property alias input: searchInput
     readonly property bool dmenuMode: mode === "dmenu"
-    readonly property bool fileMode: mode === "apps" && query.startsWith("/")
+    readonly property bool fileMode: mode === "files"
     readonly property bool calcPrefix: mode === "apps" && query.startsWith("=")
     property bool calculatorQuery: false
     property string dmenuOutPath: ""
@@ -66,8 +66,8 @@ Item {
             const controller = createTemporaryObject(controllerComponent, host);
             controller.toggleMode(data.name);
             verify(controller.opened);
-            compare(controller.mode, ["files", "calculator"].includes(data.name) ? "apps" : data.name);
-            compare(controller.query, data.name === "files" ? "/" : data.name === "calculator" ? "=" : "");
+            compare(controller.mode, data.name === "calculator" ? "apps" : data.name);
+            compare(controller.query, data.name === "calculator" ? "=" : "");
             controller.toggleMode(data.name);
             verify(!controller.opened);
             controller.openApplications();
@@ -89,7 +89,7 @@ Item {
             compare(controller.dmenuOutPath, "");
             compare(controller.dmenuItems.length, 0);
             controller.toggleMode("files");
-            compare(controller.query, "/");
+            compare(controller.mode, "files");
             controller.toggleMode("calculator");
             compare(controller.query, "=");
             controller.input.text = "=2+2";
@@ -106,6 +106,14 @@ Item {
             controller.toggleApplications();
             compare(controller.mode, "apps");
             verify(controller.opened);
+        }
+        function test_file_search_participates_in_mode_cycle() {
+            const controller = createTemporaryObject(controllerComponent, host);
+            controller.mode = "emoji";
+            controller.cycleMode(1);
+            compare(controller.mode, "files");
+            controller.cycleMode(1);
+            compare(controller.mode, "apps");
         }
     }
 }

@@ -15,6 +15,7 @@ TEST = r'''
 import QtQuick
 import QtTest
 import "."
+import "FileSearch.js" as FileSearch
 Item {
     id: host
     Component { id: files; FileSearchState { active: false; needle: "" } }
@@ -71,6 +72,13 @@ Item {
             wait(220);
             verify(!state.busy);
             verify(!job(state).running);
+        }
+        function test_file_search_command_uses_editable_exclusion_list() {
+            const command = FileSearch.command("needle", "/home/example");
+            compare(command.slice(0, 6), ["fd", "-H", "-t", "f", "--max-results", "100"]);
+            verify(command.includes("--exclude"));
+            verify(command.includes("*.png"));
+            compare(command.slice(-6), ["--", "needle", "/home/example/.config", "/home/example/Documents", "/home/example/.local/bin", "/etc"]);
         }
         function test_calculator_normalization_and_late_results() {
             const state = createTemporaryObject(calculator, host);
@@ -149,7 +157,7 @@ class BackendTests(unittest.TestCase):
                 source = "\n".join(line for line in source.splitlines()
                                    if not line.startswith("import Quickshell"))
                 (base / f"{name}.qml").write_text('import "."\n' + source)
-            for name in ("Scorer.js", "Emoji.js"):
+            for name in ("Scorer.js", "Emoji.js", "FileSearch.js"):
                 (base / name).write_text((ROOT / name).read_text())
             (base / "qmldir").write_text("singleton Quickshell 1.0 Quickshell.qml\n")
             (base / "Quickshell.qml").write_text(

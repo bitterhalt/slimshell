@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "FileSearch.js" as FileSearch
 
 // File search, MIME detection and safe editor launching; no window ownership.
 Item {
@@ -73,7 +74,7 @@ Item {
                 return;
             root.pending = false;
             search.generation = root.generation;
-            search.command = ["fd", "-H", "-t", "f", "--max-results", "100", "--exclude", "*.png", "--exclude", "*.jpg", "--exclude", "*.jpeg", "--exclude", "*.webp", "--exclude", "*.gif", "--exclude", "*.bmp", "--exclude", "*.svg", "--exclude", "*.mp4", "--exclude", "*.mkv", "--exclude", "*.webm", "--exclude", "*.mov", "--exclude", "*.avi", "--exclude", "*.ttf", "--exclude", "*.otf", "--exclude", "*.woff", "--exclude", "*.woff2", "--exclude", "*.so", "--exclude", "*.so.*", "--exclude", "*.exe", "--exclude", "*.dll", "--exclude", "*.zip", "--exclude", "*.7z", "--exclude", "*.tar", "--exclude", "*.gz", "--", root.needle, Quickshell.env("HOME") + "/.config", Quickshell.env("HOME") + "/Documents", Quickshell.env("HOME") + "/.local/bin", "/etc"];
+            search.command = FileSearch.command(root.needle, Quickshell.env("HOME") || "");
             search.running = true;
         }
     }
