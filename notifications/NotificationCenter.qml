@@ -171,8 +171,7 @@ FocusScope {
         Row {
             id: dndControls
             anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.topMargin: 8
+            anchors.verticalCenter: clearAllButton.verticalCenter
             spacing: 8
 
             Text {
@@ -185,12 +184,18 @@ FocusScope {
             }
 
             ToggleSwitch {
+                id: dndSwitch
                 config: root.config
                 checked: root.notificationService.dnd
-                opacity: checked ? 1 : 0.65
+                opacity: dndHover.hovered ? 0.8 : 1
                 onToggled: {
                     root.notificationService.toggleDnd();
                     root.forceActiveFocus();
+                }
+
+                HoverHandler {
+                    id: dndHover
+                    cursorShape: Qt.PointingHandCursor
                 }
             }
         }
