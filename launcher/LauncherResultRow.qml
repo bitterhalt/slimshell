@@ -52,7 +52,7 @@ Item {
             renderType: Text.NativeRendering
             width: parent.width
             color: root.selected ? root.config.selectionForeground : root.config.fg
-            font.pointSize: root.config.textSizeNormal
+            font.pointSize: root.config.textSizeMedium
             font.family: root.config.textFontFamily
             elide: Text.ElideRight
             textFormat: root.entry.type === "dmenu" ? Text.RichText : Text.AutoText
