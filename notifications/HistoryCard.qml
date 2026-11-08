@@ -14,7 +14,6 @@ Rectangle {
     property bool selected: false
     property bool critical: false
     property bool expanded: false
-    readonly property bool timerNotification: notification && notification.appName === "QuickShell Timer"
     readonly property color criticalTextColor: CriticalColors.text
     readonly property color criticalBorderColor: CriticalColors.border
     readonly property bool highlighted: selected || hover.hovered
@@ -71,7 +70,7 @@ Rectangle {
             id: thumbnail
             objectName: "historyAppIcon"
             anchors.fill: parent
-            source: root.critical || root.timerNotification ? "" : root.appIconSource
+            source: root.critical ? "" : root.appIconSource
             sourceSize.width: Math.ceil(width * Screen.devicePixelRatio * 2)
             sourceSize.height: Math.ceil(height * Screen.devicePixelRatio * 2)
             fillMode: Image.PreserveAspectFit
@@ -83,8 +82,8 @@ Rectangle {
         Text {
             anchors.centerIn: parent
             visible: !thumbnail.visible
-            text: root.critical ? "󰀧" : root.timerNotification ? "󱎫" : "󰂚"
-            color: root.critical ? root.criticalBorderColor : root.timerNotification ? root.config.selectionBackground : root.highlighted ? root.config.fg : root.config.muted
+            text: root.critical ? "󰀧" : "󰂚"
+            color: root.critical ? root.criticalBorderColor : root.highlighted ? root.config.fg : root.config.muted
             font.family: root.config.iconFontFamily
             font.pointSize: root.config.iconSize
         }

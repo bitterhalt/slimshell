@@ -14,7 +14,6 @@ Rectangle {
     readonly property int appIconSize: 36
     readonly property string imageIcon: HistoryModel.iconFromImage(notification ? notification.image : "")
     readonly property bool critical: notification && notification.urgency === NotificationUrgency.Critical
-    readonly property bool timerNotification: notification && notification.appName === "QuickShell Timer"
     readonly property color criticalBorderColor: CriticalColors.border
     readonly property color criticalTextColor: CriticalColors.text
 
@@ -39,17 +38,17 @@ Rectangle {
             id: appIcon
 
             anchors.fill: parent
-            visible: !root.critical && !root.timerNotification && source.toString() !== ""
+            visible: !root.critical && source.toString() !== ""
             source: HistoryModel.iconSource(root.notification ? (root.notification.appIcon || root.imageIcon) : "", (name, fallback) => Quickshell.iconPath(name, fallback))
         }
 
         Text {
             anchors.centerIn: parent
-            visible: root.critical || root.timerNotification || !appIcon.visible
-            color: root.critical ? root.criticalTextColor : root.timerNotification ? config.selectionBackground : config.muted
+            visible: root.critical || !appIcon.visible
+            color: root.critical ? root.criticalTextColor : config.muted
             font.family: config.iconFontFamily
             font.pointSize: config.iconSize
-            text: root.critical ? "󰀧" : root.timerNotification ? "󱎫" : "󰂚"
+            text: root.critical ? "󰀧" : "󰂚"
         }
     }
 

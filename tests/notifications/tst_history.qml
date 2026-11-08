@@ -379,24 +379,6 @@ Item {
             compare(iconBox.y + iconBox.height / 2, card.height / 2);
         }
 
-        function test_timer_history_uses_clock_icon_instead_of_app_icon() {
-            const note = notification(1);
-            note.appName = "QuickShell Timer";
-            card = createTemporaryObject(cardComponent, host, {
-                width: 340,
-                config: config,
-                notification: note,
-                appIconSource: "camera"
-            });
-            const icon = findText(card, "󱎫");
-            verify(card.timerNotification);
-            verify(icon !== null);
-            compare(icon.font.family, config.iconFontFamily);
-            compare(icon.font.pointSize, config.iconSize * 1.5);
-            compare(icon.color, config.selectionBackground);
-            compare(findChild(card, "historyAppIcon").source.toString(), "");
-        }
-
         function test_low_urgency_toast_policy() {
             verify(ToastPolicy.shouldShow({
                 urgency: 0,
