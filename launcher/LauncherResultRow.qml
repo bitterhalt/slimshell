@@ -3,7 +3,7 @@ import Quickshell
 import Quickshell.Widgets
 import "Dmenu.js" as Dmenu
 
-// Rendering only. The launcher owns selection, activation and the timer clock.
+// Rendering only. The launcher owns selection and activation.
 Item {
     id: root
 
@@ -32,11 +32,11 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: root.config.panelPadding
         anchors.verticalCenter: parent.verticalCenter
-        visible: root.entry.type === "calculator" || root.entry.type === "file" || root.entry.type === "binary" || root.entry.type === "emoji" || root.entry.type === "timer-start" || root.entry.type === "timer-active"
+        visible: root.entry.type === "calculator" || root.entry.type === "file" || root.entry.type === "binary" || root.entry.type === "emoji"
         color: root.selected ? root.config.selectionForeground : root.config.selectionBackground
         font.family: root.entry.type === "emoji" ? root.config.textFontFamily : root.config.iconFontFamily
         font.pointSize: root.config.iconSize * 1.5
-        text: root.entry.type === "emoji" ? root.entry.emoji : root.entry.type === "file" ? "󰈔" : root.entry.type === "binary" ? (root.entry.recent ? root.iconStar : root.iconRun) : root.entry.type === "timer-start" || root.entry.type === "timer-active" ? "󰔛" : "󰃬"
+        text: root.entry.type === "emoji" ? root.entry.emoji : root.entry.type === "file" ? "󰈔" : root.entry.type === "binary" ? (root.entry.recent ? root.iconStar : root.iconRun) : "󰃬"
     }
 
     Column {

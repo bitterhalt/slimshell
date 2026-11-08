@@ -14,16 +14,14 @@ Item {
 
     required property var config
     required property var targetScreen
-    required property var timerService
 
     property bool opened: false
     property bool quitOnClose: false
     // Mode order for Ctrl+← / Ctrl+→ cycling.
-    readonly property var modes: ["apps", "run", "emoji", "timer"]
+    readonly property var modes: ["apps", "run", "emoji"]
     property string mode: "apps"
     readonly property bool runMode: mode === "run"
     readonly property bool emojiMode: mode === "emoji"
-    readonly property bool timerMode: mode === "timer"
     // dmenu mode is entered only through `qs ipc call launcher dmenu`, so it
     // is not part of `modes` and can't be reached by cycling.
     readonly property bool dmenuMode: mode === "dmenu"
@@ -48,7 +46,7 @@ Item {
         return ranks;
     }
 
-    readonly property string placeholder: dmenuMode ? (dmenuPrompt !== "" ? dmenuPrompt : "Select") : runMode ? "Search binaries" : timerMode ? "Set a timer (e.g. 25m Focus)" : emojiMode ? "Search emojis" : fileMode ? "Search files" : "Search applications"
+    readonly property string placeholder: dmenuMode ? (dmenuPrompt !== "" ? dmenuPrompt : "Select") : runMode ? "Search binaries" : emojiMode ? "Search emojis" : fileMode ? "Search files" : "Search applications"
 
     property string query: ""
     readonly property string calculatorResult: calculator.result
@@ -60,12 +58,12 @@ Item {
     readonly property int inputHeight: panelInset + rowHeight
     readonly property int contentWidth: 380
     readonly property int contentSpacing: config.panelPadding
-    readonly property bool fileMode: !runMode && !emojiMode && !timerMode && !dmenuMode && query.trim().startsWith("/")
+    readonly property bool fileMode: !runMode && !emojiMode && !dmenuMode && query.trim().startsWith("/")
     readonly property string fileNeedle: fileMode ? query.trim().slice(1).trim() : ""
 
     // "=" prefix hands everything after it to qalc, so units, functions and
     // words work too ("=5 km to miles", "=sqrt(2)", "=1x3").
-    readonly property bool calcPrefix: !runMode && !emojiMode && !timerMode && !dmenuMode && query.trim().startsWith("=")
+    readonly property bool calcPrefix: !runMode && !emojiMode && !dmenuMode && query.trim().startsWith("=")
     readonly property string calcExpression: calcPrefix ? query.trim().slice(1).trim() : query.trim()
 
     // Plain math without the prefix is still detected automatically.
@@ -74,7 +72,7 @@ Item {
             return calcExpression.length > 0;
 
         const value = query.trim();
-        return !runMode && !emojiMode && !timerMode && !dmenuMode && !fileMode && /[0-9]/.test(value) && (/[+\-*/%^×÷]/.test(value) || /\d\s*[xX]\s*[\d(.]/.test(value)) && /^[0-9\s+\-*/%^().,xX×÷]+$/.test(value);
+        return !runMode && !emojiMode && !dmenuMode && !fileMode && /[0-9]/.test(value) && (/[+\-*/%^×÷]/.test(value) || /\d\s*[xX]\s*[\d(.]/.test(value)) && /^[0-9\s+\-*/%^().,xX×÷]+$/.test(value);
     }
 
     readonly property var applications: {
@@ -111,36 +109,6 @@ Item {
         return dmenuItems.map((line, i) => toItem(line, i, Scorer.scoreLine(line, value))).filter(item => item.score > 0).sort((a, b) => b.score - a.score || a.index - b.index);
     }
 
-    readonly property var timerInput: opened && timerMode ? parseTimer(query) : null
-
-    readonly property var timerResults: {
-        if (!opened || !timerMode)
-            return [];
-
-        if (query.trim() !== "") {
-            if (!timerInput)
-                return [];
-
-            return [
-                {
-                    type: "timer-start",
-                    text: formatDuration(timerInput.seconds),
-                    subtitle: timerInput.note || "Press Enter to start",
-                    icon: "󰔛",
-                    seconds: timerInput.seconds,
-                    note: timerInput.note
-                }
-            ];
-        }
-
-        return timerService.timers.slice().sort((a, b) => a.endAt - b.endAt).map(timer => ({
-                    type: "timer-active",
-                    text: activeTimerLabel(timer),
-                    icon: "󰔛",
-                    unit: timer.unit
-                }));
-    }
-
     readonly property var results: {
         if (!opened)
             return [];
@@ -154,8 +122,6 @@ Item {
             entries = runState.results;
         } else if (emojiMode) {
             entries = emojiState.results;
-        } else if (timerMode) {
-            entries = timerResults;
         } else if (calcPrefix) {
             entries = [];
         } else if (fileMode) {
@@ -180,7 +146,7 @@ Item {
                     })).filter(item => item.score > 0).sort((a, b) => b.score - a.score || applicationRank(a.entry.id) - applicationRank(b.entry.id) || a.text.localeCompare(b.text));
         }
 
-        if (!runMode && !timerMode && !dmenuMode && calculatorResult !== "") {
+        if (!runMode && !dmenuMode && calculatorResult !== "") {
             entries.unshift({
                 type: "calculator",
                 text: calculatorResult,
@@ -310,10 +276,6 @@ Item {
         mode = id;
         selectedIndex = 0;
 
-        if (timerMode) {
-            timerService.pruneExpired(Date.now());
-        }
-
         searchInput.forceActiveFocus();
     }
 
@@ -370,11 +332,6 @@ Item {
 
         if (item.type === "dmenu") {
             submitDmenu(item.text, item.index);
-        } else if (item.type === "timer-start") {
-            timerService.startTimer(item.seconds, item.note);
-            searchInput.text = "";
-        } else if (item.type === "timer-active") {
-            timerService.cancelTimer(item.unit);
         } else if (item.type === "application") {
             item.entry.execute();
             recordApplication(item.entry.id);
@@ -393,73 +350,6 @@ Item {
             emojiState.record(item.emoji);
             finalizeClose();
         }
-    }
-
-    function parseTimer(text): var {
-        const value = String(text || "").trim();
-
-        if (value === "")
-            return null;
-
-        const clockMatch = value.match(/^(\d+):([0-5]?\d)(?:\s+(.+))?$/);
-        if (clockMatch) {
-            const seconds = Number(clockMatch[1]) * 60 + Number(clockMatch[2]);
-            return seconds > 0 ? {
-                seconds: seconds,
-                note: (clockMatch[3] || "").trim()
-            } : null;
-        }
-
-        const unitMatch = value.match(/^((?:\d+(?:\.\d+)?\s*[hms]\s*)+)(.*)$/i);
-        if (unitMatch) {
-            let seconds = 0;
-            const parts = /(\d+(?:\.\d+)?)\s*([hms])/gi;
-            let part;
-
-            while ((part = parts.exec(unitMatch[1])) !== null) {
-                const amount = Number(part[1]);
-                const unit = part[2].toLowerCase();
-                seconds += amount * (unit === "h" ? 3600 : unit === "m" ? 60 : 1);
-            }
-
-            return seconds > 0 ? {
-                seconds: Math.ceil(seconds),
-                note: unitMatch[2].trim()
-            } : null;
-        }
-
-        const minutesMatch = value.match(/^(\d+(?:\.\d+)?)(?:\s+(.+))?$/);
-        if (!minutesMatch)
-            return null;
-
-        const seconds = Math.ceil(Number(minutesMatch[1]) * 60);
-        return seconds > 0 ? {
-            seconds: seconds,
-            note: (minutesMatch[2] || "").trim()
-        } : null;
-    }
-
-    function formatDuration(seconds): string {
-        if (seconds >= 3600) {
-            const hours = Math.floor(seconds / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
-            return hours + "h" + (minutes > 0 ? " " + minutes + "m" : "");
-        }
-
-        if (seconds >= 60) {
-            const minutes = Math.floor(seconds / 60);
-            const remainder = seconds % 60;
-            return minutes + "m" + (remainder > 0 ? " " + remainder + "s" : "");
-        }
-
-        return seconds + "s";
-    }
-
-    function activeTimerLabel(timer): string {
-        const readyAt = new Date(timer.endAt);
-        const hours = String(readyAt.getHours()).padStart(2, "0");
-        const minutes = String(readyAt.getMinutes()).padStart(2, "0");
-        return (timer.note || "Timer") + " -> " + hours + ":" + minutes;
     }
 
     function applicationRank(id): int {
@@ -668,12 +558,6 @@ Item {
                             event.accepted = true;
                         }
                         break;
-                    case Qt.Key_T:
-                        if (control) {
-                            root.setMode("timer");
-                            event.accepted = true;
-                        }
-                        break;
                     case Qt.Key_S:
                         if (control) {
                             root.openFileSearch();
@@ -753,7 +637,7 @@ Item {
                 visible: root.visibleRows > 0 && root.results.length === 0
                 color: root.config.muted
                 font.pointSize: root.config.textSizeMedium
-                text: root.dmenuMode ? "No matches" : root.calcPrefix ? (root.calcExpression === "" ? "Type an expression" : calculator.busy ? "Calculating…" : "Can't evaluate expression") : root.runMode ? (runState.loading ? "Loading binaries…" : "No binaries found") : root.timerMode ? (root.query.trim() === "" ? "No active timers" : "Try 25m, 45s, 1:30, or 2h Focus") : root.emojiMode ? "No emoji found" : root.fileMode && root.fileNeedle.length < 2 ? "Type at least two characters after /" : root.fileMode && root.fileSearching ? "Searching…" : root.fileMode ? "No files found" : "No applications found"
+                text: root.dmenuMode ? "No matches" : root.calcPrefix ? (root.calcExpression === "" ? "Type an expression" : calculator.busy ? "Calculating…" : "Can't evaluate expression") : root.runMode ? (runState.loading ? "Loading binaries…" : "No binaries found") : root.emojiMode ? "No emoji found" : root.fileMode && root.fileNeedle.length < 2 ? "Type at least two characters after /" : root.fileMode && root.fileSearching ? "Searching…" : root.fileMode ? "No files found" : "No applications found"
             }
         }
     }
@@ -801,9 +685,6 @@ Item {
         }
         function emoji(): void {
             root.toggleMode("emoji");
-        }
-        function timer(): void {
-            root.toggleMode("timer");
         }
         function files(): void {
             root.toggleMode("files");

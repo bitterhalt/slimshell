@@ -24,7 +24,7 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 | ------------ | ------------------------------------------------------------------------------------------------ |
 | **Bar**      | Workspaces, Window title, Clock and Weather, Battery, Connections, Privacy indicators, Tray etc. |
 | **Menus**    | Keyboard-driven menus for Bluetooth, Wi-Fi, Audio, Power, and Notifications                      |
-| **launcher** | Application launcher with: File Search, Calculator, Binary Runner, Emoji, Timers and Dmenu-mode  |
+| **launcher** | Application launcher with: File Search, Calculator, Binary Runner, Emoji and Dmenu-mode      |
 | **Tools**    | Clipboard, DeepL translation, and Screen recording                                               |
 | **Session**  | Lock Screen, Wallpaper Picker, and Dynamic theming with [Hellwal](https://hellwal.danihek.xyz/)  |
 
@@ -38,7 +38,7 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 | `bluetooth`          | `toggle`, `open`, `close`                                                         | Show or hide the Bluetooth menu                          |
 | `clipboard`          | `toggle`, `open`, `close`, `refresh`, `copySelected`, `deleteSelected`            | Control the clipboard picker                             |
 | `idle`               | `toggle`, `isDisabled`, `settings`                                                | Control idle handling or open its settings               |
-| `launcher`           | `toggle`, `open`, `close`, `apps`, `run`, `emoji`, `timer`, `files`, `calculator` | Open, switch, or toggle launcher modes                   |
+| `launcher`           | `toggle`, `open`, `close`, `apps`, `run`, `emoji`, `files`, `calculator` | Open, switch, or toggle launcher modes                   |
 | `lock`               | `lock`                                                                            | Lock the session                                         |
 | `locker`             | `isSecure`                                                                        | Query whether the separate lock-screen process is secure |
 | `menu`               | `open <name>`, `toggle <name>`, `close`, `packages`, `settings`, `system`         | Open a user menu or close it                             |
@@ -66,7 +66,6 @@ Launcher modes. Switch directly with the shortcuts below, or cycle with **Ctrl+â
 | Apps  | `Ctrl+A` | Search and launch desktop applications                   |
 | Run   | `Ctrl+B` | Run binaries, with recently used commands first          |
 | Emoji | `Ctrl+E` | Search by name and copy the selected emoji               |
-| Timer | `Ctrl+T` | Start timers such as `25m Focus`, `45s`, `1:30`, or `2h` |
 
 In Apps mode, `/<word>` searches files and `=expression` calculates with `qalc`. Plain math works too.
 

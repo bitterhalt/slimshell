@@ -16,11 +16,11 @@ class LauncherModeTests(unittest.TestCase):
         source = (ROOT / "launcher/Launcher.qml").read_text()
         methods = []
         for name in ("reset", "close", "finalizeClose", "cancelDmenu", "openApplications",
-                     "toggleApplications", "setMode", "toggleMode", "formatDuration", "activeTimerLabel"):
+                     "toggleApplications", "setMode", "toggleMode"):
             match = re.search(r"^    function " + name + r"\([^\n]*\{.*?^    }", source, re.M | re.S)
             self.assertIsNotNone(match, name)
             methods.append(match.group())
-        for name in ("apps", "run", "emoji", "timer", "files", "calculator"):
+        for name in ("apps", "run", "emoji", "files", "calculator"):
             self.assertRegex(
                 source,
                 rf'function {name}\(\):\s*void\s*\{{\s*root\.toggleMode\("{name}"\);?\s*\}}',
@@ -30,7 +30,7 @@ class LauncherModeTests(unittest.TestCase):
             (base / "Controller.qml").write_text('''import QtQuick
 Item {
     id: root
-    property var modes: ["apps", "run", "emoji", "timer"]
+    property var modes: ["apps", "run", "emoji"]
     property string mode: "apps"
     property string query: ""
     property bool opened: false
@@ -39,7 +39,6 @@ Item {
     property int prunes: 0
     property alias input: searchInput
     readonly property bool dmenuMode: mode === "dmenu"
-    readonly property bool timerMode: mode === "timer"
     readonly property bool fileMode: mode === "apps" && query.startsWith("/")
     readonly property bool calcPrefix: mode === "apps" && query.startsWith("=")
     property bool calculatorQuery: false
@@ -47,9 +46,6 @@ Item {
     property var dmenuItems: []
     property string dmenuPrompt: ""
     property var writes: []
-    property QtObject timerService: QtObject {
-        function pruneExpired(now) { root.prunes++; }
-    }
     TextInput { id: searchInput; onTextChanged: root.query = text }
     function writeDmenuOutput(path, value) { writes = writes.concat([{path: path, value: value}]); }
 ''' + "\n".join(methods) + "\n}\n")
@@ -62,7 +58,7 @@ Item {
     TestCase {
         name: "LauncherDirectModes"
         function test_open_switch_toggle_data() {
-            return ["apps", "run", "emoji", "timer", "files", "calculator"].map(name => ({tag: name, name: name}));
+            return ["apps", "run", "emoji", "files", "calculator"].map(name => ({tag: name, name: name}));
         }
         function test_open_switch_toggle(data) {
             failOnWarning(/TypeError|ReferenceError|Binding loop/);
@@ -71,7 +67,6 @@ Item {
             verify(controller.opened);
             compare(controller.mode, ["files", "calculator"].includes(data.name) ? "apps" : data.name);
             compare(controller.query, data.name === "files" ? "/" : data.name === "calculator" ? "=" : "");
-            if (data.name === "timer") compare(controller.prunes, 1);
             controller.toggleMode(data.name);
             verify(!controller.opened);
             controller.openApplications();
@@ -110,13 +105,6 @@ Item {
             controller.toggleApplications();
             compare(controller.mode, "apps");
             verify(controller.opened);
-        }
-        function test_active_timer_label_uses_static_ready_time() {
-            const controller = createTemporaryObject(controllerComponent, host);
-            const readyAt = new Date(0);
-            readyAt.setHours(7, 5, 0, 0);
-            compare(controller.activeTimerLabel({note: "Focus", endAt: readyAt.getTime()}), "Focus Ready: 07:05");
-            compare(controller.activeTimerLabel({note: "", endAt: readyAt.getTime()}), "Timer Ready: 07:05");
         }
     }
 }

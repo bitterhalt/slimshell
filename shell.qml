@@ -88,10 +88,6 @@ ShellRoot {
         id: appLockService
     }
 
-    TimerService {
-        id: appTimerService
-    }
-
     Loader {
         active: appConfig.launcherEnabled
 
@@ -99,7 +95,6 @@ ShellRoot {
             Launcher {
                 config: appConfig
                 targetScreen: root.activeScreen
-                timerService: appTimerService
             }
         }
     }

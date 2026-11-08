@@ -23,7 +23,6 @@ Additional tools are needed only for the features you use:
 | Administrator file editing | `sudo` with permission to use `sudoedit`                                  |
 | Calculator                 | `qalc`, `wl-copy`                                                         |
 | Emoji                      | An emoji list, described below; `wl-copy` to copy selections              |
-| Timers                     | systemd user services and `notify-send`                                   |
 | Audio card profiles        | `pactl` and PipeWire's PulseAudio compatibility service                   |
 | Screen recording           | `gpu-screen-recorder`, `notify-send`                                      |
 | Wallpaper picker           | Python 3, ImageMagick (`magick`), `awww`; Hellwal for generated colors    |
