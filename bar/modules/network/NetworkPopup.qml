@@ -452,10 +452,6 @@ PopoutPanel {
                 key: "Ctrl+S"
             },
             {
-                name: "Show / hide help",
-                key: "?"
-            },
-            {
                 name: "Close",
                 key: "Esc"
             }

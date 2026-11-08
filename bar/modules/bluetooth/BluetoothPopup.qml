@@ -275,10 +275,6 @@ PopoutPanel {
             {
                 name: "Back / close help",
                 key: "Esc"
-            },
-            {
-                name: "Show / hide help",
-                key: "?"
             }
         ]
     }

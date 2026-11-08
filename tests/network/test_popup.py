@@ -164,7 +164,9 @@ Item {
         function test_help_replaces_network_and_action_controls() {
             const popup = createTemporaryObject(popupComponent, host);
             popup.helpOpen = true;
-            verify(findChild(popup, "networkKeyboardHelp").visible);
+            const help = findChild(popup, "networkKeyboardHelp");
+            verify(help.visible);
+            verify(!help.entries.some(entry => entry.name === "Show / hide help"));
             verify(!findChild(popup, "networkDeviceList").visible);
             verify(!findChild(popup, "networkFooter").visible);
             popup.helpOpen = false;

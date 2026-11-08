@@ -120,7 +120,9 @@ Item {
         function test_help_replaces_device_list_and_scan_footer() {
             const popup = manager.popup;
             popup.helpOpen = true;
-            verify(findChild(popup, "bluetoothKeyboardHelp").visible);
+            const help = findChild(popup, "bluetoothKeyboardHelp");
+            verify(help.visible);
+            verify(!help.entries.some(entry => entry.name === "Show / hide help"));
             verify(!findChild(popup, "bluetoothDeviceList").visible);
             verify(!findChild(popup, "bluetoothFooter").visible);
         }
