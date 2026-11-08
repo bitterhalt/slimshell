@@ -158,7 +158,7 @@ class BluetoothPopupTests(unittest.TestCase):
                                        and line != 'import "../../../components"')
                     source = 'import "."\n' + source
                 (base / name).write_text(source)
-            for name in ("PopoutPanel.qml", "PanelSurface.qml", "PanelSeparator.qml", "SelectionIndicator.qml", "ShellButton.qml", "ShellIconButton.qml"):
+            for name in ("PopoutPanel.qml", "PanelSurface.qml", "PanelSeparator.qml", "SelectionIndicator.qml", "KeyboardHelp.qml", "ShellButton.qml", "ShellIconButton.qml"):
                 (base / name).write_text((ROOT.parents[2] / "components" / name).read_text())
             (base / "qmldir").write_text("singleton Quickshell 1.0 Quickshell.qml\n")
             (base / "Quickshell.qml").write_text(

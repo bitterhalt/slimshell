@@ -23,7 +23,7 @@ class NetworkPopupTests(unittest.TestCase):
                                        and line != 'import "../../../components"')
                     source = 'import "."\n' + source
                 (base / name).write_text(source)
-            for name in ("PopoutPanel.qml", "PanelSurface.qml", "PanelSeparator.qml", "ShellButton.qml",
+            for name in ("PopoutPanel.qml", "PanelSurface.qml", "PanelSeparator.qml", "KeyboardHelp.qml", "ShellButton.qml",
                          "ShellTextField.qml", "ActionRow.qml", "SelectionIndicator.qml", "ShellIconButton.qml"):
                 (base / name).write_text((ROOT / "components" / name).read_text())
             copy_control_config(base)

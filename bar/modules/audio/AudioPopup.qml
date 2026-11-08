@@ -174,78 +174,54 @@ PopoutPanel {
             }
 
             // Keyboard help shown in place of the row list.
-            Column {
+            KeyboardHelp {
                 id: helpRows
                 anchors.left: parent.left
                 anchors.right: parent.right
-                spacing: 8
                 visible: popupState.helpOpen
-                Repeater {
-                    model: [
-                        {
-                            name: "Select row",
-                            key: "↑ / ↓   k / j"
-                        },
-                        {
-                            name: "Adjust volume",
-                            key: "← / →   h / l"
-                        },
-                        {
-                            name: "Set volume",
-                            key: "` / 1–0"
-                        },
-                        {
-                            name: "Toggle mute",
-                            key: "m"
-                        },
-                        {
-                            name: "Set default output / input",
-                            key: "d"
-                        },
-                        {
-                            name: "Open options",
-                            key: "Enter / c"
-                        },
-                        {
-                            name: "Previous tab",
-                            key: "Ctrl+← / Shift+Tab / H"
-                        },
-                        {
-                            name: "Next tab",
-                            key: "Ctrl+→ / Tab / L"
-                        },
-                        {
-                            name: "Show / hide help",
-                            key: "?"
-                        },
-                        {
-                            name: "Back / close",
-                            key: "Esc"
-                        }
-                    ]
-                    delegate: Item {
-                        id: helpRow
-                        required property var modelData
-                        width: parent.width
-                        height: 20
-                        Text {
-                            renderType: Text.NativeRendering
-                            anchors.left: parent.left
-                            anchors.leftMargin: 6
-                            text: helpRow.modelData.name
-                            color: root.config.fg
-                            font.pointSize: root.config.textSizeMedium
-                        }
-                        Text {
-                            renderType: Text.NativeRendering
-                            anchors.right: parent.right
-                            anchors.rightMargin: 6
-                            text: helpRow.modelData.key
-                            color: root.config.muted
-                            font.pointSize: root.config.textSizeSmall
-                        }
+                config: root.config
+                entries: [
+                    {
+                        name: "Select row",
+                        key: "↑ / ↓   k / j"
+                    },
+                    {
+                        name: "Adjust volume",
+                        key: "← / →   h / l"
+                    },
+                    {
+                        name: "Set volume",
+                        key: "` / 1–0"
+                    },
+                    {
+                        name: "Toggle mute",
+                        key: "m"
+                    },
+                    {
+                        name: "Set default output / input",
+                        key: "d"
+                    },
+                    {
+                        name: "Open options",
+                        key: "Enter / c"
+                    },
+                    {
+                        name: "Previous tab",
+                        key: "Ctrl+← / Shift+Tab / H"
+                    },
+                    {
+                        name: "Next tab",
+                        key: "Ctrl+→ / Tab / L"
+                    },
+                    {
+                        name: "Show / hide help",
+                        key: "?"
+                    },
+                    {
+                        name: "Back / close",
+                        key: "Esc"
                     }
-                }
+                ]
             }
         }
 

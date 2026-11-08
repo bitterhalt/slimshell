@@ -414,14 +414,49 @@ PopoutPanel {
     }
 
     // Keyboard help for the scan and popup shortcuts.
-    Text {
-        renderType: Text.NativeRendering
+    KeyboardHelp {
         width: parent.width
         visible: root.helpOpen && !root.passwordMode
-        color: root.config.muted
-        font.pointSize: root.config.textSizeSmall
-        wrapMode: Text.WordWrap
-        text: root.actionMode ? "←/→ Select · Enter Activate · " + (actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "d Disconnect" : "c Connect") + " · f Forget · Esc Back" : "↑/↓ or j/k Select · Enter Connect · Ctrl+S Scan/Stop · ?/Esc Help/Close"
+        config: root.config
+        entries: root.actionMode ? [
+            {
+                name: "Select action",
+                key: "← / →"
+            },
+            {
+                name: actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "Disconnect" : "Connect",
+                key: actionPage.selectedNetwork && actionPage.selectedNetwork.connected ? "d" : "c"
+            },
+            {
+                name: "Forget network",
+                key: "f"
+            },
+            {
+                name: "Back / close",
+                key: "Esc"
+            }
+        ] : [
+            {
+                name: "Select network",
+                key: "↑ / ↓   j / k"
+            },
+            {
+                name: "Connect",
+                key: "Enter"
+            },
+            {
+                name: "Start / stop scanning",
+                key: "Ctrl+S"
+            },
+            {
+                name: "Show / hide help",
+                key: "?"
+            },
+            {
+                name: "Close",
+                key: "Esc"
+            }
+        ]
     }
 
     // Bottom connection status and scan controls.

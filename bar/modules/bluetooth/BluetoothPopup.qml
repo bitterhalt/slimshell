@@ -243,14 +243,41 @@ PopoutPanel {
         wrapMode: Text.WordWrap
     }
 
-    Text {
-        renderType: Text.NativeRendering
+    KeyboardHelp {
+        id: bluetoothHelp
         width: parent.width
         visible: root.helpOpen
-        color: root.config.muted
-        font.pointSize: root.config.textSizeSmall
-        text: "↑/↓ or j/k Select · Enter Connect/Pair · t Trust/Untrust · f Forget · Ctrl+S Scan/Stop · ?/Esc Back"
-        wrapMode: Text.WordWrap
+        config: root.config
+        entries: [
+            {
+                name: "Select device",
+                key: "↑ / ↓   j / k"
+            },
+            {
+                name: "Connect / pair",
+                key: "Enter"
+            },
+            {
+                name: "Trust / untrust",
+                key: "t"
+            },
+            {
+                name: "Forget paired device",
+                key: "f"
+            },
+            {
+                name: "Start / stop scanning",
+                key: "Ctrl+S"
+            },
+            {
+                name: "Back / close help",
+                key: "Esc"
+            },
+            {
+                name: "Show / hide help",
+                key: "?"
+            }
+        ]
     }
 
     // Device count/status and discovery controls.
