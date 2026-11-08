@@ -100,11 +100,17 @@ Item {
             const temperature = findChild(popup, "weatherTemperature");
             const detail = findChild(popup, "weatherDetailIcon");
             const moon = findChild(popup, "weatherMoonIcon");
+            const moonName = findChild(popup, "weatherMoonName");
+            const moonIllumination = findChild(popup, "weatherMoonIllumination");
             const forecast = findChild(popup, "weatherForecastIcon-0");
             fixtureConfig.iconSize = 12;
             fuzzyCompare(main.font.pointSize, 36, 0.01);
             fuzzyCompare(detail.font.pointSize, 12, 0.01);
-            fuzzyCompare(moon.font.pointSize, 9.6, 0.01);
+            fuzzyCompare(moon.font.pointSize, 12.48, 0.01);
+            compare(moonName.text, "Full Moon");
+            compare(moonName.horizontalAlignment, Text.AlignHCenter);
+            compare(moonIllumination.text, "100%");
+            compare(moonIllumination.horizontalAlignment, Text.AlignRight);
             fuzzyCompare(forecast.font.pointSize, 15.6, 0.01);
             fuzzyCompare(temperature.font.pointSize, 28, 0.01);
             fixtureConfig.fontSize = 12;

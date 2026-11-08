@@ -173,7 +173,7 @@ FocusScope {
 
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 30
+            implicitHeight: 28
             radius: root.config.popupRadius
             color: Qt.alpha(root.config.selectionBackground, 0.12)
 
@@ -187,7 +187,7 @@ FocusScope {
                     objectName: "weatherMoonIcon"
                     visible: !!root.weatherData.data.moon
                     text: root.weatherData.data.moon ? root.weatherData.data.moon.icon : ""
-                    font.pointSize: root.moonIconSize
+                    font.pointSize: root.moonIconSize * 1.30
                 }
 
                 Label {
@@ -226,7 +226,7 @@ FocusScope {
 
                 objectName: "weatherForecast-" + index
                 Layout.fillWidth: true
-                implicitHeight: 25
+                implicitHeight: 28
                 radius: root.config.popupRadius
                 color: Qt.alpha(root.config.selectionBackground, index % 2 === 0 ? 0.1 : 0.05)
 
