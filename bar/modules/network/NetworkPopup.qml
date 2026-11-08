@@ -216,9 +216,10 @@ PopoutPanel {
 
     // Connected Ethernet/Wi-Fi and nearby access points.
     Column {
+        objectName: "networkDeviceList"
         width: parent.width
         spacing: 2
-        visible: !root.passwordMode && !root.actionMode
+        visible: !root.passwordMode && !root.actionMode && !root.helpOpen
 
         Item {
             width: parent.width
@@ -366,6 +367,7 @@ PopoutPanel {
     // Connect, forget, and back actions for a selected network.
     NetworkActions {
         id: actionPage
+        objectName: "networkActions"
 
         config: root.config
         selectedNetwork: root.network.networkForSsid(root.selectedSsid)
@@ -379,12 +381,12 @@ PopoutPanel {
         }
         onActivated: index => root.activateAction(index)
         width: parent.width
-        visible: root.actionMode
+        visible: root.actionMode && !root.helpOpen
     }
 
     Text {
         width: parent.width
-        visible: root.actionMode && root.confirmForget
+        visible: root.actionMode && root.confirmForget && !root.helpOpen
         renderType: Text.NativeRendering
         color: root.config.urgent
         font.pointSize: root.config.textSizeSmall
@@ -415,6 +417,7 @@ PopoutPanel {
 
     // Keyboard help for the scan and popup shortcuts.
     KeyboardHelp {
+        objectName: "networkKeyboardHelp"
         width: parent.width
         visible: root.helpOpen && !root.passwordMode
         config: root.config
@@ -461,9 +464,10 @@ PopoutPanel {
 
     // Bottom connection status and scan controls.
     Item {
+        objectName: "networkFooter"
         width: parent.width
         height: Math.max(footerStatus.implicitHeight, scanButton.height) + root.spacing
-        visible: !root.passwordMode && !root.actionMode
+        visible: !root.passwordMode && !root.actionMode && !root.helpOpen
 
         PanelSeparator {
             config: root.config

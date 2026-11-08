@@ -161,6 +161,18 @@ Item {
             tryCompare(back, "activeFocus", true);
             compare(popup.selectedActionIndex, 2);
         }
+        function test_help_replaces_network_and_action_controls() {
+            const popup = createTemporaryObject(popupComponent, host);
+            popup.helpOpen = true;
+            verify(findChild(popup, "networkKeyboardHelp").visible);
+            verify(!findChild(popup, "networkDeviceList").visible);
+            verify(!findChild(popup, "networkFooter").visible);
+            popup.helpOpen = false;
+            popup.openRow({ssid: "Saved"});
+            popup.helpOpen = true;
+            verify(findChild(popup, "networkKeyboardHelp").visible);
+            verify(!findChild(popup, "networkActions").visible);
+        }
         function test_scan_button_toggles_and_respects_availability() {
             const popup = createTemporaryObject(popupComponent, host);
             const button = findChild(popup, "networkScanButton");

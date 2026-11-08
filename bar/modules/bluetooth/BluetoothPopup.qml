@@ -163,9 +163,11 @@ PopoutPanel {
     }
 
     Column {
+        id: deviceList
+        objectName: "bluetoothDeviceList"
         width: parent.width
         spacing: 2
-        visible: root.adapter && root.adapter.enabled
+        visible: root.adapter && root.adapter.enabled && !root.helpOpen
 
         // Connected devices, then paired devices, then nearby devices.
         Repeater {
@@ -245,6 +247,7 @@ PopoutPanel {
 
     KeyboardHelp {
         id: bluetoothHelp
+        objectName: "bluetoothKeyboardHelp"
         width: parent.width
         visible: root.helpOpen
         config: root.config
@@ -282,9 +285,10 @@ PopoutPanel {
 
     // Device count/status and discovery controls.
     Item {
+        objectName: "bluetoothFooter"
         width: parent.width
         height: Math.max(footerStatus.implicitHeight, scanButton.height) + root.spacing
-        visible: !!root.adapter && root.adapter.enabled && !root.confirmForget
+        visible: !!root.adapter && root.adapter.enabled && !root.confirmForget && !root.helpOpen
 
         PanelSeparator {
             config: root.config

@@ -117,6 +117,13 @@ Item {
             keyClick(Qt.Key_Return);
             compare(service.forgets, 1);
         }
+        function test_help_replaces_device_list_and_scan_footer() {
+            const popup = manager.popup;
+            popup.helpOpen = true;
+            verify(findChild(popup, "bluetoothKeyboardHelp").visible);
+            verify(!findChild(popup, "bluetoothDeviceList").visible);
+            verify(!findChild(popup, "bluetoothFooter").visible);
+        }
         function test_scan_button_starts_and_stops_discovery() {
             const button = findChild(manager.popup, "bluetoothScanButton");
             verify(button !== null);
