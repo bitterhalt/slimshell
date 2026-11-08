@@ -635,11 +635,17 @@ Item {
             waitForPolish(host.Window.window);
             const list = findChild(popup, "audioRows");
             const firstRow = findChild(popup, "audioRow-0");
-            compare(popup.rowHeight, 26);
-            compare(popup.rowSpacing, 0);
+            compare(popup.rowHeight, 32);
+            compare(popup.rowSpacing, 2);
             verify(firstRow !== null);
-            compare(firstRow.height, 26);
-            compare(list.contentHeight, popupControls.rows.length * 26);
+            compare(firstRow.height, 32);
+            compare(list.contentHeight, popupControls.rows.length * 32 + (popupControls.rows.length - 1) * 2);
+            popupControls.selectRow(0);
+            popupControls.activateSelected();
+            waitForPolish(host.Window.window);
+            verify(findText(popup, "✓ Off") !== null);
+            compare(findChild(popup, "audioRow-0").height, 32);
+            compare(findChild(popup, "audioRow-1").height, 32);
         }
     }
 }

@@ -13,8 +13,8 @@ PopoutPanel {
     config: audioItem.config
     contentWidth: Math.min(420, audioItem.barWindow.screen ? audioItem.barWindow.screen.width - config.popupGap * 2 : 420)
     padding: 10
-    readonly property int rowHeight: popupState.tabIndex === 3 ? 26 : popupState.tabIndex === 2 ? 56 : 44
-    readonly property int rowSpacing: popupState.tabIndex === 3 ? 0 : 2
+    readonly property int rowHeight: popupState.tabIndex === 3 ? 32 : popupState.tabIndex === 2 ? 56 : 44
+    readonly property int rowSpacing: 2
     readonly property int chromeHeight: 12 + status.height + root.spacing + footer.height
     readonly property real desiredBodyHeight: popupState.helpOpen ? helpRows.implicitHeight : popupState.contextOpen ? optionRows.implicitHeight : Math.max(rowHeight, popupState.rows.length * (rowHeight + rowSpacing) - rowSpacing)
     readonly property real maximumBodyHeight: Math.max(rowHeight, Math.min(316, root.audioItem.barWindow.screen ? root.audioItem.barWindow.screen.height - root.config.popupGap - root.padding * 2 - chromeHeight - 24 : 316))
@@ -125,8 +125,8 @@ PopoutPanel {
                         id: profileRow
                         ChoiceRow {
                             config: root.config
-                            title: entry.modelData.name + (entry.modelData.available === false ? " (unavailable)" : "")
-                            subtitle: entry.modelData.kind === "card" ? entry.modelData.media : entry.modelData.active ? "Active" : ""
+                            title: (entry.modelData.active ? "✓ " : "") + entry.modelData.name + (entry.modelData.available === false ? " (unavailable)" : "")
+                            subtitle: ""
                             selected: popupState.rows.length > 1 && entry.index === popupState.selectedIndex
                             enabled: entry.modelData.available !== false && !(popupState.profiles && popupState.profiles.changing)
                             onActivated: {
