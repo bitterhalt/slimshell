@@ -40,7 +40,7 @@ Item {
                 id: toggleIcon
 
                 anchors.centerIn: parent
-                color: revealer.hovered || revealer.revealLocked ? root.config.selectionBackground : root.config.muted
+                color: revealer.hovered || revealer.revealLocked ? root.config.fg : root.config.muted
                 font.family: root.config.iconFontFamily
                 font.pointSize: root.config.iconSize
                 text: "󰅀"

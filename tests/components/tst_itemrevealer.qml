@@ -115,8 +115,7 @@ Item {
 
             mouseMove(reverse, reverse.width - 4, reverse.height / 2);
             tryCompare(reverse, "revealProgress", 1);
-
-            compare(reverse.width, 30 + 8 + 40);
+            tryCompare(reverse, "width", 30 + 8 + 40);
             const primaryX = primary.mapToItem(reverse, 0, 0).x;
             compare(primaryX, reverse.width - 30);
             compare(revealed.mapToItem(reverse, 0, 0).x + revealed.width, primaryX - 8);
