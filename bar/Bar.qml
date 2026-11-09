@@ -166,7 +166,7 @@ PanelWindow {
         }
 
         Tray {
-            visible: barWindow.config.showTray
+            visible: barWindow.config.showTray && hasItems
             config: barWindow.config
             barWindow: barWindow
             popupManager: popupManager

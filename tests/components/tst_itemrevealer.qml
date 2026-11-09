@@ -39,6 +39,34 @@ Item {
         }
     }
 
+    Component {
+        id: reverseRevealerComponent
+
+        ItemRevealer {
+            config: fixtureConfig
+            barWindow: fixtureWindow
+            revealToLeft: true
+
+            Rectangle {
+                objectName: "reversePrimary"
+
+                width: 30
+                height: 20
+                color: "#333"
+            }
+
+            revealData: [
+                Rectangle {
+                    objectName: "reverseRevealed"
+
+                    width: 40
+                    height: 20
+                    color: "#888"
+                }
+            ]
+        }
+    }
+
     TestCase {
         name: "ItemRevealer"
         when: windowShown
@@ -70,6 +98,41 @@ Item {
             mouseMove(host, host.width - 1, host.height - 1);
             tryCompare(revealer, "revealProgress", 0);
             compare(revealer.width, collapsedWidth);
+        }
+
+        function test_reverse_layout_keeps_primary_on_the_right() {
+            const reverse = createTemporaryObject(reverseRevealerComponent, host, {
+                x: 200,
+                y: 20
+            });
+            verify(reverse !== null);
+            const primary = findChild(reverse, "reversePrimary");
+            const revealed = findChild(reverse, "reverseRevealed");
+            verify(primary !== null);
+            verify(revealed !== null);
+            compare(reverse.width, 30);
+            compare(primary.mapToItem(reverse, 0, 0).x, 0);
+
+            mouseMove(reverse, reverse.width - 4, reverse.height / 2);
+            tryCompare(reverse, "revealProgress", 1);
+
+            compare(reverse.width, 30 + 8 + 40);
+            const primaryX = primary.mapToItem(reverse, 0, 0).x;
+            compare(primaryX, reverse.width - 30);
+            compare(revealed.mapToItem(reverse, 0, 0).x + revealed.width, primaryX - 8);
+        }
+
+        function test_reveal_lock_keeps_content_open() {
+            mouseMove(revealer, 4, revealer.height / 2);
+            tryCompare(revealer, "revealProgress", 1);
+
+            revealer.revealLocked = true;
+            mouseMove(host, host.width - 1, host.height - 1);
+            tryVerify(() => !revealer.hovered);
+            compare(revealer.revealProgress, 1);
+
+            revealer.revealLocked = false;
+            tryCompare(revealer, "revealProgress", 0);
         }
     }
 }
