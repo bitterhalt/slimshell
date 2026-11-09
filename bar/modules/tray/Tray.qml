@@ -9,13 +9,56 @@ Item {
     required property var barWindow
     required property var popupManager
     property bool expanded: false
+    readonly property int hoverRevealDelay: 300
+    readonly property int trayItemWidth: 20
+    readonly property bool hasItems: trayItems.implicitWidth > 0
+    readonly property bool trayMenuOpen: popupManager.hostRequested && popupManager.activeKey === "trayMenu"
 
     property real revealProgress: 0
-    readonly property real revealWidth: trayItems.implicitWidth > 0 ? trayItems.implicitWidth + 8 : 0
+    readonly property real revealWidth: trayItems.implicitWidth > 0 ? trayItems.implicitWidth + config.spacingControl : 0
 
     height: barWindow.height
-    implicitWidth: toggleButton.width + revealWidth * revealProgress
+    width: implicitWidth
+    implicitWidth: (hasItems ? toggleButton.width : 0) + revealWidth * revealProgress
     onExpandedChanged: revealProgress = expanded ? 1 : 0
+
+    HoverHandler {
+        id: revealHover
+
+        cursorShape: Qt.PointingHandCursor
+        onHoveredChanged: {
+            if (hovered)
+                revealTimer.restart();
+            else {
+                revealTimer.stop();
+                if (!root.trayMenuOpen)
+                    root.expanded = false;
+            }
+        }
+    }
+
+    Timer {
+        id: revealTimer
+        interval: root.hoverRevealDelay
+        onTriggered: {
+            if (revealHover.hovered)
+                root.expanded = true;
+        }
+    }
+
+    Connections {
+        target: root.popupManager
+
+        function onHostRequestedChanged() {
+            if (!root.trayMenuOpen && !revealHover.hovered)
+                root.expanded = false;
+        }
+
+        function onActiveKeyChanged() {
+            if (!root.trayMenuOpen && !revealHover.hovered)
+                root.expanded = false;
+        }
+    }
 
     Behavior on revealProgress {
         NumberAnimation {
@@ -39,9 +82,9 @@ Item {
             Row {
                 id: trayItems
 
-                x: revealClip.width - implicitWidth
+                x: revealClip.width - implicitWidth - root.config.spacingControl
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: 8
+                spacing: root.config.spacingControl
 
                 Repeater {
                     model: SystemTray.items
@@ -50,7 +93,7 @@ Item {
                         id: trayItem
                         required property var modelData
 
-                        width: 20
+                        width: root.trayItemWidth
                         height: root.barWindow.height
 
                         IconImage {
@@ -96,14 +139,14 @@ Item {
         Item {
             id: toggleButton
 
-            width: 24
+            width: root.hasItems ? root.trayItemWidth : 0
             height: root.height
 
             Text {
                 id: toggleIcon
 
                 anchors.centerIn: parent
-                color: toggleMouse.containsMouse ? root.config.selectionBackground : root.config.muted
+                color: revealHover.hovered ? root.config.selectionBackground : root.config.muted
                 font.family: root.config.iconFontFamily
                 font.pointSize: root.config.iconSize
                 text: "󰅀"
@@ -115,15 +158,6 @@ Item {
                         easing.type: Easing.OutCubic
                     }
                 }
-            }
-
-            MouseArea {
-                id: toggleMouse
-
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: root.expanded = !root.expanded
             }
         }
     }
