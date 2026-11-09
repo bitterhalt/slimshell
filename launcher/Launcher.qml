@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
@@ -473,7 +474,7 @@ Item {
                 anchors.leftMargin: root.panelInset
                 anchors.rightMargin: root.panelInset
                 height: root.inputHeight - root.panelInset
-                leftPadding: root.config.spacingControl
+                leftPadding: root.config.spacingControl + (text.length === 0 && root.placeholderIcon !== "" ? modePlaceholderIcon.implicitWidth + root.config.spacingTight : 0)
                 rightPadding: root.config.spacingControl
                 topPadding: root.config.spacingTight
                 bottomPadding: root.config.spacingTight
@@ -581,14 +582,16 @@ Item {
                 Component.onCompleted: forceActiveFocus()
             }
 
-            Row {
+            RowLayout {
                 anchors.left: searchInput.left
-                anchors.leftMargin: searchInput.leftPadding
+                anchors.leftMargin: root.config.spacingControl
                 anchors.verticalCenter: searchBackground.verticalCenter
                 visible: searchInput.text.length === 0
                 spacing: root.config.spacingTight
 
                 Text {
+                    id: modePlaceholderIcon
+                    Layout.alignment: Qt.AlignVCenter
                     visible: root.placeholderIcon !== ""
                     renderType: Text.QtRendering
                     color: root.config.selectionBackground
@@ -598,6 +601,7 @@ Item {
                 }
 
                 Text {
+                    Layout.alignment: Qt.AlignVCenter
                     renderType: Text.NativeRendering
                     color: root.config.muted
                     font.family: root.config.textFontFamily
