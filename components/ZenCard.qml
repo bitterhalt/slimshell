@@ -9,8 +9,8 @@ PanelWindow {
     required property var config
     required property var targetScreen
     required property var resumeService
-    readonly property int horizontalPadding: 28
-    readonly property int verticalPadding: 14
+    readonly property int horizontalPadding: 12
+    readonly property int verticalPadding: 12
 
     screen: targetScreen
     color: "transparent"
@@ -48,7 +48,7 @@ PanelWindow {
     Rectangle {
         anchors.fill: parent
         color: root.config.bg
-        opacity: 0.5
+        opacity: 0.8
         radius: root.config.popupRadius
     }
 
@@ -59,7 +59,7 @@ PanelWindow {
         x: root.horizontalPadding
         y: root.verticalPadding
         width: Math.max(timeText.implicitWidth, modeText.implicitWidth)
-        spacing: 4
+        spacing: 8
 
         // Render the column to a texture so one shadow pass covers both labels.
         layer.enabled: true
@@ -78,10 +78,11 @@ PanelWindow {
             width: labels.width
             renderType: Text.NativeRendering
             textFormat: Text.PlainText
-            text: "Zen Mode"
+            text: Qt.formatDateTime(clock.date, root.config.clockAlternativeFormat)
             color: root.config.muted
             font.family: root.config.textFontFamily
-            font.pointSize: root.config.fontSize * 0.96
+            font.pointSize: root.config.fontSize
+            font.weight: Font.DemiBold
             horizontalAlignment: Text.AlignHCenter
         }
 
@@ -96,7 +97,7 @@ PanelWindow {
             font.family: root.config.textFontFamily
             font.pointSize: root.config.fontSize * 2.8
             font.weight: Font.DemiBold
-            horizontalAlignment: Text.AlignRight
+            horizontalAlignment: Text.AlignHCenter
         }
     }
 
