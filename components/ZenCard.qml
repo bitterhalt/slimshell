@@ -79,7 +79,7 @@ PanelWindow {
             renderType: Text.NativeRendering
             textFormat: Text.PlainText
             text: "Zen Mode"
-            color: root.config.fg
+            color: root.config.muted
             font.family: root.config.textFontFamily
             font.pointSize: root.config.fontSize * 0.96
             horizontalAlignment: Text.AlignHCenter
