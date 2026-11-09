@@ -152,7 +152,7 @@ Item {
                     width: workspaceName.implicitWidth + 16
                     height: 24
                     radius: 4
-                    color: workspaceMouse.containsMouse ? root.config.selectionBackground : Qt.alpha(workspaceItem.modelData.is_urgent ? root.config.urgent : root.config.selectionBackground, 0.5)
+                    color: workspaceMouse.containsMouse ? root.config.selectionBackground : Qt.alpha(workspaceItem.modelData.is_urgent ? root.config.urgent : root.config.selectionBackground, 0.6)
 
                     Text {
                         id: workspaceName
@@ -160,7 +160,7 @@ Item {
                         renderType: Text.NativeRendering
 
                         anchors.centerIn: parent
-                        color: workspaceMouse.containsMouse ? root.config.selectionForeground : workspaceItem.modelData.is_urgent ? root.config.fg : root.config.selectionForeground
+                        color: workspaceMouse.containsMouse ? root.config.selectionForeground : workspaceItem.modelData.is_urgent ? root.config.bg : root.config.selectionForeground
                         font.pointSize: root.config.textSizeNormal
                         font.weight: Font.DemiBold
                         text: workspaceItem.modelData.name || String(workspaceItem.modelData.idx)
