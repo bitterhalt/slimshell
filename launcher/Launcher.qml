@@ -47,7 +47,8 @@ Item {
         return ranks;
     }
 
-    readonly property string placeholder: dmenuMode ? (dmenuPrompt !== "" ? dmenuPrompt : "Select") : runMode ? "Search binaries" : emojiMode ? "Search emojis" : fileMode ? "Search files" : "Search applications"
+    readonly property bool iconPlaceholder: !dmenuMode && !emojiMode
+    readonly property string placeholder: dmenuMode ? (dmenuPrompt !== "" ? dmenuPrompt : "Select") : runMode ? "󱓞" : emojiMode ? "Search emojis" : fileMode ? "󰍉" : "󱃷"
 
     property string query: ""
     readonly property string calculatorResult: calculator.result
@@ -587,7 +588,8 @@ Item {
                 anchors.verticalCenter: searchBackground.verticalCenter
                 visible: searchInput.text.length === 0
                 color: root.config.muted
-                font.pointSize: root.config.textSizeNormal
+                font.family: root.iconPlaceholder ? root.config.iconFontFamily : root.config.textFontFamily
+                font.pointSize: root.iconPlaceholder ? root.config.iconSize : root.config.textSizeNormal
                 text: root.placeholder
             }
 
