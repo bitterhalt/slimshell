@@ -25,7 +25,6 @@ Item {
         config: root.config
         barWindow: root.barWindow
         visible: root.hasItems
-        hoverRevealDelay: 300
         revealDuration: 160
         revealToLeft: true
         revealLocked: root.trayMenuOpen

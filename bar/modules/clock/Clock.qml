@@ -6,7 +6,6 @@ import "../../../weather"
 
 ItemRevealer {
     id: root
-    hoverRevealDelay: 300
 
     required property var popupManager
     required property var weatherData

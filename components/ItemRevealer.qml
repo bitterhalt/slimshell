@@ -8,7 +8,7 @@ Item {
     default property alias contentData: primaryRow.data
     property alias revealData: revealRow.data
     property int revealDuration: 300
-    property int hoverRevealDelay: 0
+    property int hoverRevealDelay: 300
     property bool revealActive: false
     property bool revealLocked: false
     property bool revealToLeft: false
