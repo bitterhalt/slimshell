@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
@@ -48,7 +47,6 @@ Item {
         return ranks;
     }
 
-    readonly property string placeholderIcon: !dmenuMode && runMode ? "󱓞" : !dmenuMode && fileMode ? "󰍉" : !dmenuMode && !emojiMode ? "󱃷" : ""
     readonly property string placeholder: dmenuMode ? (dmenuPrompt !== "" ? dmenuPrompt : "Select") : runMode ? "Search binaries" : emojiMode ? "Search emojis" : fileMode ? "Search files" : "Search applications"
 
     property string query: ""
@@ -474,7 +472,7 @@ Item {
                 anchors.leftMargin: root.panelInset
                 anchors.rightMargin: root.panelInset
                 height: root.inputHeight - root.panelInset
-                leftPadding: root.config.spacingControl + (text.length === 0 && root.placeholderIcon !== "" ? modePlaceholderIcon.implicitWidth + root.config.spacingTight : 0)
+                leftPadding: root.config.spacingControl
                 rightPadding: root.config.spacingControl
                 topPadding: root.config.spacingTight
                 bottomPadding: root.config.spacingTight
@@ -582,32 +580,15 @@ Item {
                 Component.onCompleted: forceActiveFocus()
             }
 
-            RowLayout {
+            Text {
+                renderType: Text.NativeRendering
                 anchors.left: searchInput.left
-                anchors.leftMargin: root.config.spacingControl
+                anchors.leftMargin: searchInput.leftPadding
                 anchors.verticalCenter: searchBackground.verticalCenter
                 visible: searchInput.text.length === 0
-                spacing: root.config.spacingTight
-
-                Text {
-                    id: modePlaceholderIcon
-                    Layout.alignment: Qt.AlignVCenter
-                    visible: root.placeholderIcon !== ""
-                    renderType: Text.QtRendering
-                    color: root.config.selectionBackground
-                    font.family: root.config.iconFontFamily
-                    font.pointSize: root.config.iconSize
-                    text: root.placeholderIcon
-                }
-
-                Text {
-                    Layout.alignment: Qt.AlignVCenter
-                    renderType: Text.NativeRendering
-                    color: root.config.muted
-                    font.family: root.config.textFontFamily
-                    font.pointSize: root.config.textSizeNormal
-                    text: root.placeholder
-                }
+                color: root.config.muted
+                font.pointSize: root.config.textSizeNormal
+                text: root.placeholder
             }
 
             ListView {

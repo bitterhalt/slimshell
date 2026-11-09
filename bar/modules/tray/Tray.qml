@@ -10,11 +10,12 @@ Item {
     required property var popupManager
     property bool expanded: false
 
-    readonly property real revealProgress: expanded ? 1 : 0
+    property real revealProgress: 0
     readonly property real revealWidth: trayItems.implicitWidth > 0 ? trayItems.implicitWidth + 8 : 0
 
     height: barWindow.height
     implicitWidth: toggleButton.width + revealWidth * revealProgress
+    onExpandedChanged: revealProgress = expanded ? 1 : 0
 
     Behavior on revealProgress {
         NumberAnimation {
