@@ -50,7 +50,8 @@ Rectangle {
         onTapped: {
             const wasSelected = root.selected;
             root.picked();
-            if (root.expandableBody && (!wasSelected || root.actionEntries.length === 0 || point.position.y < content.y + actions.y))
+            const tappedBeforeActions = !root.expanded || point.position.y < content.y + actions.y;
+            if (root.expandableBody && (!wasSelected || root.actionEntries.length === 0 || tappedBeforeActions))
                 root.expandRequested();
         }
     }

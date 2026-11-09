@@ -557,6 +557,28 @@ Item {
             verify(!card.expanded);
         }
 
+        function test_selected_action_notification_expands_on_mouse_body_tap() {
+            const note = notification(1, [action("open", "Open")]);
+            note.body = "A long message with useful details that should expand when clicked. ".repeat(3);
+            card = createTemporaryObject(cardComponent, host, {
+                width: 340,
+                height: 120,
+                config: config,
+                selected: true,
+                notification: note,
+                actionEntries: Model.actionsFor(note.actions)
+            });
+            card.expandRequested.connect(() => card.expanded = !card.expanded);
+            waitForPolish(host.Window.window);
+            const body = findChild(card, "historyBodyText");
+            verify(body.truncated);
+            mouseClick(card, card.width / 2, body.mapToItem(card, 0, 0).y + body.height / 2);
+            verify(card.expanded);
+            compare(body.truncated, false);
+            const button = findChild(card, "historyAction-o");
+            verify(button !== null);
+        }
+
         function test_card_actions_without_per_item_close_button() {
             const note = notification(1, [action("default", "Open")]);
             card = createTemporaryObject(cardComponent, host, {
