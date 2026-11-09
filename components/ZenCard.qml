@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 
@@ -47,7 +48,7 @@ PanelWindow {
     Rectangle {
         anchors.fill: parent
         color: root.config.bg
-        opacity: 0.9
+        opacity: 0.5
         radius: root.config.popupRadius
     }
 
@@ -60,6 +61,17 @@ PanelWindow {
         width: Math.max(timeText.implicitWidth, modeText.implicitWidth)
         spacing: 4
 
+        // Render the column to a texture so one shadow pass covers both labels.
+        layer.enabled: true
+        layer.effect: MultiEffect {
+            shadowEnabled: true
+            shadowColor: "#000000"
+            shadowOpacity: 0.6
+            shadowBlur: 0.6
+            shadowHorizontalOffset: 0
+            shadowVerticalOffset: 2
+        }
+
         Text {
             id: modeText
 
@@ -67,7 +79,7 @@ PanelWindow {
             renderType: Text.NativeRendering
             textFormat: Text.PlainText
             text: "Zen Mode"
-            color: root.config.muted
+            color: root.config.fg
             font.family: root.config.textFontFamily
             font.pointSize: root.config.fontSize * 0.96
             horizontalAlignment: Text.AlignHCenter
@@ -80,7 +92,7 @@ PanelWindow {
             renderType: Text.NativeRendering
             textFormat: Text.PlainText
             text: Qt.formatDateTime(clock.date, root.config.clockFormat)
-            color: root.config.muted
+            color: root.config.fg
             font.family: root.config.textFontFamily
             font.pointSize: root.config.fontSize * 2.8
             font.weight: Font.DemiBold
