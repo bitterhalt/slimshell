@@ -47,8 +47,8 @@ Item {
         return ranks;
     }
 
-    readonly property bool iconPlaceholder: !dmenuMode && !emojiMode
-    readonly property string placeholder: dmenuMode ? (dmenuPrompt !== "" ? dmenuPrompt : "Select") : runMode ? "󱓞" : emojiMode ? "Search emojis" : fileMode ? "󰍉" : "󱃷"
+    readonly property string placeholderIcon: !dmenuMode && runMode ? "󱓞" : !dmenuMode && fileMode ? "󰍉" : !dmenuMode && !emojiMode ? "󱃷" : ""
+    readonly property string placeholder: dmenuMode ? (dmenuPrompt !== "" ? dmenuPrompt : "Select") : runMode ? "Search binaries" : emojiMode ? "Search emojis" : fileMode ? "Search files" : "Search applications"
 
     property string query: ""
     readonly property string calculatorResult: calculator.result
@@ -581,16 +581,29 @@ Item {
                 Component.onCompleted: forceActiveFocus()
             }
 
-            Text {
-                renderType: Text.NativeRendering
+            Row {
                 anchors.left: searchInput.left
                 anchors.leftMargin: searchInput.leftPadding
                 anchors.verticalCenter: searchBackground.verticalCenter
                 visible: searchInput.text.length === 0
-                color: root.config.muted
-                font.family: root.iconPlaceholder ? root.config.iconFontFamily : root.config.textFontFamily
-                font.pointSize: root.iconPlaceholder ? root.config.iconSize : root.config.textSizeNormal
-                text: root.placeholder
+                spacing: root.config.spacingTight
+
+                Text {
+                    visible: root.placeholderIcon !== ""
+                    renderType: Text.QtRendering
+                    color: root.config.selectionBackground
+                    font.family: root.config.iconFontFamily
+                    font.pointSize: root.config.iconSize
+                    text: root.placeholderIcon
+                }
+
+                Text {
+                    renderType: Text.NativeRendering
+                    color: root.config.muted
+                    font.family: root.config.textFontFamily
+                    font.pointSize: root.config.textSizeNormal
+                    text: root.placeholder
+                }
             }
 
             ListView {
