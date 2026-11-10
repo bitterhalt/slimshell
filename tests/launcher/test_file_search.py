@@ -28,6 +28,9 @@ Item {
         function job(state) {
             return Array.from(state.data).find(child => child.generation !== undefined);
         }
+        function binaryJob(state) {
+            return Array.from(state.data).find(child => child.objectName === "binaryProcess");
+        }
         function finish(process, output, code) {
             process.stdout.text = output;
             process.stdout.streamFinished();
@@ -142,6 +145,27 @@ Item {
             compare(state.history, ["firefox", "firefox", "foot"]);
             state.active = false;
             compare(state.results.length, 0);
+        }
+        function test_run_scans_only_while_active() {
+            const state = createTemporaryObject(run, host);
+            const process = binaryJob(state);
+            verify(process !== undefined);
+            verify(!process.running);
+            state.active = true;
+            tryCompare(process, "running", true);
+        }
+        function test_run_refreshes_binaries_on_reopen() {
+            const state = createTemporaryObject(run, host);
+            const process = binaryJob(state);
+            state.active = true;
+            tryCompare(process, "running", true);
+            finish(process, "/usr/bin/alpha\n/usr/bin/beta\n");
+            compare(state.binaries, ["alpha", "beta"]);
+            state.active = false;
+            state.active = true;
+            tryCompare(process, "running", true);
+            finish(process, "/usr/bin/alpha\n/usr/bin/beta\n/usr/bin/gamma\n");
+            compare(state.binaries, ["alpha", "beta", "gamma"]);
         }
     }
 }

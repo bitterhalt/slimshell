@@ -102,7 +102,7 @@ Item {
     }
 
     function loadBinaries(): void {
-        if (binaries.length > 0 || binaryProcess.running)
+        if (binaryProcess.running)
             return;
         const dirs = [...new Set((Quickshell.env("PATH") || "").split(":").filter(dir => dir.length > 0))];
         binaryProcess.command = ["fd", "-L", "-H", "--no-ignore", "--max-depth", "1", "-t", "x", "-a", ".", ...dirs];
@@ -118,6 +118,7 @@ Item {
 
     Process {
         id: binaryProcess
+        objectName: "binaryProcess"
         stdout: StdioCollector {
             onStreamFinished: {
                 const names = text.split("\n").filter(path => path.length > 0).map(path => path.slice(path.lastIndexOf("/") + 1)).filter(name => name.length > 0);
