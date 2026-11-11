@@ -9,7 +9,7 @@ PanelWindow {
     required property var config
     required property var targetScreen
     required property var resumeService
-    readonly property int horizontalPadding: 12
+    readonly property int horizontalPadding: 24
     readonly property int verticalPadding: 12
 
     screen: targetScreen
@@ -72,20 +72,7 @@ PanelWindow {
             shadowVerticalOffset: 2
         }
 
-        Text {
-            id: modeText
 
-            width: labels.width
-            renderType: Text.NativeRendering
-            textFormat: Text.PlainText
-            text: Qt.formatDateTime(clock.date, root.config.clockAlternativeFormat)
-            color: root.config.fg
-            font.family: root.config.textFontFamily
-            font.pointSize: root.config.fontSize
-            font.weight: Font.DemiBold
-            horizontalAlignment: Text.AlignHCenter
-            opacity: 0.8
-        }
 
         Text {
             id: timeText
@@ -96,7 +83,22 @@ PanelWindow {
             text: Qt.formatDateTime(clock.date, root.config.clockFormat)
             color: root.config.fg
             font.family: root.config.textFontFamily
-            font.pointSize: root.config.fontSize * 3
+            font.pointSize: root.config.fontSize * 2.8
+            font.weight: Font.DemiBold
+            horizontalAlignment: Text.AlignHCenter
+            opacity: 0.8
+        }
+
+        Text {
+            id: modeText
+
+            width: labels.width
+            renderType: Text.NativeRendering
+            textFormat: Text.PlainText
+            text: Qt.formatDateTime(clock.date, root.config.clockAlternativeFormat)
+            color: root.config.fg
+            font.family: root.config.textFontFamily
+            font.pointSize: root.config.fontSize
             font.weight: Font.DemiBold
             horizontalAlignment: Text.AlignHCenter
             opacity: 0.8

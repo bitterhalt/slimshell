@@ -72,7 +72,7 @@ ItemRevealer {
 
             text: {
                 const formatted = Qt.formatDateTime(clock.date, root.config.clockAlternativeFormat);
-                const weekday = Qt.formatDateTime(clock.date, "dddd");
+                const weekday = Qt.formatDateTime(clock.date, "ddd");
 
                 return formatted.replace(weekday, "<span style='color:" + root.config.selectionBackground + "'>" + weekday + "</span>");
             }

@@ -10,7 +10,7 @@
   },
   "clock": {
     "format": "HH:mm",
-    "alternativeFormat": "dddd, d MMMM"
+    "alternativeFormat": "ddd, d MMMM"
   },
   "audio": {
     "maxVolume": 1.1
