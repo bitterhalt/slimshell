@@ -26,11 +26,13 @@ Item {
     // dmenu mode is entered only through `qs ipc call launcher dmenu`, so it
     // is not part of `modes` and can't be reached by cycling.
     readonly property bool dmenuMode: mode === "dmenu"
+    readonly property bool hidePrompt: dmenuMode && dmenuHidePrompt
     property var dmenuItems: []
     property string dmenuPrompt: ""
     property int dmenuLines: 7
     property bool dmenuMinimalLines: false
     property bool dmenuIndexMode: false
+    property bool dmenuHidePrompt: false
     // Result file awaited by the caller; empty when no request is pending.
     property string dmenuOutPath: ""
     readonly property string dmenuSessionId: Date.now().toString() + "-" + Math.random().toString()
@@ -165,10 +167,11 @@ Item {
 
     // Normal modes stay fixed; dmenu can choose a row count per request.
     readonly property bool fileSearching: files.busy
-    readonly property int availableDmenuRows: targetScreen ? Math.max(0, Math.floor((targetScreen.height - config.popupGap * 2 - inputHeight - contentSpacing - panelInset) / rowHeight)) : maxVisibleRows
+    readonly property int dmenuChromeHeight: Dmenu.chromeHeight(hidePrompt, panelInset, inputHeight, contentSpacing)
+    readonly property int availableDmenuRows: targetScreen ? Math.max(0, Math.floor((targetScreen.height - config.popupGap * 2 - dmenuChromeHeight) / rowHeight)) : maxVisibleRows
     readonly property int visibleRows: dmenuMode ? Dmenu.visibleRows(dmenuLines, dmenuMinimalLines, dmenuItems.length, availableDmenuRows) : maxVisibleRows
 
-    readonly property int cardHeight: inputHeight + visibleRows * rowHeight + contentSpacing + panelInset
+    readonly property int cardHeight: dmenuChromeHeight + visibleRows * rowHeight
 
     function close(): void {
         finalizeClose();
@@ -226,7 +229,7 @@ Item {
 
     // Called from IPC: the items are read from itemsPath, and the result is
     // written atomically to outPath, awaited by launcher/dmenu-runner.
-    function requestDmenu(itemsPath, outPath, prompt, lines, minimalLines, indexMode): void {
+    function requestDmenu(itemsPath, outPath, prompt, lines, minimalLines, indexMode, hidePrompt): void {
         // Hide and clear the previous request before loading new choices.
         finalizeClose();
         dmenuOutPath = outPath;
@@ -234,6 +237,7 @@ Item {
         dmenuLines = Math.max(0, lines);
         dmenuMinimalLines = minimalLines;
         dmenuIndexMode = indexMode;
+        dmenuHidePrompt = hidePrompt;
         dmenuFile.path = "";
         dmenuFile.path = itemsPath;
     }
@@ -258,6 +262,7 @@ Item {
         dmenuOutPath = "";
         dmenuItems = [];
         dmenuPrompt = "";
+        dmenuHidePrompt = false;
         finalizeClose();
     }
 
@@ -268,6 +273,7 @@ Item {
         dmenuOutPath = "";
         dmenuItems = [];
         dmenuPrompt = "";
+        dmenuHidePrompt = false;
     }
 
     function setMode(id): void {
@@ -455,6 +461,7 @@ Item {
                 id: searchBackground
 
                 anchors.fill: searchInput
+                visible: !root.hidePrompt
                 color: root.config.bg
                 radius: 4
                 border.width: 1
@@ -468,10 +475,11 @@ Item {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.topMargin: root.panelInset
+                anchors.topMargin: root.hidePrompt ? 0 : root.panelInset
                 anchors.leftMargin: root.panelInset
                 anchors.rightMargin: root.panelInset
-                height: root.inputHeight - root.panelInset
+                height: root.hidePrompt ? 0 : root.inputHeight - root.panelInset
+                opacity: root.hidePrompt ? 0 : 1
                 leftPadding: root.config.spacingControl
                 rightPadding: root.config.spacingControl
                 topPadding: root.config.spacingTight
@@ -585,7 +593,7 @@ Item {
                 anchors.left: searchInput.left
                 anchors.leftMargin: searchInput.leftPadding
                 anchors.verticalCenter: searchBackground.verticalCenter
-                visible: searchInput.text.length === 0
+                visible: !root.hidePrompt && searchInput.text.length === 0
                 color: root.config.muted
                 font.pointSize: root.config.textSizeNormal
                 text: root.placeholder
@@ -595,7 +603,7 @@ Item {
                 id: resultList
 
                 anchors.top: searchInput.bottom
-                anchors.topMargin: root.contentSpacing
+                anchors.topMargin: root.hidePrompt ? root.panelInset : root.contentSpacing
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: root.panelInset
                 anchors.left: parent.left
@@ -703,8 +711,8 @@ Item {
         }
 
         // Used by launcher/dmenu-runner.
-        function dmenu(itemsPath: string, outPath: string, prompt: string, lines: int, minimalLines: bool, indexMode: bool): void {
-            root.requestDmenu(itemsPath, outPath, prompt, lines, minimalLines, indexMode);
+        function dmenu(itemsPath: string, outPath: string, prompt: string, lines: int, minimalLines: bool, indexMode: bool, hidePrompt: bool): void {
+            root.requestDmenu(itemsPath, outPath, prompt, lines, minimalLines, indexMode, hidePrompt);
         }
     }
 }

@@ -46,6 +46,7 @@ Item {
     property string dmenuOutPath: ""
     property var dmenuItems: []
     property string dmenuPrompt: ""
+    property bool dmenuHidePrompt: false
     property var writes: []
     TextInput { id: searchInput; onTextChanged: root.query = text }
     function writeDmenuOutput(path, value) { writes = writes.concat([{path: path, value: value}]); }
@@ -114,6 +115,16 @@ Item {
             compare(controller.mode, "files");
             controller.cycleMode(1);
             compare(controller.mode, "apps");
+        }
+        function test_cancelling_dmenu_clears_prompt_state() {
+            const controller = createTemporaryObject(controllerComponent, host);
+            controller.dmenuOutPath = "/synthetic/result";
+            controller.dmenuPrompt = "Pick";
+            controller.dmenuHidePrompt = true;
+            controller.cancelDmenu();
+            compare(controller.dmenuOutPath, "");
+            compare(controller.dmenuPrompt, "");
+            compare(controller.dmenuHidePrompt, false);
         }
     }
 }

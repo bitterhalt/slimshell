@@ -28,11 +28,11 @@ if method == "dmenuSession":
         time.sleep(30)
     print("new-session" if started and kind == "reloaded" else "session")
 elif method == "dmenu":
-    items, output, prompt, lines, minimal, index_mode = sys.argv[5:]
+    items, output, prompt, lines, minimal, index_mode, hide_prompt = sys.argv[5:]
     (base / "request.json").write_text(json.dumps({
         "items": Path(items).read_text(), "prompt": prompt, "output": output,
         "lines": int(lines), "minimal": minimal,
-        "index_mode": index_mode,
+        "index_mode": index_mode, "hide_prompt": hide_prompt,
     }))
     if kind == "ipc-error":
         sys.exit(1)
@@ -89,6 +89,14 @@ class DmenuRunnerTests(unittest.TestCase):
         self.assertEqual(request["lines"], 7)
         self.assertEqual(request["minimal"], "false")
         self.assertEqual(request["index_mode"], "false")
+        self.assertEqual(request["hide_prompt"], "false")
+
+    def test_hide_prompt(self):
+        result = self.run_runner("--hide-prompt")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        request = json.loads((self.base / "request.json").read_text())
+        self.assertEqual(request["hide_prompt"], "true")
+        self.assertEqual(request["prompt"], "")
 
     def test_index_mode(self):
         result = self.run_runner("--index", choice="1")

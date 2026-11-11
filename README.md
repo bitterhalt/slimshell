@@ -78,7 +78,7 @@ For scripts that use dmenu-style pickers:
 printf '%s\n' Search 'New Note' TODO Delete | ./launcher/dmenu-runner -p "Notes" -l 4 --minimal-lines
 ```
 
-- Supported options: `-p` / `--prompt`, `-l N` / `--lines N` (default 7), `--minimal-lines`, and `--index` (return the original zero-based input index; typed text returns `-1`).
+- Supported options: `-p` / `--prompt`, `-l N` / `--lines N` (default 7), `--minimal-lines`, `--index` (return the original zero-based input index; typed text returns `-1`), and `--hide-prompt` (hide the input row; typing still filters and Enter still selects).
 - Enter selects, Shift+Enter returns typed text, and Esc cancels with status 1. `-l 0` opens an input-only picker.
 
 Slimshell must be running. This is a small dmenu-compatible runner, not a full dmenu/rofi replacement.

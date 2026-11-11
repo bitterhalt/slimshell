@@ -45,6 +45,11 @@ TestCase {
         compare(Dmenu.visibleRows(100, true, 200, 15), 15);
     }
 
+    function test_chrome_height_with_hidden_prompt() {
+        compare(Dmenu.chromeHeight(false, 12, 48, 12), 72);
+        compare(Dmenu.chromeHeight(true, 12, 48, 12), 24);
+    }
+
     function test_match_ranking() {
         compare(Scorer.scoreLine("fire", "fire"), 10000);
         compare(Scorer.scoreLine("Firefox", "fire"), 5000);

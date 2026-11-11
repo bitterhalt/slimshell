@@ -23,16 +23,18 @@ class LauncherResultRowTests(unittest.TestCase):
             copy_control_config(base)
             launcher = (ROOT / "launcher/Launcher.qml").read_text()
             metrics = []
-            for name in ("panelInset", "inputHeight", "contentSpacing", "rowHeight", "availableDmenuRows", "cardHeight"):
+            for name in ("panelInset", "inputHeight", "contentSpacing", "rowHeight", "dmenuChromeHeight", "availableDmenuRows", "cardHeight"):
                 match = re.search(r"^    readonly property int " + name + r":[^\n]+", launcher, re.M)
                 self.assertIsNotNone(match, name)
                 metrics.append(match.group())
             (base / "LayoutMetrics.qml").write_text('''import QtQuick
+import "Dmenu.js" as Dmenu
 QtObject {
     required property var config
     property var targetScreen: null
     property int maxVisibleRows: 7
     property int visibleRows: 7
+    property bool hidePrompt: false
 ''' + "\n".join(metrics) + "\n}\n")
             (base / "qmldir").write_text("singleton Quickshell 1.0 Quickshell.qml\n")
             (base / "Quickshell.qml").write_text(
@@ -61,7 +63,12 @@ Item {
             compare(metrics.rowHeight, 36);
             compare(metrics.inputHeight - metrics.panelInset, metrics.rowHeight);
             compare(metrics.contentSpacing, fixtureConfig.panelPadding);
-            compare(metrics.cardHeight, metrics.inputHeight + metrics.rowHeight * 7 + metrics.contentSpacing + metrics.panelInset);
+            compare(metrics.cardHeight, metrics.dmenuChromeHeight + metrics.rowHeight * 7);
+            compare(metrics.dmenuChromeHeight, metrics.inputHeight + metrics.contentSpacing + metrics.panelInset);
+            metrics.hidePrompt = true;
+            compare(metrics.dmenuChromeHeight, metrics.panelInset * 2);
+            compare(metrics.cardHeight, metrics.panelInset * 2 + metrics.rowHeight * 7);
+            metrics.hidePrompt = false;
             metrics.targetScreen = {height: 400};
             metrics.visibleRows = metrics.availableDmenuRows;
             verify(metrics.cardHeight <= 400 - fixtureConfig.popupGap * 2);
