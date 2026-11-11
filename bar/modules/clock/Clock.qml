@@ -72,7 +72,11 @@ ItemRevealer {
 
             text: {
                 const formatted = Qt.formatDateTime(clock.date, root.config.clockAlternativeFormat);
-                const weekday = Qt.formatDateTime(clock.date, "ddd");
+                const longName = Qt.formatDateTime(clock.date, "dddd");
+                const shortName = Qt.formatDateTime(clock.date, "ddd");
+
+                // Check the long name first, since it usually contains the short one
+                const weekday = formatted.includes(longName) ? longName : shortName;
 
                 return formatted.replace(weekday, "<span style='color:" + root.config.selectionBackground + "'>" + weekday + "</span>");
             }
