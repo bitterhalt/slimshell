@@ -79,11 +79,12 @@ PanelWindow {
             renderType: Text.NativeRendering
             textFormat: Text.PlainText
             text: Qt.formatDateTime(clock.date, root.config.clockAlternativeFormat)
-            color: root.config.muted
+            color: root.config.fg
             font.family: root.config.textFontFamily
             font.pointSize: root.config.fontSize
             font.weight: Font.DemiBold
             horizontalAlignment: Text.AlignHCenter
+            opacity: 0.8
         }
 
         Text {
@@ -95,9 +96,10 @@ PanelWindow {
             text: Qt.formatDateTime(clock.date, root.config.clockFormat)
             color: root.config.fg
             font.family: root.config.textFontFamily
-            font.pointSize: root.config.fontSize * 2.8
+            font.pointSize: root.config.fontSize * 3
             font.weight: Font.DemiBold
             horizontalAlignment: Text.AlignHCenter
+            opacity: 0.8
         }
     }
 
