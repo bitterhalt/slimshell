@@ -21,15 +21,11 @@ Item {
     Component { id: files; FileSearchState { active: false; needle: "" } }
     Component { id: calculator; CalculatorState { active: false; query: ""; expression: "" } }
     Component { id: emoji; EmojiState { active: false; query: "" } }
-    Component { id: run; RunState { active: false; query: "" } }
     TestCase {
         name: "LauncherBackends"
         function init() { failOnWarning(/TypeError|Binding loop|ReferenceError/); }
         function job(state) {
             return Array.from(state.data).find(child => child.generation !== undefined);
-        }
-        function binaryJob(state) {
-            return Array.from(state.data).find(child => child.objectName === "binaryProcess");
         }
         function finish(process, output, code) {
             process.stdout.text = output;
@@ -132,41 +128,6 @@ Item {
             state.active = false;
             compare(state.results.length, 0);
         }
-        function test_run_quotes_arguments_and_recent_ranking() {
-            const state = createTemporaryObject(run, host);
-            state.binaries = ["firefox", "foot", "find"];
-            state.history = ["firefox", "foot", "firefox"];
-            state.active = true;
-            compare(state.results[0].text, "firefox");
-            state.query = 'foot "two words" \'literal\' escaped\\ space';
-            compare(state.name, "foot");
-            compare(state.args, ["two words", "literal", "escaped space"]);
-            state.record("foot");
-            compare(state.history, ["firefox", "firefox", "foot"]);
-            state.active = false;
-            compare(state.results.length, 0);
-        }
-        function test_run_scans_only_while_active() {
-            const state = createTemporaryObject(run, host);
-            const process = binaryJob(state);
-            verify(process !== undefined);
-            verify(!process.running);
-            state.active = true;
-            tryCompare(process, "running", true);
-        }
-        function test_run_refreshes_binaries_on_reopen() {
-            const state = createTemporaryObject(run, host);
-            const process = binaryJob(state);
-            state.active = true;
-            tryCompare(process, "running", true);
-            finish(process, "/usr/bin/alpha\n/usr/bin/beta\n");
-            compare(state.binaries, ["alpha", "beta"]);
-            state.active = false;
-            state.active = true;
-            tryCompare(process, "running", true);
-            finish(process, "/usr/bin/alpha\n/usr/bin/beta\n/usr/bin/gamma\n");
-            compare(state.binaries, ["alpha", "beta", "gamma"]);
-        }
     }
 }
 '''
@@ -176,7 +137,7 @@ class BackendTests(unittest.TestCase):
     def test_offline_backends(self):
         with tempfile.TemporaryDirectory(prefix="launcher-backends-") as directory:
             base = Path(directory)
-            for name in ("CalculatorState", "FileSearchState", "RunState", "EmojiState"):
+            for name in ("CalculatorState", "FileSearchState", "EmojiState"):
                 source = (ROOT / f"{name}.qml").read_text()
                 source = "\n".join(line for line in source.splitlines()
                                    if not line.startswith("import Quickshell"))

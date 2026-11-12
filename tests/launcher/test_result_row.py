@@ -77,7 +77,7 @@ Item {
             compare(metrics.availableDmenuRows, 0);
         }
         function test_result_kinds_data() {
-            return ["application", "binary", "emoji", "file", "calculator", "dmenu"].map(type => ({tag: type, type: type}));
+            return ["application", "emoji", "file", "calculator", "dmenu"].map(type => ({tag: type, type: type}));
         }
         function test_result_kinds(data) {
             failOnWarning(/TypeError|ReferenceError|Binding loop|Unable to assign/);

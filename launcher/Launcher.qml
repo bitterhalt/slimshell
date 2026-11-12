@@ -18,9 +18,8 @@ Item {
     property bool opened: false
     property bool quitOnClose: false
     // Mode order for Ctrl+← / Ctrl+→ cycling.
-    readonly property var modes: ["apps", "run", "emoji", "files"]
+    readonly property var modes: ["apps", "emoji", "files"]
     property string mode: "apps"
-    readonly property bool runMode: mode === "run"
     readonly property bool emojiMode: mode === "emoji"
     readonly property bool fileMode: mode === "files"
     // dmenu mode is entered only through `qs ipc call launcher dmenu`, so it
@@ -37,7 +36,7 @@ Item {
     property string dmenuOutPath: ""
     readonly property string dmenuSessionId: Date.now().toString() + "-" + Math.random().toString()
 
-    // App IDs only, newest first; separate from binary run history.
+    // App IDs only, newest first.
     property var appHistory: []
     property bool appHistoryReady: false
     readonly property int appHistoryKept: 50
@@ -49,7 +48,7 @@ Item {
         return ranks;
     }
 
-    readonly property string placeholder: dmenuMode ? (dmenuPrompt !== "" ? dmenuPrompt : "Select") : runMode ? "Search binaries" : emojiMode ? "Search emojis" : fileMode ? "Search files" : "Search applications"
+    readonly property string placeholder: dmenuMode ? (dmenuPrompt !== "" ? dmenuPrompt : "Select") : emojiMode ? "Search emojis" : fileMode ? "Search files" : "Search applications"
 
     property string query: ""
     readonly property string calculatorResult: calculator.result
@@ -65,7 +64,7 @@ Item {
 
     // "=" prefix hands everything after it to qalc, so units, functions and
     // words work too ("=5 km to miles", "=sqrt(2)", "=1x3").
-    readonly property bool calcPrefix: !runMode && !emojiMode && !fileMode && !dmenuMode && query.trim().startsWith("=")
+    readonly property bool calcPrefix: !emojiMode && !fileMode && !dmenuMode && query.trim().startsWith("=")
     readonly property string calcExpression: calcPrefix ? query.trim().slice(1).trim() : query.trim()
 
     // Plain math without the prefix is still detected automatically.
@@ -74,7 +73,7 @@ Item {
             return calcExpression.length > 0;
 
         const value = query.trim();
-        return !runMode && !emojiMode && !fileMode && !dmenuMode && /[0-9]/.test(value) && (/[+\-*/%^×÷]/.test(value) || /\d\s*[xX]\s*[\d(.]/.test(value)) && /^[0-9\s+\-*/%^().,xX×÷]+$/.test(value);
+        return !emojiMode && !fileMode && !dmenuMode && /[0-9]/.test(value) && (/[+\-*/%^×÷]/.test(value) || /\d\s*[xX]\s*[\d(.]/.test(value)) && /^[0-9\s+\-*/%^().,xX×÷]+$/.test(value);
     }
 
     readonly property var applications: {
@@ -120,8 +119,6 @@ Item {
 
         if (dmenuMode) {
             entries = dmenuResults;
-        } else if (runMode) {
-            entries = runState.results;
         } else if (emojiMode) {
             entries = emojiState.results;
         } else if (calcPrefix) {
@@ -148,7 +145,7 @@ Item {
                     })).filter(item => item.score > 0).sort((a, b) => b.score - a.score || applicationRank(a.entry.id) - applicationRank(b.entry.id) || a.text.localeCompare(b.text));
         }
 
-        if (!runMode && !fileMode && !dmenuMode && calculatorResult !== "") {
+        if (!fileMode && !dmenuMode && calculatorResult !== "") {
             entries.unshift({
                 type: "calculator",
                 text: calculatorResult,
@@ -160,7 +157,7 @@ Item {
         if (dmenuMode)
             return entries;
 
-        return !runMode && value === "" ? entries : entries.slice(0, 100);
+        return value === "" ? entries : entries.slice(0, 100);
     }
 
     onResultsChanged: selectedIndex = Math.max(0, Math.min(selectedIndex, results.length - 1))
@@ -337,10 +334,6 @@ Item {
             finalizeClose();
         } else if (item.type === "file") {
             files.open(item.path);
-        } else if (item.type === "binary") {
-            runState.record(item.text);
-            Quickshell.execDetached([item.text, ...runState.args]);
-            finalizeClose();
         } else if (item.type === "emoji") {
             Quickshell.execDetached(["wl-copy", item.emoji]);
             emojiState.record(item.emoji);
@@ -398,13 +391,6 @@ Item {
         query: root.query.trim()
         expression: root.calcExpression
         onResultReady: root.selectedIndex = 0
-    }
-
-    RunState {
-        id: runState
-        active: root.opened && root.runMode
-        query: root.query
-        onBinariesLoaded: root.selectedIndex = 0
     }
 
     EmojiState {
@@ -544,12 +530,6 @@ Item {
                             event.accepted = true;
                         }
                         break;
-                    case Qt.Key_B:
-                        if (control) {
-                            root.setMode("run");
-                            event.accepted = true;
-                        }
-                        break;
                     case Qt.Key_E:
                         if (control) {
                             root.setMode("emoji");
@@ -635,7 +615,7 @@ Item {
                 visible: root.visibleRows > 0 && root.results.length === 0
                 color: root.config.muted
                 font.pointSize: root.config.textSizeMedium
-                text: root.dmenuMode ? "No matches" : root.calcPrefix ? (root.calcExpression === "" ? "Type an expression" : calculator.busy ? "Calculating…" : "Can't evaluate expression") : root.runMode ? (runState.loading ? "Loading binaries…" : "No binaries found") : root.emojiMode ? "No emoji found" : root.fileMode && root.fileNeedle.length < 2 ? "Type at least two characters to search files" : root.fileMode && root.fileSearching ? "Searching…" : root.fileMode ? "No files found" : "No applications found"
+                text: root.dmenuMode ? "No matches" : root.calcPrefix ? (root.calcExpression === "" ? "Type an expression" : calculator.busy ? "Calculating…" : "Can't evaluate expression") : root.emojiMode ? "No emoji found" : root.fileMode && root.fileNeedle.length < 2 ? "Type at least two characters to search files" : root.fileMode && root.fileSearching ? "Searching…" : root.fileMode ? "No files found" : "No applications found"
             }
         }
     }
@@ -680,9 +660,6 @@ Item {
         }
         function search(): void {
             root.toggleMode("files");
-        }
-        function run(): void {
-            root.toggleMode("run");
         }
         function emoji(): void {
             root.toggleMode("emoji");

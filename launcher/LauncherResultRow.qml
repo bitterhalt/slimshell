@@ -10,8 +10,6 @@ Item {
     required property var config
     required property var entry
     property bool selected: false
-    readonly property string iconRun: String.fromCodePoint(0xF018D)
-    readonly property string iconStar: String.fromCodePoint(0xF04CE)
 
     Rectangle {
         anchors.fill: parent
@@ -32,11 +30,11 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: root.config.panelPadding
         anchors.verticalCenter: parent.verticalCenter
-        visible: root.entry.type === "calculator" || root.entry.type === "file" || root.entry.type === "binary" || root.entry.type === "emoji"
+        visible: root.entry.type === "calculator" || root.entry.type === "file" || root.entry.type === "emoji"
         color: root.selected ? root.config.selectionForeground : root.config.selectionBackground
         font.family: root.entry.type === "emoji" ? root.config.textFontFamily : root.config.iconFontFamily
         font.pointSize: root.config.iconSize * 1.5
-        text: root.entry.type === "emoji" ? root.entry.emoji : root.entry.type === "file" ? "󰈔" : root.entry.type === "binary" ? (root.entry.recent ? root.iconStar : root.iconRun) : "󰃬"
+        text: root.entry.type === "emoji" ? root.entry.emoji : root.entry.type === "file" ? "󰈔" : "󰃬"
     }
 
     Column {

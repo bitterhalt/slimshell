@@ -24,7 +24,7 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 | ------------ | ------------------------------------------------------------------------------------------------ |
 | **Bar**      | Workspaces, Window title, Clock and Weather, Battery, Connections, Privacy indicators, Removable drives, Tray etc. |
 | **Menus**    | Keyboard-driven menus for Bluetooth, Wi-Fi, Audio, Power, and Notifications                      |
-| **launcher** | Application launcher with: File Search, Calculator, Binary Runner, Emoji and Dmenu-mode          |
+| **launcher** | Application launcher with: File Search, Calculator, Emoji and Dmenu-mode                    |
 | **Tools**    | Clipboard, DeepL translation, and Screen recording                                               |
 | **Session**  | Lock Screen, Wallpaper Picker, and Dynamic theming with [Hellwal](https://hellwal.danihek.xyz/)  |
 
@@ -39,7 +39,7 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 | `clipboard`          | `toggle`, `open`, `close`, `refresh`, `copySelected`, `deleteSelected`             | Control the clipboard picker                                       |
 | `drives`             | `status`, `refresh`, `mount <dev>`, `unmount <dev>`, `poweroff <dev>`, `open <dev>` | Inspect and control removable drives                              |
 | `idle`               | `toggle`, `isDisabled`, `settings`                                                 | Control idle handling or open its settings                         |
-| `launcher`           | `toggle`, `open`, `close`, `apps`, `search`, `run`, `emoji`, `files`, `calculator` | Open, switch, or toggle launcher modes; `search` opens File Search |
+| `launcher`           | `toggle`, `open`, `close`, `apps`, `search`, `emoji`, `files`, `calculator` | Open, switch, or toggle launcher modes; `search` opens File Search |
 | `lock`               | `lock`                                                                             | Lock the session                                                   |
 | `locker`             | `isSecure`                                                                         | Query whether the separate lock-screen process is secure           |
 | `menu`               | `open <name>`, `toggle <name>`, `close`, `packages`, `settings`, `system`          | Open a user menu or close it                                       |
@@ -65,7 +65,6 @@ Launcher modes. Switch directly with the shortcuts below, or cycle with **Ctrl+â
 | Mode  | Shortcut | What it does                                    |
 | ----- | -------- | ----------------------------------------------- |
 | Apps  | `Ctrl+A` | Search and launch desktop applications          |
-| Run   | `Ctrl+B` | Run binaries, with recently used commands first |
 | Emoji | `Ctrl+E` | Search by name and copy the selected emoji      |
 | Files | `Ctrl+S` | Search local files by name                      |
 

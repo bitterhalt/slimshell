@@ -20,7 +20,7 @@ class LauncherModeTests(unittest.TestCase):
             match = re.search(r"^    function " + name + r"\([^\n]*\{.*?^    }", source, re.M | re.S)
             self.assertIsNotNone(match, name)
             methods.append(match.group())
-        for name in ("apps", "run", "emoji", "files", "calculator"):
+        for name in ("apps", "emoji", "files", "calculator"):
             self.assertRegex(
                 source,
                 rf'function {name}\(\):\s*void\s*\{{\s*root\.toggleMode\("{name}"\);?\s*\}}',
@@ -31,7 +31,7 @@ class LauncherModeTests(unittest.TestCase):
             (base / "Controller.qml").write_text('''import QtQuick
 Item {
     id: root
-    property var modes: ["apps", "run", "emoji", "files"]
+    property var modes: ["apps", "emoji", "files"]
     property string mode: "apps"
     property string query: ""
     property bool opened: false
@@ -60,7 +60,7 @@ Item {
     TestCase {
         name: "LauncherDirectModes"
         function test_open_switch_toggle_data() {
-            return ["apps", "run", "emoji", "files", "calculator"].map(name => ({tag: name, name: name}));
+            return ["apps", "emoji", "files", "calculator"].map(name => ({tag: name, name: name}));
         }
         function test_open_switch_toggle(data) {
             failOnWarning(/TypeError|ReferenceError|Binding loop/);

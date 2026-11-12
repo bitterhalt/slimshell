@@ -80,14 +80,12 @@ TestCase {
         compare(Emoji.normalizeHistory(["🐱"].concat(["🔥", "🐱"])), ["🐱", "🔥"]);
     }
 
-    function test_app_and_binary_ranking_unchanged() {
+    function test_app_ranking_unchanged() {
         compare(Scorer.scoreApplication({
             name: "Firefox"
         }, "firefox"), 10000);
         compare(Scorer.scoreApplication({
             name: "Firefox"
         }, "fire"), 5000);
-        compare(Scorer.scoreText("firefox", "firefox"), 10000);
-        compare(Scorer.scoreText("firefox", "fire"), 5000);
     }
 }

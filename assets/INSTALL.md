@@ -19,7 +19,7 @@ Additional tools are needed only for the features you use:
 | Feature                    | Dependencies                                                              |
 | -------------------------- | ------------------------------------------------------------------------- |
 | Clipboard history          | `cliphist`, `wl-clipboard`                                                |
-| File search and Run mode   | `fd`; file opening also uses `file`, `xdg-open`, a terminal and an editor |
+| File search                | `fd`; file opening also uses `file`, `xdg-open`, a terminal and an editor |
 | Administrator file editing | `sudo` with permission to use `sudoedit`                                  |
 | Calculator                 | `qalc`, `wl-copy`                                                         |
 | Emoji                      | An emoji list, described below; `wl-copy` to copy selections              |
