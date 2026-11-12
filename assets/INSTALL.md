@@ -66,21 +66,6 @@ qs -p "$HOME/.config/quickshell" --no-detailed-logs
 Keep the terminal open to see errors. Press Ctrl+C to stop this foreground instance
 before starting it another way.
 
-### Optional start/restart helper
-
-The `scripts/qs_toggle` helper starts or restarts the shell. Copy it into a
-directory on your `PATH`, or symlink it, for example:
-
-```bash
-mkdir -p "$HOME/.local/bin"
-ln -s "$HOME/.config/quickshell/scripts/qs_toggle" "$HOME/.local/bin/qs_toggle"
-```
-
-Run `qs_toggle` for the default renderer, or `qs_toggle -s` for software rendering.
-Software rendering uses the CPU and can help on machines with weak GPUs; speed
-and memory usage depend on the system. The current helper stops all `qs`
-processes, so do not use it while the Quickshell lock screen is active.
-
 ### Check the lock screen
 
 From another terminal, while Slimshell is running:
