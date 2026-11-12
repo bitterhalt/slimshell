@@ -8,6 +8,7 @@ import "modules/audio"
 import "modules/battery"
 import "modules/bluetooth"
 import "modules/clock"
+import "modules/drives"
 import "modules/idle"
 import "modules/network"
 import "modules/privacy"
@@ -27,6 +28,7 @@ PanelWindow {
     required property var bluetoothService
     required property var audioService
     required property var networkService
+    required property var driveService
     required property var privacyService
     required property var batteryService
     required property var weatherService
@@ -127,6 +129,12 @@ PanelWindow {
             barWindow: barWindow
             privacyService: barWindow.privacyService
             recorderService: barWindow.recorderService
+        }
+
+        Drives {
+            config: barWindow.config
+            barWindow: barWindow
+            driveService: barWindow.driveService
         }
 
         Network {

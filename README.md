@@ -22,7 +22,7 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 
 |              | What's included                                                                                  |
 | ------------ | ------------------------------------------------------------------------------------------------ |
-| **Bar**      | Workspaces, Window title, Clock and Weather, Battery, Connections, Privacy indicators, Tray etc. |
+| **Bar**      | Workspaces, Window title, Clock and Weather, Battery, Connections, Privacy indicators, Removable drives, Tray etc. |
 | **Menus**    | Keyboard-driven menus for Bluetooth, Wi-Fi, Audio, Power, and Notifications                      |
 | **launcher** | Application launcher with: File Search, Calculator, Binary Runner, Emoji and Dmenu-mode          |
 | **Tools**    | Clipboard, DeepL translation, and Screen recording                                               |
@@ -37,6 +37,7 @@ Why does this exist? Because all the well-known Quickshell setups focus too much
 | `bar`                | `toggle`, `hide`, `show`, `isVisible`                                              | Control or query bar visibility                                    |
 | `bluetooth`          | `toggle`, `open`, `close`                                                          | Show or hide the Bluetooth menu                                    |
 | `clipboard`          | `toggle`, `open`, `close`, `refresh`, `copySelected`, `deleteSelected`             | Control the clipboard picker                                       |
+| `drives`             | `status`, `refresh`, `mount <dev>`, `unmount <dev>`, `poweroff <dev>`, `open <dev>` | Inspect and control removable drives                              |
 | `idle`               | `toggle`, `isDisabled`, `settings`                                                 | Control idle handling or open its settings                         |
 | `launcher`           | `toggle`, `open`, `close`, `apps`, `search`, `run`, `emoji`, `files`, `calculator` | Open, switch, or toggle launcher modes; `search` opens File Search |
 | `lock`               | `lock`                                                                             | Lock the session                                                   |

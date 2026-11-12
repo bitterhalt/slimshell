@@ -24,6 +24,7 @@ Additional tools are needed only for the features you use:
 | Calculator                 | `qalc`, `wl-copy`                                                         |
 | Emoji                      | An emoji list, described below; `wl-copy` to copy selections              |
 | Audio card profiles        | `pactl` and PipeWire's PulseAudio compatibility service                   |
+| Removable drives           | `udisks2` (`udisksctl`) and `lsblk`; `xdg-open` to open mountpoints       |
 | Screen recording           | `gpu-screen-recorder`, `notify-send`                                      |
 | Wallpaper picker           | Python 3, ImageMagick (`magick`), `awww`; Hellwal for generated colors    |
 | Translation                | Python 3, `wl-copy`, and a DeepL API key                                  |

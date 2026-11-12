@@ -71,6 +71,11 @@ ShellRoot {
         id: appNetworkService
     }
 
+    DriveService {
+        id: appDriveService
+        resumeService: appResumeService
+    }
+
     PrivacyService {
         id: appPrivacyService
     }
@@ -265,6 +270,7 @@ ShellRoot {
             bluetoothService: appBluetoothService
             audioService: appAudioService
             networkService: appNetworkService
+            driveService: appDriveService
             privacyService: appPrivacyService
             batteryService: appBatteryService
             weatherService: appWeatherService

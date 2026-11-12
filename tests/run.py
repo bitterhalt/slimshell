@@ -28,6 +28,7 @@ SUITES = {
     "privacy": [("python", "tests/privacy")],
     "clipboard": [("qml", "tests/clipboard"), ("python", "tests/clipboard")],
     "battery": [("python", "tests/battery")],
+    "drives": [("qml", "tests/drives"), ("python", "tests/drives")],
     "services": [("python", "tests/services")],
     "polkit": [("qml", "tests/polkit"), ("python", "tests/polkit")],
     "runner": [("python", "tests")],
