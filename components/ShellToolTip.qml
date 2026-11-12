@@ -76,7 +76,7 @@ PopupWindow {
             wrapMode: Text.Wrap
             color: root.config.fg
             font.family: root.config.textFontFamily
-            font.pointSize: root.config.textSizeSmall
+            font.pointSize: root.config.textSizeMedium
         }
     }
 }

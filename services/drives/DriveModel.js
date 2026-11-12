@@ -43,6 +43,13 @@ function validMountPath(path) {
     return typeof path === "string" && path.length > 1 && path.charAt(0) === "/";
 }
 
+function mountpointName(path) {
+    var value = String(path == null ? "" : path);
+    if (value.length > 1 && value.charAt(value.length - 1) === "/")
+        value = value.slice(0, -1);
+    return value.slice(value.lastIndexOf("/") + 1);
+}
+
 function mountCommand(path) {
     if (!validDevicePath(path))
         return [];
@@ -257,12 +264,15 @@ function tooltip(volume, error) {
     if (volume.locked)
         return parts.join(" · ") + " — locked (unlock via terminal)";
     if (volume.mounted) {
-        var line = parts.join(" · ") + " — mounted at " + volume.mountpoint;
+        // udisks mounts at /run/media/<user>/<label>; the chip already shows
+        // the label, so only spell out the path when it adds information.
+        var sameName = mountpointName(volume.mountpoint).toLowerCase() === String(volume.label || "").toLowerCase();
+        var line = parts.join(" · ") + (sameName ? " — mounted" : " — mounted at " + volume.mountpoint);
         if (volume.free !== "")
             line += " (" + volume.free + " free)";
-        return line + " · click to open · right-click to unmount";
+        return line + "\nclick to open · right-click to unmount";
     }
-    return parts.join(" · ") + " — click to mount and open";
+    return parts.join(" · ") + "\nclick to mount and open";
 }
 
 function nextCompactStage(compact, count) {
@@ -281,5 +291,5 @@ function compactTooltip(volumes) {
         if (list[i] && list[i].mounted)
             mounted++;
     }
-    return list.length + " removable volumes · " + mounted + " mounted · click to expand";
+    return list.length + " removable volumes · " + mounted + " mounted\nclick to expand";
 }

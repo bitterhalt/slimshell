@@ -191,6 +191,7 @@ Item {
             compare(chip("/dev/disk0p1"), null);
             const tooltip = compact.resources.find(resource => resource.objectName === "driveCompactTooltip");
             verify(tooltip.text.includes("5 removable volumes"));
+            verify(tooltip.text.includes("mounted\nclick to expand"));
             mouseClick(compact, compact.width / 2, compact.height / 2, Qt.LeftButton);
             verify(!fakeService.compact);
             wait(50);
@@ -202,13 +203,20 @@ Item {
             fakeService.volumes = [volume("/dev/sdb1", {
                     mounted: true,
                     mountpoint: "/run/media/user/STICK"
-                }), volume("/dev/sdc1")];
+                }), volume("/dev/sdc1"), volume("/dev/sde1", {
+                    label: "STICK",
+                    mounted: true,
+                    mountpoint: "/run/media/user/STICK"
+                })];
             wait(50);
             const mountedTip = tooltip("/dev/sdb1");
             verify(mountedTip.text.includes("mounted at /run/media/user/STICK"));
-            verify(mountedTip.text.includes("click to open"));
+            verify(mountedTip.text.includes("(8.0 GB free)\nclick to open"));
             verify(mountedTip.text.includes("right-click to unmount"));
-            verify(tooltip("/dev/sdc1").text.includes("click to mount and open"));
+            const sameNameTip = tooltip("/dev/sde1");
+            verify(sameNameTip.text.includes("— mounted (8.0 GB free)\nclick to open"));
+            verify(!sameNameTip.text.includes("/run/media/user/STICK"));
+            verify(tooltip("/dev/sdc1").text.includes("\nclick to mount and open"));
             fakeService.errorText = "Access denied";
             compare(tooltip("/dev/sdb1").text, "Drive bay: Access denied");
             fakeService.errorText = "";

@@ -376,6 +376,14 @@ TestCase {
         verify(Model.lsblkCommand().join(" ").includes("PARTTYPE,PARTTYPENAME"));
     }
 
+    function test_mountpoint_name_ignores_trailing_slash() {
+        compare(Model.mountpointName("/run/media/bazz/Ventoy"), "Ventoy");
+        compare(Model.mountpointName("/run/media/bazz/Ventoy/"), "Ventoy");
+        compare(Model.mountpointName("/mnt"), "mnt");
+        compare(Model.mountpointName(""), "");
+        compare(Model.mountpointName(null), "");
+    }
+
     function test_first_mountpoint_skips_blank_and_relative_lines() {
         compare(Model.firstMountpoint("/run/media/user/STICK\n"), "/run/media/user/STICK");
         compare(Model.firstMountpoint("\n  \n/boot/efi\n/media/data\n"), "/boot/efi");
@@ -411,7 +419,15 @@ TestCase {
             mountpoint: "/run/media/user/STICK",
             locked: false
         };
-        compare(Model.tooltip(mounted, ""), "STICK · 32.0 GB — mounted at /run/media/user/STICK (12.3 GB free) · click to open · right-click to unmount");
+        compare(Model.tooltip(mounted, ""), "STICK · 32.0 GB — mounted (12.3 GB free)\nclick to open · right-click to unmount");
+        compare(Model.tooltip({
+            label: "USB Stick",
+            size: "32.0 GB",
+            free: "12.3 GB",
+            mounted: true,
+            mountpoint: "/run/media/user/1234-ABCD",
+            locked: false
+        }, ""), "USB Stick · 32.0 GB — mounted at /run/media/user/1234-ABCD (12.3 GB free)\nclick to open · right-click to unmount");
         compare(Model.tooltip({
             label: "STICK",
             size: "32.0 GB",
@@ -419,7 +435,7 @@ TestCase {
             mounted: false,
             mountpoint: "",
             locked: false
-        }, ""), "STICK · 32.0 GB — click to mount and open");
+        }, ""), "STICK · 32.0 GB\nclick to mount and open");
         compare(Model.tooltip({
             label: "SECRET",
             size: "12.0 GB",
@@ -446,7 +462,7 @@ TestCase {
             {
                 mounted: true
             }
-        ]), "3 removable volumes · 2 mounted · click to expand");
+        ]), "3 removable volumes · 2 mounted\nclick to expand");
     }
 
     function test_find_volume_matches_exact_device_paths() {
