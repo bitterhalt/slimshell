@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 
@@ -58,21 +57,8 @@ PanelWindow {
 
         x: root.horizontalPadding
         y: root.verticalPadding
-        width: Math.max(timeText.implicitWidth, modeText.implicitWidth)
+        width: Math.max(timeText.implicitWidth, dateText.implicitWidth)
         spacing: 8
-
-        // Render the column to a texture so one shadow pass covers both labels.
-        layer.enabled: true
-        layer.effect: MultiEffect {
-            shadowEnabled: true
-            shadowColor: "#000000"
-            shadowOpacity: 0.6
-            shadowBlur: 0.6
-            shadowHorizontalOffset: 0
-            shadowVerticalOffset: 2
-        }
-
-
 
         Text {
             id: timeText
@@ -90,7 +76,7 @@ PanelWindow {
         }
 
         Text {
-            id: modeText
+            id: dateText
 
             width: labels.width
             renderType: Text.NativeRendering

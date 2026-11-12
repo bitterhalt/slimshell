@@ -1,6 +1,13 @@
 //@ pragma UseQApplication
 //@ pragma Env QT_QUICK_CONTROLS_STYLE=Basic
 
+////////////////////
+// RENDERING MODE //
+////////////////////
+// Remove first 2 "//" to run without GPU renderer. This is good way to save some RAM static shells like this one, since system does not need to load complex GPU stack.
+// Trade-off is larger CPU utilization, but IRL you probably wont see any difference with modern CPU. If you add some costly stuff like blurs and transistions use GPU
+////@ pragma Env QT_QUICK_BACKEND=software
+
 import QtQuick
 import Quickshell
 import Quickshell.Io
