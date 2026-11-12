@@ -12,6 +12,13 @@ function iconSource(icon, resolveIcon) {
     return icon.startsWith("/") || icon.startsWith("file:") ? icon : resolveIcon(icon, true)
 }
 
+// Toasts and history must resolve the same hint the same way: the app icon
+// wins, and an image hint only contributes when it is an image://icon/ path.
+function appIconSource(notification, resolveIcon) {
+    const icon = notification ? (notification.appIcon || iconFromImage(notification.image)) : ""
+    return iconSource(icon, resolveIcon)
+}
+
 function collapsedCardHeight(config) {
     // One summary line, one reserved body-preview line, compact spacing and
     // padding. Keep this shared with NotificationCenter's size estimate.

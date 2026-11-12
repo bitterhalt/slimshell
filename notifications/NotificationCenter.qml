@@ -59,8 +59,7 @@ FocusScope {
     }
 
     function historyIconSource(notification) {
-        const icon = notification ? (notification.appIcon || HistoryModel.iconFromImage(notification.image)) : "";
-        return HistoryModel.iconSource(icon, (name, fallback) => Quickshell.iconPath(name, fallback));
+        return HistoryModel.appIconSource(notification, (name, fallback) => Quickshell.iconPath(name, fallback));
     }
 
     HistoryState {

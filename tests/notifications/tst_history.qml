@@ -358,6 +358,32 @@ Item {
             compare(resolved.length, 1);
         }
 
+        function test_app_icon_source_matches_history_resolution() {
+            let resolved = [];
+            const resolve = (name, fallback) => {
+                resolved.push([name, fallback]);
+                return "/icons/" + name;
+            };
+            compare(Model.appIconSource({
+                appIcon: "camera",
+                image: "image://icon//tmp/shot.png"
+            }, resolve), "/icons/camera");
+            compare(Model.appIconSource({
+                appIcon: "",
+                image: "image://icon/camera"
+            }, resolve), "/icons/camera");
+            compare(Model.appIconSource({
+                appIcon: "",
+                image: "image://icon//tmp/shot.png"
+            }, resolve), "/tmp/shot.png");
+            compare(Model.appIconSource({
+                appIcon: "",
+                image: "file:///tmp/shot.png"
+            }, resolve), "");
+            compare(Model.appIconSource(null, resolve), "");
+            compare(resolved.length, 2);
+        }
+
         function test_image_hints_are_icons_not_large_previews() {
             compare(Model.iconFromImage("image://icon/camera"), "camera");
 

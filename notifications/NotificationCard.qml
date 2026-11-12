@@ -1,9 +1,9 @@
 import "../components/CriticalColors.js" as CriticalColors
 import "HistoryModel.js" as HistoryModel
 import QtQuick
+import QtQuick.Window
 import Quickshell
 import Quickshell.Services.Notifications
-import Quickshell.Widgets
 
 // Toast preview only. Full text and actions belong to notification history.
 Rectangle {
@@ -12,7 +12,6 @@ Rectangle {
     required property var config
     property var notification: null
     readonly property int appIconSize: 36
-    readonly property string imageIcon: HistoryModel.iconFromImage(notification ? notification.image : "")
     readonly property bool critical: notification && notification.urgency === NotificationUrgency.Critical
     readonly property color criticalBorderColor: CriticalColors.border
     readonly property color criticalTextColor: CriticalColors.text
@@ -34,17 +33,24 @@ Rectangle {
         width: root.appIconSize
         height: width
 
-        IconImage {
+        Image {
             id: appIcon
+            objectName: "notificationIcon"
 
             anchors.fill: parent
-            visible: !root.critical && source.toString() !== ""
-            source: HistoryModel.iconSource(root.notification ? (root.notification.appIcon || root.imageIcon) : "", (name, fallback) => Quickshell.iconPath(name, fallback))
+            source: root.critical ? "" : HistoryModel.appIconSource(root.notification, (name, fallback) => Quickshell.iconPath(name, fallback))
+            sourceSize.width: Math.ceil(width * Screen.devicePixelRatio * 2)
+            sourceSize.height: Math.ceil(height * Screen.devicePixelRatio * 2)
+            fillMode: Image.PreserveAspectFit
+            smooth: true
+            asynchronous: true
+            visible: status === Image.Ready
         }
 
         Text {
+            objectName: "notificationFallbackIcon"
             anchors.centerIn: parent
-            visible: root.critical || !appIcon.visible
+            visible: !appIcon.visible
             color: root.critical ? root.criticalTextColor : config.muted
             font.family: config.iconFontFamily
             font.pointSize: config.iconSize
