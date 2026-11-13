@@ -40,4 +40,4 @@
 
 ## Documentation
 
-- Keep README to basic features, usage, and structure; put setup details/examples in `assets/INSTALL.md`, not lengthy implementation explanations in README.
+- Keep README to basic features, usage, and structure; put setup details/examples in `assets/docs.md`, not lengthy implementation explanations in README.

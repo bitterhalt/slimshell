@@ -107,6 +107,20 @@ is already running. More IPC calls are listed in the [README](../README.md#featu
 
 ## 5. Set up optional features
 
+### Settings
+
+Edit root-level `settings.json` for appearance and behavior defaults. Changes are
+loaded automatically; invalid values use safe defaults, and malformed JSON keeps
+the previous settings. Idle timeouts, wallpaper preferences and workspace layout
+are adjusted through the UI and saved separately.
+
+Animations can be enabled or disabled in settings; each widget owns its style and timing.
+
+Edit `menus.json` to customize `user-menu1` through `user-menu4`; the fourth is an empty placeholder.
+Open one with `qs ipc call menu open user-menu1`.
+Changes reload automatically; invalid edits keep the last working menus. Power
+actions remain built in.
+
 ### Clipboard history
 
 Slimshell displays history but does not collect it. Add these Niri startup entries

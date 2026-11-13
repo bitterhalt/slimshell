@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="#features">Features</a> · <a href="#gallery">Gallery</a> · <a href="#launcher">Launcher</a> · <a href="#dmenu-mode">Dmenu mode</a> · <a href="assets/INSTALL.md">Installation</a>
+  <a href="#features">Features</a> · <a href="#gallery">Gallery</a> · <a href="#launcher">Launcher</a> · <a href="#dmenu-mode">Dmenu mode</a> · <a href="assets/docs.md">Installation</a>
 </p>
 
 ## Slimshell
@@ -85,26 +85,12 @@ Slimshell must be running. This is a small dmenu-compatible runner, not a full d
 
 ## Getting started
 
-Follow the [installation guide](assets/INSTALL.md) for dependencies, Niri startup,
+Follow the [installation guide](assets/docs.md) for dependencies, Niri startup,
 keybindings, and optional feature setup. Install into `~/.config/quickshell`, then run:
 
 ```bash
 qs -p "$HOME/.config/quickshell" --no-detailed-logs
 ```
-
-## Settings
-
-Edit root-level `settings.json` for appearance and behavior defaults. Changes are
-loaded automatically; invalid values use safe defaults, and malformed JSON keeps
-the previous settings. Idle timeouts, wallpaper preferences and workspace layout
-are adjusted through the UI and saved separately.
-
-Animations can be enabled or disabled in settings; each widget owns its style and timing.
-
-Edit `menus.json` to customize `user-menu1` through `user-menu4`; the fourth is an empty placeholder.
-Open one with `qs ipc call menu open user-menu1`.
-Changes reload automatically; invalid edits keep the last working menus. Power
-actions remain built in.
 
 ## Structure
 
