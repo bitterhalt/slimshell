@@ -58,7 +58,7 @@ Item {
                 // Deferred so the panel isn't destroyed inside its own signal
                 // handler; skipped if it was reopened during the fade-out.
                 Qt.callLater(() => {
-                    if (!opened)
+                    if (panelLoader && !opened)
                         panelLoader.active = false;
                 });
             }

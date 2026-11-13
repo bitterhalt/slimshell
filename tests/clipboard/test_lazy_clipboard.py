@@ -34,12 +34,22 @@ QtObject {
     required property var config
     required property var targetScreen
     property bool opened: false
+    property string previewPath: "/synthetic-runtime/clipboard-preview.img"
+    signal closed()
     Component.onCompleted: { config.created++; config.panel = root; }
+    Component.onDestruction: if (config.panel === root) config.panel = null
     function open() { opened = true; config.opens++; }
-    function close() { opened = false; config.closes++; }
+    function close() { opened = false; config.closes++; closed(); }
     function refresh() { config.refreshes++; }
     function copySelected() { config.copies++; }
     function deleteSelected() { config.deletes++; }
+}
+'''
+QUICKSHELL = '''pragma Singleton
+import QtQuick
+QtObject {
+    property var detached: []
+    function execDetached(command) { detached = detached.concat([command]); }
 }
 '''
 IPC = '''import QtQuick
@@ -50,6 +60,7 @@ QtObject {
 '''
 TEST = '''import QtQuick
 import QtTest
+import "."
 Item {
     id: host
     QtObject {
@@ -74,6 +85,7 @@ Item {
             fixture.created = fixture.opens = fixture.closes = 0;
             fixture.refreshes = fixture.copies = fixture.deletes = 0;
             fixture.panel = null;
+            Quickshell.detached = [];
             controller = createTemporaryObject(controllerComponent, host);
             verify(controller !== null);
         }
@@ -85,26 +97,43 @@ Item {
             controller.deleteSelected();
             compare(fixture.created, 0);
         }
-        function test_open_and_reuse() {
+        function test_close_destroys_and_reopen_creates_fresh_panel() {
             controller.open();
             verify(controller.opened);
             compare(fixture.created, 1);
             controller.close();
             verify(!controller.opened);
+            tryVerify(() => fixture.panel === null);
             controller.toggle();
             verify(controller.opened);
-            controller.toggle();
-            verify(!controller.opened);
+            compare(fixture.created, 2);
+            compare(fixture.opens, 2);
+        }
+        function test_reopen_during_close_keeps_the_same_panel() {
+            controller.open();
+            controller.close();
+            // Reopen before the deferred destroy runs.
+            controller.open();
+            verify(controller.opened);
             compare(fixture.created, 1);
             compare(fixture.opens, 2);
+            wait(0);
+            verify(controller.opened);
+        }
+        function test_close_removes_the_temp_preview() {
+            controller.open();
+            controller.close();
+            compare(Quickshell.detached.length, 1);
+            compare(Quickshell.detached[0].join(" "), "rm -f /synthetic-runtime/clipboard-preview.img");
         }
         function test_panel_close_updates_controller() {
             controller.open();
             fixture.panel.close();
             verify(!controller.opened);
+            tryVerify(() => fixture.panel === null);
             controller.toggle();
             verify(controller.opened);
-            compare(fixture.created, 1);
+            compare(fixture.created, 2);
         }
         function test_ipc_and_forwarded_actions() {
             const ipc = findChild(controller, "clipboard");
@@ -136,11 +165,16 @@ class LazyClipboardTests(unittest.TestCase):
         source = CONTROLLER.read_text()
         source = source.replace("import Quickshell\n", "")
         source = source.replace("import Quickshell.Io\n", "")
+        # Detached cleanup now goes through the Quickshell singleton, which the
+        # local qmldir registers as a double.
+        source = source.replace("import QtQuick\n", 'import QtQuick\nimport "."\n')
         with tempfile.TemporaryDirectory(prefix="clipboard-controller-") as folder:
             base = Path(folder)
             for name, text in {
                 "Clipboard.qml": source, "ClipboardPanel.qml": PANEL,
                 "LazyLoader.qml": LOADER, "IpcHandler.qml": IPC,
+                "Quickshell.qml": QUICKSHELL,
+                "qmldir": "singleton Quickshell 1.0 Quickshell.qml\n",
                 "tst_controller.qml": TEST,
             }.items():
                 (base / name).write_text(text)

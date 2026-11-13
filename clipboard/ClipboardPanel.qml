@@ -11,7 +11,7 @@ PanelWindow {
     required property var config
     required property var targetScreen
 
-    signal closed()
+    signal closed
 
     property bool opened: false
     property string query: ""
@@ -56,6 +56,9 @@ PanelWindow {
         selectedIndex = -1;
         selectedText = "";
         previewReady = false;
+        // The panel can be reused when reopened during the close fade, so the
+        // visible prompt has to be reset explicitly as well as the query.
+        searchInput.text = "";
         opened = true;
         refresh();
         Qt.callLater(() => searchInput.forceActiveFocus());
@@ -244,6 +247,7 @@ PanelWindow {
 
             TextInput {
                 id: searchInput
+                objectName: "clipboardSearchInput"
 
                 renderType: Text.NativeRendering
                 anchors.left: searchFrame.left

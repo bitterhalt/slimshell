@@ -31,7 +31,9 @@ class ClipboardLayoutTests(unittest.TestCase):
 import QtQuick
 QtObject {
     property int processId: 42
+    property var detached: []
     function env(name) { return "/synthetic-runtime"; }
+    function execDetached(command) { detached = detached.concat([command]); }
 }''',
                 "PanelWindow": '''import QtQuick
 Window {
@@ -100,6 +102,38 @@ Item {
             compare(footer.x, 0);
             compare(surface.height - footer.y - footer.height, 0);
             verify(footer.height > fixtureConfig.panelPadding * 2);
+        }
+        function test_reopen_clears_the_prompt() {
+            const window = createTemporaryObject(panelComponent, host);
+            window.open();
+            waitForPolish(window);
+            const surface = findChild(window.contentItem, "clipboardSurface");
+            const input = findChild(surface, "clipboardSearchInput");
+            verify(input !== null);
+            input.text = "image";
+            compare(window.query, "image");
+            window.close();
+            window.open();
+            compare(input.text, "");
+            compare(window.query, "");
+        }
+        function test_copy_is_detached_before_the_panel_closes() {
+            Quickshell.detached = [];
+            const window = createTemporaryObject(panelComponent, host);
+            window.opened = true;
+            waitForPolish(window);
+            window.entries = [{
+                id: "7",
+                raw: "7\\tcopied text",
+                mime: "text",
+                preview: "copied text",
+                isImage: false
+            }];
+            window.selectedIndex = 0;
+            window.copySelected();
+            compare(Quickshell.detached.length, 1);
+            verify(Quickshell.detached[0].join(" ").includes("wl-copy"));
+            verify(!window.opened);
         }
     }
 }
