@@ -11,6 +11,8 @@ PanelWindow {
     required property var config
     required property var targetScreen
 
+    signal closed()
+
     property bool opened: false
     property string query: ""
     property var entries: []
@@ -81,10 +83,13 @@ PanelWindow {
         pendingImageId = "";
         pendingTextId = "";
         previewEntryId = "";
+
+        // If an image decode is still running, wait for it to exit
+        // (its onExited emits closed()). Otherwise we're done now.
         if (imagePreviewProcess.running)
             imagePreviewProcess.signal(15);
         else
-            cleanupPreview.running = true;
+            closed();
     }
 
     function refresh(): void {
@@ -155,8 +160,8 @@ PanelWindow {
 
         if (!entry)
             return;
-        copyProcess.command = ["sh", "-lc", "printf '%s\\n' \"$1\" | cliphist decode | wl-copy", "clipboard-copy", entry.raw];
-        copyProcess.running = true;
+        // Detached so the copy survives the panel being destroyed.
+        Quickshell.execDetached(["sh", "-lc", "printf '%s\\n' \"$1\" | cliphist decode | wl-copy", "clipboard-copy", entry.raw]);
         close();
     }
 
@@ -501,12 +506,8 @@ PanelWindow {
             if (root.pendingImageId !== "")
                 root.startPendingImagePreview();
             else if (!root.opened && !popupMotion.closing)
-                cleanupPreview.running = true;
+                root.closed();
         }
-    }
-
-    Process {
-        id: copyProcess
     }
 
     Process {
@@ -537,16 +538,5 @@ PanelWindow {
                 }
             }
         }
-    }
-
-    Process {
-        id: cleanupPreview
-
-        command: ["rm", "-f", root.previewPath]
-    }
-
-    Component.onDestruction: {
-        if (opened)
-            cleanupPreview.running = true;
     }
 }

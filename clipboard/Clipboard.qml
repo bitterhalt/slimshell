@@ -14,7 +14,7 @@ Item {
     readonly property bool opened: panel ? panel.opened : false
 
     function open(): void {
-        // Construct synchronously on first use, then retain for fast reuse.
+        // Construct synchronously; the panel is destroyed again after it closes.
         panelLoader.active = true;
         panel.open();
     }
@@ -50,6 +50,18 @@ Item {
         ClipboardPanel {
             config: root.config
             targetScreen: root.targetScreen
+
+            onClosed: {
+                // Detached so the temp preview image is removed even though
+                // the panel (and its Process objects) is about to be destroyed.
+                Quickshell.execDetached(["rm", "-f", previewPath]);
+                // Deferred so the panel isn't destroyed inside its own signal
+                // handler; skipped if it was reopened during the fade-out.
+                Qt.callLater(() => {
+                    if (!opened)
+                        panelLoader.active = false;
+                });
+            }
         }
     }
 
